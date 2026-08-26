@@ -4,6 +4,8 @@ frontend/node_modules/
 
 # Python
 backend/venv/
+backend/.venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -12,8 +14,11 @@ __pycache__/
 dist/
 build/
 
-# Environment
+# Environment — covers frontend/.env.local, mobile/.env, etc. (any dotted
+# env variant anywhere in the tree), while still allowing checked-in examples.
 .env
+.env.*
+!**/.env.example
 backend/.env
 
 # Next.js
@@ -74,3 +79,9 @@ rag/chroma_db/
 mobile/.expo/
 mobile/ios/
 mobile/android/
+
+# Local data/upload directories — never commit patient-derived files
+/data/
+/uploads/
+backend/data/
+backend/uploads/

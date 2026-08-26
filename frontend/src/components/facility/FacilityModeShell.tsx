@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { FacilityProvider } from "@/context/FacilityContext";
 import { FacilityNav } from "./FacilityNav";
+import { EmergencyBar } from "@/components/ui/EmergencyBar";
 
 function FacilityChromeEffect() {
   useEffect(() => {
@@ -18,8 +19,11 @@ export function FacilityModeShell({ children }: { children: React.ReactNode }) {
   return (
     <FacilityProvider>
       <FacilityChromeEffect />
-      <FacilityNav />
-      {children}
+      <div className="flex flex-col h-full min-h-0">
+        <FacilityNav />
+        <div className="flex-1 flex flex-col min-h-0">{children}</div>
+        <EmergencyBar />
+      </div>
     </FacilityProvider>
   );
 }

@@ -2,6 +2,8 @@
 
 > All names, scenarios, and clinical details are fictional composites created for demonstration purposes. They do not represent any real individual.
 
+> **Security note:** the owner/admin passwords listed below (`DemoOwner2026!`, `DemoAdmin2026!`) are hardcoded defaults in `scripts/seed_demo.py` and are therefore public — anyone with this repo has them. They're fine for a local, non-internet-reachable database. If you seed a shared or internet-reachable environment, set `SEED_OWNER_PASSWORD` and `SEED_ADMIN_PASSWORD` first so real credentials aren't the public ones below.
+
 ## How to Seed
 
 ```bash
@@ -9,7 +11,7 @@ cd backend
 python scripts/seed_demo.py
 ```
 
-Requires: Database running + migrated (`alembic upgrade head`), `CONVERSATION_ENCRYPTION_KEY` and `JWT_SECRET_KEY` set in `.env`.
+Requires: Database running + migrated (`alembic upgrade head`), `CONVERSATION_ENCRYPTION_KEY` and `JWT_SECRET_KEY` set in `.env`. Optional: `SEED_OWNER_PASSWORD` / `SEED_ADMIN_PASSWORD` to override the public default demo passwords (see security note above).
 
 ---
 

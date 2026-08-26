@@ -31,6 +31,7 @@ Prints all access codes and PINs at the end.
 """
 
 import asyncio
+import os
 import sys
 import json
 from datetime import datetime, timedelta, timezone
@@ -169,11 +170,30 @@ FACILITY = {
 }
 
 # ─── B2B STAFF ───────────────────────────────────────────────────────────
+#
+# The owner/admin passwords below are committed to source control and are
+# therefore public. They exist only so `docs/demo-data.md` has a stable,
+# reproducible login for local/ephemeral demo use. Anyone who seeds a
+# shared or internet-reachable environment MUST override them via
+# SEED_OWNER_PASSWORD / SEED_ADMIN_PASSWORD rather than relying on these
+# defaults, since the defaults are effectively public credentials.
+_DEFAULT_OWNER_PASSWORD = "DemoOwner2026!"
+_DEFAULT_ADMIN_PASSWORD = "DemoAdmin2026!"
+_owner_password = os.environ.get("SEED_OWNER_PASSWORD", _DEFAULT_OWNER_PASSWORD)
+_admin_password = os.environ.get("SEED_ADMIN_PASSWORD", _DEFAULT_ADMIN_PASSWORD)
+if _owner_password == _DEFAULT_OWNER_PASSWORD or _admin_password == _DEFAULT_ADMIN_PASSWORD:
+    print(
+        "WARNING: seeding with the default demo owner/admin passwords, which "
+        "are public (committed to source control). Set SEED_OWNER_PASSWORD "
+        "and SEED_ADMIN_PASSWORD before seeding anything other than a local, "
+        "non-internet-reachable database.",
+        file=sys.stderr,
+    )
 
 STAFF = [
-    {"name": "Patricia Donnelly", "role": "owner", "pin": "7734", "email": "trish.donnelly@demo.calmguide.app", "password": "DemoOwner2026!", "shift": "day", "lang": "en-US"},
-    {"name": "James Okafor", "role": "admin", "pin": "4521", "email": "james.okafor@demo.calmguide.app", "password": "DemoAdmin2026!", "shift": "day", "lang": "en-US"},
-    {"name": "Priya Nair", "role": "admin", "pin": "3309", "email": "priya.nair@demo.calmguide.app", "password": "DemoAdmin2026!", "shift": "evening", "lang": "en-US"},
+    {"name": "Patricia Donnelly", "role": "owner", "pin": "7734", "email": "trish.donnelly@demo.calmguide.app", "password": _owner_password, "shift": "day", "lang": "en-US"},
+    {"name": "James Okafor", "role": "admin", "pin": "4521", "email": "james.okafor@demo.calmguide.app", "password": _admin_password, "shift": "day", "lang": "en-US"},
+    {"name": "Priya Nair", "role": "admin", "pin": "3309", "email": "priya.nair@demo.calmguide.app", "password": _admin_password, "shift": "evening", "lang": "en-US"},
     {"name": "Linda Reyes", "role": "staff", "pin": "1111", "shift": "day", "lang": "en-US"},
     {"name": "Marie-Claire Beaumont", "role": "staff", "pin": "2222", "shift": "day", "lang": "en-US"},
     {"name": "Aisha Thompson", "role": "staff", "pin": "3333", "shift": "day", "lang": "en-US"},

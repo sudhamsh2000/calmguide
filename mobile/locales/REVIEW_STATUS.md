@@ -1,5 +1,12 @@
 # Translation Review Status
 
+MVP-validated languages (English, Spanish, Hindi — see
+`backend/app/services/language_support.py`) are the tier CalmGuide is
+prioritizing for review; all other languages here are experimental. Being
+"MVP-validated" is a support-priority designation, not a claim that review is
+complete — as this table shows, `crisis.json` review is still pending for
+Spanish and Hindi too.
+
 ## Safety-Critical Files (require professional review)
 
 | File | es | zh | hi | ar | fr | pt-BR | ja | de | ko |

@@ -323,6 +323,7 @@ def create_app() -> FastAPI:
     from app.routers.facility_executive import router as facility_executive_router
     from app.routers.facility_audit import router as facility_audit_router
     from app.routers.facility_report import router as facility_report_router
+    from app.routers.languages import router as languages_router
 
     app.include_router(health_router)
     app.include_router(profile_router, prefix="/api")
@@ -344,6 +345,7 @@ def create_app() -> FastAPI:
     app.include_router(facility_executive_router, prefix="/api")
     app.include_router(facility_audit_router, prefix="/api")
     app.include_router(facility_report_router, prefix="/api")
+    app.include_router(languages_router, prefix="/api")
 
     # Consistent error format: {"error": str, "code": str}
     @app.exception_handler(HTTPException)

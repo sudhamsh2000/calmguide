@@ -1,5 +1,6 @@
 """Caregiver Check-In streaming endpoint."""
 
+import asyncio
 import json
 import logging
 
@@ -27,11 +28,29 @@ from app.services.response_guard import (
     guard_response_text,
     validate_response_quality,
 )
-from app.services.safety_gate import check_safety_gate
+from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
+from app.services.safety_classifier import classify_message
+from app.services.safety_log import log_safety_event
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["checkin"])
+
+# Strong references to in-flight background log writes — see coach.py's
+# `_spawn_background` for why a bare asyncio.create_task isn't safe here.
+_BACKGROUND_TASKS: set[asyncio.Task] = set()
+
+
+def _spawn_background(coro, label: str) -> None:
+    async def _guarded() -> None:
+        try:
+            await coro
+        except Exception:
+            logger.exception("Background task %s failed", label)
+
+    task = asyncio.create_task(_guarded())
+    _BACKGROUND_TASKS.add(task)
+    task.add_done_callback(_BACKGROUND_TASKS.discard)
 
 
 @router.post(
@@ -65,8 +84,39 @@ async def caregiver_checkin(
     language = resolve_language(locale_header)
     language_constraint = resolve_language_constraint(locale_header)
     safety = check_safety_gate(payload.message, locale_code=locale_code)
+    safety_source = "deterministic_gate"
+    classifier_confidence: float | None = None
+
+    if not safety.triggered:
+        classifier_result = classify_message(payload.message)
+        if classifier_result.flagged and classifier_result.category is not None:
+            gate_type = SafetyGateType(classifier_result.category.value)
+            safety = type(safety)(
+                triggered=True,
+                gate_type=gate_type,
+                response_text=build_gate_response_text(gate_type, locale_code),
+            )
+            safety_source = "classifier"
+            classifier_confidence = classifier_result.confidence
+
     if safety.triggered:
+        safety_gate_type = safety.gate_type
+        safety_event_source = safety_source
+        safety_event_confidence = classifier_confidence
+        safety_profile_id = profile.id
+
+        async def _log_safety_gate_event() -> None:
+            await log_safety_event(
+                event_type="safety_gate_triggered",
+                source=safety_event_source,
+                category=safety_gate_type.value if safety_gate_type else None,
+                profile_id=safety_profile_id,
+                locale_code=locale_code,
+                confidence=safety_event_confidence,
+            )
+
         async def safety_stream():
+            _spawn_background(_log_safety_gate_event(), label="checkin-safety-log")
             yield f"data: {json.dumps({'text': safety.response_text})}\n\n"
             yield "data: [DONE]\n\n"
         return StreamingResponse(

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { FacilityProvider, useFacility } from "@/context/FacilityContext";
 import { FacilityNav } from "@/components/facility/FacilityNav";
+import { EmergencyBar } from "@/components/ui/EmergencyBar";
 
 function FacilityAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -49,6 +50,7 @@ function FacilityAuthGuard({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-h-0">
         {children}
       </div>
+      {!isLoginPage && <EmergencyBar />}
     </div>
   );
 }

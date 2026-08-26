@@ -21,6 +21,8 @@ from app.models.staff import Staff
 from app.services.rate_limit import rate_limit
 from app.services.rbac import get_current_staff, staff_can_access_profile
 from app.schemas.coach import (
+    AcuteChangeScreenRequest,
+    AcuteChangeScreenResponse,
     ConversationListResponse,
     ConversationMessage,
     ConversationMessagesResponse,
@@ -44,7 +46,13 @@ from app.services.response_guard import (
     guard_response_text,
     validate_response_quality,
 )
-from app.services.safety_gate import check_safety_gate
+from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
+from app.services.safety_classifier import classify_message
+from app.services.safety_log import log_safety_event
+from app.services.acute_change_screen import (
+    AcuteChangeScreenInput,
+    evaluate_acute_change_screen,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -124,12 +132,18 @@ async def _persist_and_learn(
     user_message: str,
     llm,
 ) -> None:
-    """Save the assistant turn, then fold this session into the memory graph.
+    """DICE: Evaluate — fold this session into the memory graph.
 
+    Save the assistant turn, then fold this session into the memory graph.
     Ordered so each step sees the previous one's writes: message → tags →
     incident extraction → insights → dossier. The dossier runs last precisely
     because extraction may have just added an incident, and running it here
     keeps its narrative generation off the next crisis request's critical path.
+
+    The caregiver-reported `intervention_outcome` on an extracted incident
+    (set later via the incidents API, not here) is what actually closes the
+    Evaluate loop — this function creates the incident that outcome later
+    attaches to. See app.services.dice_workflow.EVALUATE.
     """
     from app.db import get_session_factory
 
@@ -433,6 +447,11 @@ async def coach_chat(
     staff: Staff | None = Depends(get_current_staff),
     _rl: None = Depends(rate_limit("coach")),
 ):
+    # DICE: Describe — payload.message IS the description (Moment Coach is
+    # conversational intake, not a structured form). For a new/sudden change,
+    # the caller is expected to have already run /coach/acute-change-screen,
+    # which captures onset/context in structured form. See
+    # app.services.dice_workflow.DESCRIBE.
     profile = None
     # Audit attribution is derived from the verified JWT, never from the body.
     audit_staff_id: str | None = None
@@ -513,9 +532,12 @@ async def coach_chat(
         return await _fetch_rag_context(retrieval_query)
 
     async def _db_context() -> dict[str, Any]:
-        """Cross-patient + dossier + incident reads. These share the request
+        """DICE: Investigate — profile, prior triggers, and behavior history.
+
+        Cross-patient + dossier + incident reads. These share the request
         session, so they run sequentially with respect to each other (an
-        AsyncSession is not safe for concurrent statements)."""
+        AsyncSession is not safe for concurrent statements). See
+        app.services.dice_workflow.INVESTIGATE for the full phase mapping."""
         ctx: dict[str, Any] = {
             "cross_patient_strategies": None,
             "dossier_text": "",
@@ -627,6 +649,8 @@ async def coach_chat(
     frequency_trends = _db_ctx["frequency_trends"]
     relevant_incident_dicts = _db_ctx["relevant_incident_dicts"]
 
+    # DICE: Create — non-pharmacologic caregiver actions, structured into the
+    # four response sections. See app.services.dice_workflow.CREATE.
     system_prompt = render_coach_prompt(
         patient_name=payload.patient_name,
         disease_stage=profile.disease_stage,
@@ -652,8 +676,33 @@ async def coach_chat(
     messages = history + [{"role": "user", "content": payload.message}]
 
     safety = check_safety_gate(payload.message, locale_code=locale_code)
+    safety_source = "deterministic_gate"
+    classifier_confidence: float | None = None
+
+    # Second, lightweight (non-ML) classifier layer behind the deterministic
+    # gate: catches paraphrases/near-misses the regex gate doesn't match
+    # verbatim. Escalates using the identical locale-aware response text as
+    # the deterministic gate, so a caregiver never sees a "weaker" version of
+    # the same safety response depending on which layer caught it. The
+    # deterministic gate's decision is authoritative when it fires — this
+    # layer only adds coverage, it never suppresses a gate trigger.
+    if not safety.triggered:
+        classifier_result = classify_message(payload.message)
+        if classifier_result.flagged and classifier_result.category is not None:
+            gate_type = SafetyGateType(classifier_result.category.value)
+            safety = type(safety)(
+                triggered=True,
+                gate_type=gate_type,
+                response_text=build_gate_response_text(gate_type, locale_code),
+            )
+            safety_source = "classifier"
+            classifier_confidence = classifier_result.confidence
+
     if safety.triggered:
         safety_profile_id = profile.id
+        safety_gate_type = safety.gate_type
+        safety_event_source = safety_source
+        safety_event_confidence = classifier_confidence
 
         async def _save_safety_turn() -> None:
             from app.db import get_session_factory
@@ -678,16 +727,33 @@ async def coach_chat(
                 ))
                 await save_session.commit()
 
+        async def _log_safety_gate_event() -> None:
+            await log_safety_event(
+                event_type="safety_gate_triggered",
+                source=safety_event_source,
+                category=safety_gate_type.value if safety_gate_type else None,
+                profile_id=safety_profile_id,
+                session_id=session_id,
+                staff_id=audit_staff_id,
+                facility_id=audit_facility_id,
+                locale_code=locale_code,
+                confidence=safety_event_confidence,
+            )
+
         async def safety_stream():
             # Detached for the same reason as the main path: a safety-gated
             # turn is the last one that should go unrecorded if the caregiver
             # closes the app right after reading it.
             _spawn_background(_save_safety_turn(), label=f"safety:{session_id}")
+            _spawn_background(_log_safety_gate_event(), label=f"safety-log:{session_id}")
             yield f"data: {json.dumps({'session_id': session_id})}\n\n"
             yield f"data: {json.dumps({'text': safety.response_text})}\n\n"
             yield "data: [DONE]\n\n"
 
-        logger.info("Safety gate triggered (%s) for session %s", safety.gate_type, session_id)
+        logger.info(
+            "Safety gate triggered (%s, source=%s) for session %s",
+            safety.gate_type, safety_source, session_id,
+        )
         return StreamingResponse(
             safety_stream(),
             media_type="text/event-stream",
@@ -808,4 +874,103 @@ async def coach_chat(
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+@router.post(
+    "/coach/acute-change-screen",
+    response_model=AcuteChangeScreenResponse,
+    responses={404: {"model": ErrorResponse}},
+)
+async def acute_change_screen(
+    payload: AcuteChangeScreenRequest,
+    session: AsyncSession = Depends(get_session),
+    staff: Staff | None = Depends(get_current_staff),
+):
+    """Acute behavior-change / delirium SCREEN — call this before starting a
+    Moment Coach chat session for a new or sudden behavior change.
+
+    This is a screening prompt, not a diagnosis. See
+    app/services/acute_change_screen.py for the decision logic and its
+    CLINICAL-REVIEW-REQUIRED markers.
+    """
+    profile = None
+    audit_staff_id: str | None = None
+    audit_facility_id: str | None = None
+
+    if payload.profile_id:
+        if staff is None:
+            raise HTTPException(
+                status_code=401,
+                detail={"error": "Authentication required", "code": "AUTH_REQUIRED"},
+            )
+        result = await session.execute(
+            select(Profile).where(Profile.id == payload.profile_id)
+        )
+        profile = result.scalar_one_or_none()
+        if profile is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"error": "Profile not found", "code": "PROFILE_NOT_FOUND"},
+            )
+        if not await staff_can_access_profile(session, staff, payload.profile_id):
+            raise HTTPException(
+                status_code=403,
+                detail={"error": "Not authorized for this patient", "code": "PROFILE_FORBIDDEN"},
+            )
+        audit_staff_id = staff.id
+        audit_facility_id = staff.facility_id
+    elif payload.access_code:
+        code_hash = hash_access_code(payload.access_code)
+        result = await session.execute(
+            select(Profile).where(Profile.access_code_hash == code_hash)
+        )
+        profile = result.scalar_one_or_none()
+        if profile is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"error": "Profile not found", "code": "PROFILE_NOT_FOUND"},
+            )
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail={"error": "Either profile_id or access_code is required", "code": "MISSING_IDENTIFIER"},
+        )
+
+    answers = AcuteChangeScreenInput(
+        is_new_or_different=payload.is_new_or_different,
+        is_sudden_onset=payload.is_sudden_onset,
+        alertness_change=payload.alertness_change,
+        fever_or_infection_signs=payload.fever_or_infection_signs,
+        pain_signs=payload.pain_signs,
+        urinary_retention_signs=payload.urinary_retention_signs,
+        constipation_signs=payload.constipation_signs,
+        dehydration_signs=payload.dehydration_signs,
+        medication_change_recent=payload.medication_change_recent,
+        fall_recent=payload.fall_recent,
+        unsure=payload.unsure,
+    )
+    result_ = evaluate_acute_change_screen(answers)
+
+    _spawn_background(
+        log_safety_event(
+            event_type="acute_change_screen",
+            source="acute_change_screen",
+            category=result_.outcome.value,
+            profile_id=profile.id,
+            staff_id=audit_staff_id,
+            facility_id=audit_facility_id,
+            details={
+                "concerning_flags": result_.concerning_flags,
+                "is_uncertain": result_.is_uncertain,
+            },
+        ),
+        label=f"acute-change-screen:{profile.id}",
+    )
+
+    return AcuteChangeScreenResponse(
+        outcome=result_.outcome.value,
+        concerning_flags=result_.concerning_flags,
+        is_uncertain=result_.is_uncertain,
+        message=result_.message,
     )

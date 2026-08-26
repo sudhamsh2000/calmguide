@@ -6,12 +6,21 @@ import string
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.models.behavioral_dossier import BehavioralDossier
+from app.models.care_change_event import CareChangeEvent
+from app.models.conversation import Conversation
+from app.models.daily_checkin import DailyCheckin
+from app.models.facility_patient_link import FacilityPatientLink
+from app.models.incident import Incident
 from app.models.profile import Profile
+from app.models.profile_insights import ProfileInsights
+from app.models.response_feedback import ResponseFeedback
+from app.models.safety_event import SafetyEvent
+from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.services.auth import hash_access_code
 from app.services.crypto import decrypt, encrypt
 from app.schemas.profile import (
@@ -124,6 +133,59 @@ async def get_profile(
         previous_stage=profile.previous_stage,
         stage_changed_at=profile.stage_changed_at.isoformat() if profile.stage_changed_at else None,
     )
+
+
+@router.delete(
+    "/profiles/{access_code}",
+    status_code=204,
+    responses={404: {"model": ErrorResponse}},
+)
+async def delete_profile(
+    access_code: str,
+    session: AsyncSession = Depends(get_session),
+):
+    """Erase a profile and every record in the memory graph keyed to it.
+
+    Auth follows the same access-code lookup already used by GET/PUT on this
+    router. Facility-linked profiles (FacilityPatientLink /
+    StaffPatientAssignment) are erased too — this endpoint does not add a
+    separate facility-admin authorization layer beyond what GET/PUT already
+    have, since introducing one would be a bigger auth-model change than the
+    hardening pass this endpoint is part of.
+
+    response_feedback has no profile_id column (only conversation_id), so it's
+    deleted via a subquery over this profile's conversations.
+    """
+    profile = await _find_profile_by_code(session, access_code)
+    if profile is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"error": "Profile not found", "code": "PROFILE_NOT_FOUND"},
+        )
+
+    conversation_ids = (
+        select(Conversation.id).where(Conversation.profile_id == profile.id)
+    )
+    await session.execute(
+        delete(ResponseFeedback).where(
+            ResponseFeedback.conversation_id.in_(conversation_ids)
+        )
+    )
+    for model in (
+        Conversation,
+        BehavioralDossier,
+        Incident,
+        CareChangeEvent,
+        FacilityPatientLink,
+        SafetyEvent,
+        ProfileInsights,
+        DailyCheckin,
+        StaffPatientAssignment,
+    ):
+        await session.execute(delete(model).where(model.profile_id == profile.id))
+
+    await session.execute(delete(Profile).where(Profile.id == profile.id))
+    await session.commit()
 
 
 @router.put(

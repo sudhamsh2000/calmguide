@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     # attacks on the stored hashes. Falls back to CONVERSATION_ENCRYPTION_KEY
     # when unset so existing deployments keep working.
     ACCESS_CODE_HMAC_SECRET: str = ""
+    # Operational retention window, in days, for inactive profiles. This is a
+    # deployment-configurable knob, not a claim about any legal/regulatory
+    # retention requirement — no automatic sweep runs off it yet; a deployer
+    # who sets it is expected to wire it into their own scheduled job that
+    # calls DELETE /api/profiles/{access_code} (see app.routers.profile) for
+    # profiles inactive past this window. None (default) means no retention
+    # limit is enforced.
+    DATA_RETENTION_DAYS: int | None = None
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

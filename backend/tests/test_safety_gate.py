@@ -151,6 +151,91 @@ class TestSelfHarmGate:
         assert not result.triggered, f"Should NOT trigger on: {message}"
 
 
+class TestCaregiverHarmRiskGate:
+    """Caregiver disclosing fear of harming the care recipient → distinct deflection."""
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "I'm scared I might hurt him",
+            "I'm afraid I might hurt her if this keeps up",
+            "I feel like I'm going to snap",
+            "I feel like I am going to lose control",
+            "I almost hit him today and it scared me",
+            "I can't control my temper around mom anymore",
+            "I'm afraid of what I'll do if he wakes me up again tonight",
+        ],
+    )
+    def test_triggers_on_caregiver_harm_risk(self, message: str):
+        result = check_safety_gate(message)
+        assert result.triggered, f"Should trigger on: {message}"
+        assert result.gate_type == SafetyGateType.CAREGIVER_HARM_RISK
+        assert "988" in result.response_text or "crisis" in result.response_text.lower()
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "I'm so frustrated with him today, he asked the same question ten times",
+            "This is driving me crazy but I love him",
+            "I'm exhausted and frustrated",
+            "He hurt his hand trying to open a jar",
+        ],
+    )
+    def test_does_not_trigger_on_ordinary_frustration(self, message: str):
+        result = check_safety_gate(message)
+        assert not result.triggered, f"Should NOT trigger on: {message}"
+
+
+class TestElderAbuseNeglectGate:
+    """Disclosure of possible elder abuse/neglect → distinct deflection."""
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "My sister leaves her alone for days",
+            "She hasn't been fed in days when she stays with my brother",
+            "He has bruises I can't explain",
+            "The aide hits him when he refuses to cooperate",
+            "My brother neglects mom when he watches her",
+            "The facility locks him in his room at night",
+            "I'm afraid the aide is hurting him",
+        ],
+    )
+    def test_triggers_on_elder_abuse_neglect(self, message: str):
+        result = check_safety_gate(message)
+        assert result.triggered, f"Should trigger on: {message}"
+        assert result.gate_type == SafetyGateType.ELDER_ABUSE_NEGLECT
+        assert "1-800-677-1116" in result.response_text
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "She bruises easily because of her blood thinners",
+            "He forgets to eat unless I remind him",
+            "I feel neglectful when I can't visit as often as I'd like",
+        ],
+    )
+    def test_does_not_trigger_on_non_abuse_context(self, message: str):
+        result = check_safety_gate(message)
+        assert not result.triggered, f"Should NOT trigger on: {message}"
+
+
+class TestAmbiguousDistress:
+    """Ambiguous distress should not hard-trigger a deterministic gate."""
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "I don't know what to do anymore, everything feels heavy",
+            "I feel so lost lately",
+            "Some days I just don't know how much more I can take",
+        ],
+    )
+    def test_ambiguous_distress_does_not_hard_trigger(self, message: str):
+        result = check_safety_gate(message)
+        assert not result.triggered, f"Ambiguous distress should not hard-trigger gate: {message}"
+
+
 class TestPriorityOrder:
     """Life-threat takes priority when both patterns match."""
 

@@ -1,9 +1,11 @@
 # CalmGuide Memory Graph Design
 
-**Version:** 2026-07-26
+**Version:** 2026-08-26
 **Status:** Living document — formalizes the existing Behavioral Memory Layer as a memory graph; update when computation logic changes
 **Audience:** Team, LOF Gate 1 reviewers
 **Depends on:** [`docs/domain-catalog.md`](./domain-catalog.md) — entity fields/types are defined there; this doc covers how those entities connect, invalidate, and recompute as a graph of memory.
+
+**DICE cross-reference:** `BehavioralDossier`'s contraindicated/effective lists are the mechanism behind DICE's Evaluate phase — see `app/services/dice_workflow.py` for the phase-to-code mapping. `get_relevant_incidents` (§5.1's sibling in `services/incident_retriever.py`) and `compute_dossier` are the two read paths a caregiver's memory can reach the coach prompt through; `backend/tests/test_behavioral_memory_isolation.py` regression-tests that neither ever returns another profile's data.
 
 **Framing note:** there is no literal graph database here — this is a relational schema (Postgres) that *behaves* like a memory graph: an anchor node per patient, event nodes that accumulate over time, derived nodes that recompute from those events, and one global node shared anonymously across all patients. This doc names that structure explicitly so it can be reasoned about, extended, and reviewed as one system rather than as scattered tables.
 
@@ -178,6 +180,12 @@ This ordering matters for the Gate 1 tech-architecture doc: per-patient memory i
 - No node in the per-patient memory graph carries patient name — `CoachRequest.patient_name` is explicitly transient and never persisted (see domain catalog §5).
 - The only edge that crosses from per-patient memory into global memory is the nightly aggregation from `ResponseFeedback` → `CrossPatientStrategies`, and it is one-directional, count-only, and gated by the k≥5 floor — there is no path by which a specific patient's data could be reconstructed from the global node.
 
+### 7.1 Deleting a profile
+
+`DELETE /api/profiles/{access_code}` (`app/routers/profile.py`) erases a profile and every raw/derived node keyed to it: `conversations`, `behavioral_dossier`, `incidents`, `care_change_events`, `facility_patient_links`, `safety_events`, `profile_insights`, `daily_checkin`, `staff_patient_assignments`, plus `response_feedback` (deleted via a subquery over the profile's `conversation_id`s, since that table has no direct `profile_id` column). It does not touch `CrossPatientStrategies`, which by design holds no per-patient identifiers to delete. Auth is the same access-code lookup already used by this router's GET/PUT — there is no additional facility-admin authorization layer for facility-linked profiles yet (see §9).
+
+There is no automatic retention sweep. `Settings.DATA_RETENTION_DAYS` (`app/config.py`) is an optional deployment-configurable knob — not a claim about any legal/regulatory retention requirement — that a deployer can set and wire into their own scheduled job calling the delete endpoint for inactive profiles; unset (default), no retention limit is enforced and data persists until explicitly deleted.
+
 ---
 
 ## 8. Versioning & Staleness Semantics
@@ -190,7 +198,8 @@ This ordering matters for the Gate 1 tech-architecture doc: per-patient memory i
 
 ## 9. Gaps to Flag for Gate 1 Review
 
-- **No formal eviction/decay beyond the dossier's temporal weight function.** Data is never deleted from `Incident`/`Conversation`/`DailyCheckin` — "memory" here means down-weighted, not forgotten. Worth deciding explicitly whether that's the intended long-term data retention policy (relevant to any HIPAA/privacy documentation LOF asks for).
+- **No formal eviction/decay beyond the dossier's temporal weight function short of explicit deletion.** Data is never *automatically* removed from `Incident`/`Conversation`/`DailyCheckin` — "memory" here means down-weighted, not forgotten, unless a caregiver/deployer explicitly calls the profile-delete endpoint (§7.1). Worth deciding explicitly whether time-based auto-deletion should exist (relevant to any HIPAA/privacy documentation LOF asks for) — `DATA_RETENTION_DAYS` is a config placeholder for that, not an enforced policy.
+- **Profile deletion has no separate facility-admin authorization check.** `DELETE /api/profiles/{access_code}` (§7.1) uses the same bare-access-code auth as GET/PUT on that router, so anyone holding a facility-linked patient's access code can delete that patient's record — there's no additional check against `StaffPatientAssignment`/facility-admin role. Worth deciding whether facility-linked (B2B) profiles need a stronger deletion authorization path before Gate 1.
 - **`ProfileInsights` lacks the dirty-flag pattern `BehavioralDossier` has** — inconsistent invalidation strategy between the two derived nodes (see §4). Not a bug today, but a design inconsistency worth resolving or explicitly justifying before this doc is called final. Both are now recomputed by the same background pass, so the practical gap is narrower than it was.
 - **Care-change observation windows now apply to both derived nodes.** Spec S-07b requires pre-change data to be held out of cycle detection and risk scoring as well as the dossier; that was previously implemented only in the dossier, so a recently medicated patient could still be risk-scored on pre-change episodes. Both now share `services/care_window.py`, and the crisis prompt carries a "care change recorded N days ago" note so the model stops treating in-flux behaviour as an established pattern.
 - **Delirium/pain flags are heuristic proxies, not clinically validated signals** — `dossier.py`'s own logic uses trend spikes and a fixed 3-behavior-category proxy set. This should be described to caregivers/reviewers as a screening heuristic, not a diagnostic signal, consistent with CalmGuide's "never diagnose" safety principle.

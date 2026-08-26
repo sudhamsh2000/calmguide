@@ -13,6 +13,8 @@ from enum import Enum
 class SafetyGateType(str, Enum):
     LIFE_THREAT = "life_threat"
     SELF_HARM = "self_harm"
+    CAREGIVER_HARM_RISK = "caregiver_harm_risk"
+    ELDER_ABUSE_NEGLECT = "elder_abuse_neglect"
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,7 +32,7 @@ _LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
         r"\b(?:choking(?!\s+(?:up|back|on\s+tears))|choked(?!\s+up))\b",
         r"\b(?:(?:having\s+a\s+|is\s+having\s+a\s+|had\s+a\s+)seizure|convuls(?:ing|ions?)|seizing)\b",
         r"\b(?:unconscious|unresponsive|won'?t?\s+wake|fainted)\b",
-        r"\b(?:passed?\s+out\b(?!\s+(?:the|of|with|flying)))",
+        r"\b(?:passed?\s+out\b(?!\s+(?:the|of|with|flying|flyers|brochures|pamphlets|leaflets|candy|samples|cards|business\s+cards|awards|certificates|gifts|snacks|water\s+bottles)))",
         r"\b(?:collapsed?\s+(?:on|to|and|at))\b",
         r"\b(?:heart\s+attack|chest\s+pain|cardiac\s+arrest)\b",
         r"\b(?:(?:having\s+a\s+|is\s+having\s+a\s+|signs?\s+of\s+(?:a\s+)?)stroke|one\s+side\s+(?:of\s+)?(?:face|body)\s+droop\w*|face\s+(?:is\s+)?droop\w*|(?:speech\s+is\s+)?suddenly\s+slurred|slurred?\s+speech)\b",
@@ -43,11 +45,12 @@ _LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
         r"\b(?:electric\s+shock|electrocuted)\b",
         r"\b(?:anaphyla|allergic\s+reaction\s+and\s+(?:can'?t|cannot)\s+breathe)\b",
         r"\b(?:overdos(?:e|ed|ing))\b",
+        r"\b(?:turning\s+blue|(?:lips|face|skin)\s+(?:is\s+|are\s+|turned\s+|are\s+turning\s+)?blue|blue\s+around\s+the\s+lips)\b",
     ]
 ]
 
 _MULTILINGUAL_LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
-    re.compile(p)
+    re.compile(p, re.IGNORECASE)
     for p in [
         # Spanish
         r"(?:no\s+respira|no\s+puede\s+respirar|dejó\s+de\s+respirar|sin\s+pulso|ataque\s+al\s+corazón|ataque\s+cardíaco|infarto|convulsion(?:es|ando)|inconsciente|se\s+desmayó|derrame\s+cerebral|sobredosis|se\s+ahoga|no\s+reacciona|sangra\s+mucho)",
@@ -87,7 +90,7 @@ _SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 _MULTILINGUAL_SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
-    re.compile(p)
+    re.compile(p, re.IGNORECASE)
     for p in [
         # Spanish
         r"(?:quiero\s+morir|matarme|suicid(?:io|arme)|no\s+quiero\s+vivir|acabar\s+con\s+(?:todo|mi\s+vida)|hacerme\s+daño)",
@@ -109,6 +112,33 @@ _MULTILINGUAL_SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
         r"(?:சாக\s*(?:விரும்பு|ஆசை)|தற்கொலை|வாழ\s*விரும்பவில்லை|உயிரை\s*மாய்|என்னையே\s*(?:காயப்படுத்|கொல்ல))",
         # Arabic
         r"(?:أريد\s*(?:أن\s*)?أموت|انتحار|أقتل\s*نفسي|لا\s*أريد\s*(?:أن\s*)?أعيش|أنهي\s*حياتي|إيذاء\s*نفسي)",
+    ]
+]
+
+
+_CAREGIVER_HARM_RISK_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        r"\b(?:scared|afraid|terrified|worried)\s+(?:that\s+)?I\s+(?:might|could|will|would|am\s+going\s+to)\s+hurt\s+(?:him|her|them|myself|mom|dad|my\s+\w+)\b",
+        r"\bI\s+(?:might|could)\s+(?:hurt|snap\s+at|lose\s+it\s+with|lash\s+out\s+at)\s+(?:him|her|them|mom|dad)\b",
+        r"\bI\s+feel\s+like\s+I(?:'m|\s+am)\s+(?:going\s+to\s+)?(?:snap|lose\s+control|explode|hurt\s+(?:him|her|them))\b",
+        r"\bafraid\s+of\s+what\s+I(?:'ll|\s+will|\s+might)\s+do\b",
+        r"\bI\s+(?:almost|nearly)\s+(?:hit|hurt|shook|shoved)\s+(?:him|her|them|mom|dad)\b",
+        r"\bI\s+can'?t\s+(?:control|trust)\s+my(?:self|\s+anger|\s+temper)\s+(?:around|with)\s+(?:him|her|them|mom|dad)\b",
+    ]
+]
+
+_ELDER_ABUSE_NEGLECT_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        r"\bleaves?\s+(?:him|her|them|mom|dad)\s+alone\s+for\s+days\b",
+        r"\bhasn'?t\s+(?:been\s+)?(?:fed|bathed|changed|checked\s+on)\s+(?:in|for)\s+days\b",
+        r"\b(?:unexplained\s+)?bruises?\s+(?:I\s+can'?t\s+explain|that\s+(?:worry|concern|scare)\s+me)\b",
+        r"\b(?:my\s+\w+|the\s+aide|the\s+caregiver|the\s+staff)\s+(?:hits?|slaps?|slapped)\s+(?:him|her|them|mom|dad)\b",
+        r"\bneglect(?:ed|ing|s)?\s+(?:him|her|them|mom|dad)\b",
+        r"\blocks?\s+(?:him|her|them|mom|dad)\s+(?:in|out|in\s+(?:a|the)\s+room)\b",
+        r"\bwithholds?\s+(?:his|her|their)\s+(?:food|medication|meds)\b",
+        r"\bafraid\s+(?:someone|my\s+\w+|the\s+aide)\s+(?:is\s+)?(?:hurting|abusing|neglecting)\s+(?:him|her|them|mom|dad)\b",
     ]
 ]
 
@@ -188,6 +218,91 @@ Caregiver burnout is a recognized, serious condition — not a personal failure.
 If someone is in immediate physical danger, **call {emergency}**."""
 
 
+def _build_caregiver_harm_risk_response(locale_code: str) -> str:
+    """Deflection for caregivers disclosing fear of harming the care recipient.
+
+    This is distinct from self-harm: the risk here is directed outward, at a
+    moment of overwhelm/loss of control, not at the caregiver themselves.
+    # TODO(CLINICAL-LEGAL-REVIEW): Jurisdictions may impose mandatory-reporting
+    # or duty-to-warn obligations when a caregiver discloses risk of harming a
+    # dependent adult. CalmGuide does not implement any such logic today — this
+    # response only offers crisis resources and respite guidance. Any
+    # mandatory-reporting behavior must be reviewed by clinical/legal counsel
+    # and configured per jurisdiction before being added here.
+    """
+    nums = _get_locale_numbers(locale_code)
+    crisis = nums.get("crisis") or "your local crisis helpline"
+    emergency = nums["emergency"]
+    crisis_line = f"**Crisis Helpline** — Call **{crisis}** (24/7, free, confidential)"
+    if locale_code.lower().split("-", 1)[0] == "en":
+        crisis_line = "**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+    alzheimers_line = ""
+    if nums.get("alzheimers"):
+        alzheimers_line = f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}** (respite and caregiver-crisis support)"
+
+    return f"""## Please pause and get support right now.
+
+What you're describing — fearing you might hurt the person you care for — is a sign of caregiver burnout reaching a dangerous point. This is common, and it is not a moral failing, but it needs support right now, not later.
+
+**If you feel you're close to losing control in this moment:**
+- **Step away** — put the person somewhere safe and leave the room for a few minutes if you can
+- **Call for backup** — a family member, neighbor, or respite service to take over right now
+- **Reach out to one of these services immediately:**
+
+> {crisis_line}{alzheimers_line}
+
+If the person you care for is in immediate physical danger, **call {emergency}**.
+
+CalmGuide is not a substitute for crisis intervention or professional support. Please talk to a trained counselor today."""
+
+
+def _build_elder_abuse_neglect_response(locale_code: str) -> str:
+    """Deflection when a caregiver discloses possible abuse/neglect of the care recipient.
+
+    # TODO(CLINICAL-LEGAL-REVIEW): Elder abuse/neglect reporting obligations
+    # (mandatory reporter status, timelines, agencies) vary by jurisdiction and
+    # by the discloser's relationship to the patient (family caregiver vs.
+    # licensed facility staff). CalmGuide does not determine mandatory-reporter
+    # status or file reports. This response only surfaces the U.S. Eldercare
+    # Locator as a general resource. Jurisdiction-specific hotlines/agencies
+    # and any reporting-obligation logic must be added only after clinical/
+    # legal review.
+    """
+    nums = _get_locale_numbers(locale_code)
+    emergency = nums["emergency"]
+
+    return f"""## This is serious, and you did the right thing by saying something.
+
+What you're describing may be a sign of elder abuse or neglect. You don't have to figure out what to do about it alone.
+
+**In the U.S.:**
+> **Eldercare Locator** — Call **1-800-677-1116** (Mon–Fri, free, confidential) to be connected with your local Adult Protective Services agency
+
+**If the person is in immediate danger, call {emergency}.**
+
+If you're outside the U.S., search for "adult protective services" or "elder abuse hotline" plus your country or region.
+
+CalmGuide is not a substitute for a formal report to protective services. Trained agencies can assess the situation and involve the right people to help keep everyone safe."""
+
+
+_GATE_RESPONSE_BUILDERS = {
+    SafetyGateType.LIFE_THREAT: _build_911_response,
+    SafetyGateType.SELF_HARM: _build_988_response,
+    SafetyGateType.CAREGIVER_HARM_RISK: _build_caregiver_harm_risk_response,
+    SafetyGateType.ELDER_ABUSE_NEGLECT: _build_elder_abuse_neglect_response,
+}
+
+
+def build_gate_response_text(gate_type: SafetyGateType, locale_code: str = "en") -> str:
+    """Build the deflection response text for a given gate type.
+
+    Lets callers outside this module (e.g. the second-layer classifier) reuse
+    the exact same locale-aware deflection copy as the deterministic gate,
+    so a classifier-only match escalates identically to a regex match.
+    """
+    return _GATE_RESPONSE_BUILDERS[gate_type](locale_code)
+
+
 def check_safety_gate(message: str, locale_code: str = "en") -> SafetyGateResult:
     """Check user message against deterministic safety patterns.
 
@@ -225,6 +340,22 @@ def check_safety_gate(message: str, locale_code: str = "en") -> SafetyGateResult
                 triggered=True,
                 gate_type=SafetyGateType.SELF_HARM,
                 response_text=_build_988_response(locale_code),
+            )
+
+    for pattern in _CAREGIVER_HARM_RISK_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.CAREGIVER_HARM_RISK,
+                response_text=_build_caregiver_harm_risk_response(locale_code),
+            )
+
+    for pattern in _ELDER_ABUSE_NEGLECT_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.ELDER_ABUSE_NEGLECT,
+                response_text=_build_elder_abuse_neglect_response(locale_code),
             )
 
     return SafetyGateResult(triggered=False)
