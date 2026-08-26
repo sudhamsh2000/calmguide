@@ -346,6 +346,34 @@ Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, ex
 - [docs/superpowers/specs/](docs/superpowers/specs/) --- Design specs for each phase
 - [docs/superpowers/plans/](docs/superpowers/plans/) --- Implementation plans
 
+## Clinical Safety Hardening Roadmap
+
+CalmGuide is going through an ongoing hardening pass driven by an external faculty clinical review, tracked in priority tiers: **P0** (safety-critical), **P1** (clinical/architecture), **P2** (validation / real-world use), **P3** (product/interoperability). This is an engineering roadmap, not a clinical-validation claim --- see the caveats in [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for what has and hasn't actually been reviewed by a clinician.
+
+**Done:**
+
+- **P0 --- safety-critical**
+  - Deterministic safety gate (life-threat, self-harm, caregiver-harm-risk, elder-abuse/neglect) + heuristic fallback classifier ahead of every LLM call
+  - `SafetyEvent` audit logging wired into Moment Coach and check-in flows
+  - Acute-change / delirium screening endpoint (`POST /api/coach/acute-change-screen`), run before a Moment Coach session for a new or sudden behavior change
+  - EmergencyBar 911/988 fix on web
+- **P1 --- clinical/architecture**
+  - DICE (Describe-Investigate-Create-Evaluate) workflow mapping for Moment Coach intake
+  - Behavioral-memory retrieval refactor + design documentation ([docs/memory-graph-design.md](docs/memory-graph-design.md))
+  - Privacy/PHI hardening: cascading profile deletion (`DELETE /api/profiles/{code}`), `.gitignore` hardening against accidental PHI/venv/env commits, demo-seed passwords overridable via env vars instead of hardcoded
+  - Validated-vs-experimental language configuration (`GET /api/languages`, per-language native-review-pending status)
+- **P2 --- validation / real-world use**
+  - Safety red-team evaluation harness with regression-tested sensitivity/specificity/false-positive-rate floors ([docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md))
+
+**In progress / planned:**
+
+- **P2-12** --- Offline/degraded-mode support scaffolding
+- **P2-13** --- Response-timing instrumentation
+- **P2-14** --- Dependency/license manifest + license-mismatch report
+- **P3-15** --- Facility handoff data model + FHIR mapping
+- **P3-16** --- Correct the caregiver-prevalence statistic cited in product copy
+- **P3-17** --- Finish the README/ARCHITECTURE.md documentation pass (this section is part of that)
+
 ## License
 
 Proprietary. All rights reserved.
