@@ -15,7 +15,7 @@ CalmGuide helps family caregivers (typically 55-70 years old) navigate difficult
 Browser (Next.js)          Backend (FastAPI)          External Services
 ┌──────────────────┐       ┌──────────────────┐       ┌─────────────┐
 │                  │  SSE  │                  │Stream │  OpenAI /   │
-│  React App       │◄─────│  Crisis Router   │◄──────│  Anthropic  │
+│  React App       │◄─────│  Coach Router    │◄──────│  Anthropic  │
 │  (TypeScript)    │──────►│                  │──────►│  LLM API    │
 │                  │ REST  │                  │       └─────────────┘
 └──────────────────┘       │  ┌─────────────┐ │       ┌─────────────┐
@@ -35,7 +35,9 @@ Browser (Next.js)          Backend (FastAPI)          External Services
                            └──────────────────┘
 ```
 
-**Privacy:** Patient names are stored only in the browser (localStorage). The server never persists PII --- it stores clinical profiles (disease stage, behavioral patterns, calming strategies) linked by hashed access codes. All conversations and profile data are encrypted at rest with AES-256-GCM.
+**Privacy:** Patient names are stored only in the browser (localStorage). The server never persists PII --- it stores clinical profiles (disease stage, behavioral patterns, calming strategies) linked by hashed access codes. All conversations and profile data are encrypted at rest with AES-256-GCM. A caregiver can permanently erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, etc.) via `DELETE /api/profiles/{code}` --- see [Access Codes](#access-codes).
+
+**Safety:** Every message reaching the LLM first passes a deterministic regex safety gate (`backend/app/services/safety_gate.py`) covering life-threat, self-harm, caregiver-harm-risk, and elder-abuse/neglect signals across all supported languages, with a heuristic fallback classifier behind it to catch paraphrases the gate misses. See [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for the full two-layer design, the red-team evaluation harness used to regression-test it, and its explicit non-clinical-validation caveats and known gaps.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 
@@ -54,7 +56,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Cross-Patient Learning** | Anonymized strategy effectiveness across similar patient profiles, injected into LLM prompts |
 | **Impact Showcase** | Public page with real aggregate stats (families helped, sessions, languages) |
 | **Encryption** | AES-256-GCM for all conversations, profile data, and feedback at rest |
-| **11 Languages** | English, Spanish, French, German, Arabic, Hindi, Tamil, Japanese, Korean, Portuguese (BR), Chinese |
+| **Safety Gate + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier ahead of every LLM call; regression-tested via an engineering-authored red-team dataset (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)) |
+| **Acute-Change Screening** | Structured onset/context screening prompt for new or sudden behavior changes, run before a Moment Coach session starts |
+| **11 Languages, Tiered** | English, Spanish, French, German, Arabic, Hindi, Tamil, Japanese, Korean, Portuguese (BR), Chinese --- each tagged MVP-validated or experimental, with per-language native-review status (see `backend/app/services/language_support.py`) |
+| **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
 | **Mobile App** | React Native (Expo) with full feature parity |
 
 ## Tech Stack
@@ -69,7 +74,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | LLM | OpenAI gpt-4o-mini (default) or Anthropic Claude (switchable via env var) |
 | RAG | OpenAI text-embedding-3-large, pgvector hybrid search (semantic + full-text) |
 | Scheduling | APScheduler (in-process async, nightly insights + cross-patient aggregation) |
-| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 126+ tests) |
+| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 1500+ tests) |
 | Infrastructure | Docker Compose, Alembic migrations |
 
 ## Quick Start
@@ -132,11 +137,11 @@ cd ..
 python -m rag.pipeline
 ```
 
-This scrapes content from 6 trusted sources, embeds it, and stores it in PostgreSQL. Every crisis query will then automatically retrieve relevant guidance and inject it into the LLM prompt.
+This scrapes content from 6 trusted sources, embeds it, and stores it in PostgreSQL. Every Moment Coach query will then automatically retrieve relevant guidance and inject it into the LLM prompt.
 
 ## RAG Pipeline
 
-CalmGuide uses Retrieval-Augmented Generation to ground crisis responses in authoritative caregiving guidance. The pipeline scrapes, chunks, embeds, and stores content from trusted nonprofit and government sources.
+CalmGuide uses Retrieval-Augmented Generation to ground Moment Coach responses in authoritative caregiving guidance. The pipeline scrapes, chunks, embeds, and stores content from trusted nonprofit and government sources.
 
 ### Sources
 
@@ -162,7 +167,7 @@ Seed URLs (41 pages)
     |  retrieve.py         --- hybrid search: cosine similarity + full-text keyword boost
     |                         reranking by title overlap, top-3 injected into prompt
     |
- crisis_system.jinja2     --- {% if rag_context %} block
+ coach_system.jinja2      --- {% if rag_context %} block
 ```
 
 ### Hybrid Search
@@ -216,11 +221,14 @@ npx vitest run
 calmguide/
 ├── frontend/                   # Next.js 16 App Router
 │   ├── src/
-│   │   ├── app/                # Pages (welcome, profile, home, crisis, learn)
+│   │   ├── app/[locale]/       # Pages (welcome, profile, home, coach, learn, check-in,
+│   │   │                       #   incidents, journey, facility, login, impact)
 │   │   ├── components/ui/      # Shared UI (Button, Input, Card) with tests
 │   │   ├── features/           # Feature-specific components
-│   │   │   ├── crisis/         # Crisis Mode (input, footer, renderer, parser, streaming)
+│   │   │   ├── coach/          # Moment Coach (input, footer, renderer, parser, streaming)
+│   │   │   ├── checkin/        # Daily check-in / behavioral journal
 │   │   │   ├── home/           # Home screen, patient card, conversation history
+│   │   │   ├── incidents/      # Incident logging + verification
 │   │   │   ├── learn/          # Learning scenarios
 │   │   │   └── profile/        # Profile wizard, profile view
 │   │   ├── lib/                # API client, storage helpers, theme
@@ -232,18 +240,20 @@ calmguide/
 │   ├── app/
 │   │   ├── models/             # SQLAlchemy models (Profile, Conversation, DailyCheckin, etc.)
 │   │   ├── schemas/            # Pydantic v2 request/response schemas
-│   │   ├── routers/            # API endpoints (crisis, feedback, prediction, impact, etc.)
-│   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern detector
+│   │   ├── routers/            # API endpoints (coach, feedback, care_patterns/prediction,
+│   │   │                       #   impact, incidents, care_changes, languages, facility_*, etc.)
+│   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
+│   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam
 │   │   └── prompts/            # Jinja2 system prompt templates
-│   ├── tests/                  # pytest-asyncio tests (126+)
-│   └── alembic/                # Database migrations (4 revisions)
+│   ├── tests/                  # pytest-asyncio tests (1500+)
+│   └── alembic/                # Database migrations
 │
 ├── mobile/                     # React Native (Expo)
 │   ├── src/
-│   │   ├── app/                # Expo Router screens (tabs, crisis, check-in, impact)
+│   │   ├── app/                # Expo Router screens (tabs, coach, check-in, impact)
 │   │   ├── components/         # Shared components (PatternInsights, FeedbackWidget, etc.)
 │   │   └── lib/                # API client, i18n, storage, theme
-│   └── locales/                # i18n translations (11 languages)
+│   └── locales/                # i18n translations (11 languages) + REVIEW_STATUS.md
 │
 ├── rag/                        # RAG pipeline
 │   ├── scraper/                # Web scraper + token-based chunker
@@ -253,11 +263,14 @@ calmguide/
 │   ├── pipeline.py             # CLI: scrape -> chunk -> embed -> store
 │   └── config.py               # Pydantic settings (RAG_ env prefix)
 │
+├── docs/                       # SAFETY_ARCHITECTURE.md, memory-graph-design.md, DEFERRED.md, etc.
 ├── docker-compose.yml          # PostgreSQL + pgvector
 └── ARCHITECTURE.md             # Detailed architecture & data flow diagrams
 ```
 
 ## API Endpoints
+
+Caregiver-facing endpoints (all under `/api` unless noted):
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -265,7 +278,9 @@ calmguide/
 | POST | `/api/profiles` | Create profile, returns 8-char access code |
 | GET | `/api/profiles/{code}` | Lookup profile by access code |
 | PUT | `/api/profiles/{code}` | Update profile |
-| POST | `/api/crisis/chat` | Crisis Mode --- streaming SSE response |
+| DELETE | `/api/profiles/{code}` | Erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, etc.) |
+| POST | `/api/coach/chat` | Moment Coach --- streaming SSE response |
+| POST | `/api/coach/acute-change-screen` | Structured screening prompt for new/sudden behavior changes, run before a coach session |
 | GET | `/api/conversations/{code}` | List recent conversation sessions |
 | GET | `/api/conversations/{code}/{session_id}/messages` | Get messages for a session |
 | GET | `/api/learn/scenarios` | List learning scenarios |
@@ -273,18 +288,21 @@ calmguide/
 | POST | `/api/checkin` | Caregiver emotional check-in (streaming) |
 | POST | `/api/checkin/daily` | Daily behavioral log entry |
 | GET | `/api/checkin/daily/{code}/today` | Check if today's log exists |
-| POST | `/api/feedback` | Submit crisis response feedback (thumbs + tags) |
+| POST | `/api/feedback` | Submit Moment Coach response feedback (thumbs + tags) |
 | POST | `/api/feedback/skip` | Record dismissed feedback card |
 | GET | `/api/feedback/pending/{code}` | Get most recent unfeedback'd session |
 | GET | `/api/feedback/{code}/{session_id}` | Get all feedback for a session |
 | GET | `/api/insights/{code}` | Behavioral pattern insights for a profile |
-| GET | `/api/prediction/{code}` | Tonight's risk prediction |
+| GET | `/api/care-patterns/{code}` | Tonight's risk / episode-cycle prediction |
 | GET | `/api/strategies/{code}` | Cross-patient strategy recommendations |
+| GET | `/api/languages` | Supported languages, each tagged with validation tier + native-review status |
 | GET | `/api/impact` | Public aggregate impact metrics (no auth) |
 
-## Crisis Mode
+CalmGuide also ships a separate facility (B2B) staff-portal API under `/api/facilities/*` --- covering facility/staff registration, PIN/JWT auth, resident assignment, incidents, and admin dashboards/reports. See the `facility*` routers in `backend/app/routers/` for the current, authoritative list; it isn't fully enumerated here to avoid this table drifting out of sync with that surface.
 
-Crisis Mode is the core feature. It provides structured, AI-generated guidance when a caregiver faces a behavioral crisis.
+## Moment Coach
+
+Moment Coach is the core feature. It provides structured, AI-generated guidance when a caregiver faces a behavioral crisis.
 
 ### UX Flow
 
@@ -310,7 +328,7 @@ If the response cannot be parsed into sections, it falls back to full markdown r
 CalmGuide is designed for stressed, elderly caregivers using the app at 3am:
 
 - **Colors:** Calming teal palette (#2B7A78), warm off-white backgrounds, soft coral for errors
-- **Typography:** Nunito (body, 16px min), Nunito Sans (labels). Crisis content: 18px min
+- **Typography:** Nunito (body, 16px min), Nunito Sans (labels). Moment Coach content: 18px min
 - **Touch targets:** 48x48px minimum for all interactive elements
 - **Dark mode:** Auto-activates 8pm-6am, follows system preference, manual toggle
 - **Accessibility:** WCAG AA contrast ratios, keyboard navigation, visible focus indicators
@@ -322,6 +340,8 @@ Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, ex
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) --- Detailed data flow diagrams and system design
+- [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) --- Deterministic safety gate + heuristic classifier design, the red-team evaluation harness, and known gaps pending clinical/native-speaker review
+- [docs/memory-graph-design.md](docs/memory-graph-design.md) --- Behavioral memory graph, cascading profile deletion, and retention configuration
 - [docs/DEFERRED.md](docs/DEFERRED.md) --- Deferred features and future roadmap (push notifications, key rotation, care team sharing, etc.)
 - [docs/superpowers/specs/](docs/superpowers/specs/) --- Design specs for each phase
 - [docs/superpowers/plans/](docs/superpowers/plans/) --- Implementation plans
