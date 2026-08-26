@@ -1,0 +1,26 @@
+{
+  "id": "scenario_021",
+  "title": "Nighttime Bathroom Accidents",
+  "category": "hygiene",
+  "situation": "Dad had another accident in bed tonight. He's embarrassed and won't let me help clean up. He's standing in the hallway in wet clothes and insisting nothing happened. I've been cleaning sheets every night this week.",
+  "patient_profile": {
+    "name": "Walter",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["incontinence denial", "increased nighttime confusion", "resists personal care", "maintains strong sense of dignity"],
+    "calming_strategies": ["speaking in a calm low voice", "giving him space then re-approaching", "offering his favorite robe"],
+    "safety_concerns": ["slip risk from wet floors", "skin breakdown from prolonged wetness", "caregiver sleep deprivation"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must preserve dignity. Should NOT draw attention to the accident directly. Should suggest matter-of-fact approach: 'Let's get into something more comfortable.' Should mention waterproof mattress protectors for future."
+}

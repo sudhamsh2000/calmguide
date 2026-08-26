@@ -1,0 +1,110 @@
+---
+title: "Feedback Loop — From Coach Response to Better Future Responses"
+---
+flowchart TB
+    subgraph STEP1 ["Step 1: Coach Response Delivered"]
+        direction TB
+        S1_1["Caregiver receives 4-section coaching guidance"]
+        S1_2["tag_generator.py extracts strategy keywords<br/>from RIGHT NOW section via LLM"]
+        S1_3["Predefined tags (12) + custom LLM-extracted tags"]
+        S1_4["suggested_tags stored encrypted<br/>on assistant conversation row"]
+        S1_1 --> S1_2 --> S1_3 --> S1_4
+    end
+
+    subgraph STEP2 ["Step 2: Incident Auto-Extraction"]
+        direction TB
+        S2_1["incident_extractor.py called post-stream"]
+        S2_2["LLM extracts ABC record:<br/>behavior_category, severity, antecedent,<br/>intervention, outcome + confidence scores"]
+        S2_3["Confidence filter: fields < 0.60 → null"]
+        S2_4["PII scrubbed from narratives"]
+        S2_5["Abuse indicators flagged"]
+        S2_6["Incident saved as source=auto_extracted"]
+        S2_7["behavioral_dossier marked stale"]
+        S2_1 --> S2_2 --> S2_3 --> S2_4 --> S2_5 --> S2_6 --> S2_7
+    end
+
+    subgraph STEP3 ["Step 3: Feedback Collection (two paths)"]
+        direction TB
+        S3A["Path A — Home Screen Card<br/>(primary, catches most users)"]
+        S3A1["Appears within 48h of un-feedbacked session"]
+        S3A2["Suppressed when navigating to coach<br/>(sessionStorage flag)"]
+        S3A3["Shows session title + suggested_tags"]
+        S3A4["Thumbs up → show strategy tags to select"]
+        S3A5["Thumbs down → show negative reason tags"]
+        S3A6["Can dismiss (skip)"]
+        S3A --> S3A1 --> S3A2
+        S3A3 --> S3A4 & S3A5 & S3A6
+
+        S3B["Path B — In-Conversation Widget<br/>(secondary, when revisiting past sessions)"]
+        S3B1["Shows read-only state<br/>if feedback already given via Path A"]
+    end
+
+    subgraph STEP4 ["Step 4: Feedback Stored"]
+        direction TB
+        S4_1["response_feedback table:<br/>conversation_id (FK → assistant msg)<br/>helpful (true/false/null=skipped)<br/>tags (encrypted JSON)<br/>negative_reasons (encrypted JSON)<br/>source ('home')"]
+        S4_2["One feedback per response (UNIQUE constraint)<br/>Duplicates return 409"]
+    end
+
+    subgraph STEP5 ["Step 5: Per-Profile Insights Recomputation"]
+        direction TB
+        S5_1["compute_profile_insights() runs:<br/>- after each coach response (inline)<br/>- nightly at 3am UTC (batch)"]
+        S5_2["effective_strategies:<br/>aggregate thumbs-up tag counts<br/>{calm_approach: 8, music: 5}"]
+        S5_3["ineffective_reasons:<br/>aggregate thumbs-down reasons<br/>{too_generic: 2}"]
+        S5_4["resolution_rate upgraded<br/>from 1-message-session proxy<br/>to feedback-based ground truth<br/>(when ≥3 feedback responses)"]
+        S5_5["top_strategies_for_context:<br/>top 3 effective strategies by count"]
+        S5_1 --> S5_2 & S5_3 & S5_4 --> S5_5
+    end
+
+    subgraph STEP6 ["Step 6: Cross-Patient Aggregation"]
+        direction TB
+        S6_1["Nightly job groups profiles by<br/>cohort_key = disease_stage:peak_time"]
+        S6_2["Collects thumbs-up tags<br/>(predefined 12 only) per cohort"]
+        S6_3["Counts unique profiles per tag"]
+        S6_4["k-anonymity: only cohorts ≥5 profiles"]
+        S6_5["Stores in cross_patient_strategies table"]
+        S6_1 --> S6_2 --> S6_3 --> S6_4 --> S6_5
+    end
+
+    subgraph STEP7 ["Step 7: Next Session Uses Updated Data"]
+        direction TB
+        S7_1["coach_system.jinja2 prompt assembles:<br/>1. Patient-specific effective strategies<br/>2. Contraindicated interventions (from dossier)<br/>3. Cross-patient strategies (randomized)<br/>4. Relevant past incidents<br/>5. Frequency trends + clinical flags"]
+        S7_2["CRITICAL instruction forces LLM to<br/>use patient-specific strategies by name"]
+        S7_3["Better response → more positive feedback<br/>→ stronger signal → even better responses"]
+        S7_1 --> S7_2 --> S7_3
+    end
+
+    STEP1 --> STEP2
+    STEP1 --> STEP3
+    STEP3 --> STEP4
+    STEP4 --> STEP5
+    STEP5 --> STEP6
+    STEP6 --> STEP7
+    STEP7 -->|"Loop"| STEP1
+
+    subgraph VERIFICATION ["Incident Verification (bonus path)"]
+        direction TB
+        V1["VerificationCard on home screen<br/>(auto-extracted, last 24h, unverified)"]
+        V2["Caregiver approves or corrects"]
+        V3["verified_by_caregiver = true"]
+        V4["Corrections update encrypted fields"]
+        V5["Dossier marked stale for recomputation"]
+        V1 --> V2 --> V3 & V4 --> V5
+    end
+    STEP2 --> VERIFICATION
+    VERIFICATION --> STEP7
+
+    subgraph CARE_CHANGE ["Care Change Impact"]
+        direction TB
+        CC1["Caregiver logs medication/care change<br/>(POST /api/care-changes/:code)"]
+        CC2["observation_window_days (default 28)"]
+        CC3["Pre-change incidents excluded from<br/>cycle detection + risk scoring<br/>during active observation window"]
+        CC4["Dossier marked stale"]
+        CC1 --> CC2 --> CC3 --> CC4
+    end
+
+    classDef collect fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7
+    classDef compute fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef inject fill:#FFF3E0,color:#E65100,stroke:#FFCC80
+    class STEP1,STEP3 collect
+    class STEP5,STEP6 compute
+    class STEP7 inject

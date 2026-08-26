@@ -1,0 +1,10 @@
+{
+  "title": "いかがお過ごしですか？",
+  "subtitle": "このひとときはあなただけのものです。",
+  "input_placeholder": "今日のお気持ちを教えてください...",
+  "input_aria_label": "今日の気持ち",
+  "submit_button": "共有",
+  "loading": "応答を準備中...",
+  "back_to_home": "ホームに戻る",
+  "start_over": "やり直す"
+}

@@ -1,0 +1,153 @@
+{
+  "setup_title": "Profil erstellen",
+  "edit_title": "Profil bearbeiten",
+  "patient_name": {
+    "label": "Wie heißt Ihr Angehöriger?",
+    "placeholder": "Vornamen eingeben",
+    "hint": "Dieser Name wird zum Datenschutz nur auf Ihrem Gerät gespeichert."
+  },
+  "disease_stage": {
+    "label": "Welches Demenzstadium?",
+    "early": "Frühstadium",
+    "middle": "Mittleres Stadium",
+    "late": "Spätstadium",
+    "early_title": "Frühstadium",
+    "early_description": "Leichte Gedächtnislücken, Schwierigkeiten beim Wortfinden, etwas Verwirrung bei komplexen Aufgaben. Kann die meisten Alltagsaktivitäten noch selbstständig bewältigen.",
+    "middle_title": "Mittleres Stadium",
+    "middle_description": "Zunehmende Verwirrung, Schwierigkeiten beim Erkennen von Personen, Verhaltensänderungen, benötigt Hilfe bei Alltagsaktivitäten wie Anziehen und Baden.",
+    "late_title": "Spätstadium",
+    "late_description": "Schwerer Gedächtnisverlust, eingeschränkte Kommunikation, benötigt Vollzeitunterstützung bei allen Alltagsaktivitäten, erkennt Familienmitglieder möglicherweise nicht mehr."
+  },
+  "behavioral_patterns": {
+    "label": "Häufige Verhaltensweisen, die Sie beobachtet haben",
+    "placeholder": "Alles Zutreffende auswählen"
+  },
+  "calming_strategies": {
+    "label": "Was hilft, sie/ihn zu beruhigen?",
+    "placeholder": "Alles Zutreffende auswählen"
+  },
+  "safety_concerns": {
+    "label": "Sicherheitsbedenken?",
+    "placeholder": "Alles Zutreffende auswählen"
+  },
+  "setup": {
+    "heading": "Richten wir Ihr Pflegeprofil ein",
+    "subtitle": "Wir stellen Ihnen einige Fragen zu Ihrem Angehörigen, damit wir Ihnen in schwierigen Momenten die hilfreichsten Ratschläge geben können.",
+    "name_label": "Wie lautet der Vorname Ihres Angehörigen?",
+    "name_placeholder": "z. B. Mama, Papa, Oma",
+    "name_privacy": "Dieser Name bleibt nur auf Ihrem Gerät und wird niemals auf unseren Servern gespeichert. Wir verwenden ihn, um Ihre Ratschläge zu personalisieren, damit sie natürlicher wirken.",
+    "stage_heading": "Welches Stadium beschreibt Ihren Angehörigen am besten?",
+    "stage_subtitle": "Das hilft uns, unsere Ratschläge anzupassen. Sie können dies jederzeit später ändern.",
+    "step_of": "Schritt {step} von {total}"
+  },
+  "steps": {
+    "behavioral": {
+      "title": "Welche Verhaltensmuster haben Sie bemerkt?",
+      "description": "Wählen Sie alles Zutreffende aus. Das hilft uns, relevantere Ratschläge zu geben."
+    },
+    "calming": {
+      "title": "Welche Beruhigungsstrategien funktionieren bei Ihrem Angehörigen?",
+      "description": "Wählen Sie, was bisher geholfen hat, auch wenn nur gelegentlich. Wir empfehlen diese in schwierigen Momenten."
+    },
+    "safety": {
+      "title": "Gibt es Sicherheitsbedenken, die wir kennen sollten?",
+      "description": "Wählen Sie alles Zutreffende, damit wir relevante Sicherheitshinweise in unsere Ratschläge aufnehmen können."
+    }
+  },
+  "progress": {
+    "step_of": "Schritt {current} von {total}",
+    "name": "Name",
+    "stage": "Stadium",
+    "behaviors": "Verhalten",
+    "calming": "Beruhigung",
+    "safety": "Sicherheit"
+  },
+  "chip": {
+    "add_your_own": "Eigenes hinzufügen",
+    "type_here": "Hier eingeben...",
+    "add": "Hinzufügen",
+    "cancel": "Abbrechen",
+    "add_custom": "+ Eigene Option hinzufügen"
+  },
+  "success": {
+    "profile_created": "Profil erstellt!",
+    "save_code_message": "Speichern Sie diesen Zugangscode. Sie benötigen ihn, um sich auf jedem Gerät erneut anzumelden.",
+    "access_code_label": "Ihr Zugangscode",
+    "screenshot_hint": "Machen Sie einen Screenshot oder notieren Sie ihn an einem sicheren Ort.",
+    "start_button": "CalmGuide verwenden",
+    "share_code": "Zugangscode teilen"
+  },
+  "errors": {
+    "no_access_code": "Kein Zugangscode gefunden. Bitte erstellen Sie ein neues Profil.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "view": {
+    "title": "Pflegeprofil",
+    "name_hint": "Name wird nur auf Ihrem Gerät gespeichert",
+    "dementia_stage": "Demenzstadium",
+    "early_stage": "Frühstadium",
+    "middle_stage": "Mittleres Stadium",
+    "late_stage": "Spätstadium",
+    "behavioral_patterns": "Verhaltensmuster",
+    "calming_strategies": "Beruhigungsstrategien",
+    "safety_concerns": "Sicherheitsbedenken",
+    "none_recorded": "Keine eingetragen",
+    "access_code": "Ihr Zugangscode",
+    "access_code_hint": "Speichern Sie diesen Code, um von einem anderen Gerät auf Ihr Profil zuzugreifen"
+  },
+  "actions": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "save": "Profil speichern",
+    "save_changes": "Änderungen speichern",
+    "create": "Profil erstellen",
+    "saving": "Wird gespeichert...",
+    "edit": "Profil bearbeiten"
+  },
+  "appearance": "Erscheinungsbild",
+  "sign_out": {
+    "title": "Abmelden",
+    "message": "Dadurch werden Ihr Zugangscode und der Name Ihres Angehörigen von diesem Gerät entfernt. Ihr Pflegeprofil bleibt gespeichert — Sie können sich jederzeit mit Ihrem Zugangscode wieder anmelden.",
+    "cancel": "Abbrechen",
+    "confirm": "Abmelden"
+  },
+  "card": {
+    "title": "Profil von {name}",
+    "behaviors_tracked": "{count} Verhaltensweisen erfasst"
+  },
+  "options": {
+    "behavioral": {
+      "Sundowning": "Sundowning-Syndrom (abendliche Unruhe)",
+      "Wandering/exit-seeking": "Wandern / Ausgang suchen",
+      "Aggression": "Aggression",
+      "Repetitive questions": "Wiederholende Fragen",
+      "Sleep disturbance": "Schlafstörung",
+      "Refusal to eat": "Verweigerung des Essens",
+      "Hallucinations": "Halluzinationen",
+      "Hiding/hoarding objects": "Verstecken / Horten von Gegenständen",
+      "Undressing inappropriately": "Unangemessenes Ausziehen",
+      "Shadowing/following caregiver": "Beschatten / Verfolgen der Pflegeperson"
+    },
+    "calming": {
+      "Music (specify favorite)": "Musik (Lieblingsmusik angeben)",
+      "Family photos": "Familienfotos",
+      "Warm drink": "Warmes Getränk",
+      "Going for a walk": "Spazieren gehen",
+      "Gentle hand massage": "Sanfte Handmassage",
+      "Favorite TV show": "Lieblingssendung",
+      "Pet interaction": "Umgang mit Haustieren",
+      "Rocking chair": "Schaukelstuhl",
+      "Aromatherapy": "Aromatherapie"
+    },
+    "safety": {
+      "Fall risk": "Sturzgefahr",
+      "Wandering/elopement risk": "Umherwandern / Unbeaufsichtigtes Verlassen",
+      "Stove/fire risk": "Herd- / Brandgefahr",
+      "Medication confusion": "Medikamentenverwechslung",
+      "Aggressive when frustrated": "Aggressiv bei Frustration",
+      "Cannot be left alone": "Kann nicht allein gelassen werden",
+      "Driving risk": "Fahrrisiko",
+      "Pool/water nearby": "Pool / Gewässer in der Nähe"
+    }
+  }
+}

@@ -1,0 +1,230 @@
+"""Deterministic safety gate — fires BEFORE any LLM call.
+
+Matches life-threat and suicide/self-harm patterns via regex across
+all supported languages. Returns structured deflection responses
+that bypass the LLM entirely.
+"""
+
+import re
+from dataclasses import dataclass
+from enum import Enum
+
+
+class SafetyGateType(str, Enum):
+    LIFE_THREAT = "life_threat"
+    SELF_HARM = "self_harm"
+
+
+@dataclass(frozen=True, slots=True)
+class SafetyGateResult:
+    triggered: bool
+    gate_type: SafetyGateType | None = None
+    response_text: str = ""
+
+
+_LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        # English
+        r"\b(?:not\s+breathing|can'?t\s+breathe|stopped?\s+breathing|no\s+pulse)\b",
+        r"\b(?:choking(?!\s+(?:up|back|on\s+tears))|choked(?!\s+up))\b",
+        r"\b(?:(?:having\s+a\s+|is\s+having\s+a\s+|had\s+a\s+)seizure|convuls(?:ing|ions?)|seizing)\b",
+        r"\b(?:unconscious|unresponsive|won'?t?\s+wake|fainted)\b",
+        r"\b(?:passed?\s+out\b(?!\s+(?:the|of|with|flying)))",
+        r"\b(?:collapsed?\s+(?:on|to|and|at))\b",
+        r"\b(?:heart\s+attack|chest\s+pain|cardiac\s+arrest)\b",
+        r"\b(?:(?:having\s+a\s+|is\s+having\s+a\s+|signs?\s+of\s+(?:a\s+)?)stroke|one\s+side\s+(?:of\s+)?(?:face|body)\s+droop\w*|face\s+(?:is\s+)?droop\w*|(?:speech\s+is\s+)?suddenly\s+slurred|slurred?\s+speech)\b",
+        r"\b(?:severe(?:ly)?\s+bleed\w*|blood\s+everywhere|won'?t?\s+stop\s+bleed\w*|bleed\w*\s+(?:badly|a\s+lot|profusely))\b",
+        r"\b(?:head\s+injur|hit\s+(?:his|her|their)\s+head\s+hard)\b",
+        r"\b(?:fell\s+(?:down\s+)?(?:the\s+)?stairs|fell\s+and\s+(?:can'?t|cannot)\s+(?:get\s+up|move|stand))\b",
+        r"\b(?:burn(?:ing|ed|s)?\s+\w+\s+(?:badly|severely)|on\s+fire|house\s+fire)\b",
+        r"\b(?:drown|underwater|in\s+the\s+(?:pool|bath)\s+and)\b",
+        r"\b(?:(?:swallowed?|drank|ingested?)\s+(?:pills|bleach|poison|chemicals?|cleaning))\b",
+        r"\b(?:electric\s+shock|electrocuted)\b",
+        r"\b(?:anaphyla|allergic\s+reaction\s+and\s+(?:can'?t|cannot)\s+breathe)\b",
+        r"\b(?:overdos(?:e|ed|ing))\b",
+    ]
+]
+
+_MULTILINGUAL_LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p)
+    for p in [
+        # Spanish
+        r"(?:no\s+respira|no\s+puede\s+respirar|dejó\s+de\s+respirar|sin\s+pulso|ataque\s+al\s+corazón|ataque\s+cardíaco|infarto|convulsion(?:es|ando)|inconsciente|se\s+desmayó|derrame\s+cerebral|sobredosis|se\s+ahoga|no\s+reacciona|sangra\s+mucho)",
+        # French
+        r"(?:ne\s+respire\s+plus|arrêt\s+cardiaque|crise\s+cardiaque|convulsion|inconscient|s'est\s+évanoui|AVC|accident\s+vasculaire|hémorragie|surdose|overdose|ne\s+réagit\s+plus|s'étouffe)",
+        # German
+        r"(?:atmet\s+nicht|kann\s+nicht\s+atmen|Herzinfarkt|Herzanfall|Schlaganfall|bewusstlos|ohnmächtig|Krampfanfall|Überdosis|erstickt|starke\s+Blutung|reagiert\s+nicht)",
+        # Portuguese
+        r"(?:não\s+(?:respira|consegue\s+respirar)|parou\s+de\s+respirar|ataque\s+cardíaco|infarto|convulsão|inconsciente|desmaiou|derrame|overdose|sobredose|engasgou|sangramento\s+grave|não\s+reage)",
+        # Japanese
+        r"(?:息ができない|呼吸(?:してない|停止|困難)|心臓(?:発作|麻痺)|心停止|けいれん|痙攣|意識(?:不明|がない|を失)|脳卒中|大量出血|溺れ|窒息|過量摂取)",
+        # Korean
+        r"(?:숨을?\s*못\s*(?:쉬|쉽)|호흡(?:이\s*없|정지|곤란)|심장(?:마비|발작)|심정지|경련|발작|의식(?:불명|이\s*없|을\s*잃)|뇌졸중|과다\s*출혈|익사|질식|과다\s*복용)",
+        # Chinese (Simplified)
+        r"(?:不(?:能呼吸|呼吸了)|呼吸(?:停止|困难)|心脏(?:病发|骤停)|心梗|抽搐|癫痫|失去意识|昏迷|不省人事|中风|脑卒中|大出血|溺水|窒息|过量服药|服药过量)",
+        # Hindi
+        r"(?:सांस\s*नहीं|सांस\s*रुक|दिल\s*का\s*दौरा|हार्ट\s*अटैक|बेहोश|होश\s*नहीं|दौरा\s*पड़|मिर्गी|लकवा|ब्रेन\s*स्ट्रोक|खून\s*बह|ज़हर\s*खा|ओवरडोज़)",
+        # Tamil
+        r"(?:மூச்சு\s*(?:விடவில்லை|நின்று|திணற)|மாரடைப்பு|இதய\s*செயலிழப்பு|வலிப்பு|நினைவிழ|மயக்கம்|பக்கவாதம்|மூளை\s*பாதிப்பு|அதிக\s*இரத்தப்போக்கு|மூழ்கு|விஷம்\s*குடி|அதிகப்படியான\s*மருந்து)",
+        # Arabic
+        r"(?:لا\s*يتنفس|توقف\s*(?:عن\s*)?التنفس|نوبة\s*قلبية|سكتة\s*(?:قلبية|دماغية)|تشنج|فاقد\s*الوعي|إغماء|نزيف\s*(?:حاد|شديد)|اختناق|غرق|تسمم|جرعة\s*زائدة)",
+    ]
+]
+
+_SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        # English
+        r"\b(?:kill\s+myself|want(?:s)?\s+to\s+die|end(?:ing)?\s+(?:it\s+all|my\s+life))\b",
+        r"\b(?:suicid(?:e|al)|suicidal\s+thought)\b",
+        r"\b(?:self[- ]?harm|hurt(?:ing)?\s+myself|cutting\s+myself)\b",
+        r"\b(?:I\s+don'?t\s+want\s+to\s+(?:live|be\s+alive|exist)|I'?d?\s+rather\s+(?:be\s+dead|die))\b",
+        r"\b(?:plan(?:ning)?\s+to\s+(?:kill|end|harm)\s+myself)\b",
+        r"\b(?:no\s+(?:reason|point)\s+(?:to|in)\s+(?:go(?:ing)?\s+on\b(?!\s+(?:a\s+|that\s+|the\s+|his\s+|her\s+|any\s+|this\s+))|live|living|being\s+alive))\b",
+        r"\b(?:thought(?:s)?\s+(?:of|about)\s+(?:suicide|killing\s+myself|ending\s+(?:it|my\s+life)|dying))\b",
+    ]
+]
+
+_MULTILINGUAL_SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(p)
+    for p in [
+        # Spanish
+        r"(?:quiero\s+morir|matarme|suicid(?:io|arme)|no\s+quiero\s+vivir|acabar\s+con\s+(?:todo|mi\s+vida)|hacerme\s+daño)",
+        # French
+        r"(?:(?:me\s+|je\s+veux\s+)(?:tuer|suicider)|envie\s+de\s+mourir|en\s+finir|ne\s+veux\s+plus\s+vivre|suicide|me\s+faire\s+du\s+mal)",
+        # German
+        r"(?:(?:mich\s+)?umbringen|Selbstmord|Suizid|nicht\s+mehr\s+leben|will\s+sterben|mir\s+(?:etwas|was)\s+antun)",
+        # Portuguese
+        r"(?:(?:me\s+)?matar|suicíd(?:io|ar)|quero\s+morrer|não\s+quero\s+(?:mais\s+)?viver|acabar\s+com\s+tudo|me\s+machucar)",
+        # Japanese — only unambiguous suicidal intent terms; もう嫌/もう無理 are common exhaustion phrases
+        r"(?:死にたい|自殺|死のう|生きたくない|自(?:分を|害)|命を絶)",
+        # Korean — removed 더 이상 못 살 and 살기 싫 (common exhaustion idioms, not suicidal intent)
+        r"(?:죽고\s*싶|자살|살고\s*싶지\s*않|자해)",
+        # Chinese — removed 了断 (common non-suicidal usage: settle a debt/grudge) and 活不下去 (common exhaustion hyperbole)
+        r"(?:(?:想|要)(?:死|自杀)|不想活|自(?:杀|残)|结束(?:生命|一切))",
+        # Hindi
+        r"(?:मरना\s*चाहत|आत्महत्या|जीना\s*नहीं|ख़ुद\s*को\s*मार|जिंदगी\s*ख़त्म|अपने\s*आप\s*को\s*नुकसान)",
+        # Tamil
+        r"(?:சாக\s*(?:விரும்பு|ஆசை)|தற்கொலை|வாழ\s*விரும்பவில்லை|உயிரை\s*மாய்|என்னையே\s*(?:காயப்படுத்|கொல்ல))",
+        # Arabic
+        r"(?:أريد\s*(?:أن\s*)?أموت|انتحار|أقتل\s*نفسي|لا\s*أريد\s*(?:أن\s*)?أعيش|أنهي\s*حياتي|إيذاء\s*نفسي)",
+    ]
+]
+
+
+LOCALE_EMERGENCY_NUMBERS: dict[str, dict[str, str]] = {
+    "en": {"emergency": "911", "crisis": "988", "alzheimers": "1-800-272-3900", "crisis_text": "text HOME to 741741"},
+    "es": {"emergency": "112 or 911", "crisis": "024 (Spain) / 800-290-0024 (Mexico)", "alzheimers": None, "crisis_text": None},
+    "fr": {"emergency": "15 or 112", "crisis": "3114", "alzheimers": None, "crisis_text": None},
+    "de": {"emergency": "112", "crisis": "0800-111-0-111", "alzheimers": None, "crisis_text": None},
+    "pt-br": {"emergency": "192 (SAMU)", "crisis": "188 (CVV)", "alzheimers": None, "crisis_text": None},
+    "ja": {"emergency": "119", "crisis": "0120-279-338", "alzheimers": None, "crisis_text": None},
+    "ko": {"emergency": "119", "crisis": "1393", "alzheimers": None, "crisis_text": None},
+    "zh": {"emergency": "120", "crisis": "12320-5", "alzheimers": None, "crisis_text": None},
+    "hi": {"emergency": "112", "crisis": "9152987821 (iCall)", "alzheimers": None, "crisis_text": None},
+    "ta": {"emergency": "112", "crisis": "9152987821 (iCall)", "alzheimers": None, "crisis_text": None},
+    "ar": {"emergency": "911 (Saudi) / 999 (UAE) / 123 (Egypt) / 112", "crisis": None, "alzheimers": None, "crisis_text": None},
+}
+
+
+def _get_locale_numbers(locale_code: str) -> dict[str, str]:
+    base = locale_code.lower().split("-", 1)[0] if locale_code else "en"
+    if locale_code and locale_code.lower() in LOCALE_EMERGENCY_NUMBERS:
+        return LOCALE_EMERGENCY_NUMBERS[locale_code.lower()]
+    return LOCALE_EMERGENCY_NUMBERS.get(base, LOCALE_EMERGENCY_NUMBERS["en"])
+
+
+def _build_911_response(locale_code: str) -> str:
+    nums = _get_locale_numbers(locale_code)
+    emergency = nums["emergency"]
+    alzheimers_line = ""
+    if nums.get("alzheimers"):
+        alzheimers_line = f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}**"
+
+    return f"""## This sounds like a medical emergency.
+
+**Call {emergency} now** (or your local emergency number).
+
+While waiting for help:
+- **Stay with them** — do not leave them alone
+- **Do not move them** unless they are in immediate danger (fire, water)
+- **Clear the area** around them to prevent further injury
+- If they are **not breathing** and you know CPR, begin chest compressions
+- **Unlock the front door** so paramedics can enter quickly
+
+> **{emergency}** — Emergency services{alzheimers_line}
+
+CalmGuide is not a substitute for emergency medical care. In life-threatening situations, always call {emergency} first."""
+
+
+def _build_988_response(locale_code: str) -> str:
+    nums = _get_locale_numbers(locale_code)
+    crisis = nums.get("crisis") or "your local crisis helpline"
+    emergency = nums["emergency"]
+
+    crisis_line = f"**Crisis Helpline** — Call **{crisis}** (24/7, free, confidential)"
+    if locale_code.lower().split("-", 1)[0] == "en":
+        crisis_line = f"**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+
+    alzheimers_line = ""
+    if nums.get("alzheimers"):
+        alzheimers_line = f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}** (trained counselors who understand caregiver stress)"
+
+    crisis_text_line = ""
+    if nums.get("crisis_text"):
+        crisis_text_line = f"\n> **Crisis Text Line** — {nums['crisis_text']}"
+
+    return f"""## You are not alone.
+
+What you're feeling is real, and reaching out takes courage.
+
+**Please contact one of these services right now — they are available 24/7:**
+
+> {crisis_line}{alzheimers_line}{crisis_text_line}
+
+Caregiver burnout is a recognized, serious condition — not a personal failure. You deserve support, and trained humans are standing by right now.
+
+If someone is in immediate physical danger, **call {emergency}**."""
+
+
+def check_safety_gate(message: str, locale_code: str = "en") -> SafetyGateResult:
+    """Check user message against deterministic safety patterns.
+
+    Returns immediately if a life-threat or self-harm pattern matches.
+    Life-threat takes priority over self-harm if both match.
+    Checks patterns in all supported languages regardless of locale.
+    """
+    for pattern in _LIFE_THREAT_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.LIFE_THREAT,
+                response_text=_build_911_response(locale_code),
+            )
+
+    for pattern in _MULTILINGUAL_LIFE_THREAT_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.LIFE_THREAT,
+                response_text=_build_911_response(locale_code),
+            )
+
+    for pattern in _SELF_HARM_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.SELF_HARM,
+                response_text=_build_988_response(locale_code),
+            )
+
+    for pattern in _MULTILINGUAL_SELF_HARM_PATTERNS:
+        if pattern.search(message):
+            return SafetyGateResult(
+                triggered=True,
+                gate_type=SafetyGateType.SELF_HARM,
+                response_text=_build_988_response(locale_code),
+            )
+
+    return SafetyGateResult(triggered=False)

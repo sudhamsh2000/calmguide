@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "おはようございます",
+    "afternoon": "こんにちは",
+    "evening": "こんばんは"
+  },
+  "hero": "あなたは一人ではありません。",
+  "coach_card": {
+    "title": "今、何かが\n起きています",
+    "subtitle": "落ち着いたステップバイステップのガイダンスを取得"
+  },
+  "quick_actions": {
+    "practice": "練習",
+    "practice_subtitle": "シナリオで学ぶ",
+    "check_in": "チェックイン",
+    "check_in_subtitle": "今日の調子はいかがですか？"
+  },
+  "loading_profile": "ケアプロフィールを読み込み中...",
+  "conversations": {
+    "heading": "最近",
+    "title": "最近の会話",
+    "empty": "まだ会話はありません",
+    "empty_detail": "最近の会話はまだありません。サポートが必要なときはモーメントコーチボタンを押してください。",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "気づいたパターン",
+    "this_week": "今週",
+    "last_week": "先週",
+    "peak_time": "多い時間帯",
+    "recurring_themes": "よくあるテーマ",
+    "effective_strategies": "うまくいったこと",
+    "peak_overnight": "夜間",
+    "peak_morning": "朝",
+    "peak_afternoon": "午後",
+    "peak_evening": "夕方",
+    "trend_rising": "増えています",
+    "trend_falling": "減っています",
+    "trend_steady": "安定しています",
+    "drift_alert": "今週、困難な瞬間が増えています（{last_count}件から{this_count}件）。これはあなたのせいではありません — 病気の経過の一部である可能性があります。ケアチームに相談すると良いアイデアがもらえるかもしれません。",
+    "cycle_detected": "症状のパターンが見つかりました",
+    "cycle_interval": "症状は{days}日おきに起きる傾向があります",
+    "cross_patient_title": "似た患者に効果があること"
+  },
+  "feedback": {
+    "title": "どうでしたか？",
+    "did_this_help": "役に立ちましたか？",
+    "what_worked": "何がうまくいきましたか？",
+    "what_went_wrong": "今回、役に立たなかったことは？",
+    "tap_any": "どれかタップ",
+    "done": "完了",
+    "thanks": "ありがとうございます — これからのサポートに活かします",
+    "you_rated": "評価していただきました",
+    "dismiss_label": "フィードバックを閉じる",
+    "time_just_now": "たった今",
+    "time_hours_ago": "{count}時間前",
+    "time_earlier_today": "今日の早い時間",
+    "time_yesterday": "昨日"
+  },
+  "impact_link": "CalmGuideがどのように家族を支えているか見る",
+  "daily_checkin": {
+    "title": "今日はどうでしたか？",
+    "severity_calm": "穏やかな一日",
+    "severity_mild": "軽い症状があった",
+    "severity_tough": "つらい症状があった",
+    "when": "いつ頃？",
+    "time_overnight": "夜間",
+    "time_morning": "朝",
+    "time_afternoon": "午後",
+    "time_evening": "夕方",
+    "what_helped": "何が役立ちましたか？",
+    "done": "完了",
+    "thanks": "記録しました — パターンを把握するのに役立ちます"
+  },
+  "care_patterns": {
+    "title": "今夜は少し注意が必要かもしれません",
+    "reason_cycle": "症状は{interval}日おきに起きる傾向があり、前回から{days_since}日が経っています",
+    "reason_trend": "最近、症状が増えてきています",
+    "what_helps": "これまで役立ったこと：",
+    "cross_patient_hint": "似た状況の患者を介護している{count}人が{strategy}を役立てています"
+  },
+  "cross_patient": {
+    "title": "似た患者に効果があること"
+  },
+  "log_incident": "出来事を記録する",
+  "recent_incidents": "最近のインシデント",
+  "see_all": "すべて表示",
+  "server_error": "サーバーに接続できません。緊急連絡先は常に上部に表示されています。"
+}

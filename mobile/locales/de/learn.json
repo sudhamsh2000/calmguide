@@ -1,0 +1,65 @@
+{
+  "title": "Übungsszenarien",
+  "subtitle": "Bauen Sie mit geführten Szenarien Selbstvertrauen auf",
+  "scenario": {
+    "the_situation": "Die Situation",
+    "your_response": "Ihre Reaktion",
+    "response_placeholder": "Wie würden Sie mit dieser Situation umgehen? Beschreiben Sie, was Sie sagen und tun würden...",
+    "get_feedback": "Feedback erhalten",
+    "getting_feedback": "Feedback wird geladen...",
+    "your_feedback": "Ihr Feedback",
+    "try_different": "Einen anderen Ansatz versuchen",
+    "stage_label": "{stage} Stadium",
+    "stages": {
+      "early": "Früh",
+      "middle": "Mittel",
+      "late": "Spät"
+    }
+  },
+  "list": {
+    "subtitle": "Üben Sie häufige Situationen, um besser vorbereitet zu sein.",
+    "loading": "Szenarien werden geladen...",
+    "filter_label": "Nach Kategorie filtern",
+    "filter_all": "Alle",
+    "filter_behavioral": "Verhalten",
+    "filter_daily_care": "Tägliche Pflege",
+    "filter_safety": "Sicherheit",
+    "filter_communication": "Kommunikation",
+    "filter_self_care": "Selbstfürsorge",
+    "empty": "Keine Szenarien für diese Kategorie gefunden.",
+    "show_all": "Alle Szenarien anzeigen",
+    "load_error": "Szenarien konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+  },
+  "scenarios": {
+    "sundowning-evening": {
+      "title": "Abendliche Unruhe (Sundowning-Syndrom)",
+      "description": "Ihr Angehöriger wird mit Einbruch des Abends zunehmend ängstlich und verwirrt. Er besteht darauf, 'nach Hause zu gehen', obwohl er bereits zu Hause ist."
+    },
+    "refusal-to-bathe": {
+      "title": "Verweigerung des Badens",
+      "description": "Ihr Angehöriger hat sich seit mehreren Tagen nicht gewaschen und wird aggressiv, wenn Sie es vorschlagen."
+    },
+    "wandering-night": {
+      "title": "Nächtliches Umherwandern",
+      "description": "Sie wachen um 2 Uhr nachts auf und finden Ihren Angehörigen angekleidet vor, wie er versucht, das Haus zu verlassen."
+    },
+    "repeated-questions": {
+      "title": "Wiederholte Fragen",
+      "description": "Ihr Angehöriger hat Ihnen in der letzten Stunde dieselbe Frage 15 Mal gestellt. Sie spüren, wie Ihre Geduld schwindet."
+    },
+    "medication-refusal": {
+      "title": "Medikamentenverweigerung",
+      "description": "Ihr Angehöriger spuckt seine Medikamente aus und beschuldigt Sie, ihn vergiften zu wollen."
+    },
+    "caregiver-burnout": {
+      "title": "Überlastung der Pflegeperson",
+      "description": "Sie haben seit Wochen nicht mehr als 4 Stunden pro Nacht geschlafen. Heute haben Sie die Geduld verloren und es belastet Sie."
+    }
+  },
+  "loading": "Szenario wird geladen...",
+  "error": {
+    "not_found": "Dieses Szenario kann nicht geladen werden. Es existiert möglicherweise nicht.",
+    "load_failed": "Dieses Szenario kann nicht geladen werden. Bitte versuchen Sie es später erneut.",
+    "feedback_failed": "Feedback kann derzeit nicht abgerufen werden. Bitte versuchen Sie es später erneut."
+  }
+}

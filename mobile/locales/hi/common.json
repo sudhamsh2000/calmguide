@@ -1,0 +1,152 @@
+{
+  "app_name": "CalmGuide",
+  "nav": {
+    "home": "होम",
+    "coach": "पल कोच",
+    "learn": "अभ्यास",
+    "check_in": "हाल-चाल",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "back_to_home": "होम पर वापस जाएं",
+    "back_to_scenarios": "परिदृश्यों पर वापस जाएं",
+    "terms": "सेवा की शर्तें",
+    "privacy": "गोपनीयता नीति",
+    "back": "वापस"
+  },
+  "actions": {
+    "send": "भेजें",
+    "submit": "सबमिट करें",
+    "cancel": "रद्द करें",
+    "try_again": "फिर से कोशिश करें",
+    "dismiss": "बंद करें",
+    "share": "साझा करें",
+    "copy": "Copy",
+    "copied": "Copied",
+    "speak_now": "Speak now…",
+    "loading_label": "Loading"
+  },
+  "loading": "लोड हो रहा है...",
+  "error": {
+    "generic": "हमारी तरफ से कुछ गड़बड़ हो गई। आपकी जानकारी सुरक्षित है — कृपया फिर से कोशिश करें।",
+    "connection": "हम अभी अपने सर्वर से संपर्क नहीं कर पा रहे। अगर आपको तुरंत मदद चाहिए, तो अल्ज़ाइमर हेल्पलाइन 1-800-272-3900 पर उपलब्ध है।",
+    "no_access_code": "लगता है आपने अभी तक देखभाल प्रोफ़ाइल सेट नहीं की है। चलिए इसे करते हैं — बस कुछ मिनट लगेंगे।"
+  },
+  "privacy_hint": "सभी की गोपनीयता की रक्षा के लिए, हम आपको नाम या व्यक्तिगत विवरण के बजाय व्यवहार का वर्णन करने के लिए प्रोत्साहित करते हैं।",
+  "language": {
+    "label": "भाषा",
+    "auto_detected": "हम {language} का उपयोग करेंगे — क्या आप कोई अलग भाषा चाहते हैं?",
+    "change": "भाषा बदलें",
+    "confirm": "{language} के साथ जारी रखें"
+  },
+  "login": {
+    "title": "एक्सेस कोड दर्ज करें",
+    "subtitle": "अपनी देखभाल प्रोफ़ाइल सेट करते समय प्राप्त 8-अक्षर का एक्सेस कोड दर्ज करें, साथ ही अपने प्रियजन का नाम भी।",
+    "code_label": "एक्सेस कोड",
+    "code_hint": "8 अक्षर, अक्षर और संख्याएं",
+    "name_label": "आपके प्रियजन का नाम",
+    "name_placeholder": "जैसे: पापा, माँ, दादी",
+    "name_hint": "केवल इस डिवाइस पर संग्रहीत — हमारे सर्वर पर कभी नहीं भेजा जाता।",
+    "submit": "प्रोफ़ाइल से जुड़ें",
+    "submitting": "जुड़ रहे हैं...",
+    "error_not_found": "एक्सेस कोड नहीं मिला। कृपया जाँचें और फिर से कोशिश करें।",
+    "no_code": "एक्सेस कोड नहीं है?",
+    "setup_new": "नई प्रोफ़ाइल सेट करें",
+    "back": "स्वागत पृष्ठ पर वापस जाएं",
+    "error_incomplete_code": "Please enter your complete 8-character access code.",
+    "error_missing_name": "Please enter your loved one's name."
+  },
+  "welcome": {
+    "tagline": "जब आपके प्रियजन को आपकी सबसे ज़्यादा ज़रूरत हो, तब शांत मार्गदर्शन।",
+    "get_started": "शुरू करें",
+    "have_access_code": "मेरे पास एक्सेस कोड है",
+    "facility_login": "मैं देखभाल सुविधा का कर्मचारी हूँ",
+    "privacy_note": "आपकी बातचीत निजी है। हमारे सर्वर पर कोई व्यक्तिगत डेटा संग्रहीत नहीं किया जाता।",
+    "terms": "शर्तें",
+    "privacy": "गोपनीयता"
+  },
+  "tags": {
+    "calm_approach": "शांत रहना",
+    "music": "संगीत",
+    "redirection": "ध्यान बदलना",
+    "physical_space": "आसपास का माहौल",
+    "familiar_objects": "जानी-पहचानी चीज़ें",
+    "routine": "दिनचर्या",
+    "lighting": "रोशनी",
+    "simple_words": "सरल शब्द",
+    "physical_touch": "प्यार से छूना",
+    "called_for_help": "मदद बुलाई",
+    "waited_it_out": "इंतज़ार किया",
+    "left_the_room": "कमरे से बाहर गया/गई",
+    "too_generic": "बहुत सामान्य",
+    "wrong_situation": "अलग स्थिति",
+    "didnt_understand": "समझ नहीं आया",
+    "felt_unsafe": "असुरक्षित महसूस हुआ",
+    "already_tried": "पहले भी कोशिश की थी"
+  },
+  "disclaimer": {
+    "title": "Before you continue",
+    "lead_a": "CalmGuide is an",
+    "lead_a_emph": "educational and emotional-support companion",
+    "lead_a_tail": ".",
+    "lead_b": "It is",
+    "lead_b_emph": "not a medical device",
+    "lead_b_tail": ".",
+    "no_diagnosis": "It does not diagnose, treat, or provide medical advice.",
+    "bullet_emergency": "In emergencies, call",
+    "bullet_doctor": "For medical questions, call your doctor",
+    "bullet_helpline_lead": "For trained human support, call the",
+    "bullet_helpline_emph": "Alzheimer's Association 24/7 Helpline",
+    "bullet_helpline_at": "at",
+    "ack": "CalmGuide AI का उपयोग करके मार्गदर्शन देता है — यह मदद के लिए है, लेकिन यह आपके डॉक्टर या आपातकालीन सेवाओं का विकल्प नहीं है।",
+    "cta": "I understand — continue"
+  },
+  "journey_nav": {
+    "heading": "आप इस यात्रा में कहाँ हैं?",
+    "noticing": "बदलाव दिख रहे हैं?",
+    "diagnosis": "नया निदान",
+    "hospice": "अंतिम चरण की देखभाल के बारे में सोच रहे हैं",
+    "bereavement": "खोने के बाद"
+  },
+  "emergency": {
+    "label": "आपातकालीन संपर्क",
+    "call_911": "911 पर कॉल करें",
+    "call_988": "988 संकट हेल्पलाइन पर कॉल करें",
+    "crisis_line": "988 संकट हेल्पलाइन",
+    "call_alz": "अल्जाइमर हेल्पलाइन पर कॉल करें",
+    "alz_helpline": "अल्जाइमर हेल्पलाइन",
+    "choose_option": "तत्काल सहायता के लिए सबसे तेज़ विकल्प चुनें।",
+    "emergency_services": "आपातकालीन सेवाएं"
+  },
+  "add": "जोड़ें",
+  "cancel": "रद्द करें",
+  "add_custom": "कस्टम विकल्प जोड़ें",
+  "type_custom": "अपना लिखें...",
+  "restart": {
+    "title": "पुनरारंभ आवश्यक",
+    "message": "कृपया ऐप को पूरी तरह बंद करें और नई लेआउट दिशा लागू करने के लिए फिर से खोलें।",
+    "ok": "ठीक है"
+  },
+  "error_boundary": {
+    "title": "कुछ गलत हो गया",
+    "message": "ऐप में एक त्रुटि आई। आपका डेटा सुरक्षित है।",
+    "retry": "पुनः प्रयास करें"
+  },
+  "accessibility": {
+    "back": "वापस",
+    "voice_input": "वॉइस इनपुट",
+    "stop_voice": "वॉइस इनपुट बंद करें",
+    "voice_stopped": "वॉइस इनपुट बंद हो गया",
+    "listening": "सुन रहा है। अभी बोलें।",
+    "read_aloud": "जोर से पढ़ें",
+    "stop_reading": "पढ़ना बंद करें",
+    "switch_light": "लाइट मोड में बदलें",
+    "switch_dark": "डार्क मोड में बदलें",
+    "loading_response": "प्रतिक्रिया लोड हो रही है",
+    "edit_profile": "प्रोफ़ाइल संपादित करें",
+    "helpful": "सहायक",
+    "not_helpful": "सहायक नहीं",
+    "dismiss_feedback": "फ़ीडबैक खारिज करें",
+    "send_message": "संदेश भेजें",
+    "delete": "हटाएं"
+  }
+}

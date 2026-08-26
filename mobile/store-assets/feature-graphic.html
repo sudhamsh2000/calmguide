@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1024px;
+    height: 500px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a3a38 0%, #2B7A78 45%, #3AAFA9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Subtle pattern overlay */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 75% 35%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 40%);
+  }
+
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    padding: 0 80px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+
+  .text-side {
+    flex: 1;
+    color: white;
+  }
+
+  .brand {
+    font-size: 44px;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  .brand-bold { font-weight: 800; }
+  .brand-light { font-weight: 300; }
+
+  .tagline {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.95);
+    margin-bottom: 24px;
+    max-width: 380px;
+  }
+
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 400;
+  }
+
+  .feature-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+  }
+
+  .phone-frame {
+    width: 220px;
+    height: 400px;
+    background: #FAFAF5;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 3px rgba(255,255,255,0.15);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .phone-header {
+    background: #FAFAF5;
+    padding: 16px 16px 10px;
+    text-align: center;
+  }
+
+  .phone-brand {
+    font-size: 16px;
+    color: #2B7A78;
+    letter-spacing: -0.5px;
+  }
+
+  .phone-greeting {
+    font-size: 9px;
+    color: #636E72;
+    margin-top: 6px;
+  }
+
+  .phone-hero {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2D3436;
+    margin-top: 2px;
+  }
+
+  .phone-coach-card {
+    margin: 8px 12px;
+    background: #2B7A78;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .phone-coach-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.18);
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+  }
+
+  .phone-coach-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    line-height: 1.3;
+  }
+
+  .phone-coach-sub {
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+  }
+
+  .phone-actions {
+    display: flex;
+    gap: 8px;
+    margin: 0 12px;
+  }
+
+  .phone-action {
+    flex: 1;
+    background: white;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+
+  .phone-action-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    margin: 0 auto 4px;
+  }
+
+  .phone-action-label {
+    font-size: 8px;
+    font-weight: 600;
+    color: #2D3436;
+  }
+
+  .phone-action-sub {
+    font-size: 6px;
+    color: #636E72;
+    margin-top: 1px;
+  }
+
+  .phone-emergency {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: #B84C36;
+    color: white;
+    font-size: 7px;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 14px;
+  }
+
+  .disclaimer {
+    position: absolute;
+    bottom: 16px;
+    left: 80px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="text-side">
+      <div class="brand">
+        <span class="brand-bold">Calm</span><span class="brand-light">Guide</span>
+      </div>
+      <div class="tagline">
+        Calm guidance when your loved one needs you most.
+      </div>
+      <div class="features">
+        <div class="feature"><div class="feature-dot"></div> AI companion for dementia caregivers</div>
+        <div class="feature"><div class="feature-dot"></div> Calm, step-by-step caregiving guidance</div>
+        <div class="feature"><div class="feature-dot"></div> Behavioral pattern tracking & insights</div>
+        <div class="feature"><div class="feature-dot"></div> 11 languages supported</div>
+        <div class="feature"><div class="feature-dot"></div> Privacy-first — no account required</div>
+      </div>
+    </div>
+
+    <div class="phone-frame" style="position: relative;">
+      <div class="phone-header">
+        <div class="phone-brand"><b>Calm</b>Guide</div>
+        <div class="phone-greeting">Good evening</div>
+        <div class="phone-hero">You're not alone.</div>
+      </div>
+      <div class="phone-coach-card">
+        <div class="phone-coach-icon">!</div>
+        <div class="phone-coach-title">Something is<br>happening right now</div>
+        <div class="phone-coach-sub">Get calm, step-by-step guidance</div>
+      </div>
+      <div class="phone-actions">
+        <div class="phone-action">
+          <div class="phone-action-icon" style="background: #EDE4F7;"></div>
+          <div class="phone-action-label">Practice</div>
+          <div class="phone-action-sub">Learn with scenarios</div>
+        </div>
+        <div class="phone-action">
+          <div class="phone-action-icon" style="background: #E0F0E7;"></div>
+          <div class="phone-action-label">Check-In</div>
+          <div class="phone-action-sub">How are you today?</div>
+        </div>
+      </div>
+      <div class="phone-emergency">Emergency</div>
+    </div>
+  </div>
+  <div class="disclaimer">Not a medical service. Educational support only.</div>
+</body>
+</html>

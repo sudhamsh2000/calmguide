@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "सुप्रभात",
+    "afternoon": "नमस्कार",
+    "evening": "शुभ संध्या"
+  },
+  "hero": "आप अकेले नहीं हैं।",
+  "coach_card": {
+    "title": "अभी कुछ\nहो रहा है",
+    "subtitle": "शांत, चरण-दर-चरण मार्गदर्शन प्राप्त करें"
+  },
+  "quick_actions": {
+    "practice": "अभ्यास",
+    "practice_subtitle": "परिदृश्यों से सीखें",
+    "check_in": "हाल-चाल",
+    "check_in_subtitle": "आज आप कैसा महसूस कर रहे हैं?"
+  },
+  "loading_profile": "आपकी देखभाल प्रोफ़ाइल लोड हो रही है...",
+  "conversations": {
+    "heading": "हालिया",
+    "title": "हालिया बातचीत",
+    "empty": "अभी तक कोई बातचीत नहीं",
+    "empty_detail": "अभी तक कोई हालिया बातचीत नहीं है। जब आपको मार्गदर्शन चाहिए हो, तो पल कोच बटन दबाएं।",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "हमने जो पैटर्न देखे हैं",
+    "this_week": "इस हफ्ते",
+    "last_week": "पिछले हफ्ते",
+    "peak_time": "सबसे ज़्यादा घटनाओं का समय",
+    "recurring_themes": "बार-बार आने वाली बातें",
+    "effective_strategies": "क्या काम आया",
+    "peak_overnight": "रात को",
+    "peak_morning": "सुबह",
+    "peak_afternoon": "दोपहर को",
+    "peak_evening": "शाम को",
+    "trend_rising": "बढ़ रहा है",
+    "trend_falling": "घट रहा है",
+    "trend_steady": "स्थिर",
+    "drift_alert": "इस हफ्ते हम ज़्यादा कठिन पल देख रहे हैं ({last_count} से {this_count})। यह आपकी गलती नहीं है — यह बीमारी के पैटर्न का हिस्सा हो सकता है। आपकी देखभाल टीम के पास मदद के लिए विचार हो सकते हैं।",
+    "cycle_detected": "एपिसोड का पैटर्न मिला",
+    "cycle_interval": "एपिसोड आमतौर पर हर {days} दिन में होते हैं",
+    "cross_patient_title": "मिलते-जुलते मरीज़ों में क्या काम आता है"
+  },
+  "feedback": {
+    "title": "कैसा रहा?",
+    "did_this_help": "क्या इससे मदद मिली?",
+    "what_worked": "क्या काम आया?",
+    "what_went_wrong": "इस बार क्या मदद नहीं कर पाया?",
+    "tap_any": "कोई भी टैप करें",
+    "done": "हो गया",
+    "thanks": "शुक्रिया — इससे हम आपकी बेहतर मदद कर पाएंगे",
+    "you_rated": "आपने इसे रेट किया",
+    "dismiss_label": "फ़ीडबैक बंद करें",
+    "time_just_now": "अभी-अभी",
+    "time_hours_ago": "{count} घंटे पहले",
+    "time_earlier_today": "आज पहले",
+    "time_yesterday": "कल"
+  },
+  "impact_link": "देखें कैसे CalmGuide परिवारों की मदद कर रहा है",
+  "daily_checkin": {
+    "title": "आज का दिन कैसा रहा?",
+    "severity_calm": "शांत दिन",
+    "severity_mild": "हल्का एपिसोड",
+    "severity_tough": "मुश्किल एपिसोड",
+    "when": "कब?",
+    "time_overnight": "रात को",
+    "time_morning": "सुबह",
+    "time_afternoon": "दोपहर को",
+    "time_evening": "शाम को",
+    "what_helped": "क्या काम आया?",
+    "done": "हो गया",
+    "thanks": "दर्ज किया — इससे हम पैटर्न पहचान पाएंगे"
+  },
+  "care_patterns": {
+    "title": "आज रात थोड़ी अतिरिक्त देखभाल की जरूरत हो सकती है",
+    "reason_cycle": "एपिसोड आमतौर पर हर {interval} दिन में होते हैं, और आखिरी एपिसोड को {days_since} दिन हो गए हैं",
+    "reason_trend": "एपिसोड हाल ही में बढ़ रहे हैं",
+    "what_helps": "पहले क्या मददगार रहा:",
+    "cross_patient_hint": "मिलते-जुलते मरीज़ों की देखभाल करने वाले {count} लोगों को {strategy} फायदेमंद लगा"
+  },
+  "cross_patient": {
+    "title": "मिलते-जुलते मरीज़ों में क्या काम आता है"
+  },
+  "log_incident": "घटना दर्ज करें",
+  "recent_incidents": "हाल की घटनाएं",
+  "see_all": "सभी देखें",
+  "server_error": "हम अभी अपने सर्वर तक नहीं पहुँच सकते। आपातकालीन संपर्क हमेशा ऊपर उपलब्ध हैं।"
+}

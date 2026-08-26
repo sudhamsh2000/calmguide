@@ -1,0 +1,26 @@
+{
+  "id": "scenario_020",
+  "title": "Exit-Seeking at Care Facility",
+  "category": "exit_seeking",
+  "situation": "Mom keeps trying to leave the memory care facility. She stands by the door and waits for someone to open it, then tries to slip out. She tells staff she needs to go home to cook dinner for her family. This is the third time today.",
+  "patient_profile": {
+    "name": "Dorothy",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["exit-seeking behavior", "believes she needs to fulfill homemaker role", "becomes agitated when redirected from doors", "calmer in the afternoon"],
+    "calming_strategies": ["giving her a basket of towels to fold", "asking her to help set the table", "looking through recipe cards together"],
+    "safety_concerns": ["elopement risk", "has made it outside twice before", "gets disoriented quickly outdoors"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Should use purposeful activity redirection (towel folding, table setting). Should NOT say 'you live here now' or 'you can't leave'. Should validate her desire to care for family."
+}

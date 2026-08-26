@@ -1,0 +1,65 @@
+{
+  "title": "Escenarios de Práctica",
+  "subtitle": "Gana confianza con escenarios guiados",
+  "scenario": {
+    "the_situation": "La Situación",
+    "your_response": "Tu Respuesta",
+    "response_placeholder": "¿Cómo manejarías esta situación? Describe qué dirías y harías...",
+    "get_feedback": "Obtener Retroalimentación",
+    "getting_feedback": "Obteniendo Retroalimentación...",
+    "your_feedback": "Tu Retroalimentación",
+    "try_different": "Probar un Enfoque Diferente",
+    "stage_label": "Etapa {stage}",
+    "stages": {
+      "early": "Temprana",
+      "middle": "Media",
+      "late": "Tardía"
+    }
+  },
+  "list": {
+    "subtitle": "Practica situaciones comunes para sentirte más preparado.",
+    "loading": "Cargando escenarios...",
+    "filter_label": "Filtrar por categoría",
+    "filter_all": "Todos",
+    "filter_behavioral": "Comportamental",
+    "filter_daily_care": "Cuidado Diario",
+    "filter_safety": "Seguridad",
+    "filter_communication": "Comunicación",
+    "filter_self_care": "Autocuidado",
+    "empty": "No se encontraron escenarios para esta categoría.",
+    "show_all": "Mostrar todos los escenarios",
+    "load_error": "No se pueden cargar los escenarios. Inténtalo de nuevo más tarde."
+  },
+  "scenarios": {
+    "sundowning-evening": {
+      "title": "Agitación Nocturna (Síndrome del Ocaso)",
+      "description": "Tu ser querido se vuelve cada vez más ansioso y confundido al caer la tarde. Insiste en 'volver a casa' aunque ya está en casa."
+    },
+    "refusal-to-bathe": {
+      "title": "Negativa a Bañarse",
+      "description": "Tu ser querido no se ha bañado en varios días y se pone agresivo cuando se lo sugieres."
+    },
+    "wandering-night": {
+      "title": "Deambulación Nocturna",
+      "description": "Te despiertas a las 2 de la madrugada y encuentras a tu ser querido vestido e intentando salir de casa."
+    },
+    "repeated-questions": {
+      "title": "Preguntas Repetitivas",
+      "description": "Tu ser querido te ha hecho la misma pregunta 15 veces en la última hora. Sientes que se te acaba la paciencia."
+    },
+    "medication-refusal": {
+      "title": "Rechazo a la Medicación",
+      "description": "Tu ser querido escupe sus medicamentos y te acusa de intentar envenenarle."
+    },
+    "caregiver-burnout": {
+      "title": "Agotamiento del Cuidador",
+      "description": "Llevas semanas durmiendo menos de 4 horas por noche. Hoy perdiste la paciencia y eso te pesa."
+    }
+  },
+  "loading": "Cargando escenario...",
+  "error": {
+    "not_found": "No se puede cargar este escenario. Es posible que no exista.",
+    "load_failed": "No se puede cargar este escenario. Inténtalo de nuevo más tarde.",
+    "feedback_failed": "No se puede obtener retroalimentación ahora. Inténtalo de nuevo más tarde."
+  }
+}

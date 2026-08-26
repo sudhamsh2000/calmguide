@@ -1,0 +1,115 @@
+{
+  "logger": {
+    "title": "사건 기록하기",
+    "what_happened": "무슨 일이 있었나요?",
+    "when": "언제 발생했나요?",
+    "just_now": "방금",
+    "earlier_today": "오늘 일찍",
+    "yesterday": "어제",
+    "save": "저장",
+    "saved": "저장되었습니다!",
+    "more_details_prompt": "세부 사항을 추가하시겠습니까?",
+    "yes_add_details": "네, 추가할게요",
+    "no_thanks": "괜찮습니다",
+    "how_bad": "그 순간이 얼마나 강렬했나요?",
+    "how_long": "얼마나 지속되었나요?",
+    "skip": "건너뛰기",
+    "what_before": "그 전에 무엇을 하고 있었나요?",
+    "what_tried": "어떤 방법을 시도하셨나요?",
+    "did_it_help": "도움이 되었나요?",
+    "anything_else": "기억해 두고 싶은 것이 있으신가요?",
+    "tap_to_dictate": "탭하여 음성 입력",
+    "done": "완료",
+    "category": {
+      "aggression_anger": "공격성\n또는 분노",
+      "confusion_disorientation": "혼란",
+      "wandering_exit_seeking": "배회\n또는 외출 시도",
+      "refusing_care": "돌봄\n거부",
+      "sleep_problems": "수면\n문제",
+      "hallucinations": "환각\n증상",
+      "repetitive_behavior": "반복\n행동",
+      "other": "기타"
+    },
+    "severity": {
+      "mild": "경미",
+      "moderate": "보통",
+      "severe": "심각"
+    },
+    "duration": {
+      "seconds": "수 초",
+      "minutes": "수 분",
+      "about_an_hour": "약 1시간",
+      "longer": "그 이상"
+    },
+    "antecedent": {
+      "task_demand": "돌봄 중",
+      "transition": "전환 시",
+      "environmental": "소음 / 혼잡",
+      "social": "혼자 / 무료함",
+      "physical_state": "신체적 필요",
+      "unknown": "잘 모르겠음"
+    },
+    "intervention": {
+      "music": "음악",
+      "redirect": "주의 전환",
+      "quiet_space": "조용한 공간",
+      "warm_drink": "따뜻한 음료",
+      "wait_it_out": "지켜보기",
+      "other": "기타"
+    },
+    "outcome": {
+      "resolved": "해결됨",
+      "partially_resolved": "부분적",
+      "unresolved": "아니요",
+      "escalated": "악화됨"
+    }
+  },
+  "verification": {
+    "title": "앞서 기록된 내용입니다",
+    "looks_right": "맞습니다",
+    "let_me_fix": "수정할게요",
+    "dismiss": "닫기"
+  },
+  "history": {
+    "title": "사건 기록",
+    "filter_all_types": "전체 유형",
+    "filter_this_month": "이번 달",
+    "no_incidents": "아직 기록된 사건이 없습니다",
+    "no_incidents_subtitle": "기록하신 사건이 여기에 표시됩니다",
+    "resolved": "해결됨",
+    "partially_resolved": "부분 해결",
+    "unresolved": "미해결",
+    "escalated": "악화됨",
+    "see_all": "전체 사건 보기",
+    "auto_extracted": "자동 기록",
+    "manual": "직접 기록"
+  },
+  "patterns": {
+    "title": "발견된 패턴",
+    "this_week": "이번 주",
+    "up_from": "지난달 주 {count}회에서 증가",
+    "most_common": "가장 빈번함",
+    "whats_helping": "도움이 되는 것",
+    "see_details": "상세 보기",
+    "time_clusters": "시간대별",
+    "frequency": "빈도",
+    "what_works": "효과 있음",
+    "what_doesnt": "효과 없음",
+    "trend": "추이 (최근 30일)"
+  },
+  "home": {
+    "log_incident": "사건 기록하기"
+  },
+  "detail": {
+    "when": "언제",
+    "what_happened": "무슨 일이 있었나요",
+    "severity": "심각도",
+    "duration": "지속 시간",
+    "what_before": "이전에 무슨 일이 있었나요",
+    "what_tried": "어떤 조치를 취했나요",
+    "outcome": "결과",
+    "location": "장소",
+    "source": "출처",
+    "not_found": "사건을 찾을 수 없습니다"
+  }
+}

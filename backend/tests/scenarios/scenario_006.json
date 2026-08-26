@@ -1,0 +1,26 @@
+{
+  "id": "scenario_006",
+  "title": "Verbal Aggression",
+  "category": "aggression",
+  "situation": "Dad is calling me horrible names and telling me to get out of his house. He says I'm a stranger who broke in. I've been caring for him for two years.",
+  "patient_profile": {
+    "name": "Frank",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["doesn't recognize family members at times", "verbal aggression when confused", "Capgras-like delusions"],
+    "calming_strategies": ["leaving and re-entering the room", "introducing self gently", "showing wedding photos together"],
+    "safety_concerns": ["may call police on family", "becomes more agitated if contradicted"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'I'm your son/daughter, don't you remember?'. Should explain misidentification as a brain change, not personal rejection."
+}

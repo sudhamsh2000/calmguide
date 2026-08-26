@@ -1,0 +1,26 @@
+{
+  "id": "scenario_007",
+  "title": "Sundowning - Evening Anxiety",
+  "category": "sundowning",
+  "situation": "It's 5pm and Mom is pacing around the house saying she needs to pick up the children from school. She's getting more anxious by the minute. This happens every evening.",
+  "patient_profile": {
+    "name": "Patricia",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["sundowning starting at 4-5pm", "believes children are young", "paces and wrings hands"],
+    "calming_strategies": ["turning on more lights", "starting a simple folding task", "playing hymns from her church"],
+    "safety_concerns": ["trips over furniture while pacing", "has tried to leave house at dusk"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'Your children are grown up now'. Should explain sundowning biology. Suggest increasing lighting and structured activity."
+}

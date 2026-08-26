@@ -1,0 +1,152 @@
+{
+  "app_name": "CalmGuide",
+  "nav": {
+    "home": "Home",
+    "coach": "Moment Coach",
+    "learn": "Practice",
+    "check_in": "Check-In",
+    "profile": "Profile",
+    "settings": "Settings",
+    "back_to_home": "Back to home",
+    "back_to_scenarios": "Back to scenarios",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "back": "Back"
+  },
+  "actions": {
+    "send": "Send",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "try_again": "Try Again",
+    "dismiss": "Dismiss",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied",
+    "speak_now": "Speak now…",
+    "loading_label": "Loading"
+  },
+  "loading": "Loading...",
+  "error": {
+    "generic": "Something didn't work on our end. Your information is safe — please try again.",
+    "connection": "We can't reach our servers right now. If you need immediate help, the Alzheimer's Helpline is available at 1-800-272-3900.",
+    "no_access_code": "It looks like you haven't set up a care profile yet. Let's get that done — it only takes a few minutes."
+  },
+  "login": {
+    "title": "Enter Access Code",
+    "subtitle": "Enter the 8-character access code you received when you set up your care profile, along with your loved one's name.",
+    "code_label": "Access Code",
+    "code_hint": "8 characters, letters and numbers",
+    "name_label": "Your Loved One's Name",
+    "name_placeholder": "e.g. Dad, Mom, Margaret",
+    "name_hint": "Stored only on this device — never sent to our servers.",
+    "submit": "Connect to Profile",
+    "submitting": "Connecting...",
+    "error_not_found": "Access code not found. Please check and try again.",
+    "error_incomplete_code": "Please enter your complete 8-character access code.",
+    "error_missing_name": "Please enter your loved one's name.",
+    "no_code": "Don't have an access code?",
+    "setup_new": "Set up a new profile",
+    "back": "Back to welcome"
+  },
+  "disclaimer": {
+    "title": "Before you continue",
+    "lead_a": "CalmGuide is an",
+    "lead_a_emph": "educational and emotional-support companion",
+    "lead_a_tail": ".",
+    "lead_b": "It is",
+    "lead_b_emph": "not a medical device",
+    "lead_b_tail": ".",
+    "no_diagnosis": "It does not diagnose, treat, or provide medical advice.",
+    "bullet_emergency": "In emergencies, call",
+    "bullet_doctor": "For medical questions, call your doctor",
+    "bullet_helpline_lead": "For trained human support, call the",
+    "bullet_helpline_emph": "Alzheimer's Association 24/7 Helpline",
+    "bullet_helpline_at": "at",
+    "ack": "CalmGuide uses AI to offer guidance — it's here to help, but it's not a replacement for your doctor or emergency services.",
+    "cta": "I understand — continue"
+  },
+  "journey_nav": {
+    "heading": "Where are you in the journey?",
+    "noticing": "Noticing changes?",
+    "diagnosis": "New diagnosis",
+    "hospice": "Thinking about hospice",
+    "bereavement": "After loss"
+  },
+  "welcome": {
+    "tagline": "Calm guidance when your loved one needs you most.",
+    "get_started": "Get Started",
+    "have_access_code": "I have an access code",
+    "facility_login": "I'm care facility staff",
+    "privacy_note": "Your conversations are private. No personal data is stored on our servers.",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "privacy_hint": "To protect everyone's privacy, we encourage you to describe behaviors rather than using names or personal details.",
+  "language": {
+    "label": "Language",
+    "auto_detected": "We'll use {language} — would you like a different language?",
+    "change": "Change language",
+    "confirm": "Continue with {language}"
+  },
+  "tags": {
+    "calm_approach": "Calm approach",
+    "music": "Music",
+    "redirection": "Redirection",
+    "physical_space": "Physical space",
+    "familiar_objects": "Familiar objects",
+    "routine": "Routine",
+    "lighting": "Lighting",
+    "simple_words": "Simple words",
+    "physical_touch": "Physical touch",
+    "called_for_help": "Called for help",
+    "waited_it_out": "Waited it out",
+    "left_the_room": "Left the room",
+    "too_generic": "Too generic",
+    "wrong_situation": "Wrong situation",
+    "didnt_understand": "Didn't understand",
+    "felt_unsafe": "Felt unsafe",
+    "already_tried": "Already tried this"
+  },
+  "emergency": {
+    "label": "Emergency contacts",
+    "call_911": "Call 911",
+    "call_988": "Call 988 Suicide and Crisis Lifeline",
+    "crisis_line": "988 Crisis Line",
+    "call_alz": "Call Alzheimer's Association Helpline",
+    "alz_helpline": "Alz Helpline",
+    "choose_option": "Choose the fastest option for urgent support.",
+    "emergency_services": "Emergency services"
+  },
+  "restart": {
+    "title": "Restart required",
+    "message": "Please fully close the app and reopen it to apply the new layout direction.",
+    "ok": "OK"
+  },
+  "error_boundary": {
+    "title": "Something went wrong",
+    "message": "The app encountered an error. Your data is safe.",
+    "retry": "Try Again"
+  },
+  "accessibility": {
+    "back": "Back",
+    "voice_input": "Voice input",
+    "stop_voice": "Stop voice input",
+    "voice_stopped": "Voice input stopped",
+    "listening": "Listening. Speak now.",
+    "read_aloud": "Read aloud",
+    "stop_reading": "Stop reading",
+    "switch_light": "Switch to light mode",
+    "switch_dark": "Switch to dark mode",
+    "loading_response": "Loading response",
+    "edit_profile": "Edit profile",
+    "helpful": "Helpful",
+    "not_helpful": "Not helpful",
+    "dismiss_feedback": "Dismiss feedback",
+    "send_message": "Send message",
+    "delete": "Delete"
+  },
+  "add": "Add",
+  "cancel": "Cancel",
+  "add_custom": "Add custom option",
+  "type_custom": "Type your own..."
+}

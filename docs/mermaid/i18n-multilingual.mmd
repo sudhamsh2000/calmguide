@@ -1,0 +1,101 @@
+---
+title: "Internationalization — 11-Language Pipeline"
+---
+flowchart TB
+    subgraph SUPPORTED ["11 Supported Languages"]
+        direction LR
+        L1["en (English)"]
+        L2["es (Spanish)"]
+        L3["fr (French)"]
+        L4["de (German)"]
+        L5["ar (Arabic)"]
+        L6["hi (Hindi)"]
+        L7["ta (Tamil)"]
+        L8["ja (Japanese)"]
+        L9["ko (Korean)"]
+        L10["pt-br (Brazilian Portuguese)"]
+        L11["zh (Chinese Simplified)"]
+    end
+
+    subgraph LOCALE_RESOLUTION ["Locale Resolution Chain"]
+        direction TB
+        LR1["1. X-App-Locale header<br/>(set by frontend from user preference)"]
+        LR2["2. Accept-Language header<br/>(browser default)"]
+        LR3["3. Default: en"]
+        LR1 -->|"not set"| LR2
+        LR2 -->|"not matched"| LR3
+    end
+
+    subgraph FRONTEND_WEB ["Frontend (Next.js + next-intl)"]
+        direction TB
+        FW1["URL routing: /[locale]/page<br/>/en/coach, /ta/home, /ar/learn"]
+        FW2["Middleware: negotiates locale<br/>from URL → header → browser"]
+        FW3["Server-side translation loading<br/>/locales/{lang}/{namespace}.json"]
+        FW4["7 namespaces per language:<br/>common, home, coach, checkin,<br/>learn, profile, impact"]
+        FW5["RTL support for Arabic<br/>(CSS dir attribute)"]
+    end
+
+    subgraph FRONTEND_MOBILE ["Mobile (Expo + i18next)"]
+        direction TB
+        FM1["Static imports: all 11 locales × 7 namespaces<br/>(bundled at build time)"]
+        FM2["Device locale detection<br/>(expo-localization)"]
+        FM3["RTL: I18nManager.forceRTL() for Arabic"]
+    end
+
+    subgraph BACKEND_LOCALE ["Backend Locale Handling"]
+        direction TB
+        BL1["resolve_locale_code()<br/>maps header → supported code"]
+        BL2["resolve_language()<br/>code → language name<br/>(e.g., 'ta' → 'Tamil')"]
+        BL3["resolve_language_constraint()<br/>returns script/register rules"]
+        BL4["resolve_model_for_locale()<br/>non-English → gpt-4o override<br/>(better multilingual output)"]
+        BL5["Locale stored on each conversation row"]
+        BL1 --> BL2 & BL3 & BL4 & BL5
+    end
+
+    subgraph LANGUAGE_CONSTRAINTS ["Script-Specific Constraints (6 languages)"]
+        direction TB
+        LC_AR["Arabic: Modern Standard Arabic, فصحى,<br/>Arabic script only, formal register"]
+        LC_HI["Hindi: Devanagari script,<br/>no romanization, शुद्ध हिंदी, आप form"]
+        LC_TA["Tamil: Written Tamil (எழுத்துத் தமிழ்),<br/>8 detailed rules, SOV structure,<br/>common vocabulary corrections,<br/>post-write verification step"]
+        LC_JA["Japanese: です/ます体 (polite form)"]
+        LC_KO["Korean: Hangul, 합쇼체/해요체<br/>(polite formal)"]
+        LC_ZH["Chinese: Simplified (简体中文),<br/>warm/respectful tone"]
+    end
+
+    subgraph RAG_MULTILINGUAL ["RAG Multilingual Query (retrieval_query.py)"]
+        direction TB
+        RM1["RAG corpus is English-only<br/>(41 pages from nonprofit sources)"]
+        RM2{"Is locale English?"}
+        RM3["LLM rewrites query to English<br/>'Convert caregiver request into<br/>concise English retrieval query'"]
+        RM4["Sanitize: 280 chars, normalize whitespace"]
+        RM5["Search English corpus with English query"]
+        RM6["LLM responds in target language<br/>(language constraint in prompt)"]
+        RM2 -->|"No"| RM3 --> RM4 --> RM5 --> RM6
+        RM2 -->|"Yes"| RM5
+    end
+
+    subgraph RESPONSE_GUARD_MULTI ["Response Guard — Multilingual Validation"]
+        direction TB
+        RG1["Script Ratio Check<br/>(≥65% in target script, 55% for ja)"]
+        RG2["Romanization Detection<br/>(<20% pure ASCII words in non-Latin text)"]
+        RG3["Localized Disrespectful Phrases<br/>Tamil (6), Hindi (6), Arabic (5),<br/>Chinese (4), Japanese (3), Korean (3)"]
+        RG4["Locale-Specific Fallback Messages<br/>3 modes × 11 languages = 33 fallbacks"]
+    end
+
+    subgraph SAFETY_GATE_MULTI ["Safety Gate — Multilingual Patterns"]
+        direction TB
+        SG1["Life-threat: 10 multilingual patterns<br/>(es, fr, de, pt, ja, ko, zh, hi, ta, ar)"]
+        SG2["Self-harm: 10 multilingual patterns<br/>(same 10 languages)"]
+        SG3["Emergency numbers per locale<br/>(11 locale-specific number sets)"]
+    end
+
+    LOCALE_RESOLUTION --> BACKEND_LOCALE
+    BACKEND_LOCALE --> LANGUAGE_CONSTRAINTS
+    BACKEND_LOCALE --> RAG_MULTILINGUAL
+    BACKEND_LOCALE --> RESPONSE_GUARD_MULTI
+    BACKEND_LOCALE --> SAFETY_GATE_MULTI
+
+    classDef latin fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef nonlatin fill:#FFF3E0,color:#E65100,stroke:#FFCC80
+    class L1,L2,L3,L4,L10 latin
+    class L5,L6,L7,L8,L9,L11 nonlatin

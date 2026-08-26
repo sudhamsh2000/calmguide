@@ -1,0 +1,230 @@
+---
+title: "CalmGuide Database — Entity Relationship Diagram"
+---
+erDiagram
+    profiles ||--o{ conversations : "has"
+    profiles ||--o| profile_insights : "has one"
+    profiles ||--o{ daily_checkin : "has"
+    profiles ||--o{ incidents : "has"
+    profiles ||--o| behavioral_dossier : "has one"
+    profiles ||--o{ care_change_events : "has"
+    profiles ||--o{ facility_patient_links : "linked to"
+    profiles ||--o{ staff_patient_assignments : "assigned to"
+
+    conversations ||--o| response_feedback : "has one"
+    conversations }o--o| staff : "logged by"
+    conversations }o--o| facilities : "within"
+
+    incidents }o--o| conversations : "extracted from"
+    incidents }o--o| staff : "logged by"
+    incidents }o--o| facilities : "within"
+
+    facilities ||--o{ staff : "employs"
+    facilities ||--o{ facility_patient_links : "has"
+    facilities ||--o{ staff_patient_assignments : "manages"
+    facilities ||--o{ audit_logs : "has"
+
+    staff ||--o{ staff_patient_assignments : "assigned"
+    staff ||--o{ audit_logs : "performed"
+
+    profiles {
+        string id PK "UUID"
+        string access_code_hash UK "SHA-256, indexed"
+        string disease_stage "early|middle|late|unknown"
+        text behavioral_patterns "AES-256-GCM encrypted JSON array"
+        text calming_strategies "AES-256-GCM encrypted JSON array"
+        text safety_concerns "AES-256-GCM encrypted JSON array"
+        string previous_stage "nullable"
+        timestamp stage_changed_at "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    conversations {
+        string id PK "UUID"
+        string session_id IX "groups messages in a session"
+        string profile_id FK
+        string role "user|assistant"
+        string locale_code "nullable, e.g. en, ta, ar"
+        text suggested_tags "AES-256-GCM encrypted JSON"
+        text content "AES-256-GCM encrypted"
+        string caregiver_role "nullable"
+        boolean is_safety_gate "false by default"
+        string staff_id FK "nullable (B2B)"
+        string facility_id FK "nullable (B2B)"
+        string metadata "nullable, encrypted JSON"
+        timestamp created_at
+    }
+
+    incidents {
+        string id PK "UUID"
+        string profile_id FK
+        string conversation_id FK "nullable"
+        string source "manual|voice|auto_extracted"
+        timestamp incident_time
+        string time_slot "overnight|morning|afternoon|evening"
+        string behavior_category "7 categories + other"
+        string behavior_subcategory "nullable"
+        string npi_domain "nullable"
+        string severity "mild|moderate|severe"
+        string duration_category "seconds|minutes|about_an_hour|longer"
+        text antecedent_description "AES-256-GCM encrypted"
+        string antecedent_category "6 categories"
+        text behavior_description "AES-256-GCM encrypted"
+        text intervention_description "AES-256-GCM encrypted"
+        string intervention_outcome "resolved|partially_resolved|unresolved|escalated"
+        string location "nullable"
+        boolean is_recurring "nullable"
+        string caregiver_role "nullable"
+        string recall_confidence "high|moderate|low|very_low"
+        float extraction_confidence "0.0-1.0, nullable"
+        boolean verified_by_caregiver
+        timestamp verified_at "nullable"
+        string staff_id FK "nullable (B2B)"
+        string facility_id FK "nullable (B2B)"
+        text metadata "AES-256-GCM encrypted JSON"
+        timestamp created_at
+    }
+
+    behavioral_dossier {
+        string id PK "UUID"
+        string profile_id FK UK "one per profile"
+        boolean is_stale "dirty-flag pattern"
+        integer version
+        text dossier_text "AES-256-GCM encrypted narrative"
+        text contraindicated_json "AES-256-GCM encrypted"
+        text effective_json "AES-256-GCM encrypted"
+        text escalation_pattern "AES-256-GCM encrypted"
+        text seven_day_timeline "AES-256-GCM encrypted"
+        text frequency_trends "AES-256-GCM encrypted"
+        text medication_correlation "AES-256-GCM encrypted"
+        text caregiver_distress_trend "AES-256-GCM encrypted"
+        text delirium_flags "AES-256-GCM encrypted"
+        text pain_flags "AES-256-GCM encrypted"
+        timestamp computed_at
+        timestamp created_at
+    }
+
+    care_change_events {
+        string id PK "UUID"
+        string profile_id FK
+        date change_date
+        text description "AES-256-GCM encrypted"
+        integer observation_window_days "default 28"
+        boolean is_active
+        timestamp created_at
+    }
+
+    profile_insights {
+        string id PK "UUID"
+        string profile_id FK UK "one per profile"
+        timestamp computed_at
+        text insights_json "AES-256-GCM encrypted JSON"
+    }
+
+    response_feedback {
+        string id PK "UUID"
+        string conversation_id FK UK "one per assistant message"
+        boolean helpful "null = skipped"
+        text tags "AES-256-GCM encrypted JSON"
+        text negative_reasons "AES-256-GCM encrypted JSON"
+        string source "home"
+        timestamp created_at
+    }
+
+    daily_checkin {
+        string id PK "UUID"
+        string profile_id FK
+        date check_date
+        string time_slot "nullable"
+        string severity "calm|mild|tough"
+        text tags "AES-256-GCM encrypted JSON"
+        timestamp created_at
+    }
+
+    cross_patient_strategies {
+        string id PK "UUID"
+        string cohort_key "e.g. middle:overnight"
+        string strategy_tag "one of 12 predefined tags"
+        integer helped_count
+        integer total_profiles
+        timestamp computed_at
+    }
+
+    facilities {
+        string id PK "UUID"
+        string name
+        string facility_code_hash UK "SHA-256, indexed"
+        jsonb settings "nullable"
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    staff {
+        string id PK "UUID"
+        string facility_id FK
+        string name
+        string email "nullable, indexed"
+        string role "staff|admin|owner"
+        string pin_hash "bcrypt, nullable"
+        string password_hash "bcrypt, nullable"
+        string language_preference "default en-US"
+        boolean is_active
+        timestamp last_login_at "nullable"
+        integer failed_login_count "5 → lockout"
+        timestamp locked_until "nullable"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    staff_patient_assignments {
+        string id PK "UUID"
+        string staff_id FK
+        string profile_id FK
+        string facility_id FK
+        string shift_pattern "day|evening|night|all"
+        boolean is_primary
+        timestamp started_at
+        timestamp ended_at "null = active"
+    }
+
+    facility_patient_links {
+        string id PK "UUID"
+        string facility_id FK
+        string profile_id FK
+        string linked_by FK "staff who linked"
+        string unit "nullable"
+        string room "nullable"
+        string bed "nullable"
+        boolean is_active
+        timestamp linked_at
+    }
+
+    audit_logs {
+        bigint id PK "autoincrement"
+        timestamp timestamp
+        string user_id FK "staff.id"
+        string user_name
+        string user_role
+        string action "LOGIN|CREATE|READ|UPDATE|DELETE|..."
+        string resource_type "auth|staff|patient_link|..."
+        string resource_id "nullable"
+        string outcome "SUCCESS|FAILURE"
+        string facility_id FK
+        string source_ip "nullable"
+        string user_agent "nullable"
+        jsonb details "nullable"
+    }
+
+    rag_chunks {
+        bigint id PK "autoincrement"
+        string chunk_id UK "SHA-256 dedup"
+        text content
+        text source_url
+        text source_title
+        text source_name
+        text source_domain
+        vector embedding "vector(3072)"
+        tsvector search_vector "generated column"
+    }

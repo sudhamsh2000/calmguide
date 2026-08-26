@@ -1,0 +1,115 @@
+{
+  "logger": {
+    "title": "Log an incident",
+    "what_happened": "What happened?",
+    "when": "When did this happen?",
+    "just_now": "Just now",
+    "earlier_today": "Earlier today",
+    "yesterday": "Yesterday",
+    "save": "Save",
+    "saved": "Saved!",
+    "more_details_prompt": "Want to add a few more details?",
+    "yes_add_details": "Yes, add details",
+    "no_thanks": "No thanks",
+    "how_bad": "How intense was the moment?",
+    "how_long": "How long did it last?",
+    "skip": "Skip",
+    "what_before": "What was happening before?",
+    "what_tried": "What did you try?",
+    "did_it_help": "Did it help?",
+    "anything_else": "Anything else you want to remember?",
+    "tap_to_dictate": "Tap to dictate",
+    "done": "Done",
+    "category": {
+      "aggression_anger": "Aggression\nor anger",
+      "confusion_disorientation": "Confusion",
+      "wandering_exit_seeking": "Wandering\nor leaving",
+      "refusing_care": "Refusing\ncare",
+      "sleep_problems": "Sleep\nproblems",
+      "hallucinations": "Seeing /\nhearing things",
+      "repetitive_behavior": "Repetitive\nbehavior",
+      "other": "Other"
+    },
+    "severity": {
+      "mild": "Mild",
+      "moderate": "Moderate",
+      "severe": "Severe"
+    },
+    "duration": {
+      "seconds": "Seconds",
+      "minutes": "Minutes",
+      "about_an_hour": "About an hour",
+      "longer": "Longer"
+    },
+    "antecedent": {
+      "task_demand": "During care",
+      "transition": "Transition",
+      "environmental": "Noise / crowd",
+      "social": "Alone / bored",
+      "physical_state": "Physical need",
+      "unknown": "Not sure"
+    },
+    "intervention": {
+      "music": "Music",
+      "redirect": "Redirect",
+      "quiet_space": "Quiet space",
+      "warm_drink": "Warm drink",
+      "wait_it_out": "Wait it out",
+      "other": "Other"
+    },
+    "outcome": {
+      "resolved": "Resolved",
+      "partially_resolved": "Partly",
+      "unresolved": "No",
+      "escalated": "Got worse"
+    }
+  },
+  "verification": {
+    "title": "We captured this from earlier",
+    "looks_right": "Looks right",
+    "let_me_fix": "Let me fix something",
+    "dismiss": "Dismiss"
+  },
+  "history": {
+    "title": "Incident History",
+    "filter_all_types": "All types",
+    "filter_this_month": "This month",
+    "no_incidents": "No incidents recorded yet",
+    "no_incidents_subtitle": "Incidents you log will appear here",
+    "resolved": "Resolved",
+    "partially_resolved": "Partly resolved",
+    "unresolved": "Unresolved",
+    "escalated": "Escalated",
+    "see_all": "See all incidents",
+    "auto_extracted": "Auto-captured",
+    "manual": "Manually logged"
+  },
+  "patterns": {
+    "title": "Patterns we're noticing",
+    "this_week": "this week",
+    "up_from": "Up from {count}/week last month",
+    "most_common": "Most common",
+    "whats_helping": "What's helping",
+    "see_details": "See details",
+    "time_clusters": "Time of day",
+    "frequency": "Frequency",
+    "what_works": "What works",
+    "what_doesnt": "What doesn't work",
+    "trend": "Trend (last 30 days)"
+  },
+  "home": {
+    "log_incident": "Log an incident"
+  },
+  "detail": {
+    "when": "When",
+    "what_happened": "What happened",
+    "severity": "Severity",
+    "duration": "Duration",
+    "what_before": "What was happening before",
+    "what_tried": "What was tried",
+    "outcome": "Outcome",
+    "location": "Location",
+    "source": "Source",
+    "not_found": "Incident not found"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "scenario_016",
+  "title": "Refusing to Change Clothes",
+  "category": "hygiene",
+  "situation": "Dad has been wearing the same shirt for five days. When I try to change it, he gets angry and says it's his favorite. He's starting to have skin irritation.",
+  "patient_profile": {
+    "name": "Earl",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["attached to specific clothing", "refuses to change", "doesn't notice soiled clothes"],
+    "calming_strategies": ["buying duplicates of favorite items", "laying out clothes the night before", "making it part of a routine"],
+    "safety_concerns": ["skin irritation", "hygiene declining"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Should suggest buying duplicate shirts, swapping while sleeping, and making dressing a routine. Explain comfort-seeking behavior."
+}

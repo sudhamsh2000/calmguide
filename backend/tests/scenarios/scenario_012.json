@@ -1,0 +1,26 @@
+{
+  "id": "scenario_012",
+  "title": "Repetitive Questions - Deceased Spouse",
+  "category": "repetitive_questions",
+  "situation": "Dad keeps asking where Mom is. She passed away three years ago. Every time I tell him, he breaks down crying like it's the first time. I can't keep doing this to him.",
+  "patient_profile": {
+    "name": "Harold",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["asks about deceased wife repeatedly", "grieves fresh each time told", "looks for wife around the house"],
+    "calming_strategies": ["talking about happy memories of wife", "showing wedding photo", "saying she stepped out for a moment"],
+    "safety_concerns": ["deep grief episodes", "has refused to eat after learning of wife's death again"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "This is a key therapeutic fibbing scenario. Should suggest NOT re-telling the death. Redirect to happy memories or a gentle therapeutic fib."
+}

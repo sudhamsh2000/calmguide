@@ -1,0 +1,26 @@
+{
+  "id": "scenario_013",
+  "title": "Visual Hallucinations",
+  "category": "hallucinations",
+  "situation": "Mom says there are children playing in the living room. There's nobody there. She's smiling and talking to them. Should I be worried?",
+  "patient_profile": {
+    "name": "Evelyn",
+    "disease_stage": "late-middle",
+    "behavioral_patterns": ["sees people who aren't there", "talks to hallucinations", "generally pleasant hallucinations"],
+    "calming_strategies": ["not arguing about what she sees", "gentle distraction with a snack", "changing the lighting in the room"],
+    "safety_concerns": ["occasionally frightening hallucinations at night", "visual processing changes"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'there's nobody there'. Pleasant hallucinations may not need intervention. Explain when hallucinations become concerning."
+}

@@ -1,0 +1,104 @@
+---
+title: "Nightly Job — APScheduler 3am UTC Daily"
+---
+flowchart TB
+    TRIGGER["APScheduler Trigger<br/>cron: hour=3, minute=0 UTC"]
+
+    subgraph PHASE1 ["Phase 1: Per-Profile Insights"]
+        direction TB
+        P1_1["SELECT DISTINCT profile_id<br/>FROM conversations"]
+        P1_2["For each profile_id:"]
+
+        subgraph INSIGHTS_COMPUTE ["compute_profile_insights()"]
+            direction TB
+            IC1["Load all conversations<br/>Group by session_id"]
+            IC2["First message timestamp per session"]
+            IC3["Session frequency<br/>(this_week vs last_week count)"]
+            IC4["Trend detection<br/>≥1.5x → increasing<br/>≤0.7x → decreasing<br/>else → stable"]
+            IC5["Peak time bucket<br/>(overnight/morning/afternoon/evening)"]
+            IC6["Drift alert<br/>(≥3 this week + increasing)"]
+            IC7["Top triggers<br/>(keyword frequency from user messages,<br/>stopwords removed, top 5)"]
+            IC8["Resolution rate<br/>(1-message sessions / total)<br/>overridden by feedback if ≥3 responses"]
+            IC9["Effective strategies<br/>(thumbs-up feedback tags, counted)"]
+            IC10["Ineffective reasons<br/>(thumbs-down reasons, counted)"]
+            IC11["Episode cycle detection<br/>(coaching sessions + non-calm check-ins,<br/>CV-based, ≥5 episodes, ≥14 days)"]
+            IC12["Risk score computation<br/>(cycle position + trend + time bonuses)"]
+            IC13["Care level assignment<br/>(≥50 → needs_attention, <50 → stable)"]
+            IC1 --> IC2 --> IC3 --> IC4
+            IC2 --> IC5
+            IC4 --> IC6
+            IC1 --> IC7
+            IC3 --> IC8
+            IC9 & IC10 --> IC8
+            IC11 --> IC12 --> IC13
+        end
+
+        P1_3{"total_sessions ≥ 3?"}
+        P1_4["UPSERT profile_insights<br/>(encrypt insights_json)"]
+        P1_5["Skip — not enough data"]
+
+        P1_1 --> P1_2 --> INSIGHTS_COMPUTE
+        INSIGHTS_COMPUTE --> P1_3
+        P1_3 -->|"Yes"| P1_4
+        P1_3 -->|"No"| P1_5
+    end
+    TRIGGER --> PHASE1
+
+    subgraph PHASE2 ["Phase 2: Stale Dossier Recomputation"]
+        direction TB
+        P2_1["SELECT profile_id FROM behavioral_dossier<br/>WHERE is_stale = true"]
+        P2_2["For each stale profile:"]
+
+        subgraph DOSSIER_COMPUTE ["compute_dossier()"]
+            direction TB
+            DC1["Load all incidents for profile"]
+            DC2["Load active care change events"]
+            DC3["Apply weights:<br/>temporal (0.0-1.0 by age)<br/>× stage transition (0.3 if pre-transition)<br/>× recall confidence (0.3-1.0)<br/>× extraction confidence (0.0-1.0)<br/>× observation window (0.0 if in window)"]
+            DC4["Separate into:<br/>contraindicated (outcome=escalated)<br/>effective (outcome=resolved)"]
+            DC5["7-day timeline construction"]
+            DC6["Frequency trends per category<br/>(current vs previous week,<br/>spike if ≥2x and ≥2 recent)"]
+            DC7["Delirium flags<br/>(any category has spike direction)"]
+            DC8["Pain flags<br/>(≥2 recent incidents in<br/>aggression + refusing_care + repetitive)"]
+            DC9["Encrypt all fields"]
+            DC10["Set is_stale=false, bump version"]
+            DC1 --> DC3 --> DC4 --> DC5
+            DC2 --> DC3
+            DC4 --> DC6 --> DC7
+            DC4 --> DC8
+            DC9 --> DC10
+        end
+
+        P2_1 --> P2_2 --> DOSSIER_COMPUTE
+    end
+    PHASE1 --> PHASE2
+
+    subgraph PHASE3 ["Phase 3: Cross-Patient Strategy Aggregation"]
+        direction TB
+        P3_1["Load all profiles + disease stages"]
+        P3_2["Compute peak_time per profile<br/>(from conversation timestamps)"]
+        P3_3["Build cohort_key = stage:peak_time<br/>(e.g., middle:overnight)"]
+        P3_4["For each profile in each cohort:<br/>collect thumbs-up feedback tags"]
+        P3_5["Filter to 12 predefined tags only<br/>(no custom tags cross boundaries)"]
+        P3_6["Count unique profiles per tag per cohort"]
+        P3_7["DELETE all cross_patient_strategies<br/>(full rebuild)"]
+        P3_8["INSERT new entries<br/>(cohort_key, strategy_tag,<br/>helped_count, total_profiles)"]
+        P3_1 --> P3_2 --> P3_3 --> P3_4
+        P3_4 --> P3_5 --> P3_6
+        P3_6 --> P3_7 --> P3_8
+    end
+    PHASE2 --> PHASE3
+
+    subgraph ERROR_HANDLING ["Error Isolation"]
+        direction LR
+        EH1["Per-profile failures logged,<br/>don't block other profiles"]
+        EH2["Dossier failures logged per profile"]
+        EH3["Cross-patient failure logged<br/>as separate phase"]
+        EH4["Top-level try/catch<br/>logs and continues"]
+    end
+
+    classDef phase1 fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef phase2 fill:#FFF3E0,color:#E65100,stroke:#FFCC80
+    classDef phase3 fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7
+    class PHASE1 phase1
+    class PHASE2 phase2
+    class PHASE3 phase3

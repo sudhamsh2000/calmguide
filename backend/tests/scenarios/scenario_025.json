@@ -1,0 +1,26 @@
+{
+  "id": "scenario_025",
+  "title": "Paranoia - Accusing Family of Stealing",
+  "category": "hallucinations",
+  "situation": "Mom is screaming that I stole her wedding ring. She says I took it while she was sleeping. She actually lost it months ago but she's convinced I'm a thief. She's threatening to call the police. My kids are here and they're scared.",
+  "patient_profile": {
+    "name": "Rose",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["hides objects and forgets where", "accuses family of stealing", "paranoia worsens in the evening", "fixates on missing items for hours"],
+    "calming_strategies": ["offering to 'help look together'", "distraction with photo albums", "cup of chamomile tea"],
+    "safety_concerns": ["has called 911 about 'intruders' before", "hides important items like medication"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'I didn't steal it' or 'You lost it yourself.' Should validate Rose's distress ('I can see you're really upset about your ring'). Suggest offering to help search together. Explain that confabulation and paranoia are common in middle-stage dementia as the brain fills in gaps. Address the children being present — brief, calm explanation appropriate for them. Recommend keeping duplicate items of frequently lost objects."
+}

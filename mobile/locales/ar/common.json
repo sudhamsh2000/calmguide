@@ -1,0 +1,152 @@
+{
+  "app_name": "CalmGuide",
+  "nav": {
+    "home": "الرئيسية",
+    "coach": "مرشد اللحظة",
+    "learn": "التدريب",
+    "check_in": "كيف حالك",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "back_to_home": "العودة إلى الرئيسية",
+    "back_to_scenarios": "العودة إلى السيناريوهات",
+    "terms": "شروط الخدمة",
+    "privacy": "سياسة الخصوصية",
+    "back": "رجوع"
+  },
+  "actions": {
+    "send": "إرسال",
+    "submit": "تأكيد",
+    "cancel": "إلغاء",
+    "try_again": "حاول مرة أخرى",
+    "dismiss": "إغلاق",
+    "share": "مشاركة",
+    "copy": "Copy",
+    "copied": "Copied",
+    "speak_now": "Speak now…",
+    "loading_label": "Loading"
+  },
+  "loading": "جار التحميل...",
+  "error": {
+    "generic": "حدث خطأ من جانبنا. معلوماتك آمنة — يرجى المحاولة مرة أخرى.",
+    "connection": "لا نستطيع الوصول إلى خوادمنا الآن. إذا كنت بحاجة إلى مساعدة فورية، خط مساعدة الزهايمر متاح على الرقم 1-800-272-3900.",
+    "no_access_code": "يبدو أنك لم تُعِدّ ملف رعاية بعد. لنقم بذلك — لن يستغرق الأمر سوى دقائق قليلة."
+  },
+  "privacy_hint": "لحماية خصوصية الجميع، نشجعك على وصف السلوكيات بدلاً من استخدام الأسماء أو التفاصيل الشخصية.",
+  "language": {
+    "label": "اللغة",
+    "auto_detected": "سنستخدم {language} — هل تريد لغة مختلفة؟",
+    "change": "تغيير اللغة",
+    "confirm": "المتابعة بـ{language}"
+  },
+  "login": {
+    "title": "أدخل رمز الوصول",
+    "subtitle": "أدخل رمز الوصول المكوّن من 8 أحرف الذي تلقّيته عند إعداد ملف الرعاية الخاص بك، مع اسم من تحبّ.",
+    "code_label": "رمز الوصول",
+    "code_hint": "8 أحرف، حروف وأرقام",
+    "name_label": "اسم من تحبّ",
+    "name_placeholder": "مثلاً: أبي، أمي، جدّتي",
+    "name_hint": "يُحفظ على هذا الجهاز فقط — لا يُرسل أبداً إلى خوادمنا.",
+    "submit": "الاتصال بالملف الشخصي",
+    "submitting": "جارٍ الاتصال...",
+    "error_not_found": "لم يُعثر على رمز الوصول. يرجى التحقق والمحاولة مرة أخرى.",
+    "no_code": "ليس لديك رمز وصول؟",
+    "setup_new": "إعداد ملف شخصي جديد",
+    "back": "العودة إلى صفحة الترحيب",
+    "error_incomplete_code": "Please enter your complete 8-character access code.",
+    "error_missing_name": "Please enter your loved one's name."
+  },
+  "welcome": {
+    "tagline": "إرشاد هادئ حين يحتاجك أحباؤك أكثر ما يكون.",
+    "get_started": "ابدأ الآن",
+    "have_access_code": "لدي رمز الوصول",
+    "facility_login": "أنا موظف في مرفق الرعاية",
+    "privacy_note": "محادثاتك خاصة. لا يتم تخزين أي بيانات شخصية على خوادمنا.",
+    "terms": "الشروط",
+    "privacy": "الخصوصية"
+  },
+  "tags": {
+    "calm_approach": "الهدوء والطمأنينة",
+    "music": "الموسيقى",
+    "redirection": "تحويل الانتباه",
+    "physical_space": "المساحة المحيطة",
+    "familiar_objects": "أشياء مألوفة",
+    "routine": "الروتين اليومي",
+    "lighting": "الإضاءة",
+    "simple_words": "كلمات بسيطة",
+    "physical_touch": "اللمس الحنون",
+    "called_for_help": "طلبت المساعدة",
+    "waited_it_out": "انتظرت حتى مرّت",
+    "left_the_room": "غادرت الغرفة",
+    "too_generic": "عام جداً",
+    "wrong_situation": "الموقف مختلف",
+    "didnt_understand": "لم أفهم",
+    "felt_unsafe": "شعرت بعدم الأمان",
+    "already_tried": "جرّبت هذا من قبل"
+  },
+  "disclaimer": {
+    "title": "Before you continue",
+    "lead_a": "CalmGuide is an",
+    "lead_a_emph": "educational and emotional-support companion",
+    "lead_a_tail": ".",
+    "lead_b": "It is",
+    "lead_b_emph": "not a medical device",
+    "lead_b_tail": ".",
+    "no_diagnosis": "It does not diagnose, treat, or provide medical advice.",
+    "bullet_emergency": "In emergencies, call",
+    "bullet_doctor": "For medical questions, call your doctor",
+    "bullet_helpline_lead": "For trained human support, call the",
+    "bullet_helpline_emph": "Alzheimer's Association 24/7 Helpline",
+    "bullet_helpline_at": "at",
+    "ack": "يستخدم CalmGuide الذكاء الاصطناعي لتقديم الإرشادات — هو هنا للمساعدة، لكنه ليس بديلاً عن طبيبك أو خدمات الطوارئ.",
+    "cta": "I understand — continue"
+  },
+  "journey_nav": {
+    "heading": "أين أنت في هذه الرحلة؟",
+    "noticing": "هل تلاحظ تغييرات؟",
+    "diagnosis": "تشخيص جديد",
+    "hospice": "التفكير في الرعاية التلطيفية",
+    "bereavement": "بعد الفقدان"
+  },
+  "emergency": {
+    "label": "جهات اتصال الطوارئ",
+    "call_911": "اتصل بـ 911",
+    "call_988": "اتصل بخط الأزمات 988",
+    "crisis_line": "خط الأزمات 988",
+    "call_alz": "اتصل بخط مساعدة جمعية الزهايمر",
+    "alz_helpline": "خط الزهايمر",
+    "choose_option": "اختر الخيار الأسرع للحصول على دعم عاجل.",
+    "emergency_services": "خدمات الطوارئ"
+  },
+  "add": "إضافة",
+  "cancel": "إلغاء",
+  "add_custom": "إضافة خيار مخصص",
+  "type_custom": "اكتب خيارك...",
+  "restart": {
+    "title": "إعادة تشغيل مطلوبة",
+    "message": "يرجى إغلاق التطبيق بالكامل وإعادة فتحه لتطبيق اتجاه التخطيط الجديد.",
+    "ok": "حسنًا"
+  },
+  "error_boundary": {
+    "title": "حدث خطأ ما",
+    "message": "واجه التطبيق خطأ. بياناتك آمنة.",
+    "retry": "حاول مرة أخرى"
+  },
+  "accessibility": {
+    "back": "رجوع",
+    "voice_input": "إدخال صوتي",
+    "stop_voice": "إيقاف الإدخال الصوتي",
+    "voice_stopped": "تم إيقاف الإدخال الصوتي",
+    "listening": "جارٍ الاستماع. تحدث الآن.",
+    "read_aloud": "قراءة بصوت عالٍ",
+    "stop_reading": "إيقاف القراءة",
+    "switch_light": "التبديل إلى الوضع الفاتح",
+    "switch_dark": "التبديل إلى الوضع الداكن",
+    "loading_response": "جارٍ تحميل الرد",
+    "edit_profile": "تعديل الملف الشخصي",
+    "helpful": "مفيد",
+    "not_helpful": "غير مفيد",
+    "dismiss_feedback": "تجاهل التعليقات",
+    "send_message": "إرسال رسالة",
+    "delete": "حذف"
+  }
+}

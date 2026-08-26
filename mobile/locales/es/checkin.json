@@ -1,0 +1,10 @@
+{
+  "title": "¿Cómo estás llevando todo esto?",
+  "subtitle": "Este momento es solo para ti.",
+  "input_placeholder": "Cuéntame cómo te sientes hoy...",
+  "input_aria_label": "Cómo te sientes hoy",
+  "submit_button": "Compartir",
+  "loading": "Tomando un momento para responder...",
+  "back_to_home": "Volver al inicio",
+  "start_over": "Empezar de nuevo"
+}

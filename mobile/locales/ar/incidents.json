@@ -1,0 +1,115 @@
+{
+  "logger": {
+    "title": "تسجيل حادثة",
+    "what_happened": "ماذا حدث؟",
+    "when": "متى حدث هذا؟",
+    "just_now": "الآن",
+    "earlier_today": "في وقت سابق اليوم",
+    "yesterday": "أمس",
+    "save": "حفظ",
+    "saved": "تم الحفظ!",
+    "more_details_prompt": "هل تريد إضافة بعض التفاصيل؟",
+    "yes_add_details": "نعم، أضف تفاصيل",
+    "no_thanks": "لا، شكراً",
+    "how_bad": "ما مدى حدّة اللحظة؟",
+    "how_long": "كم استمر؟",
+    "skip": "تخطّي",
+    "what_before": "ماذا كان يحدث قبلها؟",
+    "what_tried": "ماذا جرّبت؟",
+    "did_it_help": "هل ساعد ذلك؟",
+    "anything_else": "هل هناك شيء آخر تريد تذكّره؟",
+    "tap_to_dictate": "اضغط للإملاء",
+    "done": "تم",
+    "category": {
+      "aggression_anger": "عدوانية\nأو غضب",
+      "confusion_disorientation": "ارتباك",
+      "wandering_exit_seeking": "تجوّل\nأو محاولة الخروج",
+      "refusing_care": "رفض\nالرعاية",
+      "sleep_problems": "مشاكل\nالنوم",
+      "hallucinations": "رؤية /\nسماع أشياء",
+      "repetitive_behavior": "سلوك\nمتكرر",
+      "other": "أخرى"
+    },
+    "severity": {
+      "mild": "خفيف",
+      "moderate": "متوسط",
+      "severe": "شديد"
+    },
+    "duration": {
+      "seconds": "ثوانٍ",
+      "minutes": "دقائق",
+      "about_an_hour": "حوالي ساعة",
+      "longer": "أطول"
+    },
+    "antecedent": {
+      "task_demand": "أثناء الرعاية",
+      "transition": "انتقال",
+      "environmental": "ضوضاء / ازدحام",
+      "social": "وحده / يشعر بالملل",
+      "physical_state": "حاجة جسدية",
+      "unknown": "غير متأكد"
+    },
+    "intervention": {
+      "music": "موسيقى",
+      "redirect": "تحويل الانتباه",
+      "quiet_space": "مكان هادئ",
+      "warm_drink": "مشروب دافئ",
+      "wait_it_out": "الانتظار",
+      "other": "أخرى"
+    },
+    "outcome": {
+      "resolved": "تم الحل",
+      "partially_resolved": "جزئياً",
+      "unresolved": "لا",
+      "escalated": "ازداد سوءاً"
+    }
+  },
+  "verification": {
+    "title": "التقطنا هذا مما سبق",
+    "looks_right": "يبدو صحيحاً",
+    "let_me_fix": "دعني أصحّح شيئاً",
+    "dismiss": "تجاهل"
+  },
+  "history": {
+    "title": "سجل الحوادث",
+    "filter_all_types": "جميع الأنواع",
+    "filter_this_month": "هذا الشهر",
+    "no_incidents": "لا توجد حوادث مسجّلة بعد",
+    "no_incidents_subtitle": "الحوادث التي تسجّلها ستظهر هنا",
+    "resolved": "تم الحل",
+    "partially_resolved": "حُلّت جزئياً",
+    "unresolved": "لم تُحل",
+    "escalated": "تصاعدت",
+    "see_all": "عرض جميع الحوادث",
+    "auto_extracted": "التقاط تلقائي",
+    "manual": "تسجيل يدوي"
+  },
+  "patterns": {
+    "title": "أنماط لاحظناها",
+    "this_week": "هذا الأسبوع",
+    "up_from": "أكثر من {count}/أسبوع الشهر الماضي",
+    "most_common": "الأكثر شيوعاً",
+    "whats_helping": "ما الذي يساعد",
+    "see_details": "عرض التفاصيل",
+    "time_clusters": "الوقت من اليوم",
+    "frequency": "التكرار",
+    "what_works": "ما ينفع",
+    "what_doesnt": "ما لا ينفع",
+    "trend": "الاتجاه (آخر 30 يوماً)"
+  },
+  "home": {
+    "log_incident": "تسجيل حادثة"
+  },
+  "detail": {
+    "when": "متى",
+    "what_happened": "ماذا حدث",
+    "severity": "الشدة",
+    "duration": "المدة",
+    "what_before": "ماذا كان يحدث قبل ذلك",
+    "what_tried": "ما الذي تم تجربته",
+    "outcome": "النتيجة",
+    "location": "الموقع",
+    "source": "المصدر",
+    "not_found": "لم يتم العثور على الحادثة"
+  }
+}

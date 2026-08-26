@@ -1,0 +1,40 @@
+{
+  "title": "Coach du moment",
+  "subtitle": "Décrivez ce qui se passe et recevez des conseils calmes, étape par étape.",
+  "greeting": "Respirez profondément.",
+  "greeting_detail": "Dites-moi ce qui se passe — je vous guiderai étape par étape.",
+  "input_placeholder": "Décrivez ce qui se passe...",
+  "input_aria_label": "Décrivez ce qui se passe",
+  "submit_button": "Obtenir des conseils",
+  "followup_placeholder": "Posez une question de suivi…",
+  "followup_aria_label": "Message de suivi",
+  "you_asked": "Vous avez demandé",
+  "still_working": "En cours…",
+  "loading_conversation": "Chargement de la conversation…",
+  "sections": {
+    "right_now": "MAINTENANT",
+    "why": "POURQUOI CELA SE PRODUIT",
+    "what_not_to_do": "CE QU'IL NE FAUT PAS FAIRE",
+    "escalation": "QUAND APPELER À L'AIDE"
+  },
+  "error": {
+    "profile_not_found": "Nous n'avons pas trouvé de profil pour ce code. Vérifiez le code dans l'onglet Profil, ou créez un nouveau profil si nécessaire.",
+    "server_error": "Nous ne pouvons pas nous connecter pour le moment. Pendant que nous réessayons, rappelez-vous : vous faites de votre mieux. Si c'est une urgence, appelez le 911.",
+    "something_wrong": "Une erreur s'est produite",
+    "something_wrong_status": "Une erreur s'est produite ({status}). Veuillez réessayer.",
+    "connection_failed": "Connexion impossible. Veuillez vérifier votre connexion et réessayer.",
+    "no_access_code": "Aucun code d'accès trouvé. Veuillez d'abord configurer votre profil.",
+    "loading_failed": "Un problème est survenu lors du chargement de l'Assistant du Moment. Veuillez réessayer."
+  },
+  "honesty_disclaimer": "Moment Coach vous aide quand vous avez le temps de taper et de lire — soirées difficiles, crises comportementales, syndrome crépusculaire. Il ne remplace PAS l'aide d'urgence. Si vous ne pouvez pas poser le téléphone, si vos mains tremblent, si quelqu'un est en danger — appelez le 911.",
+  "safety_disclosure": {
+    "safety_headline": "Assistant IA — pas pour les urgences.",
+    "safety_call_emergency": "Appelez le {number} si quelqu'un est en danger.",
+    "safety_info": "Info sécurité",
+    "safety_hide": "Masquer",
+    "safety_talking_to_ai": "Vous parlez à une IA, pas à un humain.",
+    "safety_emergency_instruction": "En cas d'urgence, appelez le {number}.",
+    "safety_helpline": "Pour un soutien humain formé, appelez le {phone} ({name})."
+  },
+  "finding_guidance": "Recherche de conseils pour vous..."
+}

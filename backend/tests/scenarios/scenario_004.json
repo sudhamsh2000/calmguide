@@ -1,0 +1,26 @@
+{
+  "id": "scenario_004",
+  "title": "Physical Aggression - Hitting",
+  "category": "aggression",
+  "situation": "Dad just hit me when I tried to help him change clothes. He's never done this before. He looks scared and angry.",
+  "patient_profile": {
+    "name": "Walter",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["resists personal care", "startles easily", "former military - reacts to perceived threats"],
+    "calming_strategies": ["speaking in low calm voice", "stepping back and giving space", "playing marching band music"],
+    "safety_concerns": ["has struck caregiver during dressing", "strong upper body"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must prioritize caregiver safety first. Should explain fight-or-flight response in dementia. Must NOT suggest restraint."
+}

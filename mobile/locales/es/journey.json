@@ -1,0 +1,84 @@
+{
+  "trusted_resources": "Recursos de confianza",
+  "noticing": {
+    "title": "¿Está notando cambios?",
+    "subtitle": "Si se pregunta si algo no está bien, no está solo. Muchas familias comienzan aquí.",
+    "p1_lead": "Olvidar un nombre, repetir una pregunta, confundirse en un lugar nuevo — esto puede ser envejecimiento normal o algo más.",
+    "p1_emph": "CalmGuide no puede decirle cuál es el caso.",
+    "p2": "Lo que importa es que lo notó y está prestando atención. Ese es el primer acto de cuidado.",
+    "p3": "Los recursos a continuación pueden ayudarle a entender lo que está observando y decidir si debe hablar con un médico. Una visita al médico es la única forma de saberlo con certeza.",
+    "footnote": "CalmGuide no realiza evaluaciones, diagnósticos ni valoraciones de la función cognitiva. Somos un compañero educativo, no una herramienta médica.",
+    "resources": {
+      "ten_signs_label": "Alzheimer's Association — 10 señales de advertencia",
+      "ten_signs_desc": "Aprenda la diferencia entre el envejecimiento normal y los primeros signos de demencia.",
+      "doctor_label": "Hable con su médico",
+      "doctor_desc": "Solo un profesional médico puede evaluar y diagnosticar. Lleve sus observaciones.",
+      "helpline_label": "Línea de ayuda 24/7 de la Alzheimer's Association",
+      "helpline_desc": "1-800-272-3900 — Apoyo gratuito y confidencial de especialistas capacitados.",
+      "nia_label": "National Institute on Aging — ¿Qué es la demencia?",
+      "nia_desc": "Descripción educativa de los tipos y síntomas de demencia del NIH."
+    }
+  },
+  "diagnosis": {
+    "title": "¿Acaba de recibir un diagnóstico?",
+    "subtitle": "Este es uno de los momentos más difíciles. Tómelo paso a paso.",
+    "p1": "Un diagnóstico de demencia lo cambia todo — y nada — al mismo tiempo. Su ser querido sigue siendo la misma persona que era ayer. Pero ahora tiene un nombre para lo que ha estado pasando, y eso puede sentirse abrumador.",
+    "p2_emph": "No necesita resolver todo hoy.",
+    "p2_tail": "Lo más importante ahora es respirar y saber que millones de familias han recorrido este camino antes que usted.",
+    "p3": "Los recursos a continuación le conectan con personas que pueden ayudarle a dar los primeros pasos — grupos de apoyo, guías de planificación y personas capacitadas que entienden su situación.",
+    "p4": "Cuando esté listo, CalmGuide puede ayudarle con el día a día: aprender sobre la enfermedad, guiarle en momentos difíciles y cuidar de usted mismo en el proceso.",
+    "resources": {
+      "helpline_label": "Línea de ayuda 24/7 de la Alzheimer's Association",
+      "helpline_desc": "1-800-272-3900 — Hable con una persona real ahora mismo. Entienden lo que está sintiendo.",
+      "support_label": "Encuentre un grupo de apoyo local",
+      "support_desc": "Conéctese con otras familias que están pasando por lo mismo cerca de usted.",
+      "after_label": "Alzheimer's Association — Después del diagnóstico",
+      "after_desc": "Qué esperar, planificación legal y primeros pasos después de un diagnóstico.",
+      "can_label": "Caregiver Action Network",
+      "can_desc": "Apoyo, educación y defensa para cuidadores familiares."
+    }
+  },
+  "hospice": {
+    "title": "¿Está considerando cuidados paliativos?",
+    "subtitle": "Esta etapa plantea las preguntas más difíciles. Usted merece el apoyo de personas que han pasado por esto antes.",
+    "p1": "Cuando la demencia llega a su etapa final, el enfoque cambia de manejar comportamientos a brindar confort. Este es un tipo de cuidado completamente diferente — y merece su propio tipo de apoyo.",
+    "p2_emph": "CalmGuide no está preparado para guiarle en decisiones de fin de vida.",
+    "p2_tail": "Estas decisiones son profundamente personales y médicas, y merecen la atención de profesionales de cuidados paliativos, equipos de atención paliativa y consejeros especializados en esta etapa.",
+    "p3": "Lo que sí podemos decirle: elegir cuidados paliativos no es rendirse. Es elegir confort y dignidad para alguien a quien ama.",
+    "resources": {
+      "hfa_label": "Hospice Foundation of America",
+      "hfa_desc": "Educación y apoyo para familias que enfrentan decisiones de fin de vida.",
+      "alz_late_label": "Alzheimer's Association — Cuidados en etapa avanzada",
+      "alz_late_desc": "Qué esperar en la etapa avanzada de la demencia y cómo brindar confort.",
+      "nhpco_label": "National Hospice and Palliative Care Organization",
+      "nhpco_desc": "Encuentre proveedores de cuidados paliativos y conozca las opciones de atención paliativa.",
+      "helpline_label": "Línea de ayuda 24/7 de la Alzheimer's Association",
+      "helpline_desc": "1-800-272-3900 — Consejeros que entienden el cuidado al final de la vida.",
+      "nia_label": "National Institute on Aging — Fin de vida",
+      "nia_desc": "Orientación sobre cuidados de confort, toma de decisiones y qué sucede al final."
+    }
+  },
+  "bereavement": {
+    "title": "Después de la pérdida",
+    "subtitle": "El cuidado puede haber terminado, pero los sentimientos no. Eso es normal.",
+    "p1": "Perder a alguien por demencia es un tipo único de duelo. Es posible que haya estado en duelo durante meses o años antes del fallecimiento — viendo cómo la persona que conocía cambiaba poco a poco. Ahora que se ha ido, el duelo puede sentirse diferente a lo que esperaba.",
+    "p2": "Alivio, culpa, entumecimiento, enojo, tristeza — todo esto es normal. A menudo todo al mismo tiempo.",
+    "p3_emph": "CalmGuide fue creado para el cuidado, no para el apoyo en el duelo.",
+    "p3_tail": "Usted merece personas especializadas en lo que está atravesando ahora. Los recursos a continuación pueden conectarle con ellas.",
+    "p4_lead": "Si el duelo se siente abrumador o tiene pensamientos de hacerse daño, por favor llame al",
+    "p4_emph": "988",
+    "p4_tail": "ahora mismo. Usted también importa.",
+    "resources": {
+      "lifeline_label": "988 Línea de Prevención del Suicidio y Crisis",
+      "lifeline_desc": "Llame o envíe un mensaje de texto al 988 — 24/7, gratuito, confidencial. Si el duelo se siente insoportable ahora.",
+      "alz_grief_label": "Alzheimer's Association — Duelo y pérdida",
+      "alz_grief_desc": "Entendiendo el duelo que comienza mucho antes de la muerte — y continúa después.",
+      "griefshare_label": "GriefShare — Encuentre un grupo de apoyo",
+      "griefshare_desc": "Grupos de apoyo para el duelo locales y en línea en todo el país.",
+      "helpline_label": "Línea de ayuda 24/7 de la Alzheimer's Association",
+      "helpline_desc": "1-800-272-3900 — También apoyan a las familias después de la pérdida, no solo durante el cuidado.",
+      "children_label": "National Alliance for Grieving Children",
+      "children_desc": "Si los niños en la familia también están en duelo."
+    }
+  }
+}

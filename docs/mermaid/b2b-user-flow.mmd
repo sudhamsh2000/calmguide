@@ -1,0 +1,150 @@
+---
+title: "CalmGuide B2B — Facility User Flows by Role"
+---
+flowchart TD
+    FAC_LOGIN["/facility/login"]
+
+    subgraph LOGIN_FLOW ["Login Flow — 4 Modes"]
+        direction TB
+        LM1["1. Enter Facility Code<br/>(8-char, verifies via GET /api/facilities/:code/verify)"]
+        LM2["2. Staff Selector Grid<br/>(GET /api/facilities/:code/staff/active<br/>shows staff-role only, not admin/owner)"]
+        LM3["3. PIN Pad Entry<br/>(POST /api/facility/auth/pin<br/>5 attempts → 30-min lockout)"]
+        LM4["4. Email/Password Login<br/>(POST /api/facility/auth/login<br/>for admin/owner roles)"]
+        LM1 -->|"Code valid"| LM2
+        LM2 -->|"Select staff member"| LM3
+        LM1 -->|"Admin login link"| LM4
+        LM2 -->|"Admin login link"| LM4
+    end
+    FAC_LOGIN --> LOGIN_FLOW
+
+    subgraph AUTH_GUARD ["Auth & Session — FacilityContext"]
+        direction TB
+        AG1["JWT Token (15-min expiry)"]
+        AG2["Auto-refresh every 5 min"]
+        AG3["Inactivity timeout: 15 min<br/>(mouse/touch/key/scroll resets)"]
+        AG4["localStorage: token + staff + facility code"]
+        AG5["FacilityProvider wraps /facility/* routes"]
+        AG1 --> AG2 --> AG3
+    end
+    LOGIN_FLOW -->|"Successful auth<br/>JWT + staff info stored"| AUTH_GUARD
+
+    %% =====================================================================
+    %% ROLE: CNA (staff)
+    %% =====================================================================
+    subgraph CNA_FLOW ["CNA (staff role) — /facility/residents"]
+        direction TB
+        CNA1["My Residents List<br/>(GET /api/facility/my-residents<br/>filtered by StaffPatientAssignment)"]
+        CNA2["Resident Card<br/>(risk badge, top contraindicated,<br/>top effective, last incident)"]
+        CNA3["Behavioral Card<br/>(GET /api/facility/residents/:id/behavioral-card)"]
+        CNA4["What NOT To Do<br/>(red, from contraindicated_json)"]
+        CNA5["What Works<br/>(green, from effective_json)"]
+        CNA6["Escalation Pattern"]
+        CNA7["Recent Incidents (7 days)"]
+        CNA1 --> CNA2 -->|"Tap"| CNA3
+        CNA3 --> CNA4 & CNA5 & CNA6 & CNA7
+    end
+    AUTH_GUARD -->|"role=staff → redirect"| CNA_FLOW
+
+    CNA3 -->|"Ask Moment Coach"| CRISIS_B2B["/coach?profile_id=...&risk=...&unit=..."]
+    CNA3 -->|"Log Incident"| INCIDENT_B2B["/incidents/new?profile_id=..."]
+
+    subgraph CRISIS_B2B_FLOW ["B2B Coach Mode"]
+        direction TB
+        CB1["ResidentContextBanner<br/>(unit/room/bed + risk badge)"]
+        CB2["FacilityModeShell<br/>(wraps in FacilityProvider)"]
+        CB3["Same coach flow as B2C<br/>but uses profile_id instead of access_code"]
+        CB4["Conversations tagged with<br/>staff_id + facility_id"]
+        CB1 --> CB2 --> CB3 --> CB4
+    end
+    CRISIS_B2B --> CRISIS_B2B_FLOW
+
+    subgraph INCIDENT_B2B_FLOW ["B2B Incident Logging"]
+        direction TB
+        IB1["POST /api/incidents/by-profile/:profile_id<br/>(requires staff/admin role via RBAC)"]
+        IB2["staff_id + facility_id attached"]
+        IB1 --> IB2
+    end
+    INCIDENT_B2B --> INCIDENT_B2B_FLOW
+
+    %% =====================================================================
+    %% ROLE: Admin (DON)
+    %% =====================================================================
+    subgraph ADMIN_FLOW ["Admin/DON — /facility/dashboard + management"]
+        direction TB
+        AD1["Dashboard Summary<br/>(GET /api/facility/dashboard/summary)"]
+        AD2["KPI Cards: Incidents (total/severe),<br/>Staff Adoption %, Family Sessions"]
+        AD3["Trends Page<br/>(GET /api/facility/dashboard/trends<br/>7d/30d/90d periods)"]
+        AD4["Incident Frequency by Category"]
+        AD5["Time of Day Distribution"]
+        AD6["Intervention Effectiveness (success rate)"]
+        AD7["Staff Activity<br/>(GET /api/facility/dashboard/staff-activity)"]
+        AD8["Sessions/week, Incidents logged,<br/>Assigned patients per staff"]
+        AD1 --> AD2
+        AD3 --> AD4 & AD5 & AD6
+        AD7 --> AD8
+    end
+    AUTH_GUARD -->|"role=admin → redirect"| ADMIN_FLOW
+
+    subgraph STAFF_MGMT ["Staff Management"]
+        direction TB
+        SM1["Staff List<br/>(GET /api/facilities/:code/staff)"]
+        SM2["Add Staff<br/>(POST — name, PIN, role, language)"]
+        SM3["Edit Staff / Deactivate<br/>(PUT / DELETE)"]
+        SM4["Assign Staff → Patient<br/>(POST /api/facilities/:code/assignments)"]
+        SM5["Remove Assignment<br/>(DELETE /api/facilities/:code/assignments/:id)"]
+        SM1 --> SM2 & SM3
+        SM1 --> SM4 & SM5
+    end
+    ADMIN_FLOW --> STAFF_MGMT
+
+    subgraph RESIDENT_MGMT ["Resident Management"]
+        direction TB
+        RM1["All Residents List<br/>(GET /api/facilities/:code/patients)"]
+        RM2["Add Resident<br/>(POST /api/facilities/:code/residents<br/>creates Profile + FacilityPatientLink)"]
+        RM3["Link Existing Patient<br/>(POST /api/facilities/:code/patients<br/>by access_code)"]
+        RM4["Staff Assignment During Creation<br/>(checkbox grid of active CNAs)"]
+        RM2 --> RM4
+    end
+    ADMIN_FLOW --> RESIDENT_MGMT
+
+    subgraph AUDIT ["Audit Logs"]
+        direction TB
+        AU1["GET /api/facility/audit-logs<br/>Filter: user_id, resource_type, date range"]
+        AU2["Logged: LOGIN, FAILED_LOGIN, LOGOUT,<br/>CREATE, READ, UPDATE, DELETE<br/>on: auth, staff, patient_link, resident,<br/>assignment, patient_profile, facility_dashboard"]
+    end
+    ADMIN_FLOW --> AUDIT
+
+    ADMIN_FLOW -->|"Download Report"| PDF["GET /api/facility/report/pdf<br/>(ReportLab PDF with KPIs,<br/>categories, time distribution)"]
+
+    %% =====================================================================
+    %% ROLE: Owner (Executive)
+    %% =====================================================================
+    subgraph OWNER_FLOW ["Owner/Executive — /facility/executive"]
+        direction TB
+        OW1["Executive Overview<br/>(GET /api/facility/executive/overview)"]
+        OW2["Days Active"]
+        OW3["Incident Rate<br/>(current vs previous 30d, % change)"]
+        OW4["Staff Adoption Rate<br/>(active in 7d / total)"]
+        OW5["ROI Estimate<br/>(incident reduction %)"]
+        OW1 --> OW2 & OW3 & OW4 & OW5
+    end
+    AUTH_GUARD -->|"role=owner → redirect"| OWNER_FLOW
+
+    OWNER_FLOW -->|"Has all admin capabilities"| ADMIN_FLOW
+
+    subgraph NAV ["Facility Navigation Bar"]
+        direction LR
+        N1["Residents"]
+        N2["Dashboard"]
+        N3["Staff"]
+        N4["Trends"]
+        N5["Settings"]
+        N6["Logout"]
+    end
+
+    classDef cna fill:#E0F0E7,color:#333,stroke:#3A7D5C
+    classDef admin fill:#EDE4F7,color:#333,stroke:#7C4DBA
+    classDef owner fill:#FFF3CD,color:#333,stroke:#FFE69C
+    class CNA_FLOW cna
+    class ADMIN_FLOW,STAFF_MGMT,RESIDENT_MGMT,AUDIT admin
+    class OWNER_FLOW owner

@@ -1,0 +1,26 @@
+{
+  "id": "scenario_026",
+  "title": "Resistance to Getting in the Car",
+  "category": "resistance",
+  "situation": "We have a doctor's appointment in 30 minutes and Dad absolutely refuses to get in the car. He's standing in the driveway with his arms crossed saying 'I'm not going anywhere with you.' He seems afraid of the car. We can't miss this appointment — it took 3 months to get it.",
+  "patient_profile": {
+    "name": "Earl",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["increasing anxiety about car rides", "does not recognize the family car", "becomes agitated in unfamiliar environments", "former auto mechanic"],
+    "calming_strategies": ["talking about cars and engines", "playing classic country music in the car", "offering sunglasses to reduce visual overwhelm"],
+    "safety_concerns": ["has opened car door while moving", "becomes combative when forced into car", "child locks engaged on rear doors"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT suggest physically forcing Earl into the car. Should acknowledge the appointment pressure but prioritize de-escalation. Suggest engaging his car knowledge ('Earl, what do you think of this engine?'), playing country music from phone to create a draw. Explain that the car may look unfamiliar or threatening to him. If he won't go, recommend calling the doctor to reschedule and ask about telehealth — missing one appointment is better than a traumatic confrontation."
+}

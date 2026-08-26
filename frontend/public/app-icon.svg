@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="CalmGuide app icon, day">
+  <defs>
+    <radialGradient id="aid-bg" cx="22%" cy="18%" r="100%">
+      <stop offset="0%" stop-color="#FBF7EE"></stop>
+      <stop offset="60%" stop-color="#F6F1E8"></stop>
+      <stop offset="100%" stop-color="#EFE7D6"></stop>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#aid-bg)"></rect>
+  <rect x="2" y="2" width="1020" height="1020" rx="222" fill="none" stroke="#E4D9C2" stroke-width="4"></rect>
+  <g transform="translate(192, 192) scale(10)">
+    <path d="M 48 18 A 20 20 0 1 0 48 46" fill="none" stroke="#3F5C50" stroke-width="3" stroke-linecap="round"></path>
+    <circle cx="35" cy="32" r="3.5" fill="#3F5C50"></circle>
+  </g>
+</svg>

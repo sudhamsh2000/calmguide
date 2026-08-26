@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "Bom dia",
+    "afternoon": "Boa tarde",
+    "evening": "Boa noite"
+  },
+  "hero": "Você não está sozinho(a).",
+  "coach_card": {
+    "title": "Algo está\nacontecendo agora",
+    "subtitle": "Receba orientações tranquilas, passo a passo"
+  },
+  "quick_actions": {
+    "practice": "Praticar",
+    "practice_subtitle": "Aprender com cenários",
+    "check_in": "Como Estou",
+    "check_in_subtitle": "Como você está hoje?"
+  },
+  "loading_profile": "Carregando seu perfil de cuidados...",
+  "conversations": {
+    "heading": "Recentes",
+    "title": "Conversas Recentes",
+    "empty": "Nenhuma conversa ainda",
+    "empty_detail": "Ainda não há conversas recentes. Toque no botão Coach do Momento quando precisar de orientação.",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "Padrões que notamos",
+    "this_week": "Esta semana",
+    "last_week": "Semana passada",
+    "peak_time": "Horário de pico",
+    "recurring_themes": "Temas frequentes",
+    "effective_strategies": "O que funcionou",
+    "peak_overnight": "Madrugada",
+    "peak_morning": "Manhã",
+    "peak_afternoon": "Tarde",
+    "peak_evening": "Noite",
+    "trend_rising": "Aumentando",
+    "trend_falling": "Diminuindo",
+    "trend_steady": "Estável",
+    "drift_alert": "Estamos vendo mais momentos difíceis esta semana ({last_count} para {this_count}). Não é sua culpa — isso pode fazer parte do padrão da doença. Sua equipe de cuidados pode ter ideias que ajudem.",
+    "cycle_detected": "Padrão de episódios detectado",
+    "cycle_interval": "Os episódios tendem a ocorrer a cada {days} dias",
+    "cross_patient_title": "O que funciona com pacientes parecidos"
+  },
+  "feedback": {
+    "title": "Como foi?",
+    "did_this_help": "Isso ajudou?",
+    "what_worked": "O que funcionou?",
+    "what_went_wrong": "O que não ajudou desta vez?",
+    "tap_any": "toque em qualquer",
+    "done": "Pronto",
+    "thanks": "Obrigado — isso nos ajuda a te ajudar melhor",
+    "you_rated": "Você avaliou isso",
+    "dismiss_label": "Fechar avaliação",
+    "time_just_now": "Agora há pouco",
+    "time_hours_ago": "Há {count}h",
+    "time_earlier_today": "Mais cedo hoje",
+    "time_yesterday": "Ontem"
+  },
+  "impact_link": "Veja como o CalmGuide está ajudando famílias",
+  "daily_checkin": {
+    "title": "Como foi hoje?",
+    "severity_calm": "Dia tranquilo",
+    "severity_mild": "Episódio leve",
+    "severity_tough": "Episódio difícil",
+    "when": "Quando?",
+    "time_overnight": "Madrugada",
+    "time_morning": "Manhã",
+    "time_afternoon": "Tarde",
+    "time_evening": "Noite",
+    "what_helped": "O que ajudou?",
+    "done": "Pronto",
+    "thanks": "Registrado — isso nos ajuda a identificar padrões"
+  },
+  "care_patterns": {
+    "title": "Esta noite pode precisar de um pouco mais de atenção",
+    "reason_cycle": "Os episódios têm tendência a ocorrer a cada {interval} dias, e já fazem {days_since} dias desde o último",
+    "reason_trend": "Os episódios têm aumentado ultimamente",
+    "what_helps": "O que ajudou antes:",
+    "cross_patient_hint": "{count} cuidadores com pacientes parecidos acharam {strategy} útil"
+  },
+  "cross_patient": {
+    "title": "O que funciona com pacientes parecidos"
+  },
+  "log_incident": "Registrar um incidente",
+  "recent_incidents": "Incidentes recentes",
+  "see_all": "Ver tudo",
+  "server_error": "Não conseguimos acessar nossos servidores agora. Os contatos de emergência estão sempre disponíveis acima."
+}

@@ -1,0 +1,121 @@
+---
+title: "Safety Pipeline — Pre-LLM Gate + Post-LLM Guard"
+---
+flowchart TB
+    MSG["Caregiver Message"]
+
+    subgraph PRE_LLM ["Pre-LLM: Deterministic Safety Gate (safety_gate.py)"]
+        direction TB
+        SG1["Check LIFE-THREAT patterns"]
+        SG2["16 English regex patterns<br/>(not breathing, choking, seizure,<br/>unconscious, heart attack, stroke,<br/>severe bleeding, head injury, stairs fall,<br/>burns, drowning, poison, electric shock,<br/>anaphylaxis, overdose, passed out)"]
+        SG3["10 Multilingual patterns<br/>(Spanish, French, German, Portuguese,<br/>Japanese, Korean, Chinese, Hindi, Tamil, Arabic)"]
+
+        SG4["Check SELF-HARM patterns"]
+        SG5["7 English regex patterns<br/>(kill myself, want to die, suicidal,<br/>self-harm, don't want to live,<br/>planning to kill myself, thoughts of suicide)"]
+        SG6["10 Multilingual patterns<br/>(same 10 languages)"]
+
+        SG7{"Match?"}
+        SG8["Life-threat → 911 Response<br/>(locale-specific emergency numbers)"]
+        SG9["Self-harm → 988 Response<br/>(locale-specific crisis helplines)"]
+        SG10["No match → Continue to LLM"]
+
+        SG1 --> SG2 & SG3
+        SG4 --> SG5 & SG6
+        SG2 & SG3 --> SG7
+        SG5 & SG6 --> SG7
+        SG7 -->|"Life-threat"| SG8
+        SG7 -->|"Self-harm"| SG9
+        SG7 -->|"Neither"| SG10
+    end
+    MSG --> PRE_LLM
+
+    subgraph EMERGENCY_NUMBERS ["Locale-Specific Emergency Numbers"]
+        direction LR
+        EN_DATA["en: 911, 988, 1-800-272-3900<br/>es: 112/911, 024/800-290-0024<br/>fr: 15/112, 3114<br/>de: 112, 0800-111-0-111<br/>pt-br: 192 SAMU, 188 CVV<br/>ja: 119, 0120-279-338<br/>ko: 119, 1393<br/>zh: 120, 12320-5<br/>hi/ta: 112, 9152987821 iCall<br/>ar: 911/999/123/112"]
+    end
+    SG8 & SG9 --> EMERGENCY_NUMBERS
+
+    subgraph GATE_RESPONSE ["Safety Gate Response Format"]
+        direction TB
+        GR1["SSE stream: {session_id} → {text: response} → [DONE]"]
+        GR2["Both user + assistant messages saved<br/>with is_safety_gate = true"]
+        GR3["LLM is NEVER called"]
+    end
+    EMERGENCY_NUMBERS --> GATE_RESPONSE
+
+    SG10 --> LLM_STREAM["LLM Streaming<br/>(coach / checkin / learn)"]
+
+    subgraph POST_LLM ["Post-LLM: Response Quality Guard (response_guard.py)"]
+        direction TB
+
+        subgraph LANG_CHECK ["Language/Script Validation"]
+            LC1{"Is locale<br/>non-Latin script?"}
+            LC2["6 Script Rules:<br/>ar (Arabic), hi (Devanagari),<br/>ja (Hiragana/Katakana/Kanji),<br/>ko (Hangul), ta (Tamil), zh (CJK)"]
+            LC3["Check 1: ≥100 meaningful letters<br/>(strip markdown, URLs, machine markers)"]
+            LC4["Check 2: ≥65% of letters<br/>in target script (55% for Japanese)"]
+            LC5["Check 3: Romanization detection<br/>(<20% pure ASCII words among ≥10 words)"]
+            LC1 -->|"ar/hi/ja/ko/ta/zh"| LC2
+            LC2 --> LC3 --> LC4 --> LC5
+            LC1 -->|"Latin script locale<br/>(en/es/fr/de/pt-br)"| LC_PASS["Pass"]
+        end
+
+        subgraph RESPECT_CHECK ["Disrespectful Phrase Detection"]
+            RC1["13 English regex patterns<br/>(crazy, senile, force/control/shut up,<br/>attention seeking, manipulative,<br/>burden, difficult patient, demented,<br/>vegetable, gone in the head)"]
+            RC2["Localized phrase lists:<br/>Tamil (6), Hindi (6), Arabic (5),<br/>Chinese (4), Japanese (3), Korean (3)"]
+            RC3["Known bad English boilerplate<br/>(I am designed specifically for...)"]
+        end
+
+        subgraph REPAIR ["Auto-Repair Pipeline"]
+            RP1["Build repair prompt:<br/>'Rewrite entirely in {language}<br/>for locale {locale_code}'"]
+            RP2["Include language constraints<br/>(script rules, vocabulary, register)"]
+            RP3["LLM rewrites response"]
+            RP4{"Re-validate<br/>repaired text"}
+            RP5["Repair valid → send 'replace' SSE event"]
+            RP6["Repair also fails →<br/>locale-specific fallback message"]
+            RP1 --> RP2 --> RP3 --> RP4
+            RP4 -->|"Valid"| RP5
+            RP4 -->|"Still invalid"| RP6
+        end
+
+        LLM_STREAM --> LANG_CHECK
+        LANG_CHECK -->|"Failed"| REPAIR
+        LANG_CHECK -->|"Passed"| RESPECT_CHECK
+        RESPECT_CHECK -->|"Failed"| REPAIR
+        RESPECT_CHECK -->|"Passed"| VALID["Response valid<br/>→ streamed as-is"]
+    end
+
+    subgraph FALLBACKS ["Locale-Specific Fallback Messages"]
+        direction TB
+        FB1["3 modes × 11 languages = 33 fallback messages"]
+        FB2["coach: 'I didn't generate that correctly.<br/>If urgent, stay with your loved one,<br/>lower noise, use calm voice.'"]
+        FB3["checkin: 'I didn't generate that correctly.<br/>Tell me how you're feeling.'"]
+        FB4["learn: 'I didn't generate that correctly.<br/>Try again with your response.'"]
+    end
+    RP6 --> FALLBACKS
+
+    subgraph PROMPT_SAFETY ["In-Prompt Safety Rules (Jinja2 Templates)"]
+        direction TB
+        PS1["6 Non-Negotiable Rules:<br/>1. Never contradict patient's reality<br/>2. Never provide medical diagnosis<br/>3. Never suggest physical restraint<br/>4. Never fabricate information<br/>5. Always use patient's name<br/>6. Always use known strategies"]
+        PS2["Caregiver Distress Detection<br/>(surface 988 + Alzheimer's helpline)"]
+        PS3["Elder Abuse Detection<br/>(compassionate, surface Eldercare Locator)"]
+        PS4["Prompt Injection Handling<br/>(ignore overrides, address caregiving)"]
+        PS5["Dangerous Fictional Framing<br/>(treat same as direct request)"]
+        PS6["Pre-Response Safety Verification<br/>(5-point checklist before responding)"]
+    end
+
+    subgraph INCIDENT_SAFETY ["Incident Extraction Safety"]
+        direction TB
+        IS1["Negative Strategy Detection<br/>(physical restraint, locked in,<br/>withholding food/medication,<br/>threatening, intimidating)"]
+        IS2["→ safety_concern field set"]
+        IS3["PII Scrubbing<br/>(third-party names → [family member]<br/>doctor names → [doctor]<br/>locations → [location])"]
+        IS1 --> IS2
+    end
+
+    classDef gate fill:#FDE8E8,color:#991B1B,stroke:#FCA5A5
+    classDef guard fill:#FFF7ED,color:#9A3412,stroke:#FDBA74
+    classDef prompt fill:#EDE9FE,color:#5B21B6,stroke:#C4B5FD
+    classDef fallback fill:#F1F5F9,color:#475569,stroke:#CBD5E1
+    class PRE_LLM gate
+    class POST_LLM guard
+    class PROMPT_SAFETY prompt
+    class FALLBACKS fallback

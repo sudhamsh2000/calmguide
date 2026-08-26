@@ -1,0 +1,21 @@
+{
+  "name": "CalmGuide",
+  "short_name": "CalmGuide",
+  "description": "Multilingual AI companion for dementia caregivers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FBF7EE",
+  "theme_color": "#2B7A78",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

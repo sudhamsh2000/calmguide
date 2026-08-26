@@ -1,0 +1,99 @@
+---
+title: "Encryption & Privacy Model"
+---
+flowchart TB
+    subgraph BROWSER ["Browser (localStorage)"]
+        direction TB
+        BL1["patient_name<br/>(NEVER sent to server for storage)"]
+        BL2["access_code<br/>(plaintext, for API calls)"]
+        BL3["preferred_language"]
+        BL4["disclaimer_accepted"]
+        BL5["profiles[] (multi-profile)"]
+        BL6["B2B: facility_code, token,<br/>token_expires, staff JSON"]
+    end
+
+    subgraph TRANSIT ["In Transit"]
+        direction TB
+        TR1["patient_name → sent in POST body<br/>→ injected into LLM prompt (transient)<br/>→ NEVER written to database"]
+        TR2["access_code → SHA-256 hashed<br/>on every request for profile lookup"]
+        TR3["HTTPS + SSE for streaming"]
+    end
+
+    subgraph SERVER ["Server (PostgreSQL)"]
+        direction TB
+
+        subgraph ENCRYPTED ["AES-256-GCM Encrypted Fields"]
+            direction TB
+            EF1["profiles.behavioral_patterns<br/>profiles.calming_strategies<br/>profiles.safety_concerns"]
+            EF2["conversations.content<br/>conversations.suggested_tags"]
+            EF3["response_feedback.tags<br/>response_feedback.negative_reasons"]
+            EF4["daily_checkin.tags"]
+            EF5["profile_insights.insights_json"]
+            EF6["incidents.antecedent_description<br/>incidents.behavior_description<br/>incidents.intervention_description<br/>incidents.metadata"]
+            EF7["behavioral_dossier.dossier_text<br/>+ contraindicated/effective/escalation<br/>+ timeline/trends/flags (all fields)"]
+            EF8["care_change_events.description"]
+        end
+
+        subgraph HASHED ["One-Way Hashed"]
+            direction TB
+            HF1["profiles.access_code_hash<br/>(SHA-256)"]
+            HF2["facilities.facility_code_hash<br/>(SHA-256)"]
+            HF3["staff.pin_hash<br/>(bcrypt, 12 rounds)"]
+            HF4["staff.password_hash<br/>(bcrypt)"]
+        end
+
+        subgraph NOT_ENCRYPTED ["Not Encrypted (Aggregate/Public)"]
+            direction TB
+            NE1["cross_patient_strategies<br/>(predefined tags + counts only,<br/>no PII, k-anonymized)"]
+            NE2["rag_chunks<br/>(public nonprofit content)"]
+            NE3["audit_logs<br/>(operational metadata)"]
+        end
+
+        subgraph NEVER_STORED ["NEVER Stored"]
+            direction TB
+            NS1["patient_name<br/>(exists only in LLM prompt memory)"]
+            NS2["caregiver identity<br/>(no user accounts, no emails for B2C)"]
+            NS3["API keys<br/>(.env only, gitignored)"]
+        end
+    end
+
+    subgraph ENCRYPTION_DETAIL ["Encryption Implementation (crypto.py)"]
+        direction TB
+        ED1["Key: CONVERSATION_ENCRYPTION_KEY env var<br/>32-byte random, base64-encoded"]
+        ED2["Algorithm: AES-256-GCM (authenticated encryption)"]
+        ED3["Format: ENC: + base64(12-byte nonce || ciphertext || 16-byte GCM tag)"]
+        ED4["Validated at startup (lifespan)"]
+        ED5["Non-ENC values returned as-is<br/>(migration safety, logged as warning)"]
+    end
+
+    subgraph CROSS_PATIENT_PRIVACY ["Cross-Patient Privacy"]
+        direction TB
+        CPP1["k-anonymity: only surfaces when<br/>cohort has ≥5 profiles"]
+        CPP2["Only 12 predefined tags cross<br/>patient boundaries<br/>(calm_approach, music, redirection, etc.)"]
+        CPP3["No custom/free-text tags<br/>in cross-patient table"]
+        CPP4["Strategy order randomized<br/>in prompt to prevent feedback loops"]
+        CPP5["No profile IDs in cross_patient_strategies<br/>(only aggregate counts)"]
+    end
+
+    subgraph PII_HANDLING ["PII Scrubbing (pii_scrubber.py)"]
+        direction TB
+        PII1["Auto-extracted incident narratives<br/>scrubbed before encryption"]
+        PII2["Third-party names → [family member]"]
+        PII3["Doctor names → [doctor]"]
+        PII4["Locations → [location]"]
+        PII5["Patient name + generic labels preserved<br/>(mom, dad, grandma, etc.)"]
+    end
+
+    BROWSER -->|"HTTPS POST"| TRANSIT
+    TRANSIT -->|"Write"| SERVER
+    ENCRYPTED -.->|"Decrypt on read"| TRANSIT
+    TRANSIT -.->|"Response"| BROWSER
+
+    classDef encrypted fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7
+    classDef hashed fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef never fill:#FCE4EC,color:#C62828,stroke:#EF9A9A
+    classDef public fill:#F5F5F5,color:#616161,stroke:#E0E0E0
+    class ENCRYPTED encrypted
+    class HASHED hashed
+    class NEVER_STORED never
+    class NOT_ENCRYPTED public

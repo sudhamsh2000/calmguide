@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" role="img" aria-label="CalmGuide">
+  <g transform="translate(4, 0)">
+    <path d="M 48 18 A 20 20 0 1 0 48 46" fill="none" stroke="#3F5C50" stroke-width="3" stroke-linecap="round"></path>
+    <circle cx="35" cy="32" r="3.5" fill="#3F5C50"></circle>
+  </g>
+  <text x="78" y="44" font-family="Fraunces, Georgia, serif" font-weight="350" font-size="36" letter-spacing="-1.2" fill="#2A2520">CalmGuide<tspan fill="#3F5C50">.</tspan></text>
+</svg>

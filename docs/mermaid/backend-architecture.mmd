@@ -1,0 +1,162 @@
+---
+title: "CalmGuide Backend Architecture — Full System"
+---
+flowchart TB
+    subgraph CLIENTS ["Clients"]
+        direction LR
+        WEB["Next.js Frontend<br/>(App Router, TypeScript)"]
+        MOBILE["Expo Mobile App<br/>(React Native)"]
+    end
+
+    subgraph FASTAPI ["FastAPI Application (main.py)"]
+        direction TB
+        LIFESPAN["Lifespan Manager<br/>- Validate encryption key<br/>- Warm DB engine<br/>- Init LLM provider<br/>- Init RAG vector store<br/>- Start APScheduler"]
+
+        subgraph ROUTERS ["18 Routers"]
+            direction TB
+            subgraph B2C_ROUTERS ["B2C Routers"]
+                R_PROFILE["profile.py<br/>/api/profiles"]
+                R_CRISIS["coach.py<br/>/api/coach/chat + /api/conversations"]
+                R_LEARN["learn.py<br/>/api/learn"]
+                R_CHECKIN["checkin.py<br/>/api/checkin"]
+                R_FEEDBACK["feedback.py<br/>/api/feedback"]
+                R_INSIGHTS["insights.py<br/>/api/insights"]
+                R_PREDICTION["prediction.py<br/>/api/care-patterns + /api/strategies"]
+                R_INCIDENTS["incidents.py<br/>/api/incidents"]
+                R_DAILY["checkin_daily.py<br/>/api/checkin/daily"]
+                R_CARE["care_changes.py<br/>/api/care-changes"]
+                R_IMPACT["impact.py<br/>/api/impact"]
+                R_HEALTH["health.py<br/>/health"]
+            end
+            subgraph B2B_ROUTERS ["B2B Facility Routers"]
+                R_FAC["facility.py<br/>/api/facilities"]
+                R_FAC_AUTH["facility_auth.py<br/>/api/facility/auth"]
+                R_FAC_STAFF["facility_staff.py<br/>/api/facilities/:code/staff"]
+                R_FAC_RES["facility_residents.py<br/>/api/facility/my-residents"]
+                R_FAC_DASH["facility_dashboard.py<br/>/api/facility/dashboard"]
+                R_FAC_EXEC["facility_executive.py<br/>/api/facility/executive"]
+                R_FAC_AUDIT["facility_audit.py<br/>/api/facility/audit-logs"]
+                R_FAC_RPT["facility_report.py<br/>/api/facility/report/pdf"]
+            end
+        end
+
+        subgraph SERVICES ["16 Services"]
+            direction TB
+            subgraph LLM_LAYER ["LLM Provider Layer"]
+                LLM_ABC["LLMProvider (ABC)<br/>stream_completion() → AsyncGenerator<br/>completion() → str"]
+                LLM_OAI["OpenAIProvider<br/>gpt-4o-mini (default)<br/>gpt-4o (multilingual)"]
+                LLM_ANT["AnthropicProvider<br/>claude-sonnet-4"]
+                LLM_FACTORY["get_llm_provider()<br/>factory, configured via LLM_PROVIDER env"]
+                LLM_ABC --> LLM_OAI & LLM_ANT
+                LLM_FACTORY --> LLM_ABC
+            end
+
+            subgraph PROMPT_LAYER ["Prompt Engine"]
+                PROMPT["prompt.py<br/>Jinja2 template renderer"]
+                TEMPLATES["4 Templates:<br/>coach_system.jinja2<br/>checkin_system.jinja2<br/>learn_system.jinja2<br/>extraction_system.jinja2"]
+                LOCALE["Locale Resolution<br/>11 languages, language constraints<br/>model override for non-English"]
+                PROMPT --> TEMPLATES
+                PROMPT --> LOCALE
+            end
+
+            subgraph SAFETY_LAYER ["Safety Pipeline"]
+                GATE["safety_gate.py<br/>Deterministic regex — fires BEFORE LLM"]
+                GATE_LIFE["Life-Threat Patterns<br/>(16 EN + 10 multilingual)"]
+                GATE_SELF["Self-Harm Patterns<br/>(7 EN + 10 multilingual)"]
+                GUARD["response_guard.py<br/>Post-stream validation"]
+                GUARD_LANG["Script Validation<br/>(6 non-Latin: ar, hi, ja, ko, ta, zh<br/>min 65% script ratio, romanization detection)"]
+                GUARD_RESP["Disrespectful Phrase Check<br/>(58 EN + localized lists)"]
+                GUARD_REPAIR["Auto-Repair<br/>(LLM rewrite → validate → fallback)"]
+                GATE --> GATE_LIFE & GATE_SELF
+                GUARD --> GUARD_LANG --> GUARD_RESP --> GUARD_REPAIR
+            end
+
+            subgraph CRYPTO_LAYER ["Encryption"]
+                CRYPTO["crypto.py<br/>AES-256-GCM<br/>ENC: prefix + base64"]
+                AUTH["auth.py<br/>SHA-256 access code hashing"]
+            end
+
+            subgraph INCIDENT_LAYER ["Incident System"]
+                EXTRACTOR["incident_extractor.py<br/>LLM-based ABC extraction<br/>from conversations"]
+                RETRIEVER["incident_retriever.py<br/>Keyword-based category detection<br/>→ retrieve matching past incidents"]
+                PII["pii_scrubber.py<br/>Strip third-party names,<br/>doctor names, locations"]
+            end
+
+            subgraph ANALYTICS_LAYER ["Analytics & Patterns"]
+                INSIGHTS_SVC["insights.py<br/>compute_profile_insights()"]
+                PATTERN["pattern_detector.py<br/>CV-based cycle detection<br/>risk scoring (0-100)"]
+                CROSS["cross_patient.py<br/>Anonymized strategy aggregation<br/>k-anonymity (min 5 profiles)"]
+                DOSSIER["dossier.py<br/>Weighted incident analysis<br/>temporal/stage/confidence weights<br/>care change observation windows"]
+                TAG_GEN["tag_generator.py<br/>LLM extracts strategy tags<br/>from coach responses"]
+            end
+
+            subgraph AUTH_LAYER ["B2B Auth"]
+                JWT["jwt_service.py<br/>HS256, 15-min expiry"]
+                RBAC["rbac.py<br/>require_role() dependency<br/>staff/admin/owner"]
+                FAC_AUTH["facility_auth.py<br/>bcrypt PIN + password<br/>5-attempt lockout (30 min)"]
+                AUDIT_SVC["audit_service.py<br/>log_audit() → AuditLog table"]
+            end
+
+            RAG_QUERY["retrieval_query.py<br/>Multilingual → English rewrite<br/>for English-only RAG corpus"]
+        end
+
+        subgraph MODELS ["15 SQLAlchemy Models"]
+            direction LR
+            M_PROFILE["Profile"]
+            M_CONV["Conversation"]
+            M_INCIDENT["Incident"]
+            M_DOSSIER["BehavioralDossier"]
+            M_CARE_CHG["CareChangeEvent"]
+            M_INSIGHTS["ProfileInsights"]
+            M_FEEDBACK["ResponseFeedback"]
+            M_DAILY["DailyCheckin"]
+            M_CROSS["CrossPatientStrategies"]
+            M_FACILITY["Facility"]
+            M_STAFF["Staff"]
+            M_ASSIGN["StaffPatientAssignment"]
+            M_LINK["FacilityPatientLink"]
+            M_AUDIT["AuditLog"]
+        end
+    end
+
+    subgraph EXTERNAL ["External Services"]
+        direction LR
+        PG["PostgreSQL 16 + pgvector"]
+        OPENAI_API["OpenAI API<br/>Chat + Embeddings"]
+        ANTHROPIC_API["Anthropic API<br/>Claude Messages"]
+    end
+
+    subgraph RAG_PIPELINE ["RAG Pipeline (rag/ module)"]
+        direction TB
+        SCRAPER["scraper/crawl.py<br/>41 seed URLs (alz.org, Mayo, etc.)<br/>httpx + BeautifulSoup"]
+        CHUNKER["scraper/chunk.py<br/>tiktoken o200k_base<br/>400 tokens, 50 overlap"]
+        EMBEDDER["embeddings/embed.py<br/>text-embedding-3-large<br/>3072 dims, batch 100"]
+        VSTORE["vectorstores/pgvector.py<br/>rag_chunks table<br/>GIN index on tsvector<br/>ivfflat on embedding"]
+        RETRIEVER_RAG["retrieve.py<br/>Hybrid: cosine + keyword boost (+0.15)<br/>Title rerank (+0.05/word)<br/>Top 3 above 0.20"]
+        SCRAPER --> CHUNKER --> EMBEDDER --> VSTORE
+        VSTORE --> RETRIEVER_RAG
+    end
+
+    subgraph SCHEDULER ["APScheduler — Nightly 3am UTC"]
+        direction TB
+        NIGHTLY1["Phase 1: Per-Profile Insights<br/>(session frequency, cycles, triggers,<br/>feedback aggregation, risk scores)"]
+        NIGHTLY2["Phase 2: Stale Dossier Recomputation<br/>(where is_stale = true)"]
+        NIGHTLY3["Phase 3: Cross-Patient Aggregation<br/>(cohort_key = stage:peak_time)"]
+        NIGHTLY1 --> NIGHTLY2 --> NIGHTLY3
+    end
+
+    CLIENTS -->|"HTTPS + SSE"| FASTAPI
+    FASTAPI --> PG
+    LLM_OAI --> OPENAI_API
+    LLM_ANT --> ANTHROPIC_API
+    EMBEDDER --> OPENAI_API
+    SCHEDULER --> FASTAPI
+
+    classDef safety fill:#FDE8E8,color:#991B1B,stroke:#FCA5A5
+    classDef llm fill:#DBEAFE,color:#1E40AF,stroke:#93C5FD
+    classDef analytics fill:#F3E8FF,color:#6B21A8,stroke:#C4B5FD
+    classDef rag fill:#DCFCE7,color:#166534,stroke:#86EFAC
+    class SAFETY_LAYER safety
+    class LLM_LAYER llm
+    class ANALYTICS_LAYER analytics
+    class RAG_PIPELINE rag

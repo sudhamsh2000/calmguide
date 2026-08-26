@@ -1,0 +1,153 @@
+{
+  "setup_title": "创建档案",
+  "edit_title": "编辑档案",
+  "patient_name": {
+    "label": "您的亲人叫什么名字？",
+    "placeholder": "输入他们的名字",
+    "hint": "为保护隐私，此名字仅存储在您的设备上。"
+  },
+  "disease_stage": {
+    "label": "痴呆症处于哪个阶段？",
+    "early": "早期",
+    "middle": "中期",
+    "late": "晚期",
+    "early_title": "早期阶段",
+    "early_description": "轻微记忆减退，找词困难，复杂任务有些混乱。仍可独立处理大多数日常活动。",
+    "middle_title": "中期阶段",
+    "middle_description": "混乱加剧，难以认识他人，行为改变，需要日常活动（如穿衣、洗澡）方面的帮助。",
+    "late_title": "晚期阶段",
+    "late_description": "严重记忆丧失，沟通能力有限，需要全天候协助所有日常活动，可能不认识家人。"
+  },
+  "behavioral_patterns": {
+    "label": "您注意到的常见行为",
+    "placeholder": "选择所有适用项"
+  },
+  "calming_strategies": {
+    "label": "什么方法有助于让他们平静？",
+    "placeholder": "选择所有适用项"
+  },
+  "safety_concerns": {
+    "label": "有哪些安全方面的担忧？",
+    "placeholder": "选择所有适用项"
+  },
+  "setup": {
+    "heading": "让我们设置您的照护档案",
+    "subtitle": "我们会询问一些关于您亲人的问题，以便在困难时刻为您提供最有帮助的指导。",
+    "name_label": "您的亲人叫什么名字？",
+    "name_placeholder": "例如：妈妈、爸爸、奶奶",
+    "name_privacy": "此名字仅保存在您的设备上，从不存储在我们的服务器上。我们使用它来个性化您的指导，使其更自然。",
+    "stage_heading": "哪个阶段最能描述您的亲人？",
+    "stage_subtitle": "这有助于我们量身定制指导。您随时可以更改此设置。",
+    "step_of": "第 {step} 步，共 {total} 步"
+  },
+  "steps": {
+    "behavioral": {
+      "title": "您注意到了哪些行为模式？",
+      "description": "选择所有适用项。这有助于我们为您提供更相关的指导。"
+    },
+    "calming": {
+      "title": "哪些安抚策略对您的亲人有效？",
+      "description": "选择以前有效的方法，即使只是偶尔有效。困难时刻我们会建议这些方法。"
+    },
+    "safety": {
+      "title": "有哪些我们需要了解的安全顾虑？",
+      "description": "选择所有适用项，以便我们在指导中包含相关安全提醒。"
+    }
+  },
+  "progress": {
+    "step_of": "第 {current} 步，共 {total} 步",
+    "name": "姓名",
+    "stage": "阶段",
+    "behaviors": "行为",
+    "calming": "安抚",
+    "safety": "安全"
+  },
+  "chip": {
+    "add_your_own": "添加自定义",
+    "type_here": "在此输入...",
+    "add": "添加",
+    "cancel": "取消",
+    "add_custom": "+ 添加自定义选项"
+  },
+  "success": {
+    "profile_created": "档案已创建！",
+    "save_code_message": "请保存此访问码。您将需要它在任何设备上重新登录。",
+    "access_code_label": "您的访问码",
+    "screenshot_hint": "截图或将其写在安全的地方。",
+    "start_button": "开始使用 CalmGuide",
+    "share_code": "分享访问码"
+  },
+  "errors": {
+    "no_access_code": "未找到访问码。请创建新档案。",
+    "generic": "出现了问题，请重试。"
+  },
+  "view": {
+    "title": "护理档案",
+    "name_hint": "姓名仅存储在您的设备上",
+    "dementia_stage": "痴呆症阶段",
+    "early_stage": "早期阶段",
+    "middle_stage": "中期阶段",
+    "late_stage": "晚期阶段",
+    "behavioral_patterns": "行为模式",
+    "calming_strategies": "安抚策略",
+    "safety_concerns": "安全顾虑",
+    "none_recorded": "暂无记录",
+    "access_code": "您的访问码",
+    "access_code_hint": "保存此码以便从其他设备访问您的档案"
+  },
+  "actions": {
+    "next": "下一步",
+    "back": "返回",
+    "save": "保存档案",
+    "save_changes": "保存更改",
+    "create": "创建档案",
+    "saving": "保存中...",
+    "edit": "编辑档案"
+  },
+  "appearance": "外观",
+  "sign_out": {
+    "title": "退出登录",
+    "message": "这将从此设备移除您的访问码和亲人的姓名。您的护理档案会保持保存状态——您可以随时使用访问码重新登录。",
+    "cancel": "取消",
+    "confirm": "退出登录"
+  },
+  "card": {
+    "title": "{name}的档案",
+    "behaviors_tracked": "已记录 {count} 个行为"
+  },
+  "options": {
+    "behavioral": {
+      "Sundowning": "日落综合症（傍晚躁动）",
+      "Wandering/exit-seeking": "游荡 / 寻找出口",
+      "Aggression": "攻击性行为",
+      "Repetitive questions": "重复提问",
+      "Sleep disturbance": "睡眠障碍",
+      "Refusal to eat": "拒绝进食",
+      "Hallucinations": "幻觉",
+      "Hiding/hoarding objects": "藏匿 / 囤积物品",
+      "Undressing inappropriately": "不当脱衣",
+      "Shadowing/following caregiver": "跟随 / 依附照护者"
+    },
+    "calming": {
+      "Music (specify favorite)": "音乐（指定最喜欢的）",
+      "Family photos": "家庭照片",
+      "Warm drink": "热饮",
+      "Going for a walk": "散步",
+      "Gentle hand massage": "轻柔手部按摩",
+      "Favorite TV show": "最喜欢的电视节目",
+      "Pet interaction": "与宠物互动",
+      "Rocking chair": "摇椅",
+      "Aromatherapy": "芳香疗法"
+    },
+    "safety": {
+      "Fall risk": "跌倒风险",
+      "Wandering/elopement risk": "游荡 / 无人看管外出",
+      "Stove/fire risk": "炉灶 / 火灾风险",
+      "Medication confusion": "药物混淆",
+      "Aggressive when frustrated": "受挫时有攻击性",
+      "Cannot be left alone": "不能独处",
+      "Driving risk": "驾驶风险",
+      "Pool/water nearby": "附近有泳池 / 水域"
+    }
+  }
+}

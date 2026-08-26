@@ -1,0 +1,26 @@
+{
+  "id": "scenario_022",
+  "title": "Driving Refusal to Stop",
+  "category": "safety",
+  "situation": "Dad took the car keys while I was in the shower and drove to the store. A neighbor called to say he was driving on the wrong side of the road. He's back now and insisting he's a perfectly fine driver. He's furious that I want to take the keys.",
+  "patient_profile": {
+    "name": "Frank",
+    "disease_stage": "early",
+    "behavioral_patterns": ["strong independence", "denial of cognitive changes", "becomes angry when abilities questioned", "was a professional truck driver for 30 years"],
+    "calming_strategies": ["acknowledging his driving expertise", "looking at photos from his trucking days", "going for walks together"],
+    "safety_concerns": ["unsafe driving", "has gotten lost driving twice", "refuses to accept driving limitations"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Should not directly attack his identity as a driver. Should suggest practical safety measures (hide keys, disable car). Should recommend doctor's involvement in the driving conversation as a face-saving measure."
+}

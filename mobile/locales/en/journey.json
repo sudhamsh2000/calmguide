@@ -1,0 +1,84 @@
+{
+  "trusted_resources": "Trusted resources",
+  "noticing": {
+    "title": "Noticing changes?",
+    "subtitle": "If you're wondering whether something is wrong, you're not alone. Many families start here.",
+    "p1_lead": "Forgetting a name, repeating a question, getting confused in a new place — these can be normal aging or something more.",
+    "p1_emph": "CalmGuide cannot tell you which.",
+    "p2": "What matters is that you noticed, and you're paying attention. That's the first act of care.",
+    "p3": "The resources below can help you understand what you're seeing and decide whether to talk to a doctor. A doctor's visit is the only way to know for sure.",
+    "footnote": "CalmGuide does not screen, diagnose, or assess cognitive function. We are an educational companion, not a medical tool.",
+    "resources": {
+      "ten_signs_label": "Alzheimer's Association — 10 Warning Signs",
+      "ten_signs_desc": "Learn the difference between normal aging and early signs of dementia.",
+      "doctor_label": "Talk to Your Doctor",
+      "doctor_desc": "Only a medical professional can evaluate and diagnose. Bring your observations.",
+      "helpline_label": "Alzheimer's Association 24/7 Helpline",
+      "helpline_desc": "1-800-272-3900 — Free, confidential support from trained specialists.",
+      "nia_label": "National Institute on Aging — What Is Dementia?",
+      "nia_desc": "Educational overview of dementia types and symptoms from the NIH."
+    }
+  },
+  "diagnosis": {
+    "title": "Just received a diagnosis?",
+    "subtitle": "This is one of the hardest moments. Take it one step at a time.",
+    "p1": "A dementia diagnosis changes everything — and nothing — all at once. Your loved one is still the same person they were yesterday. But now you have a name for what's been happening, and that can feel like a lot.",
+    "p2_emph": "You don't need to figure everything out today.",
+    "p2_tail": "The most important thing right now is to breathe, and to know that millions of families have walked this road before you.",
+    "p3": "The resources below connect you with people who can help you take the first steps — support groups, planning guides, and trained humans who understand.",
+    "p4": "When you're ready, CalmGuide can help with the day-to-day: learning about the disease, coaching through tough moments, and caring for yourself along the way.",
+    "resources": {
+      "helpline_label": "Alzheimer's Association 24/7 Helpline",
+      "helpline_desc": "1-800-272-3900 — Talk to a real person right now. They understand what you're feeling.",
+      "support_label": "Find a Local Support Group",
+      "support_desc": "Connect with other families going through the same thing near you.",
+      "after_label": "Alzheimer's Association — After Diagnosis",
+      "after_desc": "What to expect, legal planning, and first steps after a diagnosis.",
+      "can_label": "Caregiver Action Network",
+      "can_desc": "Support, education, and advocacy for family caregivers."
+    }
+  },
+  "hospice": {
+    "title": "Thinking about hospice?",
+    "subtitle": "This stage asks the hardest questions. You deserve support from people who have been here before.",
+    "p1": "When dementia reaches its final stage, the focus shifts from managing behaviors to providing comfort. This is an entirely different kind of caregiving — and it deserves its own kind of support.",
+    "p2_emph": "CalmGuide is not equipped to guide you through end-of-life decisions.",
+    "p2_tail": "These decisions are deeply personal and medical, and they deserve the attention of hospice professionals, palliative care teams, and counselors who specialize in this stage.",
+    "p3": "What we can tell you: choosing hospice is not giving up. It is choosing comfort and dignity for someone you love.",
+    "resources": {
+      "hfa_label": "Hospice Foundation of America",
+      "hfa_desc": "Education and support for families facing end-of-life decisions.",
+      "alz_late_label": "Alzheimer's Association — Late-Stage Care",
+      "alz_late_desc": "What to expect in late-stage dementia and how to provide comfort.",
+      "nhpco_label": "National Hospice and Palliative Care Organization",
+      "nhpco_desc": "Find hospice providers and learn about palliative care options.",
+      "helpline_label": "Alzheimer's Association 24/7 Helpline",
+      "helpline_desc": "1-800-272-3900 — Counselors who understand end-of-life caregiving.",
+      "nia_label": "National Institute on Aging — End of Life",
+      "nia_desc": "Guidance on comfort care, making decisions, and what happens at the end."
+    }
+  },
+  "bereavement": {
+    "title": "After loss",
+    "subtitle": "The caregiving may be over, but the feelings aren't. That's normal.",
+    "p1": "Losing someone to dementia is a unique kind of grief. You may have been grieving for months or years before the death — watching the person you knew slowly change. Now that they're gone, the grief may feel different than you expected.",
+    "p2": "Relief, guilt, numbness, anger, sadness — all of these are normal. Often at the same time.",
+    "p3_emph": "CalmGuide was built for caregiving, not grief support.",
+    "p3_tail": "You deserve people who specialize in what you're going through now. The resources below can connect you.",
+    "p4_lead": "If the grief feels overwhelming or you're having thoughts of harming yourself, please call",
+    "p4_emph": "988",
+    "p4_tail": "right now. You matter too.",
+    "resources": {
+      "lifeline_label": "988 Suicide & Crisis Lifeline",
+      "lifeline_desc": "Call or text 988 — 24/7, free, confidential. If grief feels unbearable right now.",
+      "alz_grief_label": "Alzheimer's Association — Grief and Loss",
+      "alz_grief_desc": "Understanding grief that begins long before death — and continues after.",
+      "griefshare_label": "GriefShare — Find a Support Group",
+      "griefshare_desc": "Local and online grief support groups across the country.",
+      "helpline_label": "Alzheimer's Association 24/7 Helpline",
+      "helpline_desc": "1-800-272-3900 — They support families after loss too, not just during caregiving.",
+      "children_label": "National Alliance for Grieving Children",
+      "children_desc": "If children in the family are also grieving."
+    }
+  }
+}

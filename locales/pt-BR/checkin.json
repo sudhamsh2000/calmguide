@@ -1,0 +1,10 @@
+{
+  "title": "Como você está se saindo?",
+  "subtitle": "Este momento é só para você.",
+  "input_placeholder": "Me conte como você está se sentindo hoje...",
+  "input_aria_label": "Como você está se sentindo hoje",
+  "submit_button": "Compartilhar",
+  "loading": "Um momento para responder...",
+  "back_to_home": "Voltar ao início",
+  "start_over": "Recomeçar"
+}

@@ -1,0 +1,110 @@
+---
+title: "RAG Pipeline — Ingestion + Retrieval"
+---
+flowchart TB
+    subgraph INGESTION ["Ingestion Pipeline (rag/pipeline.py)"]
+        direction TB
+
+        SEEDS["41 Seed URLs<br/>alz.org, Mayo Clinic, HelpGuide,<br/>caregiver.org, CDC"]
+
+        subgraph SCRAPE ["Scraping (scraper/crawl.py)"]
+            SC1["httpx async HTTP client"]
+            SC2["BeautifulSoup HTML parsing"]
+            SC3["html2text → markdown"]
+            SC4["Boilerplate removal"]
+            SC5["Domain allowlist enforcement"]
+            SC6["1.5s polite delay between requests"]
+        end
+        SEEDS --> SCRAPE
+
+        subgraph CHUNK ["Chunking (scraper/chunk.py)"]
+            CH1["tiktoken (o200k_base tokenizer)"]
+            CH2["400 tokens per chunk"]
+            CH3["50 token overlap"]
+            CH4["Title prepended to each chunk<br/>(semantic anchor)"]
+            CH5["chunk_id = SHA256(url:index:content)"]
+        end
+        SCRAPE -->|"ScrapedPage[]"| CHUNK
+
+        subgraph EMBED ["Embedding (embeddings/embed.py)"]
+            EM1["OpenAI text-embedding-3-large"]
+            EM2["3072 dimensions"]
+            EM3["Batched: 100 chunks per API call"]
+        end
+        CHUNK -->|"Chunk[]"| EMBED
+
+        subgraph STORE ["Storage (vectorstores/pgvector.py)"]
+            ST1["PostgreSQL rag_chunks table"]
+            ST2["Columns:<br/>id BIGSERIAL PK<br/>chunk_id TEXT UNIQUE<br/>content TEXT<br/>source_url, source_title,<br/>source_name, source_domain TEXT<br/>embedding vector(3072)<br/>search_vector tsvector (generated)"]
+            ST3["Indexes:<br/>GIN on search_vector<br/>UNIQUE on chunk_id<br/>ivfflat on embedding"]
+            ST4["search_vector = to_tsvector('english',<br/>source_title || ' ' || content)"]
+        end
+        EMBED -->|"float[][]"| STORE
+    end
+
+    subgraph RETRIEVAL ["Retrieval at Query Time (rag/retrieve.py)"]
+        direction TB
+
+        QUERY["Caregiver message<br/>(or English-rewritten query)"]
+
+        subgraph STEP1 ["Step 1: Embed Query"]
+            R1["embed_text(query)<br/>→ 3072-dim vector"]
+        end
+        QUERY --> STEP1
+
+        subgraph STEP2 ["Step 2: Hybrid PostgreSQL Query"]
+            R2["Fetch top 9 candidates (k×3)"]
+            R3["score = cosine_similarity(query_vec, chunk_vec)"]
+            R4["+ IF keyword_match THEN 0.15 ELSE 0"]
+            R5["keyword_match via:<br/>plainto_tsquery('english', query_text)<br/>matched against search_vector"]
+        end
+        STEP1 --> STEP2
+
+        subgraph STEP3 ["Step 3: Python Reranking"]
+            R6["For each candidate:<br/>title_words ∩ query_words"]
+            R7["+0.05 per overlapping word"]
+            R8["Sort by boosted score descending"]
+        end
+        STEP2 -->|"9 candidates"| STEP3
+
+        subgraph STEP4 ["Step 4: Filter & Format"]
+            R9["Keep top 3 above min_score (0.20)"]
+            R10["Format each as:<br/>Source: name<br/>URL: url<br/>Title: title<br/>content"]
+            R11["Join with \\n\\n---\\n\\n separator"]
+        end
+        STEP3 --> STEP4
+
+        INJECT["Injected into Jinja2 prompt:<br/>## Relevant Caregiving Guidance<br/>{{ rag_context }}"]
+        STEP4 --> INJECT
+    end
+
+    subgraph MULTILINGUAL ["Multilingual Query Handling (retrieval_query.py)"]
+        direction TB
+        ML1["Check locale: is non-English?"]
+        ML2["Check: is RAG configured?"]
+        ML3["LLM prompt:<br/>'Rewrite this caregiver request into<br/>a concise English retrieval query'"]
+        ML4["Sanitize: 280 chars max,<br/>normalize whitespace"]
+        ML1 -->|"non-English"| ML2
+        ML2 -->|"RAG available"| ML3
+        ML3 --> ML4
+    end
+
+    MULTILINGUAL -->|"English query"| QUERY
+
+    subgraph VECTORSTORE_ABC ["Vector Store Abstraction"]
+        direction TB
+        VS_BASE["VectorStore (ABC)<br/>setup(), add(), search(),<br/>count(), clear()"]
+        VS_PG["PgVectorStore<br/>(production — PostgreSQL)"]
+        VS_CHROMA["ChromaStore<br/>(local dev alternative)"]
+        VS_QDRANT["QdrantStore<br/>(cloud alternative)"]
+        VS_FACTORY["get_vector_store()<br/>configured via RAG_VECTOR_STORE env"]
+        VS_BASE --> VS_PG & VS_CHROMA & VS_QDRANT
+        VS_FACTORY --> VS_BASE
+    end
+
+    classDef ingest fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7
+    classDef retrieve fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef multi fill:#FFF3E0,color:#E65100,stroke:#FFCC80
+    class INGESTION ingest
+    class RETRIEVAL retrieve
+    class MULTILINGUAL multi

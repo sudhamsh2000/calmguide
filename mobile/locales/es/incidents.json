@@ -1,0 +1,115 @@
+{
+  "logger": {
+    "title": "Registrar un incidente",
+    "what_happened": "¿Qué sucedió?",
+    "when": "¿Cuándo ocurrió?",
+    "just_now": "Ahora mismo",
+    "earlier_today": "Hoy más temprano",
+    "yesterday": "Ayer",
+    "save": "Guardar",
+    "saved": "¡Guardado!",
+    "more_details_prompt": "¿Desea agregar más detalles?",
+    "yes_add_details": "Sí, agregar detalles",
+    "no_thanks": "No, gracias",
+    "how_bad": "¿Qué tan intenso fue el momento?",
+    "how_long": "¿Cuánto duró?",
+    "skip": "Omitir",
+    "what_before": "¿Qué estaba pasando antes?",
+    "what_tried": "¿Qué intentó?",
+    "did_it_help": "¿Funcionó?",
+    "anything_else": "¿Algo más que quiera recordar?",
+    "tap_to_dictate": "Toque para dictar",
+    "done": "Listo",
+    "category": {
+      "aggression_anger": "Agresión\no enojo",
+      "confusion_disorientation": "Confusión",
+      "wandering_exit_seeking": "Deambulación\no fuga",
+      "refusing_care": "Rechaza\ncuidados",
+      "sleep_problems": "Problemas\nde sueño",
+      "hallucinations": "Ve / escucha\ncosas",
+      "repetitive_behavior": "Conducta\nrepetitiva",
+      "other": "Otro"
+    },
+    "severity": {
+      "mild": "Leve",
+      "moderate": "Moderado",
+      "severe": "Grave"
+    },
+    "duration": {
+      "seconds": "Segundos",
+      "minutes": "Minutos",
+      "about_an_hour": "Cerca de una hora",
+      "longer": "Más tiempo"
+    },
+    "antecedent": {
+      "task_demand": "Durante cuidados",
+      "transition": "Transición",
+      "environmental": "Ruido / multitud",
+      "social": "Solo / aburrido",
+      "physical_state": "Necesidad física",
+      "unknown": "No sé"
+    },
+    "intervention": {
+      "music": "Música",
+      "redirect": "Redirigir",
+      "quiet_space": "Lugar tranquilo",
+      "warm_drink": "Bebida caliente",
+      "wait_it_out": "Esperar",
+      "other": "Otro"
+    },
+    "outcome": {
+      "resolved": "Resuelto",
+      "partially_resolved": "Parcialmente",
+      "unresolved": "No",
+      "escalated": "Empeoró"
+    }
+  },
+  "verification": {
+    "title": "Capturamos esto de antes",
+    "looks_right": "Se ve bien",
+    "let_me_fix": "Quiero corregir algo",
+    "dismiss": "Descartar"
+  },
+  "history": {
+    "title": "Historial de incidentes",
+    "filter_all_types": "Todos los tipos",
+    "filter_this_month": "Este mes",
+    "no_incidents": "Aún no hay incidentes registrados",
+    "no_incidents_subtitle": "Los incidentes que registre aparecerán aquí",
+    "resolved": "Resuelto",
+    "partially_resolved": "Parcialmente resuelto",
+    "unresolved": "Sin resolver",
+    "escalated": "Escalado",
+    "see_all": "Ver todos los incidentes",
+    "auto_extracted": "Captura automática",
+    "manual": "Registro manual"
+  },
+  "patterns": {
+    "title": "Patrones que estamos notando",
+    "this_week": "esta semana",
+    "up_from": "Más que {count}/semana el mes pasado",
+    "most_common": "Más común",
+    "whats_helping": "Qué está ayudando",
+    "see_details": "Ver detalles",
+    "time_clusters": "Hora del día",
+    "frequency": "Frecuencia",
+    "what_works": "Qué funciona",
+    "what_doesnt": "Qué no funciona",
+    "trend": "Tendencia (últimos 30 días)"
+  },
+  "home": {
+    "log_incident": "Registrar un incidente"
+  },
+  "detail": {
+    "when": "Cuándo",
+    "what_happened": "Qué pasó",
+    "severity": "Gravedad",
+    "duration": "Duración",
+    "what_before": "Qué estaba pasando antes",
+    "what_tried": "Qué se intentó",
+    "outcome": "Resultado",
+    "location": "Ubicación",
+    "source": "Fuente",
+    "not_found": "Incidente no encontrado"
+  }
+}

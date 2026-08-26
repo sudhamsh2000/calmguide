@@ -1,0 +1,129 @@
+---
+title: "Personalization Engine — How CalmGuide Learns About Each Patient"
+---
+flowchart TB
+    subgraph DATA_SOURCES ["Data Collection Points"]
+        direction LR
+        DS1["Profile Setup<br/>(disease_stage, behavioral_patterns,<br/>calming_strategies, safety_concerns)"]
+        DS2["Coach Conversations<br/>(timestamps, locale, content)"]
+        DS3["Caregiver Feedback<br/>(thumbs + strategy tags,<br/>negative reasons)"]
+        DS4["Daily Check-In<br/>(calm/mild/tough,<br/>time_slot, tags)"]
+        DS5["Manual Incidents<br/>(ABC structured,<br/>caregiver-reported)"]
+        DS6["Auto-Extracted Incidents<br/>(LLM extraction from<br/>coaching conversations)"]
+        DS7["Care Change Events<br/>(medication changes,<br/>observation windows)"]
+    end
+
+    subgraph PER_PROFILE ["Per-Profile Analytics (insights.py)"]
+        direction TB
+        PP1["Session Frequency<br/>this_week vs last_week"]
+        PP2["Trend Detection<br/>increasing (≥1.5x) / decreasing (≤0.7x) / stable"]
+        PP3["Peak Time<br/>overnight / morning / afternoon / evening"]
+        PP4["Top Triggers<br/>(keyword frequency from user messages,<br/>stopwords removed, top 5)"]
+        PP5["Resolution Rate<br/>proxy: 1-message sessions<br/>upgraded: feedback-based if ≥3 responses"]
+        PP6["Effective Strategies<br/>(from thumbs-up feedback tags)"]
+        PP7["Ineffective Reasons<br/>(from thumbs-down reasons)"]
+        PP8["Drift Alert<br/>(≥3 sessions this week + increasing trend)"]
+    end
+    DS2 & DS3 & DS4 --> PER_PROFILE
+
+    subgraph CYCLE_DETECTION ["Episode Cycle Detection (pattern_detector.py)"]
+        direction TB
+        CD1["Collect episode dates<br/>(coaching sessions + non-calm check-ins)"]
+        CD2["Sort unique dates,<br/>compute consecutive intervals"]
+        CD3["Coefficient of Variation (CV)<br/>CV = stdev / mean"]
+        CD4{"CV < 0.3 → High confidence<br/>CV < 0.5 → Moderate<br/>CV < 0.7 → Low<br/>CV ≥ 0.7 → No cycle"}
+        CD5["Requirements:<br/>≥5 episodes, ≥14 day span, ≥3 intervals"]
+        CD6["Output: avg_interval_days,<br/>last_episode_date, next_expected_date"]
+        CD1 --> CD2 --> CD3 --> CD4
+        CD5 -.-> CD1
+        CD4 -->|"Cycle detected"| CD6
+    end
+    DS2 & DS4 --> CYCLE_DETECTION
+
+    subgraph RISK_SCORING ["Risk Scoring (pattern_detector.py)"]
+        direction TB
+        RS1["Cycle Position = days_since_last / avg_interval"]
+        RS2["Base Score (0-70)<br/>< 0.3 → low (just had episode)<br/>0.7-1.0 → high (episode due)<br/>> 1.0 → overdue (max 70)"]
+        RS3["Trend Bonus (0-20)<br/>increasing=20, stable=5, decreasing=0"]
+        RS4["Time Bonus (0-10)<br/>+10 if current hour in peak_time window"]
+        RS5["Total = min(100, base + trend + time)"]
+        RS6["care_level =<br/>≥50 → needs_attention<br/><50 → stable"]
+        RS1 --> RS2 --> RS5
+        RS3 --> RS5
+        RS4 --> RS5
+        RS5 --> RS6
+    end
+    CYCLE_DETECTION --> RISK_SCORING
+
+    subgraph DOSSIER_SYSTEM ["Behavioral Dossier (dossier.py)"]
+        direction TB
+        DO1["Incident Weighting:<br/>temporal × stage × confidence × extraction"]
+        DO2["Temporal Weight<br/>≤30d → 1.0<br/>≤180d → 0.5<br/>≤365d → 0.2<br/>>365d → 0.0"]
+        DO3["Stage Transition Weight<br/>pre-transition incidents → 0.3"]
+        DO4["Recall Confidence<br/>high=1.0, mod=0.8, low=0.5, very_low=0.3"]
+        DO5["Care Change Window<br/>pre-change incidents during<br/>active observation window → 0.0"]
+        DO6["Output Fields:<br/>contraindicated (escalated interventions)<br/>effective (resolved interventions)<br/>7-day timeline<br/>frequency trends per category<br/>delirium flags (spike detection)<br/>pain flags (aggression + refusing care)"]
+        DO7["LLM Narrative (optional)<br/>≤300 word clinical summary<br/>from weighted incidents"]
+        DO1 --> DO2 & DO3 & DO4 & DO5
+        DO1 --> DO6 --> DO7
+    end
+    DS5 & DS6 & DS7 --> DOSSIER_SYSTEM
+
+    subgraph CROSS_PATIENT ["Cross-Patient Learning (cross_patient.py)"]
+        direction TB
+        XP1["Cohort Key = disease_stage:peak_time<br/>(e.g., middle:overnight)"]
+        XP2["Aggregate predefined tags<br/>from thumbs-up feedback"]
+        XP3["Count unique profiles per tag"]
+        XP4["k-Anonymity: only surface<br/>when cohort ≥5 profiles"]
+        XP5["12 predefined tags only<br/>(no custom tags cross boundaries)"]
+        XP6["Randomize order in prompt<br/>(prevent feedback loops)"]
+        XP1 --> XP2 --> XP3 --> XP4
+        XP5 -.-> XP2
+        XP4 --> XP6
+    end
+    DS3 --> CROSS_PATIENT
+
+    subgraph PROMPT_INJECTION ["How Personalization Enters the LLM Prompt"]
+        direction TB
+        PI1["Patient Context Section<br/>name, stage, patterns,<br/>strategies, concerns"]
+        PI2["CONTRAINDICATED Section<br/>(red warning, from dossier)"]
+        PI3["Effective Interventions<br/>(what has worked, with dates)"]
+        PI4["Frequency Trends<br/>(spike/increasing/stable/decreasing)"]
+        PI5["Delirium Screening<br/>(7 questions if spike detected)"]
+        PI6["Pain Screening<br/>(5 questions if aggression+refusing)"]
+        PI7["Behavioral Dossier Narrative"]
+        PI8["Relevant Past Incidents<br/>(ABC records, max 3)"]
+        PI9["RAG Context<br/>(3 chunks from knowledge base)"]
+        PI10["Cross-Patient Strategies<br/>(what works for similar patients)"]
+        PI11["CRITICAL Instruction<br/>USE patient-specific strategies by name"]
+    end
+
+    PER_PROFILE -->|"top_strategies,<br/>peak_time"| PROMPT_INJECTION
+    CYCLE_DETECTION -->|"cycle data"| RISK_SCORING
+    RISK_SCORING -->|"care_level"| HOME_CARD["Home Screen:<br/>Tonight's Outlook Card"]
+    DOSSIER_SYSTEM -->|"contraindicated, effective,<br/>trends, flags, narrative"| PROMPT_INJECTION
+    CROSS_PATIENT -->|"cohort strategies"| PROMPT_INJECTION
+    DS1 -->|"Profile data"| PROMPT_INJECTION
+    PROMPT_INJECTION -->|"coach_system.jinja2"| LLM_CALL["LLM Stream"]
+
+    subgraph FEEDBACK_LOOP ["Feedback Loop — Data Gets Better Over Time"]
+        direction LR
+        FL1["Response generated<br/>with personalized context"]
+        FL2["Strategy tags extracted<br/>(tag_generator.py)"]
+        FL3["Caregiver rates response<br/>(thumbs + tags)"]
+        FL4["Incident auto-extracted<br/>(incident_extractor.py)"]
+        FL5["Nightly job recomputes<br/>insights + dossier + cross-patient"]
+        FL6["Next session uses<br/>updated personalization"]
+        FL1 --> FL2 --> FL3 --> FL5
+        FL1 --> FL4 --> FL5
+        FL5 --> FL6 --> FL1
+    end
+
+    classDef source fill:#E8F5E9,color:#2E7D32,stroke:#A5D6A7
+    classDef compute fill:#E3F2FD,color:#1565C0,stroke:#90CAF9
+    classDef output fill:#FFF3E0,color:#E65100,stroke:#FFCC80
+    classDef safety fill:#FCE4EC,color:#C62828,stroke:#EF9A9A
+    class DATA_SOURCES source
+    class PER_PROFILE,CYCLE_DETECTION,RISK_SCORING,DOSSIER_SYSTEM,CROSS_PATIENT compute
+    class PROMPT_INJECTION output
+    class PI2,PI5,PI6 safety

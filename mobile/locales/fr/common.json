@@ -1,0 +1,152 @@
+{
+  "app_name": "CalmGuide",
+  "nav": {
+    "home": "Accueil",
+    "coach": "Coach du moment",
+    "learn": "S'entraîner",
+    "check_in": "Comment ça va",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "back_to_home": "Retour à l'accueil",
+    "back_to_scenarios": "Retour aux scénarios",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "back": "Retour"
+  },
+  "actions": {
+    "send": "Envoyer",
+    "submit": "Valider",
+    "cancel": "Annuler",
+    "try_again": "Réessayer",
+    "dismiss": "Fermer",
+    "share": "Partager",
+    "copy": "Copy",
+    "copied": "Copied",
+    "speak_now": "Speak now…",
+    "loading_label": "Loading"
+  },
+  "loading": "Chargement...",
+  "error": {
+    "generic": "Quelque chose n'a pas fonctionné de notre côté. Vos informations sont en sécurité — veuillez réessayer.",
+    "connection": "Nous ne pouvons pas joindre nos serveurs pour le moment. Si vous avez besoin d'aide immédiate, la Ligne d'aide Alzheimer est disponible au 1-800-272-3900.",
+    "no_access_code": "Il semble que vous n'ayez pas encore configuré de profil de soins. Faisons-le — cela ne prend que quelques minutes."
+  },
+  "privacy_hint": "Pour protéger la vie privée de chacun, nous vous encourageons à décrire les comportements plutôt que d'utiliser des noms ou des informations personnelles.",
+  "language": {
+    "label": "Langue",
+    "auto_detected": "Nous utiliserons {language} — souhaitez-vous changer de langue ?",
+    "change": "Changer de langue",
+    "confirm": "Continuer en {language}"
+  },
+  "login": {
+    "title": "Saisissez votre code d'accès",
+    "subtitle": "Saisissez le code d'accès de 8 caractères reçu lors de la configuration de votre profil de soin, ainsi que le prénom de votre proche.",
+    "code_label": "Code d'accès",
+    "code_hint": "8 caractères, lettres et chiffres",
+    "name_label": "Prénom de votre proche",
+    "name_placeholder": "ex. Papa, Maman, Marguerite",
+    "name_hint": "Enregistré uniquement sur cet appareil — jamais envoyé à nos serveurs.",
+    "submit": "Accéder au profil",
+    "submitting": "Connexion en cours...",
+    "error_not_found": "Code d'accès introuvable. Veuillez vérifier et réessayer.",
+    "no_code": "Vous n'avez pas de code d'accès ?",
+    "setup_new": "Créer un nouveau profil",
+    "back": "Retour à l'accueil",
+    "error_incomplete_code": "Please enter your complete 8-character access code.",
+    "error_missing_name": "Please enter your loved one's name."
+  },
+  "welcome": {
+    "tagline": "Un accompagnement serein quand votre proche en a le plus besoin.",
+    "get_started": "Commencer",
+    "have_access_code": "J'ai un code d'accès",
+    "facility_login": "Je suis personnel d'un établissement de soins",
+    "privacy_note": "Vos conversations sont privées. Aucune donnée personnelle n'est stockée sur nos serveurs.",
+    "terms": "Conditions",
+    "privacy": "Confidentialité"
+  },
+  "tags": {
+    "calm_approach": "Rester calme",
+    "music": "Musique",
+    "redirection": "Détourner l'attention",
+    "physical_space": "L'environnement",
+    "familiar_objects": "Objets familiers",
+    "routine": "Routine",
+    "lighting": "L'éclairage",
+    "simple_words": "Mots simples",
+    "physical_touch": "Contact doux",
+    "called_for_help": "Appelé à l'aide",
+    "waited_it_out": "Attendu que ça passe",
+    "left_the_room": "Quitté la pièce",
+    "too_generic": "Trop général",
+    "wrong_situation": "Mauvaise situation",
+    "didnt_understand": "Pas compris",
+    "felt_unsafe": "Pas en sécurité",
+    "already_tried": "Déjà essayé"
+  },
+  "disclaimer": {
+    "title": "Before you continue",
+    "lead_a": "CalmGuide is an",
+    "lead_a_emph": "educational and emotional-support companion",
+    "lead_a_tail": ".",
+    "lead_b": "It is",
+    "lead_b_emph": "not a medical device",
+    "lead_b_tail": ".",
+    "no_diagnosis": "It does not diagnose, treat, or provide medical advice.",
+    "bullet_emergency": "In emergencies, call",
+    "bullet_doctor": "For medical questions, call your doctor",
+    "bullet_helpline_lead": "For trained human support, call the",
+    "bullet_helpline_emph": "Alzheimer's Association 24/7 Helpline",
+    "bullet_helpline_at": "at",
+    "ack": "CalmGuide utilise l'IA pour offrir des conseils — il est là pour vous aider, mais ne remplace pas votre médecin ni les services d'urgence.",
+    "cta": "I understand — continue"
+  },
+  "journey_nav": {
+    "heading": "Où en êtes-vous dans ce parcours ?",
+    "noticing": "Vous remarquez des changements ?",
+    "diagnosis": "Nouveau diagnostic",
+    "hospice": "Réflexion sur les soins palliatifs",
+    "bereavement": "Après la perte"
+  },
+  "emergency": {
+    "label": "Contacts d'urgence",
+    "call_911": "Appeler le 911",
+    "call_988": "Appeler la ligne de crise 988",
+    "crisis_line": "Ligne de crise 988",
+    "call_alz": "Appeler la ligne Alzheimer",
+    "alz_helpline": "Ligne Alzheimer",
+    "choose_option": "Choisissez l'option la plus rapide pour une aide urgente.",
+    "emergency_services": "Services d'urgence"
+  },
+  "add": "Ajouter",
+  "cancel": "Annuler",
+  "add_custom": "Ajouter une option personnalisée",
+  "type_custom": "Tapez le vôtre...",
+  "restart": {
+    "title": "Redémarrage nécessaire",
+    "message": "Veuillez fermer complètement l'application et la rouvrir pour appliquer la nouvelle direction de mise en page.",
+    "ok": "OK"
+  },
+  "error_boundary": {
+    "title": "Une erreur s'est produite",
+    "message": "L'application a rencontré une erreur. Vos données sont en sécurité.",
+    "retry": "Réessayer"
+  },
+  "accessibility": {
+    "back": "Retour",
+    "voice_input": "Saisie vocale",
+    "stop_voice": "Arrêter la saisie vocale",
+    "voice_stopped": "Saisie vocale arrêtée",
+    "listening": "Écoute en cours. Parlez maintenant.",
+    "read_aloud": "Lire à voix haute",
+    "stop_reading": "Arrêter la lecture",
+    "switch_light": "Passer au mode clair",
+    "switch_dark": "Passer au mode sombre",
+    "loading_response": "Chargement de la réponse",
+    "edit_profile": "Modifier le profil",
+    "helpful": "Utile",
+    "not_helpful": "Pas utile",
+    "dismiss_feedback": "Ignorer les commentaires",
+    "send_message": "Envoyer le message",
+    "delete": "Supprimer"
+  }
+}

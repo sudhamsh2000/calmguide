@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "早上好",
+    "afternoon": "下午好",
+    "evening": "晚上好"
+  },
+  "hero": "您并不孤单。",
+  "coach_card": {
+    "title": "现在有些事情\n正在发生",
+    "subtitle": "获得平静、循序渐进的指导"
+  },
+  "quick_actions": {
+    "practice": "练习",
+    "practice_subtitle": "通过情景学习",
+    "check_in": "心情签到",
+    "check_in_subtitle": "今天您感觉怎么样？"
+  },
+  "loading_profile": "正在加载您的护理档案...",
+  "conversations": {
+    "heading": "最近",
+    "title": "最近的对话",
+    "empty": "暂无对话",
+    "empty_detail": "目前还没有最近的对话。需要指导时，请点击时刻教练按钮。",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "我们注意到的规律",
+    "this_week": "本周",
+    "last_week": "上周",
+    "peak_time": "高发时段",
+    "recurring_themes": "反复出现的情况",
+    "effective_strategies": "有效的方法",
+    "peak_overnight": "深夜",
+    "peak_morning": "早上",
+    "peak_afternoon": "下午",
+    "peak_evening": "晚上",
+    "trend_rising": "在增加",
+    "trend_falling": "在减少",
+    "trend_steady": "平稳",
+    "drift_alert": "我们发现本周困难时刻增多了（{last_count}次到{this_count}次）。这不是您的错——这可能是疾病发展的一部分。您的护理团队可能有好的建议。",
+    "cycle_detected": "发现状况规律",
+    "cycle_interval": "状况通常每隔{days}天出现一次",
+    "cross_patient_title": "对类似患者有效的方法"
+  },
+  "feedback": {
+    "title": "情况怎么样？",
+    "did_this_help": "这有帮助吗？",
+    "what_worked": "什么有效？",
+    "what_went_wrong": "这次什么没有帮助？",
+    "tap_any": "点击任意选项",
+    "done": "完成",
+    "thanks": "谢谢——这让我们能更好地帮助您",
+    "you_rated": "您评价了这次",
+    "dismiss_label": "关闭反馈",
+    "time_just_now": "刚刚",
+    "time_hours_ago": "{count}小时前",
+    "time_earlier_today": "今天早些时候",
+    "time_yesterday": "昨天"
+  },
+  "impact_link": "看看CalmGuide是如何帮助家庭的",
+  "daily_checkin": {
+    "title": "今天怎么样？",
+    "severity_calm": "平静的一天",
+    "severity_mild": "轻微状况",
+    "severity_tough": "困难状况",
+    "when": "什么时候？",
+    "time_overnight": "深夜",
+    "time_morning": "早上",
+    "time_afternoon": "下午",
+    "time_evening": "晚上",
+    "what_helped": "什么有帮助？",
+    "done": "完成",
+    "thanks": "已记录——这帮助我们发现规律"
+  },
+  "care_patterns": {
+    "title": "今晚可能需要多一些关注",
+    "reason_cycle": "状况通常每隔{interval}天出现一次，距上次已有{days_since}天了",
+    "reason_trend": "最近状况越来越频繁",
+    "what_helps": "之前有帮助的方法：",
+    "cross_patient_hint": "{count}位照护类似患者的家属发现{strategy}很有用"
+  },
+  "cross_patient": {
+    "title": "对类似患者有效的方法"
+  },
+  "log_incident": "记录一次事件",
+  "recent_incidents": "最近事件",
+  "see_all": "查看全部",
+  "server_error": "无法连接服务器。紧急联系人始终可用。"
+}

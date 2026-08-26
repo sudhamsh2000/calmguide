@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "hero": "You're not alone.",
+  "coach_card": {
+    "title": "Something is\nhappening right now",
+    "subtitle": "Get calm, step-by-step guidance"
+  },
+  "quick_actions": {
+    "practice": "Practice",
+    "practice_subtitle": "Learn with scenarios",
+    "check_in": "Check-In",
+    "check_in_subtitle": "How are you today?"
+  },
+  "loading_profile": "Loading your care profile...",
+  "conversations": {
+    "heading": "Recent",
+    "title": "Recent Conversations",
+    "empty": "No conversations yet",
+    "empty_detail": "No recent conversations yet. Tap the Moment Coach button when you need guidance.",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "Patterns We've Noticed",
+    "this_week": "This week",
+    "last_week": "Last week",
+    "peak_time": "Peak time",
+    "recurring_themes": "Recurring themes",
+    "effective_strategies": "What's been working",
+    "peak_overnight": "Overnight",
+    "peak_morning": "Morning",
+    "peak_afternoon": "Afternoon",
+    "peak_evening": "Evening",
+    "trend_rising": "Rising",
+    "trend_falling": "Falling",
+    "trend_steady": "Steady",
+    "drift_alert": "We're seeing more difficult moments this week ({last_count} to {this_count}). This is not your fault — it can be part of the disease pattern. Your care team may have ideas that help.",
+    "cycle_detected": "Episode pattern detected",
+    "cycle_interval": "Episodes tend to happen every {days} days",
+    "cross_patient_title": "What works for similar patients"
+  },
+  "feedback": {
+    "title": "How did it go?",
+    "did_this_help": "Did this help?",
+    "what_worked": "What worked?",
+    "what_went_wrong": "What didn't help this time?",
+    "tap_any": "tap any",
+    "done": "Done",
+    "thanks": "Thanks — this helps us help you better",
+    "you_rated": "You rated this",
+    "dismiss_label": "Dismiss feedback",
+    "time_just_now": "Just now",
+    "time_hours_ago": "{count}h ago",
+    "time_earlier_today": "Earlier today",
+    "time_yesterday": "Yesterday"
+  },
+  "daily_checkin": {
+    "title": "How was today?",
+    "severity_calm": "Calm day",
+    "severity_mild": "Mild episode",
+    "severity_tough": "Tough episode",
+    "when": "When?",
+    "time_overnight": "Overnight",
+    "time_morning": "Morning",
+    "time_afternoon": "Afternoon",
+    "time_evening": "Evening",
+    "what_helped": "What helped?",
+    "done": "Done",
+    "thanks": "Logged — this helps us spot patterns"
+  },
+  "care_patterns": {
+    "title": "What we're noticing",
+    "reason_cycle": "Difficult moments have tended to happen every {interval} days, and it's been {days_since} days since the last one",
+    "reason_trend": "Difficult moments have been more frequent recently",
+    "what_helps": "What's helped before:",
+    "cross_patient_hint": "{count} caregivers with similar patients found {strategy} helpful"
+  },
+  "cross_patient": {
+    "title": "What works for similar patients"
+  },
+  "impact_link": "See how CalmGuide is helping families",
+  "log_incident": "Log an incident",
+  "recent_incidents": "Recent incidents",
+  "see_all": "See all",
+  "server_error": "We can't reach our servers right now. Your emergency contacts are always available above."
+}

@@ -1,0 +1,26 @@
+{
+  "id": "scenario_001",
+  "title": "Nighttime Wandering",
+  "category": "wandering",
+  "situation": "Mom is trying to leave the house at 2am. She says she needs to go to work. She's already put her coat on and is at the front door.",
+  "patient_profile": {
+    "name": "Margaret",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["sundowning", "exit-seeking at night", "believes she still works"],
+    "calming_strategies": ["playing Frank Sinatra music", "offering warm milk", "showing family photo album"],
+    "safety_concerns": ["fall risk", "door locks sometimes left unlocked"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Should reference sundowning pattern and suggest music/photos as calming strategies. Should NOT say 'you don't work anymore'."
+}

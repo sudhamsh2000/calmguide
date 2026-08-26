@@ -1,0 +1,115 @@
+{
+  "logger": {
+    "title": "घटना दर्ज करें",
+    "what_happened": "क्या हुआ?",
+    "when": "यह कब हुआ?",
+    "just_now": "अभी",
+    "earlier_today": "आज पहले",
+    "yesterday": "कल",
+    "save": "सहेजें",
+    "saved": "सहेजा गया!",
+    "more_details_prompt": "क्या आप कुछ और जानकारी जोड़ना चाहेंगे?",
+    "yes_add_details": "हाँ, जानकारी जोड़ें",
+    "no_thanks": "नहीं, धन्यवाद",
+    "how_bad": "वह पल कितना तीव्र था?",
+    "how_long": "कितनी देर तक चला?",
+    "skip": "छोड़ें",
+    "what_before": "पहले क्या हो रहा था?",
+    "what_tried": "आपने क्या किया?",
+    "did_it_help": "क्या इससे मदद मिली?",
+    "anything_else": "कुछ और जो आप याद रखना चाहें?",
+    "tap_to_dictate": "बोलने के लिए टैप करें",
+    "done": "पूरा हुआ",
+    "category": {
+      "aggression_anger": "आक्रामकता\nया गुस्सा",
+      "confusion_disorientation": "भ्रम",
+      "wandering_exit_seeking": "भटकना\nया बाहर जाना",
+      "refusing_care": "देखभाल से\nइनकार",
+      "sleep_problems": "नींद की\nसमस्या",
+      "hallucinations": "कुछ दिखना /\nसुनाई देना",
+      "repetitive_behavior": "दोहराव वाला\nव्यवहार",
+      "other": "अन्य"
+    },
+    "severity": {
+      "mild": "हल्का",
+      "moderate": "मध्यम",
+      "severe": "गंभीर"
+    },
+    "duration": {
+      "seconds": "सेकंड",
+      "minutes": "मिनट",
+      "about_an_hour": "लगभग एक घंटा",
+      "longer": "अधिक"
+    },
+    "antecedent": {
+      "task_demand": "देखभाल के दौरान",
+      "transition": "बदलाव",
+      "environmental": "शोर / भीड़",
+      "social": "अकेले / ऊब",
+      "physical_state": "शारीरिक ज़रूरत",
+      "unknown": "पता नहीं"
+    },
+    "intervention": {
+      "music": "संगीत",
+      "redirect": "ध्यान भटकाना",
+      "quiet_space": "शांत जगह",
+      "warm_drink": "गर्म पेय",
+      "wait_it_out": "इंतज़ार करना",
+      "other": "अन्य"
+    },
+    "outcome": {
+      "resolved": "हल हुआ",
+      "partially_resolved": "आंशिक",
+      "unresolved": "नहीं",
+      "escalated": "बिगड़ गया"
+    }
+  },
+  "verification": {
+    "title": "हमने पहले की जानकारी रिकॉर्ड की है",
+    "looks_right": "सही है",
+    "let_me_fix": "मुझे ठीक करने दें",
+    "dismiss": "हटाएँ"
+  },
+  "history": {
+    "title": "घटना इतिहास",
+    "filter_all_types": "सभी प्रकार",
+    "filter_this_month": "इस महीने",
+    "no_incidents": "अभी तक कोई घटना दर्ज नहीं",
+    "no_incidents_subtitle": "आपकी दर्ज की गई घटनाएँ यहाँ दिखेंगी",
+    "resolved": "हल हुआ",
+    "partially_resolved": "आंशिक रूप से हल",
+    "unresolved": "अनसुलझा",
+    "escalated": "बिगड़ गया",
+    "see_all": "सभी घटनाएँ देखें",
+    "auto_extracted": "स्वचालित रूप से रिकॉर्ड",
+    "manual": "मैन्युअल रूप से दर्ज"
+  },
+  "patterns": {
+    "title": "हमें ये पैटर्न दिख रहे हैं",
+    "this_week": "इस हफ़्ते",
+    "up_from": "पिछले महीने {count}/हफ़्ते से बढ़ा",
+    "most_common": "सबसे आम",
+    "whats_helping": "क्या काम आ रहा है",
+    "see_details": "विवरण देखें",
+    "time_clusters": "दिन का समय",
+    "frequency": "आवृत्ति",
+    "what_works": "क्या काम करता है",
+    "what_doesnt": "क्या काम नहीं करता",
+    "trend": "रुझान (पिछले 30 दिन)"
+  },
+  "home": {
+    "log_incident": "घटना दर्ज करें"
+  },
+  "detail": {
+    "when": "कब",
+    "what_happened": "क्या हुआ",
+    "severity": "गंभीरता",
+    "duration": "अवधि",
+    "what_before": "पहले क्या हो रहा था",
+    "what_tried": "क्या प्रयास किया गया",
+    "outcome": "परिणाम",
+    "location": "स्थान",
+    "source": "स्रोत",
+    "not_found": "घटना नहीं मिली"
+  }
+}

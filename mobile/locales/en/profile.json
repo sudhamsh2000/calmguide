@@ -1,0 +1,158 @@
+{
+  "setup_title": "Create Profile",
+  "edit_title": "Edit Profile",
+  "patient_name": {
+    "label": "What is your loved one's name?",
+    "placeholder": "Enter their first name",
+    "hint": "This name is stored only on your device for privacy."
+  },
+  "disease_stage": {
+    "label": "What stage of dementia?",
+    "early": "Early",
+    "middle": "Middle",
+    "late": "Late",
+    "early_title": "Early Stage",
+    "early_description": "Mild memory lapses, difficulty finding words, some confusion with complex tasks. Can still manage most daily activities independently.",
+    "middle_title": "Middle Stage",
+    "middle_description": "Increasing confusion, difficulty recognizing people, behavioral changes, needs help with daily activities like dressing and bathing.",
+    "late_title": "Late Stage",
+    "late_description": "Severe memory loss, limited communication, needs full-time assistance with all daily activities, may not recognize family members.",
+    "anchor_early": "Can have conversations and manage some daily tasks with reminders. May repeat questions or misplace items.",
+    "anchor_middle": "Needs help with most daily tasks. May not always recognize familiar people. May wander or resist care.",
+    "anchor_late": "Needs help with all daily tasks. Limited or no speech. May not recognize family.",
+    "anchor_unsure": "I'm not sure"
+  },
+  "behavioral_patterns": {
+    "label": "Common behaviors you've noticed",
+    "placeholder": "Select all that apply"
+  },
+  "calming_strategies": {
+    "label": "What helps calm them down?",
+    "placeholder": "Select all that apply"
+  },
+  "safety_concerns": {
+    "label": "Any safety concerns?",
+    "placeholder": "Select all that apply"
+  },
+  "setup": {
+    "heading": "Let's set up your care profile",
+    "subtitle": "We'll ask a few questions about your loved one so we can give you the most helpful guidance during difficult moments.",
+    "name_label": "What is your loved one's first name?",
+    "name_placeholder": "e.g., Mom, Dad, Margaret",
+    "name_privacy": "This name stays on your device only and is never stored on our servers. We use it to personalize your guidance so it feels more natural.",
+    "stage_heading": "What stage best describes your loved one?",
+    "stage_subtitle": "This helps us tailor our guidance. You can always change this later.",
+    "behavioral_stage_heading": "Which best describes your loved one RIGHT NOW?",
+    "step_of": "Step {step} of {total}"
+  },
+  "steps": {
+    "behavioral": {
+      "title": "What behavioral patterns have you noticed?",
+      "description": "Select all that apply. This helps us give you more relevant guidance."
+    },
+    "calming": {
+      "title": "What calming strategies work for your loved one?",
+      "description": "Select what has worked before, even occasionally. We'll suggest these during tough moments."
+    },
+    "safety": {
+      "title": "Any safety concerns we should know about?",
+      "description": "Select all that apply so we can include relevant safety reminders in our guidance."
+    }
+  },
+  "progress": {
+    "step_of": "Step {current} of {total}",
+    "name": "Name",
+    "stage": "Stage",
+    "behaviors": "Behaviors",
+    "calming": "Calming",
+    "safety": "Safety"
+  },
+  "chip": {
+    "add_your_own": "Add your own",
+    "type_here": "Type here...",
+    "add": "Add",
+    "cancel": "Cancel",
+    "add_custom": "+ Add custom option"
+  },
+  "success": {
+    "profile_created": "Profile Created!",
+    "save_code_message": "Save this access code. You will need it to log back in on any device.",
+    "access_code_label": "Your Access Code",
+    "screenshot_hint": "Screenshot this or write it down somewhere safe.",
+    "start_button": "Start Using CalmGuide",
+    "share_code": "Share Access Code"
+  },
+  "errors": {
+    "no_access_code": "No access code found. Please create a new profile.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "view": {
+    "title": "Care Profile",
+    "name_hint": "Name stored on your device only",
+    "dementia_stage": "Dementia Stage",
+    "early_stage": "Early Stage",
+    "middle_stage": "Middle Stage",
+    "late_stage": "Late Stage",
+    "behavioral_patterns": "Behavioral Patterns",
+    "calming_strategies": "Calming Strategies",
+    "safety_concerns": "Safety Concerns",
+    "none_recorded": "None recorded",
+    "access_code": "Your Access Code",
+    "access_code_hint": "Save this code to access your profile from another device"
+  },
+  "actions": {
+    "next": "Next",
+    "back": "Back",
+    "save": "Save Profile",
+    "save_changes": "Save Changes",
+    "create": "Create Profile",
+    "saving": "Saving...",
+    "edit": "Edit Profile"
+  },
+  "appearance": "Appearance",
+  "sign_out": {
+    "title": "Sign Out",
+    "message": "This will remove your access code and your loved one's name from this device. Your care profile stays saved — you can sign back in anytime with your access code.",
+    "cancel": "Cancel",
+    "confirm": "Sign Out"
+  },
+  "card": {
+    "title": "{name}'s Profile",
+    "behaviors_tracked": "{count} behaviors tracked"
+  },
+  "options": {
+    "behavioral": {
+      "Sundowning": "Sundowning (evening agitation)",
+      "Wandering/exit-seeking": "Wandering / Exit-seeking",
+      "Aggression": "Aggression",
+      "Repetitive questions": "Repetitive Questions",
+      "Sleep disturbance": "Sleep Disturbance",
+      "Refusal to eat": "Refusal to Eat",
+      "Hallucinations": "Hallucinations",
+      "Hiding/hoarding objects": "Hiding / Hoarding Objects",
+      "Undressing inappropriately": "Undressing Inappropriately",
+      "Shadowing/following caregiver": "Shadowing / Following Caregiver"
+    },
+    "calming": {
+      "Music (specify favorite)": "Music (specify favorite)",
+      "Family photos": "Family Photos",
+      "Warm drink": "Warm Drink",
+      "Going for a walk": "Going for a Walk",
+      "Gentle hand massage": "Gentle Hand Massage",
+      "Favorite TV show": "Favorite TV Show",
+      "Pet interaction": "Pet Interaction",
+      "Rocking chair": "Rocking Chair",
+      "Aromatherapy": "Aromatherapy"
+    },
+    "safety": {
+      "Fall risk": "Fall Risk",
+      "Wandering/elopement risk": "Wandering / Leaving Unsupervised",
+      "Stove/fire risk": "Stove / Fire Risk",
+      "Medication confusion": "Medication Confusion",
+      "Aggressive when frustrated": "Aggressive When Frustrated",
+      "Cannot be left alone": "Cannot Be Left Alone",
+      "Driving risk": "Driving Risk",
+      "Pool/water nearby": "Pool / Water Nearby"
+    }
+  }
+}

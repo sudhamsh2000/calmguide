@@ -1,0 +1,10 @@
+{
+  "title": "您最近还好吗？",
+  "subtitle": "这一刻只属于您。",
+  "input_placeholder": "告诉我您今天的感受...",
+  "input_aria_label": "您今天感觉怎么样",
+  "submit_button": "分享",
+  "loading": "稍等，正在回应...",
+  "back_to_home": "返回首页",
+  "start_over": "重新开始"
+}

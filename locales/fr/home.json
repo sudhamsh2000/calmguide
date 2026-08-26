@@ -1,0 +1,92 @@
+{
+  "greeting": {
+    "morning": "Bonjour",
+    "afternoon": "Bon après-midi",
+    "evening": "Bonsoir"
+  },
+  "hero": "Vous n'êtes pas seul(e).",
+  "coach_card": {
+    "title": "Quelque chose se\npasse en ce moment",
+    "subtitle": "Recevez des conseils calmes, étape par étape"
+  },
+  "quick_actions": {
+    "practice": "S'entraîner",
+    "practice_subtitle": "Apprendre avec des scénarios",
+    "check_in": "Comment ça va",
+    "check_in_subtitle": "Comment allez-vous aujourd'hui ?"
+  },
+  "loading_profile": "Chargement de votre profil de soins...",
+  "conversations": {
+    "heading": "Récentes",
+    "title": "Conversations récentes",
+    "empty": "Aucune conversation pour l'instant",
+    "empty_detail": "Aucune conversation récente pour le moment. Touchez le bouton Coach du moment lorsque vous avez besoin d'aide.",
+    "timestamp_today_at": "Today at {time}",
+    "timestamp_yesterday_at": "Yesterday at {time}",
+    "timestamp_weekday_at": "{weekday} at {time}",
+    "timestamp_date_at": "{date} at {time}"
+  },
+  "patterns": {
+    "title": "Les habitudes qu'on a remarquées",
+    "this_week": "Cette semaine",
+    "last_week": "La semaine dernière",
+    "peak_time": "Moment le plus fréquent",
+    "recurring_themes": "Thèmes récurrents",
+    "effective_strategies": "Ce qui a marché",
+    "peak_overnight": "La nuit",
+    "peak_morning": "Le matin",
+    "peak_afternoon": "L'après-midi",
+    "peak_evening": "Le soir",
+    "trend_rising": "En hausse",
+    "trend_falling": "En baisse",
+    "trend_steady": "Stable",
+    "drift_alert": "Nous observons davantage de moments difficiles cette semaine ({last_count} à {this_count}). Ce n'est pas de votre faute — cela peut faire partie du cours de la maladie. Votre équipe soignante a peut-être des idées pour vous aider.",
+    "cycle_detected": "Habitude d'épisodes détectée",
+    "cycle_interval": "Les épisodes ont tendance à se produire tous les {days} jours",
+    "cross_patient_title": "Ce qui marche pour des patients similaires"
+  },
+  "feedback": {
+    "title": "Comment ça s'est passé ?",
+    "did_this_help": "Est-ce que ça a aidé ?",
+    "what_worked": "Qu'est-ce qui a marché ?",
+    "what_went_wrong": "Qu'est-ce qui n'a pas aidé cette fois ?",
+    "tap_any": "touchez n'importe lequel",
+    "done": "Terminé",
+    "thanks": "Merci — ça nous aide à mieux vous aider",
+    "you_rated": "Vous avez évalué ceci",
+    "dismiss_label": "Fermer le retour",
+    "time_just_now": "À l'instant",
+    "time_hours_ago": "Il y a {count}h",
+    "time_earlier_today": "Plus tôt aujourd'hui",
+    "time_yesterday": "Hier"
+  },
+  "impact_link": "Voyez comment CalmGuide aide les familles",
+  "daily_checkin": {
+    "title": "Comment s'est passée la journée ?",
+    "severity_calm": "Journée calme",
+    "severity_mild": "Épisode léger",
+    "severity_tough": "Épisode difficile",
+    "when": "Quand ?",
+    "time_overnight": "La nuit",
+    "time_morning": "Le matin",
+    "time_afternoon": "L'après-midi",
+    "time_evening": "Le soir",
+    "what_helped": "Qu'est-ce qui a aidé ?",
+    "done": "Terminé",
+    "thanks": "Enregistré — ça nous aide à repérer des habitudes"
+  },
+  "care_patterns": {
+    "title": "Ce soir pourrait demander un peu plus d'attention",
+    "reason_cycle": "Les épisodes ont tendance à se produire tous les {interval} jours, et ça fait {days_since} jours depuis le dernier",
+    "reason_trend": "Les épisodes sont plus fréquents ces derniers temps",
+    "what_helps": "Ce qui a aidé avant :",
+    "cross_patient_hint": "{count} aidants avec des patients similaires ont trouvé {strategy} utile"
+  },
+  "cross_patient": {
+    "title": "Ce qui marche pour des patients similaires"
+  },
+  "log_incident": "Signaler un incident",
+  "recent_incidents": "Incidents récents",
+  "see_all": "Tout voir",
+  "server_error": "Nous ne pouvons pas joindre nos serveurs. Les contacts d'urgence sont toujours disponibles ci-dessus."
+}

@@ -1,0 +1,10 @@
+{
+  "title": "How are you holding up?",
+  "subtitle": "This moment is just for you.",
+  "input_placeholder": "Tell me how you're feeling today...",
+  "input_aria_label": "How are you feeling today",
+  "submit_button": "Share",
+  "loading": "Taking a moment to respond...",
+  "back_to_home": "Back to home",
+  "start_over": "Start Over"
+}

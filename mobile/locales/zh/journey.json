@@ -1,0 +1,84 @@
+{
+  "trusted_resources": "可信赖的资源",
+  "noticing": {
+    "title": "您注意到一些变化了吗？",
+    "subtitle": "如果您正在思考是否有什么不对劲，请放心，您并不孤单。许多家庭都是从这里开始的。",
+    "p1_lead": "忘记一个名字、重复同一个问题、在陌生的地方感到困惑——这些可能是正常的衰老现象，也可能意味着更多。",
+    "p1_emph": "CalmGuide 无法告诉您究竟是哪种情况。",
+    "p2": "重要的是，您注意到了这些变化，并且在用心关注。这就是关爱的第一步。",
+    "p3": "以下资源可以帮助您理解您所观察到的情况，并决定是否需要咨询医生。只有通过就医，才能真正确认原因。",
+    "footnote": "CalmGuide 不提供筛查、诊断或认知功能评估。我们是一个教育辅助工具，而非医疗工具。",
+    "resources": {
+      "ten_signs_label": "Alzheimer's Association —— 十大预警信号",
+      "ten_signs_desc": "了解正常衰老与早期痴呆症征兆之间的区别。",
+      "doctor_label": "与您的医生沟通",
+      "doctor_desc": "只有医疗专业人员才能进行评估和诊断。请带上您观察到的情况。",
+      "helpline_label": "Alzheimer's Association 全天候热线",
+      "helpline_desc": "1-800-272-3900 —— 由专业人员提供的免费、保密支持服务。",
+      "nia_label": "National Institute on Aging —— 什么是痴呆症？",
+      "nia_desc": "来自美国国立卫生研究院的痴呆症类型和症状科普介绍。"
+    }
+  },
+  "diagnosis": {
+    "title": "刚刚收到诊断结果？",
+    "subtitle": "这是最艰难的时刻之一。请一步一步来。",
+    "p1": "一个痴呆症的诊断，仿佛在一瞬间改变了一切——却又什么都没变。您的亲人仍然是昨天的那个人。只是现在，您为一直以来发生的变化有了一个名称，这可能让您感到难以承受。",
+    "p2_emph": "您不需要今天就把所有事情都想清楚。",
+    "p2_tail": "现在最重要的是深呼吸，并且知道在您之前，已有千千万万的家庭走过了同样的路。",
+    "p3": "以下资源可以帮助您联系到能够陪您迈出第一步的人——互助小组、规划指南，以及真正理解您处境的专业人士。",
+    "p4": "当您准备好的时候，CalmGuide 可以帮助您应对日常事务：了解疾病知识、在困难时刻给予指导，以及在这一路上关照好您自己。",
+    "resources": {
+      "helpline_label": "Alzheimer's Association 全天候热线",
+      "helpline_desc": "1-800-272-3900 —— 现在就与真人交谈。他们理解您的感受。",
+      "support_label": "寻找附近的互助小组",
+      "support_desc": "与您身边正在经历相同处境的家庭建立联系。",
+      "after_label": "Alzheimer's Association —— 诊断之后",
+      "after_desc": "诊断后可以预期的情况、法律规划，以及接下来的第一步。",
+      "can_label": "Caregiver Action Network",
+      "can_desc": "为家庭照护者提供支持、教育和倡导服务。"
+    }
+  },
+  "hospice": {
+    "title": "在考虑临终关怀吗？",
+    "subtitle": "这个阶段面临着最艰难的抉择。您值得获得有经验的人的支持。",
+    "p1": "当痴呆症进入晚期，照护的重心从管理行为转变为提供舒适。这是一种完全不同的照护方式——它需要与之相匹配的专门支持。",
+    "p2_emph": "CalmGuide 没有能力为您提供临终决策方面的指导。",
+    "p2_tail": "这些决定涉及深层的个人情感和医疗考量，需要临终关怀专业人员、姑息治疗团队以及专门服务于这一阶段的咨询师来帮助您。",
+    "p3": "我们想告诉您的是：选择临终关怀并不是放弃，而是为您所爱的人选择舒适与尊严。",
+    "resources": {
+      "hfa_label": "Hospice Foundation of America",
+      "hfa_desc": "为面临临终决策的家庭提供教育和支持。",
+      "alz_late_label": "Alzheimer's Association —— 晚期照护",
+      "alz_late_desc": "了解晚期痴呆症可能出现的情况，以及如何提供舒适照护。",
+      "nhpco_label": "National Hospice and Palliative Care Organization",
+      "nhpco_desc": "寻找临终关怀服务提供者，了解姑息治疗方案。",
+      "helpline_label": "Alzheimer's Association 全天候热线",
+      "helpline_desc": "1-800-272-3900 —— 理解临终照护的专业咨询师为您服务。",
+      "nia_label": "National Institute on Aging —— 生命的最后阶段",
+      "nia_desc": "关于舒适照护、决策以及临终过程的指导。"
+    }
+  },
+  "bereavement": {
+    "title": "失去亲人之后",
+    "subtitle": "照护可能结束了，但内心的感受并没有。这很正常。",
+    "p1": "因痴呆症失去亲人是一种独特的悲伤。您可能在亲人离世前的数月甚至数年里就已经开始悲伤——看着您熟悉的那个人慢慢改变。现在他们走了，这份悲伤可能和您预想的不一样。",
+    "p2": "释然、内疚、麻木、愤怒、悲伤——这些感受都是正常的，而且常常同时出现。",
+    "p3_emph": "CalmGuide 是为照护过程设计的，而非用于哀伤支持。",
+    "p3_tail": "您值得获得专门帮助您度过当前阶段的人的支持。以下资源可以为您提供帮助。",
+    "p4_lead": "如果悲伤让您感到难以承受，或者您有伤害自己的念头，请立即拨打",
+    "p4_emph": "988",
+    "p4_tail": "。您同样重要。",
+    "resources": {
+      "lifeline_label": "988 自杀与危机生命热线",
+      "lifeline_desc": "拨打或发短信至 988 —— 全天候、免费、保密。如果此刻悲伤让您难以承受。",
+      "alz_grief_label": "Alzheimer's Association —— 悲伤与失去",
+      "alz_grief_desc": "了解那种在亲人离世前很久就开始、并在之后延续的悲伤。",
+      "griefshare_label": "GriefShare —— 寻找互助小组",
+      "griefshare_desc": "遍布各地的线下和线上哀伤互助小组。",
+      "helpline_label": "Alzheimer's Association 全天候热线",
+      "helpline_desc": "1-800-272-3900 —— 他们不仅在照护期间提供支持，在失去亲人之后同样如此。",
+      "children_label": "National Alliance for Grieving Children",
+      "children_desc": "如果家中的孩子也在经历丧亲之痛。"
+    }
+  }
+}

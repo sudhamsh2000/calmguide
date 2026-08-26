@@ -1,0 +1,26 @@
+{
+  "id": "scenario_029",
+  "title": "Failure to Recognize Loved One",
+  "category": "confusion",
+  "situation": "Dad just looked at me and asked 'Who are you? Why are you in my house?' I'm his daughter. I've been caring for him for three years. He looks scared of me. I can't stop crying. How do I make him remember me?",
+  "patient_profile": {
+    "name": "William",
+    "disease_stage": "late-middle",
+    "behavioral_patterns": ["intermittent recognition of family", "sometimes thinks daughter is his late wife", "becomes frightened of 'strangers' in the house", "calmer with women than men"],
+    "calming_strategies": ["speaking softly and slowly", "showing old family photo with his late wife", "offering his favorite butterscotch candy"],
+    "safety_concerns": ["may become aggressive if he feels threatened by 'strangers'", "has called police about intruders"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must address both the patient's fear AND the caregiver's heartbreak. Must NOT insist 'I'm your daughter!' or quiz him on who she is. Should suggest introducing herself gently as a friendly person ('Hi William, I'm here to help you'). Explain that face recognition is processed in brain regions damaged by late-middle stage dementia — this is not a choice or a reflection of their relationship. The caregiver's grief at not being recognized is profound and valid. Suggest showing family photos not to 'test' him but as a comfort activity."
+}

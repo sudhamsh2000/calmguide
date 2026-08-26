@@ -1,0 +1,26 @@
+{
+  "id": "scenario_014",
+  "title": "Paranoid Delusions - Theft",
+  "category": "hallucinations",
+  "situation": "Dad is accusing me of stealing his wallet. He's tearing apart his room looking for it. He says I'm a thief and wants to call the police. I hid his wallet because he was giving money to scammers.",
+  "patient_profile": {
+    "name": "Arthur",
+    "disease_stage": "middle",
+    "behavioral_patterns": ["accuses family of stealing", "hides belongings and forgets", "suspicious of caregivers"],
+    "calming_strategies": ["helping him search together", "keeping duplicates of commonly lost items", "redirecting to a favorite TV show"],
+    "safety_concerns": ["has called 911 about 'theft'", "financial vulnerability to scams"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'I didn't steal it' or 'you forgot where you put it'. Should suggest searching together. Explain paranoia as a symptom."
+}

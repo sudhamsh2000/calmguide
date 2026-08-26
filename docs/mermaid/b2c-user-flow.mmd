@@ -1,0 +1,105 @@
+---
+title: "CalmGuide B2C — Caregiver User Flow"
+---
+flowchart TD
+    WELCOME["/  Welcome Page"]
+    SETUP["/profile/setup  Profile Wizard"]
+    LOGIN["/login  Access Code + Name"]
+    HOME["/home  Home Screen"]
+    CRISIS["/coach  Moment Coach"]
+    CHECKIN["/check-in  Emotional Check-In"]
+    LEARN["/learn  Scenario List"]
+    LEARN_ID["/learn/:id  Scenario Practice"]
+    PROFILE["/profile  Profile View/Edit"]
+    INCIDENTS_NEW["/incidents/new  Log Incident"]
+    INCIDENTS["/incidents  Incident History"]
+    INCIDENT_DETAIL["/incidents/:id  Incident Detail"]
+    IMPACT["/impact  Public Impact"]
+    JOURNEY_N["/journey/noticing"]
+    JOURNEY_D["/journey/diagnosis"]
+    JOURNEY_H["/journey/hospice"]
+    JOURNEY_B["/journey/bereavement"]
+    PRIVACY["/privacy"]
+    TERMS["/terms"]
+
+    WELCOME -->|"Get Started"| SETUP
+    WELCOME -->|"Have access code"| LOGIN
+    WELCOME -->|"Facility login"| FAC_LOGIN["/facility/login"]
+
+    subgraph PROFILE_SETUP ["Profile Setup — 5-Step Wizard"]
+        direction TB
+        S1["Step 1: Patient Name"]
+        S2["Step 2: Disease Stage"]
+        S3["Step 3: Behavioral Patterns<br/>(chip selector)"]
+        S4["Step 4: Calming Strategies<br/>(chip selector)"]
+        S5["Step 5: Safety Concerns<br/>(chip selector)"]
+        S1 --> S2 --> S3 --> S4 --> S5
+    end
+    SETUP --> PROFILE_SETUP
+    PROFILE_SETUP -->|"Submit → POST /api/profiles<br/>Returns access_code"| SUCCESS_CODE["Show Access Code<br/>(save to localStorage)"]
+    SUCCESS_CODE --> HOME
+
+    LOGIN -->|"Enter 8-char code + name<br/>GET /api/profiles/:code<br/>Save to localStorage"| HOME
+
+    subgraph HOME_CARDS ["Home Screen — Priority-Ordered Cards"]
+        direction TB
+        H1["1. Care Pattern Alert<br/>(if needs_attention)"]
+        H2["2. Patient Card<br/>(name, stage, behavior count)"]
+        H3["3. Moment Coach CTA<br/>(primary, gradient card)"]
+        H4["4. Verification Card<br/>(auto-extracted incident review)"]
+        H5["5. Feedback Card<br/>(How did it go? — within 48h)"]
+        H6["6. Quick Actions Grid<br/>(Practice + Check-In)"]
+        H7["7. Daily Check-In Card<br/>(calm/mild/tough — 1 per day)"]
+        H8["8. Pattern Insights<br/>(trends, cycle, strategies)"]
+        H9["9. Incident Pattern Card<br/>(frequency trends)"]
+        H10["10. Log Incident + Recent"]
+        H11["11. Conversation History"]
+        H12["12. Journey Navigation"]
+    end
+    HOME --> HOME_CARDS
+
+    H3 -->|"Tap"| CRISIS
+    H6 -->|"Practice"| LEARN
+    H6 -->|"Check-In"| CHECKIN
+    H7 -->|"Submit"| DAILY_CHECKIN_API["POST /api/checkin/daily"]
+    H10 -->|"Log Incident"| INCIDENTS_NEW
+    H10 -->|"Tap incident"| INCIDENT_DETAIL
+    H11 -->|"Tap session"| CRISIS_RESUME["Resume: /coach?session_id=..."]
+    H5 -->|"Thumbs + Tags"| FEEDBACK_API["POST /api/feedback"]
+    H4 -->|"Approve/Correct"| VERIFY_API["POST /api/incidents/:code/verify/:id"]
+
+    subgraph CRISIS_FLOW ["Coach Mode — SSE Streaming"]
+        direction TB
+        CP1["Phase 1: Big Input<br/>(describe situation)"]
+        CP2["Phase 2: Chat Layout"]
+        CP3["Breathing Indicator<br/>(while waiting)"]
+        CP4["4-Section Response<br/>(RIGHT NOW / WHY / WHAT NOT / ESCALATION)"]
+        CP5["Footer Input<br/>(follow-up questions)"]
+        CP1 -->|"Submit message"| CP3
+        CP3 --> CP4
+        CP4 --> CP5
+        CP5 -->|"Next message"| CP3
+    end
+    CRISIS --> CRISIS_FLOW
+    CRISIS_RESUME --> CP2
+
+    LEARN -->|"Select scenario"| LEARN_ID
+    LEARN_ID -->|"Submit practice response<br/>POST /api/learn/interact"| LEARN_FEEDBACK["Expert Feedback<br/>(5 sections)"]
+
+    CHECKIN -->|"Type how you feel<br/>POST /api/checkin<br/>SSE stream"| CHECKIN_RESP["Empathetic Response<br/>(3 paragraphs)"]
+
+    INCIDENTS_NEW -->|"POST /api/incidents/:code"| INCIDENTS
+    INCIDENTS -->|"Tap"| INCIDENT_DETAIL
+    INCIDENT_DETAIL -->|"Edit"| INCIDENT_EDIT["PUT /api/incidents/:code/:id"]
+
+    H12 --> JOURNEY_N & JOURNEY_D & JOURNEY_H & JOURNEY_B
+
+    HOME -->|"Profile Switcher"| PROFILE
+    PROFILE -->|"Edit"| SETUP
+
+    classDef primary fill:#2B7A78,color:#fff,stroke:none
+    classDef secondary fill:#f5f5f5,color:#333,stroke:#ddd
+    classDef alert fill:#FFF3CD,color:#856404,stroke:#FFE69C
+    class CRISIS,CRISIS_FLOW primary
+    class HOME_CARDS secondary
+    class H1 alert

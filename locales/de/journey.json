@@ -1,0 +1,84 @@
+{
+  "trusted_resources": "Vertrauenswürdige Ressourcen",
+  "noticing": {
+    "title": "Veränderungen bemerkt?",
+    "subtitle": "Wenn Sie sich fragen, ob etwas nicht stimmt, sind Sie nicht allein. Viele Familien beginnen hier.",
+    "p1_lead": "Einen Namen vergessen, eine Frage wiederholen, sich an einem neuen Ort nicht zurechtfinden — das kann normales Altern sein oder etwas anderes.",
+    "p1_emph": "CalmGuide kann Ihnen nicht sagen, was davon zutrifft.",
+    "p2": "Wichtig ist, dass Sie es bemerkt haben und aufmerksam sind. Das ist bereits der erste Schritt der Fürsorge.",
+    "p3": "Die folgenden Ressourcen können Ihnen helfen zu verstehen, was Sie beobachten, und zu entscheiden, ob ein Arztbesuch sinnvoll ist. Nur ein Arztbesuch kann Gewissheit bringen.",
+    "footnote": "CalmGuide führt keine Untersuchungen, Diagnosen oder kognitiven Beurteilungen durch. Wir sind ein Bildungsbegleiter, kein medizinisches Werkzeug.",
+    "resources": {
+      "ten_signs_label": "Alzheimer's Association — 10 Warnzeichen",
+      "ten_signs_desc": "Erfahren Sie den Unterschied zwischen normalem Altern und frühen Anzeichen einer Demenz.",
+      "doctor_label": "Sprechen Sie mit Ihrem Arzt",
+      "doctor_desc": "Nur eine medizinische Fachperson kann eine Beurteilung und Diagnose vornehmen. Bringen Sie Ihre Beobachtungen mit.",
+      "helpline_label": "Alzheimer's Association 24/7-Helpline",
+      "helpline_desc": "1-800-272-3900 — Kostenlose, vertrauliche Unterstützung von geschulten Fachkräften.",
+      "nia_label": "National Institute on Aging — Was ist Demenz?",
+      "nia_desc": "Bildungsübersicht über Demenztypen und Symptome vom NIH."
+    }
+  },
+  "diagnosis": {
+    "title": "Gerade eine Diagnose erhalten?",
+    "subtitle": "Das ist einer der schwersten Momente. Gehen Sie es Schritt für Schritt an.",
+    "p1": "Eine Demenzdiagnose verändert alles — und gleichzeitig nichts. Ihr Angehöriger ist noch derselbe Mensch wie gestern. Aber jetzt haben Sie einen Namen für das, was passiert, und das kann sich überwältigend anfühlen.",
+    "p2_emph": "Sie müssen nicht alles heute herausfinden.",
+    "p2_tail": "Das Wichtigste jetzt ist, durchzuatmen und zu wissen, dass Millionen von Familien diesen Weg schon vor Ihnen gegangen sind.",
+    "p3": "Die folgenden Ressourcen verbinden Sie mit Menschen, die Ihnen bei den ersten Schritten helfen können — Selbsthilfegruppen, Planungsleitfäden und geschulte Fachleute, die verstehen, was Sie durchmachen.",
+    "p4": "Wenn Sie bereit sind, kann CalmGuide Sie im Alltag unterstützen: beim Verstehen der Erkrankung, bei schwierigen Momenten und bei der Selbstfürsorge auf diesem Weg.",
+    "resources": {
+      "helpline_label": "Alzheimer's Association 24/7-Helpline",
+      "helpline_desc": "1-800-272-3900 — Sprechen Sie jetzt mit einem echten Menschen. Man versteht dort, was Sie fühlen.",
+      "support_label": "Eine Selbsthilfegruppe in Ihrer Nähe finden",
+      "support_desc": "Vernetzen Sie sich mit anderen Familien, die das Gleiche durchmachen.",
+      "after_label": "Alzheimer's Association — Nach der Diagnose",
+      "after_desc": "Was Sie erwartet, rechtliche Planung und erste Schritte nach einer Diagnose.",
+      "can_label": "Caregiver Action Network",
+      "can_desc": "Unterstützung, Bildung und Interessenvertretung für pflegende Angehörige."
+    }
+  },
+  "hospice": {
+    "title": "Denken Sie über Hospiz nach?",
+    "subtitle": "Diese Phase stellt die schwierigsten Fragen. Sie verdienen Unterstützung von Menschen, die das schon durchlebt haben.",
+    "p1": "Wenn die Demenz ihr letztes Stadium erreicht, verlagert sich der Fokus vom Umgang mit Verhaltensweisen hin zur Bereitstellung von Komfort. Das ist eine ganz andere Art der Pflege — und sie verdient ihre eigene Art der Unterstützung.",
+    "p2_emph": "CalmGuide ist nicht dafür ausgelegt, Sie durch Entscheidungen am Lebensende zu begleiten.",
+    "p2_tail": "Diese Entscheidungen sind zutiefst persönlich und medizinisch, und sie verdienen die Aufmerksamkeit von Hospizfachkräften, Palliativteams und Beratern, die auf diese Phase spezialisiert sind.",
+    "p3": "Was wir Ihnen sagen können: Sich für Hospiz zu entscheiden bedeutet nicht aufzugeben. Es bedeutet, Komfort und Würde für einen Menschen zu wählen, den Sie lieben.",
+    "resources": {
+      "hfa_label": "Hospice Foundation of America",
+      "hfa_desc": "Bildung und Unterstützung für Familien, die vor Entscheidungen am Lebensende stehen.",
+      "alz_late_label": "Alzheimer's Association — Pflege im Spätstadium",
+      "alz_late_desc": "Was Sie im Spätstadium der Demenz erwartet und wie Sie Komfort bieten können.",
+      "nhpco_label": "National Hospice and Palliative Care Organization",
+      "nhpco_desc": "Finden Sie Hospizanbieter und erfahren Sie mehr über Palliativversorgung.",
+      "helpline_label": "Alzheimer's Association 24/7-Helpline",
+      "helpline_desc": "1-800-272-3900 — Berater, die die Pflege am Lebensende verstehen.",
+      "nia_label": "National Institute on Aging — Lebensende",
+      "nia_desc": "Leitfaden zu Komfortpflege, Entscheidungsfindung und was am Ende geschieht."
+    }
+  },
+  "bereavement": {
+    "title": "Nach dem Verlust",
+    "subtitle": "Die Pflege mag vorbei sein, aber die Gefühle nicht. Das ist normal.",
+    "p1": "Jemanden durch Demenz zu verlieren ist eine besondere Art der Trauer. Möglicherweise haben Sie schon Monate oder Jahre vor dem Tod getrauert — während Sie zusahen, wie sich der Mensch, den Sie kannten, langsam veränderte. Jetzt, da er gegangen ist, fühlt sich die Trauer vielleicht anders an, als Sie erwartet haben.",
+    "p2": "Erleichterung, Schuldgefühle, Taubheit, Wut, Traurigkeit — all das ist normal. Oft gleichzeitig.",
+    "p3_emph": "CalmGuide wurde für die Pflege entwickelt, nicht für Trauerbegleitung.",
+    "p3_tail": "Sie verdienen Menschen, die auf das spezialisiert sind, was Sie jetzt durchmachen. Die folgenden Ressourcen können Sie damit verbinden.",
+    "p4_lead": "Wenn die Trauer überwältigend wird oder Sie Gedanken haben, sich selbst zu verletzen, rufen Sie bitte jetzt",
+    "p4_emph": "988",
+    "p4_tail": "an. Auch Sie sind wichtig.",
+    "resources": {
+      "lifeline_label": "988 Suizid- und Krisenhotline",
+      "lifeline_desc": "Rufen Sie 988 an oder schreiben Sie eine SMS — rund um die Uhr, kostenlos, vertraulich. Wenn sich die Trauer gerade unerträglich anfühlt.",
+      "alz_grief_label": "Alzheimer's Association — Trauer und Verlust",
+      "alz_grief_desc": "Trauer verstehen, die lange vor dem Tod beginnt — und danach weitergeht.",
+      "griefshare_label": "GriefShare — Selbsthilfegruppe finden",
+      "griefshare_desc": "Lokale und Online-Trauergruppen im ganzen Land.",
+      "helpline_label": "Alzheimer's Association 24/7-Helpline",
+      "helpline_desc": "1-800-272-3900 — Dort unterstützt man Familien auch nach dem Verlust, nicht nur während der Pflege.",
+      "children_label": "National Alliance for Grieving Children",
+      "children_desc": "Wenn auch Kinder in der Familie trauern."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "title": "时刻教练",
+  "subtitle": "描述正在发生的事情，获得平静、循序渐进的指导。",
+  "greeting": "先深呼吸。",
+  "greeting_detail": "告诉我发生了什么——我会给您一步步的指导。",
+  "input_placeholder": "描述正在发生的事情...",
+  "input_aria_label": "描述当前情况",
+  "submit_button": "获取指导",
+  "followup_placeholder": "提一个后续问题……",
+  "followup_aria_label": "后续信息",
+  "you_asked": "您问",
+  "still_working": "处理中……",
+  "loading_conversation": "加载对话中……",
+  "sections": {
+    "right_now": "现在立刻",
+    "why": "为什么会发生这种情况",
+    "what_not_to_do": "不要做什么",
+    "escalation": "何时寻求帮助"
+  },
+  "error": {
+    "profile_not_found": "我们找不到该代码对应的档案。请在档案选项卡中检查代码，或根据需要设置新档案。",
+    "server_error": "我们现在无法连接。在我们重试的同时，请记住：您已经做得很好了。如果这是紧急情况，请拨打 911。",
+    "something_wrong": "出了一些问题"
+  },
+  "honesty_disclaimer": "Moment Coach 在您有时间打字和阅读时提供帮助——艰难的夜晚、行为发作、日落综合征。它不能替代紧急救助。如果您无法放下手机，如果双手在颤抖，如果有人处于危险中——请拨打 911。",
+  "safety_disclosure": {
+    "safety_headline": "AI助手 — 非紧急情况使用。",
+    "safety_call_emergency": "如有人处于危险中，请拨打{number}。",
+    "safety_info": "安全信息",
+    "safety_hide": "收起",
+    "safety_talking_to_ai": "您正在与AI对话，不是真人。",
+    "safety_emergency_instruction": "紧急情况请拨打{number}。",
+    "safety_helpline": "专业支持热线：{phone}（{name}）"
+  },
+  "finding_guidance": "正在为您寻找指导..."
+}

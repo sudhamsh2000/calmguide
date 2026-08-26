@@ -1,0 +1,26 @@
+{
+  "id": "scenario_008",
+  "title": "Sundowning - Nighttime Confusion",
+  "category": "sundowning",
+  "situation": "Dad woke up at midnight completely confused. He doesn't know where he is and keeps saying he wants to go home even though he's in his own bedroom. He's crying.",
+  "patient_profile": {
+    "name": "James",
+    "disease_stage": "late-middle",
+    "behavioral_patterns": ["nighttime confusion episodes", "doesn't recognize own home", "becomes tearful and frightened"],
+    "calming_strategies": ["nightlight in hallway", "warm chamomile tea", "sitting together and holding hands"],
+    "safety_concerns": ["falls in dark", "has tried to leave at night", "sleep disruption pattern"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Must NOT say 'You ARE home'. Should validate the feeling of wanting to go home. Explain that 'home' often means safety/comfort, not the physical place."
+}

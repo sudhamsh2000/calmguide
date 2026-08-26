@@ -1,0 +1,65 @@
+{
+  "title": "Practice Scenarios",
+  "subtitle": "Build confidence with guided scenarios",
+  "scenario": {
+    "the_situation": "The Situation",
+    "your_response": "Your Response",
+    "response_placeholder": "How would you handle this situation? Describe what you would say and do...",
+    "get_feedback": "Get Feedback",
+    "getting_feedback": "Getting Feedback...",
+    "your_feedback": "Your Feedback",
+    "try_different": "Try a Different Approach",
+    "stage_label": "{stage} stage",
+    "stages": {
+      "early": "Early",
+      "middle": "Middle",
+      "late": "Late"
+    }
+  },
+  "list": {
+    "subtitle": "Practice common situations to feel more prepared.",
+    "loading": "Loading scenarios...",
+    "filter_label": "Filter by category",
+    "filter_all": "All",
+    "filter_behavioral": "Behavioral",
+    "filter_daily_care": "Daily Care",
+    "filter_safety": "Safety",
+    "filter_communication": "Communication",
+    "filter_self_care": "Self Care",
+    "empty": "No scenarios found for this category.",
+    "show_all": "Show all scenarios",
+    "load_error": "Unable to load scenarios. Please try again later."
+  },
+  "scenarios": {
+    "sundowning-evening": {
+      "title": "Evening Agitation (Sundownning)",
+      "description": "Your loved one becomes increasingly anxious and confused as evening approaches. They insist on 'going home' even though they are home."
+    },
+    "refusal-to-bathe": {
+      "title": "Refusing to Bathe",
+      "description": "Your loved one hasn't bathed in several days and becomes aggressive when you suggest it."
+    },
+    "wandering-night": {
+      "title": "Nighttime Wandering",
+      "description": "You wake up at 2am to find your loved one dressed and trying to leave the house."
+    },
+    "repeated-questions": {
+      "title": "Repetitive Questions",
+      "description": "Your loved one has asked you the same question 15 times in the last hour. You feel your patience wearing thin."
+    },
+    "medication-refusal": {
+      "title": "Medication Refusal",
+      "description": "Your loved one is spitting out their medications and accusing you of trying to poison them."
+    },
+    "caregiver-burnout": {
+      "title": "Caregiver Overwhelm",
+      "description": "You haven't slept more than 4 hours a night in weeks. Today you lost your patience and it's weighing on you."
+    }
+  },
+  "loading": "Loading scenario...",
+  "error": {
+    "not_found": "Unable to load this scenario. It may not exist.",
+    "load_failed": "Unable to load this scenario. Please try again later.",
+    "feedback_failed": "Unable to get feedback right now. Please try again later."
+  }
+}

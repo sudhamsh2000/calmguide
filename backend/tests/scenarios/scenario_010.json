@@ -1,0 +1,26 @@
+{
+  "id": "scenario_010",
+  "title": "Refusal to Drink Water",
+  "category": "eating",
+  "situation": "Dad won't drink anything. I've offered water, juice, tea. He just says no to everything. It's been a hot day and I'm worried about dehydration.",
+  "patient_profile": {
+    "name": "George",
+    "disease_stage": "late",
+    "behavioral_patterns": ["refuses liquids", "forgets how to use a cup", "used to drink coffee all day"],
+    "calming_strategies": ["offering drinks in his favorite mug", "using a straw", "adding flavor to water"],
+    "safety_concerns": ["chronic dehydration", "UTI risk from low fluid intake", "difficulty swallowing"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "Should suggest water-rich foods, popsicles, flavored drinks. Specific dehydration signs for escalation. Must mention swallowing difficulty risk."
+}

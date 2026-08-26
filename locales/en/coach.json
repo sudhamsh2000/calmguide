@@ -1,0 +1,40 @@
+{
+  "title": "Moment Coach",
+  "subtitle": "Describe what is happening and receive calm, step-by-step guidance.",
+  "greeting": "Take a breath.",
+  "greeting_detail": "Tell me what's happening — I'll give you step-by-step guidance.",
+  "input_placeholder": "Describe what's happening...",
+  "input_aria_label": "Describe the situation",
+  "submit_button": "Get Guidance",
+  "followup_placeholder": "Ask a follow-up question…",
+  "followup_aria_label": "Follow-up message",
+  "you_asked": "You asked",
+  "still_working": "Still working…",
+  "loading_conversation": "Loading conversation…",
+  "sections": {
+    "right_now": "RIGHT NOW",
+    "why": "WHY THIS IS HAPPENING",
+    "what_not_to_do": "WHAT NOT TO DO",
+    "escalation": "WHEN TO CALL FOR HELP"
+  },
+  "honesty_disclaimer": "Moment Coach helps when you have time to type and read — tough evenings, behavioral flare-ups, sundowning. It does NOT replace emergency help. If you cannot put the phone down, if hands are shaking, if someone is in danger — call 911.",
+  "finding_guidance": "Finding guidance for you...",
+  "error": {
+    "profile_not_found": "We couldn't find a profile for that code. Double-check the code on the Profile tab, or set up a new profile if needed.",
+    "server_error": "We can't connect right now. While we try again, remember: you are doing your best. If this is an emergency, call 911.",
+    "something_wrong": "Something went wrong",
+    "something_wrong_status": "Something went wrong ({status}). Please try again.",
+    "connection_failed": "Unable to connect. Please check your connection and try again.",
+    "no_access_code": "No access code found. Please set up your profile first.",
+    "loading_failed": "We hit an issue loading the Moment Coach. Please try again."
+  },
+  "safety_disclosure": {
+    "safety_headline": "AI assistant — not for emergencies.",
+    "safety_call_emergency": "Call {number} if someone is in danger.",
+    "safety_info": "Safety info",
+    "safety_hide": "Hide",
+    "safety_talking_to_ai": "You're talking to AI, not a human.",
+    "safety_emergency_instruction": "In emergencies call {number}.",
+    "safety_helpline": "For trained human support call {phone} ({name})."
+  }
+}

@@ -1,0 +1,22 @@
+# Core
+openai>=1.35.0
+tiktoken>=0.7.0
+pydantic-settings>=2.3.0
+
+# Scraping
+httpx>=0.27.0
+beautifulsoup4>=4.12.0
+html2text>=2024.2.26
+
+# --- Vector store backends ---
+# Install only what you need.
+
+# pgvector (uses existing PostgreSQL)
+asyncpg>=0.29.0
+pgvector>=0.3.0
+
+# Qdrant
+qdrant-client>=1.9.0
+
+# ChromaDB
+chromadb>=0.5.0

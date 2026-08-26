@@ -1,0 +1,144 @@
+---
+title: "Coach Chat — Complete Data Flow (POST /api/coach/chat)"
+---
+sequenceDiagram
+    participant C as Client (Browser/Mobile)
+    participant R as coach.py Router
+    participant SG as SafetyGate
+    participant DB as PostgreSQL
+    participant RQ as RetrievalQuery
+    participant RAG as RAG Pipeline
+    participant CP as CrossPatient
+    participant DOS as Dossier Service
+    participant IR as IncidentRetriever
+    participant PR as Prompt Renderer
+    participant LLM as LLM Provider
+    participant RG as ResponseGuard
+    participant TG as TagGenerator
+    participant INS as Insights Service
+    participant IE as IncidentExtractor
+
+    C->>R: POST /api/coach/chat<br/>{access_code|profile_id, patient_name,<br/>message, session_id?}
+
+    Note over R: Resolve profile
+    alt B2C Mode
+        R->>DB: SELECT profile WHERE<br/>access_code_hash = SHA256(code)
+    else B2B Mode
+        R->>DB: SELECT profile WHERE id = profile_id
+    end
+    DB-->>R: Profile (stage, patterns,<br/>strategies, concerns — all encrypted)
+
+    Note over R: Resolve locale
+    R->>R: resolve_locale_code(X-App-Locale header)<br/>→ locale_code, language, constraint, model_override
+
+    Note over R,RQ: RAG query preparation
+    R->>RQ: build_english_rag_query(locale, message)
+    alt Non-English locale
+        RQ->>LLM: "Rewrite to English retrieval query"
+        LLM-->>RQ: English query
+    end
+    RQ-->>R: English RAG query
+
+    Note over R,RAG: RAG context retrieval
+    R->>RAG: get_rag_context(query, k=3, min_score=0.20)
+    RAG->>RAG: Embed query → 3072-dim vector
+    RAG->>DB: Hybrid search:<br/>cosine_similarity + tsvector keyword(+0.15)
+    DB-->>RAG: Top 9 candidates
+    RAG->>RAG: Rerank by title overlap (+0.05/word)
+    RAG-->>R: Top 3 chunks (formatted text)
+
+    Note over R,CP: Cross-patient strategies
+    R->>DB: SELECT profile_insights<br/>WHERE profile_id = ?
+    DB-->>R: insights_json (encrypted)
+    R->>R: Decrypt → extract peak_time
+    R->>CP: get_cohort_strategies(stage:peak_time)
+    CP->>DB: SELECT cross_patient_strategies<br/>WHERE cohort_key = ? AND total_profiles >= 5
+    DB-->>CP: Strategy entries
+    CP-->>R: Top 3 strategies (randomized order)
+
+    Note over R,DOS: Behavioral dossier
+    R->>DOS: get_dossier_if_fresh(profile_id)
+    DOS->>DB: SELECT behavioral_dossier<br/>WHERE profile_id = ? AND is_stale = false
+    alt Fresh dossier exists
+        DB-->>DOS: Dossier row
+    else No fresh dossier
+        DOS->>DOS: compute_dossier()<br/>(weighted incidents, trends, flags)
+    end
+    DOS-->>R: dossier_text, contraindicated,<br/>effective, delirium_flags, pain_flags,<br/>frequency_trends (all decrypted)
+
+    Note over R,IR: Relevant past incidents
+    R->>IR: get_relevant_incidents(profile_id, message)
+    IR->>IR: detect_behavior_categories(message)<br/>(keyword matching across 7 categories)
+    IR->>DB: SELECT incidents WHERE<br/>profile_id = ? AND category IN (detected)<br/>ORDER BY created_at DESC LIMIT 3
+    DB-->>IR: Matching incidents
+    IR-->>R: Formatted incident dicts (decrypted)
+
+    Note over R,PR: Prompt assembly
+    R->>PR: render_coach_prompt(all context)
+    PR->>PR: coach_system.jinja2<br/>+ domain_knowledge.jinja2<br/>Inject: patient context, contraindicated,<br/>effective interventions, frequency trends,<br/>delirium/pain flags, dossier narrative,<br/>past incidents, RAG chunks, cross-patient,<br/>language constraints, few-shot examples
+    PR-->>R: System prompt (variable length)
+
+    Note over R: Safety gate check (pre-LLM)
+    R->>SG: check_safety_gate(message, locale)
+    SG->>SG: Regex match against<br/>16 EN life-threat + 10 multilingual<br/>7 EN self-harm + 10 multilingual
+
+    alt Safety gate triggered
+        SG-->>R: SafetyGateResult(triggered=true,<br/>gate_type, response_text)
+        R->>C: SSE: {session_id} → {text: emergency response} → [DONE]
+        R->>DB: Save user + assistant messages<br/>(is_safety_gate=true)
+    else No safety trigger
+        Note over R: Save user message
+        R->>DB: INSERT conversation<br/>(encrypted content, locale, staff_id, facility_id)
+
+        Note over R,C: SSE Streaming
+        R->>C: SSE: data: {session_id}
+        R->>LLM: stream_completion(system_prompt, messages, model_override)
+        loop Each chunk
+            LLM-->>R: text chunk
+            R->>C: SSE: data: {text: chunk}
+        end
+
+        Note over R,RG: Post-stream validation
+        R->>RG: validate_response_quality(full_text, locale)
+        RG->>RG: Script ratio check (non-Latin)<br/>Romanization detection<br/>Known bad phrase check<br/>Disrespectful phrase check (EN + localized)
+        alt Validation fails
+            R->>RG: guard_response_text()
+            RG->>LLM: Repair prompt (rewrite in correct language)
+            LLM-->>RG: Repaired text
+            RG->>RG: Re-validate repaired text
+            alt Repair valid
+                RG-->>R: Repaired text
+                R->>C: SSE: data: {replace: repaired_text}
+            else Repair also fails
+                RG-->>R: Locale-specific fallback message
+                R->>C: SSE: data: {replace: fallback}
+            end
+        end
+        R->>C: SSE: data: [DONE]
+
+        Note over R: Post-DONE async operations
+        R->>DB: INSERT conversation (assistant, encrypted)
+
+        par Tag generation
+            R->>TG: generate_suggested_tags(response, llm)
+            TG->>LLM: Extract strategy keywords from RIGHT NOW
+            LLM-->>TG: JSON array of tags
+            TG-->>R: predefined_tags + custom_tags
+            R->>DB: UPDATE conversation SET suggested_tags = encrypt(tags)
+        and Insights recomputation
+            R->>INS: compute_profile_insights(profile_id)
+            INS->>DB: Load all conversations, sessions, feedback, check-ins
+            INS->>INS: Session frequency, trends, triggers,<br/>episode cycle detection, risk scoring
+            INS->>DB: UPSERT profile_insights (if >= 3 sessions)
+        and Incident extraction
+            R->>IE: extract_incident_from_conversation(messages, profile)
+            IE->>LLM: extraction_system.jinja2 prompt
+            LLM-->>IE: JSON: {behavior_category, severity, ...}
+            IE->>IE: Confidence filter (< 0.60 → null)<br/>PII scrub (names, locations, doctors)<br/>Abuse indicator check
+            IE-->>R: Extraction result
+            alt Valid extraction
+                R->>DB: INSERT incident (auto_extracted, encrypted fields)
+                R->>DB: SET behavioral_dossier.is_stale = true
+            end
+        end
+    end

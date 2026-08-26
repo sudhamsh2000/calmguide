@@ -1,0 +1,26 @@
+{
+  "id": "scenario_030",
+  "title": "Late Stage - Difficulty Swallowing/Choking Concern",
+  "category": "late_stage",
+  "situation": "Mom started coughing and choking during dinner. She's breathing now but it took a while for her to stop coughing. This has been happening more often. Tonight she turned red and I thought I was going to lose her. I'm terrified to feed her now. What do I do?",
+  "patient_profile": {
+    "name": "Helen",
+    "disease_stage": "late",
+    "behavioral_patterns": ["difficulty swallowing thin liquids", "pocketing food in cheeks", "eating very slowly", "sometimes forgets to swallow"],
+    "calming_strategies": ["gentle touch on her arm during meals", "soft music during mealtimes", "maintaining eye contact while she eats"],
+    "safety_concerns": ["aspiration pneumonia risk", "weight loss", "dehydration risk", "has been evaluated by speech therapist"]
+  },
+  "expected_elements": {
+    "uses_patient_name": true,
+    "references_disease_stage": true,
+    "has_60_second_actions": true,
+    "has_why_section": true,
+    "has_what_not_to_do": true,
+    "has_escalation_criteria": true,
+    "includes_calming_strategy": true,
+    "no_reality_contradiction": true,
+    "no_medical_advice": true,
+    "no_restraint_suggestion": true
+  },
+  "notes": "This is a late-stage scenario with serious medical implications. Must NOT provide specific swallowing therapy or dietary modification advice — that is the speech therapist's role. Should recommend contacting Helen's doctor and speech therapist about the worsening pattern. Immediate comfort: keep Helen upright, gentle reassurance. Explain that swallowing difficulty (dysphagia) is common in late-stage dementia as the brain loses ability to coordinate the complex swallow reflex. Address the caregiver's fear directly — feeding anxiety is real and understandable. Mention advance care planning gently if appropriate."
+}

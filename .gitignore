@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+backend/.env
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/tsconfig.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+frontend/coverage/
+htmlcov/
+
+# Docker
+*.log
+
+# Playwright
+.playwright-mcp/
+
+# Claude Code
+.claude/
+.agents/
+.mcp.json
+skills-lock.json
+
+# Screenshots (dev only)
+screenshots/
+
+# Project planning (not source)
+CalmGuide_Build_Plan.md
+CalmGuide_UI_Prototype.html
+CLAUDE.md
+
+# Superpowers planning docs — local only
+docs/superpowers/
+
+# RAG local data
+rag/.env
+rag/chroma_db/
+
+# SQLite test databases
+*.db
+
+# Git worktrees
+.worktrees/
+
+# Superpowers brainstorm sessions
+.superpowers/
+
+# Expo generated files
+mobile/.expo/
+mobile/ios/
+mobile/android/

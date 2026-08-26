@@ -1,0 +1,36 @@
+{
+  "title": "Acompañamiento",
+  "subtitle": "Describe lo que está pasando y recibe orientación tranquila, paso a paso.",
+  "greeting": "Respira hondo.",
+  "greeting_detail": "Cuéntame qué está pasando — te daré orientación paso a paso.",
+  "input_placeholder": "Describe lo que está pasando...",
+  "input_aria_label": "Describe lo que está pasando",
+  "submit_button": "Obtener Orientación",
+  "followup_placeholder": "Haz una pregunta de seguimiento…",
+  "followup_aria_label": "Mensaje de seguimiento",
+  "you_asked": "Preguntaste",
+  "still_working": "Procesando…",
+  "loading_conversation": "Cargando conversación…",
+  "sections": {
+    "right_now": "AHORA MISMO",
+    "why": "POR QUÉ ESTÁ PASANDO ESTO",
+    "what_not_to_do": "QUÉ NO HACER",
+    "escalation": "CUÁNDO PEDIR AYUDA"
+  },
+  "error": {
+    "profile_not_found": "No pudimos encontrar un perfil para ese código. Verifica el código en la pestaña de Perfil, o configura un nuevo perfil si es necesario.",
+    "server_error": "No podemos conectarnos ahora. Mientras lo intentamos de nuevo, recuerda: estás haciendo lo mejor que puedes. Si es una emergencia, llama al 911.",
+    "something_wrong": "Algo salió mal"
+  },
+  "honesty_disclaimer": "Moment Coach le ayuda cuando tiene tiempo para escribir y leer — tardes difíciles, episodios de conducta, síndrome del atardecer. NO reemplaza la ayuda de emergencia. Si no puede soltar el teléfono, si le tiemblan las manos, si alguien está en peligro — llame al 911.",
+  "safety_disclosure": {
+    "safety_headline": "Asistente de IA — no para emergencias.",
+    "safety_call_emergency": "Llame al {number} si alguien está en peligro.",
+    "safety_info": "Info de seguridad",
+    "safety_hide": "Ocultar",
+    "safety_talking_to_ai": "Está hablando con IA, no con una persona.",
+    "safety_emergency_instruction": "En emergencias llame al {number}.",
+    "safety_helpline": "Para apoyo humano capacitado llame al {phone} ({name})."
+  },
+  "finding_guidance": "Buscando orientación para ti..."
+}
