@@ -12,6 +12,7 @@ import { formatResidentLocation } from '@/lib/facility-utils';
 import { BreathingIndicator } from '@/components/ui/BreathingIndicator';
 import { BackButton } from '@/components/ui/BackButton';
 import { SafetyDisclosure } from '@/components/ui/SafetyDisclosure';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { ResidentContextBanner } from '@/components/facility/ResidentContextBanner';
 import { FacilityModeShell } from '@/components/facility/FacilityModeShell';
 import { MedicalDisclaimer } from '@/components/ui/MedicalDisclaimer';
@@ -206,6 +207,10 @@ function CoachPageInner() {
             <SafetyDisclosure />
           </div>
 
+          <div className="empty:hidden [&:not(:empty)]:mb-3">
+            <OfflineBanner />
+          </div>
+
           <GreetingCard />
 
           <CoachInput onSubmit={handleSendMessage} disabled={isStreaming} />
@@ -236,6 +241,10 @@ function CoachPageInner() {
         </div>
         <SafetyDisclosure />
       </header>
+
+      <div className="shrink-0 px-5 empty:hidden [&:not(:empty)]:pt-3">
+        <OfflineBanner />
+      </div>
 
       {isFacilityMode && (
         <ResidentContextBanner unit={unit} room={room} bed={bed} riskLevel={risk} />

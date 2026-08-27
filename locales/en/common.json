@@ -127,6 +127,12 @@
     "message": "The app encountered an error. Your data is safe.",
     "retry": "Try Again"
   },
+  "network": {
+    "offline_banner": "You're offline. We'll keep trying to reconnect.",
+    "offline_detail": "Your message is saved and will send once you're back online. If this is an emergency, call 911.",
+    "back_online": "You're back online.",
+    "retrying": "Reconnecting…"
+  },
   "accessibility": {
     "back": "Back",
     "voice_input": "Voice input",

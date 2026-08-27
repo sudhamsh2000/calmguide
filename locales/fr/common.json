@@ -131,6 +131,12 @@
     "message": "L'application a rencontré une erreur. Vos données sont en sécurité.",
     "retry": "Réessayer"
   },
+  "network": {
+    "offline_banner": "Vous êtes hors ligne. Nous continuons d'essayer de nous reconnecter.",
+    "offline_detail": "Votre message est enregistré et sera envoyé dès que vous serez de nouveau en ligne. En cas d'urgence, appelez le 911.",
+    "back_online": "Vous êtes de nouveau en ligne.",
+    "retrying": "Reconnexion en cours…"
+  },
   "accessibility": {
     "back": "Retour",
     "voice_input": "Saisie vocale",

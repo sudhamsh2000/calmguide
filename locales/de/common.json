@@ -131,6 +131,12 @@
     "message": "Die App ist auf einen Fehler gestoßen. Ihre Daten sind sicher.",
     "retry": "Erneut versuchen"
   },
+  "network": {
+    "offline_banner": "Sie sind offline. Wir versuchen weiterhin, die Verbindung wiederherzustellen.",
+    "offline_detail": "Ihre Nachricht ist gespeichert und wird gesendet, sobald Sie wieder online sind. Im Notfall wählen Sie 911.",
+    "back_online": "Sie sind wieder online.",
+    "retrying": "Verbindung wird wiederhergestellt…"
+  },
   "accessibility": {
     "back": "Zurück",
     "voice_input": "Spracheingabe",

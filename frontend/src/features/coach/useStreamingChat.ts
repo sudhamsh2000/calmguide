@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { coachChat, ApiError } from '@/lib/api';
+import { coachChat, ApiError, RequestTimeoutError } from '@/lib/api';
 import { getAccessCode, getPatientName } from '@/lib/storage';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 export interface StreamingChatState {
   /** The accumulated response text for the current message */
@@ -31,10 +32,12 @@ export interface UseStreamingChatReturn extends StreamingChatState {
  */
 export function useStreamingChat(initialSessionId?: string, profileId?: string, patientNameOverride?: string): UseStreamingChatReturn {
   const t = useTranslations('coach');
+  const tc = useTranslations('common');
   const [response, setResponse] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [error, setError] = useState<string | null>(null);
+  const { isOnline } = useNetworkStatus();
 
   // Use a ref to hold the session ID so the callback always sees the latest value
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
@@ -44,6 +47,12 @@ export function useStreamingChat(initialSessionId?: string, profileId?: string, 
   // produce localized error strings without being re-created on every render.
   const tRef = useRef(t);
   tRef.current = t;
+  const tcRef = useRef(tc);
+  tcRef.current = tc;
+  // Same treatment for connectivity — lets the stable sendMessage callback
+  // distinguish "you're offline" from "the server had a problem" (P2-12).
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
 
   const clearError = useCallback(() => setError(null), []);
 
@@ -126,11 +135,17 @@ export function useStreamingChat(initialSessionId?: string, profileId?: string, 
           }
         }
       } catch (err) {
-        if (err instanceof ApiError) {
-          setError(tRef.current('error.something_wrong_status', { status: String(err.status) }));
-        } else if (err instanceof Error && err.name === 'AbortError') {
+        if (err instanceof Error && err.name === 'AbortError') {
           // Cancelled, ignore
           return;
+        } else if (isOnlineRef.current === false) {
+          // Known offline — distinct copy so the caregiver knows retrying
+          // won't help until connectivity is back (P2-12).
+          setError(tcRef.current('network.offline_detail'));
+        } else if (err instanceof ApiError) {
+          setError(tRef.current('error.something_wrong_status', { status: String(err.status) }));
+        } else if (err instanceof RequestTimeoutError) {
+          setError(tRef.current('error.connection_failed'));
         } else {
           setError(tRef.current('error.connection_failed'));
         }

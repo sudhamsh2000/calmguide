@@ -123,6 +123,19 @@ Features that were designed but intentionally deferred from the current implemen
 
 ---
 
+## Full Offline Support (Request Queueing, Background Sync, Read Caching)
+
+**What:** P2-12 shipped connectivity *detection* only — an offline banner, localized "you're offline" error copy (vs. a generic server error), and a passive server-side LLM-availability signal on `/health`. It intentionally stops short of:
+- **Request queueing:** a caregiver's message typed while offline is not saved and auto-sent on reconnect. They see the offline banner/error and must retry manually once back online (mobile does preserve the typed draft in the input field so nothing is lost; the web check-in/coach screens do not clear it either, but neither queues a resend).
+- **Background sync:** no service worker (web) or background task (mobile) retries failed requests when connectivity returns.
+- **Offline read caching:** past conversations, insights, and care patterns aren't cached for offline viewing — those screens still require a live connection.
+
+**Why deferred:** Request queueing and background sync for a crisis-guidance app raise real safety questions that need deliberate design, not a quick add: a queued message could be sent hours later with stale context, and a caregiver who thinks a life-threat message was "sent" while offline needs to know the safety gate (regex + classifier) is server-side and never ran on it — see `SAFETY_ARCHITECTURE.md`. Building queueing without addressing that is worse than not having it.
+
+**When to build:** After the offline-safety-gate gap above is explicitly resolved (e.g., a client-side keyword tripwire that always shows the crisis resources even offline) — queueing safety-relevant messages before that would be actively misleading.
+
+---
+
 ## Cross-Patient Learning Fed Into RAG
 
 **What:** The most effective strategies from cross-patient aggregation are ingested into the RAG knowledge base, so they appear in semantic search results alongside Alzheimer's Association guidance.

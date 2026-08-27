@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 const CHECKIN_MAX_CHARS = 1000;
 import { useTranslations } from 'next-intl';
@@ -11,6 +11,8 @@ import { BackButton } from '@/components/ui/BackButton';
 import { Button } from '@/components/ui/Button';
 import { SpeakButton } from '@/components/ui/SpeakButton';
 import { MicButton } from '@/components/ui/MicButton';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 export function CheckInScreen() {
   const t = useTranslations('checkin');
@@ -20,6 +22,11 @@ export function CheckInScreen() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isOnline } = useNetworkStatus();
+  // Read in the (stable) submit callback below without adding isOnline to
+  // its dependency array — mirrors the pattern in useStreamingChat.ts.
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
 
   const [isVoiceListening, setIsVoiceListening] = useState(false);
 
@@ -76,7 +83,11 @@ export function CheckInScreen() {
       }
       setIsDone(true);
     } catch (err) {
-      if (err instanceof ApiError) {
+      if (isOnlineRef.current === false) {
+        // Known offline — distinct copy so the caregiver knows retrying
+        // won't help until connectivity is back (P2-12).
+        setError(tc('network.offline_detail'));
+      } else if (err instanceof ApiError) {
         setError(tc('error.generic'));
       } else {
         setError(tc('error.connection'));
@@ -98,6 +109,8 @@ export function CheckInScreen() {
           <p className="text-sm text-foreground-muted mt-0.5">{t('subtitle')}</p>
         </div>
       </div>
+
+      <OfflineBanner />
 
       {/* Input area — hide after first submission */}
       {!isDone && !isStreaming && !response && (

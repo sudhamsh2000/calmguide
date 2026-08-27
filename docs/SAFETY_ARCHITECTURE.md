@@ -143,6 +143,26 @@ derived metrics on `EvaluationReport`:
   search over a labeled corpus is a documented future upgrade, contingent on
   CalmGuide acquiring a labeled safety-incident dataset it does not have
   today.
+- **The two-layer gate does not run at all while the client is offline.**
+  Both layers described in §1 are server-side only — there is no client-side
+  regex/heuristic mirror in the mobile app or web frontend. The P2-12
+  offline/degraded-mode work (`mobile/src/lib/network.ts`,
+  `frontend/src/hooks/useNetworkStatus.ts`, and each app's `OfflineBanner`)
+  detects connectivity and shows a generic "you're offline" message, but a
+  caregiver who types a life-threat message (e.g. "he's not breathing")
+  while offline gets only that generic banner/error — not the 911/988
+  deflection response the gate would have returned if the request had
+  reached the backend. This was deliberately **not** patched by porting
+  `safety_gate.py`'s regex patterns to the client: duplicating a
+  safety-critical detection layer across three codebases (Python backend,
+  TypeScript mobile, TypeScript web) risks the copies silently drifting out
+  of sync, which is worse than having no offline coverage and a clear
+  online-only guarantee. See `docs/DEFERRED.md`'s "Full Offline Support"
+  entry for why this also blocks building offline request queueing. Tracked
+  here as a known, deliberate gap rather than a silent one — flagging for
+  future design work on a minimal, explicitly-synced client-side tripwire
+  (e.g. always surfacing crisis resources when offline, independent of
+  message content) rather than a full client-side gate port.
 
 ## 4. How to run the harness
 

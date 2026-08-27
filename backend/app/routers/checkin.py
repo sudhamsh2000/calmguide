@@ -22,6 +22,7 @@ from app.services.prompt import (
     resolve_model_for_locale,
 )
 from app.services.auth import hash_access_code
+from app.services.availability import record_llm_failure, record_llm_success
 from app.services.rate_limit import rate_limit
 from app.services.response_guard import (
     get_localized_fallback,
@@ -137,9 +138,11 @@ async def caregiver_checkin(
             async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
                 full_response.append(chunk)
                 yield f"data: {json.dumps({'text': chunk})}\n\n"
+            record_llm_success()
         except Exception as exc:
             logger.error("Checkin LLM stream failed: %s", exc)
             llm_failed = True
+            record_llm_failure()
 
         if llm_failed:
             fallback = get_localized_fallback("checkin", locale_code)

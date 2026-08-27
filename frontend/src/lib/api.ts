@@ -77,6 +77,44 @@ export class ApiError extends Error {
   }
 }
 
+/** Default timeout for API calls. A hung connection (bad wifi, dead backend)
+ * should fail with a clear "check your connection" message rather than
+ * spinning indefinitely — mirrors mobile/src/lib/api.ts's fetchWithTimeout. */
+const DEFAULT_FETCH_TIMEOUT_MS = 20000;
+
+export class RequestTimeoutError extends Error {
+  constructor(message = 'The request timed out. Check your connection and try again.') {
+    super(message);
+    this.name = 'RequestTimeoutError';
+  }
+}
+
+/**
+ * fetch() with an AbortController-based timeout. Aborts after `timeoutMs`
+ * and throws RequestTimeoutError. For streaming callers (coachChat,
+ * checkIn) this only bounds time-to-first-response: the browser's fetch()
+ * promise resolves once response headers arrive, before the body is read,
+ * so a slow-but-connected stream isn't cut off mid-response.
+ */
+async function fetchWithTimeout(
+  input: string,
+  init: RequestInit = {},
+  timeoutMs: number = DEFAULT_FETCH_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new RequestTimeoutError();
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -89,7 +127,7 @@ async function request<T>(
     ...options.headers,
   };
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     ...options,
     headers,
   });
@@ -153,7 +191,7 @@ export async function coachChat(
   // B2B (facility) mode requires a staff JWT — the backend rejects a raw
   // profile_id without it. B2C (access_code) mode stays unauthenticated.
   const facilityToken = profileId ? getFacilityToken() : null;
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -245,7 +283,7 @@ export async function checkIn(
   const body = JSON.stringify({ access_code: accessCode, message });
 
   const resolvedLanguage = getActiveLocale();
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -131,6 +131,12 @@
     "message": "La aplicación encontró un error. Tus datos están seguros.",
     "retry": "Reintentar"
   },
+  "network": {
+    "offline_banner": "Estás sin conexión. Seguiremos intentando reconectar.",
+    "offline_detail": "Tu mensaje está guardado y se enviará en cuanto vuelvas a tener conexión. Si es una emergencia, llama al 911.",
+    "back_online": "Has vuelto a estar en línea.",
+    "retrying": "Reconectando…"
+  },
   "accessibility": {
     "back": "Atrás",
     "voice_input": "Entrada de voz",

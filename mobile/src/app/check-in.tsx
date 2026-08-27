@@ -5,6 +5,8 @@ import { MicButton } from '@/components/MicButton';
 import { useTheme } from '@/components/ThemeContext';
 import { streamCheckIn } from '@/lib/api';
 import { getAccessCode, getPatientName } from '@/lib/storage';
+import { useNetworkStatus } from '@/lib/network';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { router, Stack } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -44,6 +46,9 @@ function CheckInScreenInner() {
   const [patientName, setPatientNameState] = useState('Patient');
   const scrollRef = useRef<ScrollView>(null);
   const abortRef = useRef<(() => void) | null>(null);
+  const { isOnline } = useNetworkStatus();
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
 
   useEffect(() => {
     getAccessCode().then((c) => setAccessCodeState(c ?? ''));
@@ -70,7 +75,7 @@ function CheckInScreenInner() {
       },
       () => {
         setPhase('done');
-        setError(tc('error.connection'));
+        setError(isOnlineRef.current === false ? tc('network.offline_detail') : tc('error.connection'));
       }
     );
   }, [message, accessCode, patientName, tc]);
@@ -113,6 +118,8 @@ function CheckInScreenInner() {
               {t('subtitle')}
             </Text>
           </View>
+
+          <OfflineBanner />
 
           {/* Input area — hide after submission */}
           {phase === 'input' && (

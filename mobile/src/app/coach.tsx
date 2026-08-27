@@ -11,6 +11,8 @@ import { ResidentContextBanner } from '@/components/facility/ResidentContextBann
 import { MarkdownText } from '@/components/MarkdownText';
 import { parseCoachResponse, type CoachSection, type CoachSectionId } from '@/lib/parse-response';
 import { getAccessCode, getPatientName } from '@/lib/storage';
+import { useNetworkStatus } from '@/lib/network';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -192,6 +194,9 @@ function CoachScreenInner() {
   const [history, setHistory] = useState<ChatExchange[]>([]);
   const [accessCode, setAccessCodeState] = useState('');
   const [patientName, setPatientNameState] = useState('Patient');
+  const { isOnline } = useNetworkStatus();
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
   const scrollRef = useRef<ScrollView>(null);
   const abortRef = useRef<(() => void) | null>(null);
   const rawRef = useRef('');
@@ -290,9 +295,16 @@ function CoachScreenInner() {
         setIsStreaming(false);
         setRawResponse('');
         rawRef.current = '';
-        setStreamError(err.message.includes('422')
-          ? t('error.profile_not_found')
-          : t('error.server_error'));
+        // A known-offline device almost certainly failed because of that, not
+        // a server-side problem — say so, since "we can't connect" reads very
+        // differently from "check your own connection" to a stressed caregiver.
+        setStreamError(
+          isOnlineRef.current === false
+            ? tc('network.offline_detail')
+            : err.message.includes('422')
+              ? t('error.profile_not_found')
+              : t('error.server_error')
+        );
       }
     );
   }, [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush]);
@@ -323,6 +335,7 @@ function CoachScreenInner() {
           contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 24 }}
         >
           <SafetyDisclosure />
+          <OfflineBanner />
           {/* Phase 1: initial input */}
           {showInitial && (
             <>

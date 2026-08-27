@@ -131,6 +131,12 @@
     "message": "应用遇到错误。您的数据是安全的。",
     "retry": "重试"
   },
+  "network": {
+    "offline_banner": "您已离线。我们会持续尝试重新连接。",
+    "offline_detail": "您的消息已保存，将在您重新联网后发送。如果是紧急情况，请拨打 911。",
+    "back_online": "您已重新联网。",
+    "retrying": "正在重新连接…"
+  },
   "accessibility": {
     "back": "返回",
     "voice_input": "语音输入",

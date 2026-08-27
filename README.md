@@ -61,6 +61,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **11 Languages, Tiered** | English, Spanish, French, German, Arabic, Hindi, Tamil, Japanese, Korean, Portuguese (BR), Chinese --- each tagged MVP-validated or experimental, with per-language native-review status (see `backend/app/services/language_support.py`) |
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
 | **Mobile App** | React Native (Expo) with full feature parity |
+| **Offline/Degraded-Mode Awareness** | Mobile and web both detect connectivity loss (NetInfo / `navigator.onLine`) and show a localized offline banner + distinct "you're offline" error copy instead of a generic server error; `/health` also reports a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) alongside DB status. Detection only --- no request queueing or background sync yet, see [docs/DEFERRED.md](docs/DEFERRED.md) |
 
 ## Tech Stack
 
@@ -74,7 +75,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | LLM | OpenAI gpt-4o-mini (default) or Anthropic Claude (switchable via env var) |
 | RAG | OpenAI text-embedding-3-large, pgvector hybrid search (semantic + full-text) |
 | Scheduling | APScheduler (in-process async, nightly insights + cross-patient aggregation) |
-| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 1500+ tests) |
+| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 1500+ tests), Jest + @testing-library/react-native (mobile) |
 | Infrastructure | Docker Compose, Alembic migrations |
 
 ## Quick Start
@@ -215,6 +216,13 @@ cd frontend
 npx vitest run
 ```
 
+### Mobile
+
+```bash
+cd mobile
+npx jest
+```
+
 ## Project Structure
 
 ```
@@ -231,7 +239,8 @@ calmguide/
 │   │   │   ├── incidents/      # Incident logging + verification
 │   │   │   ├── learn/          # Learning scenarios
 │   │   │   └── profile/        # Profile wizard, profile view
-│   │   ├── lib/                # API client, storage helpers, theme
+│   │   ├── lib/                # API client (with fetch-timeout handling), storage helpers, theme
+│   │   ├── hooks/               # useNetworkStatus (online/offline), useSpeechSynthesis, etc.
 │   │   └── context/            # React Context (profile state)
 │   ├── vitest.config.ts
 │   └── tailwind.config.ts      # CalmGuide design tokens
@@ -243,7 +252,8 @@ calmguide/
 │   │   ├── routers/            # API endpoints (coach, feedback, care_patterns/prediction,
 │   │   │                       #   impact, incidents, care_changes, languages, facility_*, etc.)
 │   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
-│   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam
+│   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam,
+│   │   │                       #   availability (LLM health tracker feeding /health)
 │   │   └── prompts/            # Jinja2 system prompt templates
 │   ├── tests/                  # pytest-asyncio tests (1500+)
 │   └── alembic/                # Database migrations
@@ -251,8 +261,10 @@ calmguide/
 ├── mobile/                     # React Native (Expo)
 │   ├── src/
 │   │   ├── app/                # Expo Router screens (tabs, coach, check-in, impact)
-│   │   ├── components/         # Shared components (PatternInsights, FeedbackWidget, etc.)
-│   │   └── lib/                # API client, i18n, storage, theme
+│   │   ├── components/         # Shared components (PatternInsights, FeedbackWidget,
+│   │   │                       #   OfflineBanner, etc.)
+│   │   └── lib/                # API client (with fetch-timeout handling), i18n, storage,
+│   │                           #   theme, network status (NetInfo-based)
 │   └── locales/                # i18n translations (11 languages) + REVIEW_STATUS.md
 │
 ├── rag/                        # RAG pipeline
@@ -274,7 +286,7 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/health` | Health check with DB connectivity |
+| GET | `/health` | Health check --- DB connectivity (gates HTTP 503) plus a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`, informational only) |
 | POST | `/api/profiles` | Create profile, returns 8-char access code |
 | GET | `/api/profiles/{code}` | Lookup profile by access code |
 | PUT | `/api/profiles/{code}` | Update profile |
@@ -364,10 +376,10 @@ CalmGuide is going through an ongoing hardening pass driven by an external facul
   - Validated-vs-experimental language configuration (`GET /api/languages`, per-language native-review-pending status)
 - **P2 --- validation / real-world use**
   - Safety red-team evaluation harness with regression-tested sensitivity/specificity/false-positive-rate floors ([docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md))
+  - **P2-12** --- Offline/degraded-mode support scaffolding: in-process LLM availability tracker feeding a degraded `/health` status (backend/app/services/availability.py); connectivity detection (`useNetworkStatus`) + offline banners on both mobile (NetInfo) and web (`navigator.onLine`); localized offline error copy across 11 locales that distinguishes "you're offline" from a generic server error; AbortController-based fetch timeouts on the web frontend (parity with mobile's existing `fetchWithTimeout`). Deliberately does not include request queueing, background sync, or offline read caching --- and does not run the safety gate client-side while offline --- see [docs/DEFERRED.md](docs/DEFERRED.md) and the "Known gaps" section of [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for why those are deliberate, documented gaps rather than oversights.
 
 **In progress / planned:**
 
-- **P2-12** --- Offline/degraded-mode support scaffolding
 - **P2-13** --- Response-timing instrumentation
 - **P2-14** --- Dependency/license manifest + license-mismatch report
 - **P3-15** --- Facility handoff data model + FHIR mapping

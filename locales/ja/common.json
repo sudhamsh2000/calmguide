@@ -131,6 +131,12 @@
     "message": "アプリでエラーが発生しました。データは安全です。",
     "retry": "再試行"
   },
+  "network": {
+    "offline_banner": "オフラインです。引き続き接続を試みます。",
+    "offline_detail": "メッセージは保存され、オンラインに戻ると送信されます。緊急の場合は911にお電話ください。",
+    "back_online": "オンラインに戻りました。",
+    "retrying": "再接続中…"
+  },
   "accessibility": {
     "back": "戻る",
     "voice_input": "音声入力",

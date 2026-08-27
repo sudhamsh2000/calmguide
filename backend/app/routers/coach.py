@@ -18,6 +18,7 @@ from app.db import get_session
 from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.staff import Staff
+from app.services.availability import record_llm_failure, record_llm_success
 from app.services.rate_limit import rate_limit
 from app.services.rbac import get_current_staff, staff_can_access_profile
 from app.schemas.coach import (
@@ -824,9 +825,11 @@ async def coach_chat(
                 async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
                     full_response.append(chunk)
                     yield f"data: {json.dumps({'text': chunk})}\n\n"
+                record_llm_success()
             except Exception as exc:
                 logger.error("LLM stream failed for session %s: %s", session_id, exc)
                 llm_failed = True
+                record_llm_failure()
 
             if llm_failed:
                 assistant_text = get_localized_fallback("coach", locale_code)
