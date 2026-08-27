@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import time
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -23,6 +24,7 @@ from app.services.prompt import (
 )
 from app.services.auth import hash_access_code
 from app.services.availability import record_llm_failure, record_llm_success
+from app.services.response_timing import record_llm_timing
 from app.services.rate_limit import rate_limit
 from app.services.response_guard import (
     get_localized_fallback,
@@ -134,11 +136,19 @@ async def caregiver_checkin(
     async def event_stream():
         full_response: list[str] = []
         llm_failed = False
+        stream_start = time.monotonic()
+        first_chunk_at: float | None = None
         try:
             async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
+                if first_chunk_at is None:
+                    first_chunk_at = time.monotonic()
                 full_response.append(chunk)
                 yield f"data: {json.dumps({'text': chunk})}\n\n"
             record_llm_success()
+            total_ms = (time.monotonic() - stream_start) * 1000
+            ttfc_ms = (first_chunk_at - stream_start) * 1000 if first_chunk_at is not None else total_ms
+            record_llm_timing(ttfc_ms, total_ms)
+            logger.info("Checkin LLM stream timing ttfc_ms=%.0f total_ms=%.0f", ttfc_ms, total_ms)
         except Exception as exc:
             logger.error("Checkin LLM stream failed: %s", exc)
             llm_failed = True

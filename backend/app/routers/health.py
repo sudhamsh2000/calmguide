@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.services.availability import get_llm_status
+from app.services.response_timing import get_timing_stats
 
 router = APIRouter(tags=["health"])
 
@@ -29,6 +30,12 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
     - "available" — recent LLM calls are succeeding
     - "degraded" — recent LLM calls are failing above threshold
     - "unknown" — not enough recent traffic to tell yet
+
+    `timing` reflects `app.services.response_timing`'s in-process rolling
+    p50/p95 latency window (LLM time-to-first-chunk/total, RAG retrieval
+    duration). Same per-process caveat as `llm` above; informational only,
+    never gates the HTTP status code. A metric with no recent traffic
+    reports `"samples": 0` and `null` percentiles rather than an error.
     """
     db_status = "connected"
     try:
@@ -43,4 +50,9 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
     llm_status = get_llm_status()
     overall = "unhealthy" if not db_healthy else ("degraded" if llm_status == "degraded" else "healthy")
 
-    return {"status": overall, "database": db_status, "llm": llm_status}
+    return {
+        "status": overall,
+        "database": db_status,
+        "llm": llm_status,
+        "timing": get_timing_stats(),
+    }

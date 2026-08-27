@@ -253,7 +253,8 @@ calmguide/
 │   │   │                       #   impact, incidents, care_changes, languages, facility_*, etc.)
 │   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
 │   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam,
-│   │   │                       #   availability (LLM health tracker feeding /health)
+│   │   │                       #   availability + response_timing (LLM health/latency
+│   │   │                       #   trackers feeding /health)
 │   │   └── prompts/            # Jinja2 system prompt templates
 │   ├── tests/                  # pytest-asyncio tests (1500+)
 │   └── alembic/                # Database migrations
@@ -286,7 +287,7 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/health` | Health check --- DB connectivity (gates HTTP 503) plus a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`, informational only) |
+| GET | `/health` | Health check --- DB connectivity (gates HTTP 503) plus a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) and a rolling p50/p95 response-timing block (LLM time-to-first-chunk/total, RAG retrieval); both informational only |
 | POST | `/api/profiles` | Create profile, returns 8-char access code |
 | GET | `/api/profiles/{code}` | Lookup profile by access code |
 | PUT | `/api/profiles/{code}` | Update profile |
@@ -377,10 +378,10 @@ CalmGuide is going through an ongoing hardening pass driven by an external facul
 - **P2 --- validation / real-world use**
   - Safety red-team evaluation harness with regression-tested sensitivity/specificity/false-positive-rate floors ([docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md))
   - **P2-12** --- Offline/degraded-mode support scaffolding: in-process LLM availability tracker feeding a degraded `/health` status (backend/app/services/availability.py); connectivity detection (`useNetworkStatus`) + offline banners on both mobile (NetInfo) and web (`navigator.onLine`); localized offline error copy across 11 locales that distinguishes "you're offline" from a generic server error; AbortController-based fetch timeouts on the web frontend (parity with mobile's existing `fetchWithTimeout`). Deliberately does not include request queueing, background sync, or offline read caching --- and does not run the safety gate client-side while offline --- see [docs/DEFERRED.md](docs/DEFERRED.md) and the "Known gaps" section of [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for why those are deliberate, documented gaps rather than oversights.
+  - **P2-13** --- Response-timing instrumentation: in-process rolling p50/p95 latency tracker (`backend/app/services/response_timing.py`), same per-process/informational-only scope as P2-12's availability tracker. Records LLM time-to-first-chunk and total stream duration around both Moment Coach's and check-in's `stream_completion()` calls (successful streams only --- a failed call's duration isn't a meaningful latency sample, and `availability.py` already tracks failure rate separately), plus RAG retrieval duration in `_fetch_rag_context`. Surfaced as a `timing` block on `GET /health` alongside the existing `llm` field; never gates the HTTP status code. No new DB table --- this is a lightweight visibility layer, not a metrics store; back it with a real backend (Prometheus, Datadog, etc.) before relying on it for SLOs across instances.
 
 **In progress / planned:**
 
-- **P2-13** --- Response-timing instrumentation
 - **P2-14** --- Dependency/license manifest + license-mismatch report
 - **P3-15** --- Facility handoff data model + FHIR mapping
 - **P3-16** --- Correct the caregiver-prevalence statistic cited in product copy

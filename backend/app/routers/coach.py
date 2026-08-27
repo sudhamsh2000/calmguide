@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import time
 import uuid
 from datetime import datetime, timezone
 from typing import Any
@@ -19,6 +20,7 @@ from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.staff import Staff
 from app.services.availability import record_llm_failure, record_llm_success
+from app.services.response_timing import record_llm_timing, record_rag_timing
 from app.services.rate_limit import rate_limit
 from app.services.rbac import get_current_staff, staff_can_access_profile
 from app.schemas.coach import (
@@ -64,14 +66,20 @@ async def _fetch_rag_context(message: str) -> str:
     Returns an empty string if the RAG pipeline is not configured or fails,
     so the app continues to work without it.
     """
+    start = time.monotonic()
     try:
         from rag.retrieve import get_rag_context  # noqa: PLC0415
         context = await get_rag_context(message, k=3, min_score=0.20)
+        duration_ms = (time.monotonic() - start) * 1000
+        record_rag_timing(duration_ms)
         if context:
             chunk_count = len(context.split("\n\n---\n\n"))
-            logger.info("RAG: injected %d chunk(s) (%d chars)", chunk_count, len(context))
+            logger.info(
+                "RAG: injected %d chunk(s) (%d chars) duration_ms=%.0f",
+                chunk_count, len(context), duration_ms,
+            )
         else:
-            logger.info("RAG: no chunks above min_score threshold")
+            logger.info("RAG: no chunks above min_score threshold duration_ms=%.0f", duration_ms)
         return context
     except Exception as exc:
         logger.warning("RAG: unavailable — %s", exc)
@@ -821,11 +829,22 @@ async def coach_chat(
             yield f"data: {json.dumps({'session_id': session_id})}\n\n"
 
             llm_failed = False
+            stream_start = time.monotonic()
+            first_chunk_at: float | None = None
             try:
                 async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
+                    if first_chunk_at is None:
+                        first_chunk_at = time.monotonic()
                     full_response.append(chunk)
                     yield f"data: {json.dumps({'text': chunk})}\n\n"
                 record_llm_success()
+                total_ms = (time.monotonic() - stream_start) * 1000
+                ttfc_ms = (first_chunk_at - stream_start) * 1000 if first_chunk_at is not None else total_ms
+                record_llm_timing(ttfc_ms, total_ms)
+                logger.info(
+                    "Coach LLM stream timing session=%s ttfc_ms=%.0f total_ms=%.0f",
+                    session_id, ttfc_ms, total_ms,
+                )
             except Exception as exc:
                 logger.error("LLM stream failed for session %s: %s", session_id, exc)
                 llm_failed = True
