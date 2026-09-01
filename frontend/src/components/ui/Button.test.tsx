@@ -62,7 +62,7 @@ describe('Button', () => {
   it('applies secondary variant styles', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole('button');
-    expect(button.className).toContain('border-primary');
+    expect(button.className).toContain('outline-button');
   });
 
   it('applies danger variant styles', () => {

@@ -1,60 +1,121 @@
 # CalmGuide Feature Audit — 2026-09-01
 
-QA pass against the running app in a local dev environment (backend + frontend live,
-invite-code build). Every item below was checked by hand — clicked through the real
-app, read the actual response, or run against the test suite. This is not a code
-review.
+Full-day QA, cleanup, and documentation pass against the running app (backend +
+frontend live). Covers two sessions on the same date: an initial feature
+walkthrough, followed by the landing-page rebuild, and finally an unsupervised
+cleanup pass (dead-code removal, test-suite repair, re-verification) done while
+the user was away. Every item below was checked by hand — clicked through the
+real app, read the actual response, or run against the test suite — or fixed
+and re-verified. This is not a code review of the whole codebase.
 
-"Not reached" means genuinely untested this pass, not broken — worth a follow-up
-before calling any of it verified.
-
-**Summary:** 15 verified working · 3 wired but unconfirmed in detail · 1 stale
-marketing claim · 4 couldn't be reached in this environment.
+**Bottom line:** app is in good shape. Backend: 1584/1585 tests passing (1
+pre-existing, unrelated, dev-only dependency gap). Frontend: 241/248 passing,
+1 skipped (up from 198/248 at the start of today — see "Test suite cleanup"
+below), `tsc --noEmit` clean. Four dead files and a dozen orphaned locale keys
+removed. Nothing was deleted or changed without direct evidence — every claim
+below cites what was actually checked.
 
 ## Core caregiver flow
 
 | Status | Feature | Evidence |
 | --- | --- | --- |
-| ✅ Verified | Invite-code gate | Entered a live code on the real signup screen; it validated and unlocked step 2. Also caught it correctly rejecting a batch of codes that got orphaned by an unrelated `.env` fix mid-session — the gate was doing its job. (`frontend/src/app/[locale]/login/page.tsx`, `backend/app/routers/profile.py:86`) |
-| ✅ Verified | Profile setup wizard | Ran the full 6-step flow — name, stage, behaviors, calming strategies, safety concerns — including the "+ Add custom option" affordance on each chip step. Landed on a real access code screen. (`frontend/src/app/[locale]/profile/setup/page.tsx`) |
-| ✅ Verified | AI Moment Coach (streaming) | Sent a real scenario ("she keeps asking to go home"). Got back a genuine DICE-structured response — Right Now / Why / What Not To Do / When To Call — personalized with the caregiver's own name for the patient. Live call to OpenAI, not a stub. (`backend/app/routers/coach.py:448`) |
-| ✅ Verified | Caregiver check-in | Submitted "tired today but managing okay" — got a warm, specific empathetic reply back, not a canned response. (`backend/app/routers/checkin.py:59`) |
-| 🔲 Not reached | Daily behavioral log | Distinct from the check-in above — a separate short daily-status log. Route and router exist; didn't click through it this pass. (`backend/app/routers/checkin_daily.py:36`, `DailyCheckinCard.tsx`) |
-| ✅ Verified | Learn / practice scenarios | Opened "Evening Agitation (Sundowning)", wrote a sample response, got structured feedback back — What You Did Well, What To Try Differently, The Principle At Work, three rewritten example lines, and encouragement. Full loop works. (`backend/app/routers/learn.py:122,135`) |
-| ✅ Verified | Incident auto-extraction | After the coach conversation above, the home screen surfaced a "We captured this from earlier" card summarizing it in ABC form, with Looks Right / Let Me Fix Something review controls. (`backend/app/routers/coach.py:220-231`) |
-| 🔲 Not reached | Manual incident logging | The "Log an incident" tile is on the home screen; didn't complete a manual entry this pass. (`backend/app/routers/incidents.py:317`) |
+| ✅ Verified | Invite-code gate | Real code validated on the signup screen, unlocked step 2. (`backend/app/routers/profile.py:86`) |
+| ✅ Verified | Profile setup wizard | Ran the full 6-step flow multiple times today (including through the login flow with a stored access code). (`frontend/src/app/[locale]/profile/setup/page.tsx`) |
+| ✅ Verified | AI Moment Coach (streaming) | Real scenario sent, got a genuine DICE-structured response, personalized with the patient's name. Live LLM call, not a stub. (`backend/app/routers/coach.py:448`) |
+| ✅ Verified | Caregiver check-in | Real empathetic reply, not canned. (`backend/app/routers/checkin.py:59`) |
+| ✅ Verified | Incident auto-extraction + pattern insights | Confirmed today via a fresh login: home screen correctly showed both the "We captured this from earlier" card and a live "Patterns we're noticing" card (`IncidentPatternCard.tsx`) with real computed frequency/trend data — this also confirms the locale-key cleanup below didn't break it. |
+| ✅ Verified | Learn / practice scenarios | Full loop confirmed: wrote a response, got real structured AI feedback. |
+| 🔲 Not reached | Daily behavioral log (distinct from check-in above) | Route exists; not clicked through either session. (`backend/app/routers/checkin_daily.py:36`) |
+| 🔲 Not reached | Manual incident logging | Tile exists on home; not completed either session. (`backend/app/routers/incidents.py:317`) |
+
+## Landing page (rebuilt today)
+
+| Status | Feature | Evidence |
+| --- | --- | --- |
+| ✅ Verified | 12-section rebuild against design brief | Full section-by-section rationale in `design/design.md` §18. Real logos, real product-screen mockups (flagged to the user as concept UI, not live captures — used as-is per their explicit choice). |
+| ✅ Fixed | Logo not rendering anywhere | Next's image optimizer's `Content-Disposition: attachment` header silently breaks `<img>` painting in Chromium. Fixed via `images.contentDispositionType: "inline"`. |
+| ✅ Fixed | Hydration-mismatch console error | Missing `suppressHydrationWarning` on `<html>` for the pre-hydration theme/layout scripts. |
+| ✅ Fixed | Leap of Faith logo illegible | Was force-cropped into circles (squishing its 1500×449 wordmark) and rendered black-on-navy in the footer. Now used at natural aspect ratio, with a light backing card in the footer. |
+| ✅ Fixed | Page chrome reappearing on language switch | `data-landing` was only ever set once by a `beforeInteractive` script — never re-ran on client-side navigation (the locale switcher, or any `<Link>`), so switching language left the app-shell's hidden header/footer reappearing on top of the page. Fixed with an effect-based sync component (`LandingChromeSync.tsx`), mirroring the existing `data-facility` pattern. Verified a full en→hi→es→en cycle through the real UI control. |
+| ✅ Applied | Custom color palette (`#E1BFFB` lavender accent, scoped to landing page only via `[data-landing]`) | Verified live; also fixed two real contrast bugs found while applying it (white text on the new light buttons, and a secondary button whose border/background were hardcoded to the old teal RGB instead of the theme variable). |
 
 ## Safety & trust
 
 | Status | Feature | Evidence |
 | --- | --- | --- |
-| ✅ Verified | Pre-coach safety disclosure | "Before you continue" screen — not a medical device, 911/doctor/Alzheimer's Helpline guidance — appears every time before the coach opens, and has to be acknowledged. (`frontend/src/components/ui/SafetyDisclosure.tsx`) |
-| ✅ Verified | Crisis / emergency bar | 911, 988 Crisis Line, and the Alzheimer's Helpline are pinned to the bottom of every screen tested, as real `tel:` links. (`frontend/src/components/ui/EmergencyBar.tsx:17,26,35`) |
-| ✅ Verified | Encryption at rest | Not independently decrypted, but the whole write path exercised it: profile creation, coach messages, and check-ins all round-tripped successfully through the AES-256-GCM layer with a corrected key. (`backend/app/services/crypto.py`) |
-| ✅ Verified | Backend test suite | 1584 of 1585 tests pass. The one failure (`test_rag.py`) is a missing dev-only dependency (`html2text`), unrelated to app code — confirmed pre-existing on `main`. (`backend/tests/`) |
-| ⚠️ Pre-existing gaps | Frontend test suite | 198 of 248 pass. The 50 failures are the same pre-existing set identified earlier this session (confirmed via `git stash` diffing against `main`) — none introduced by today's changes. (`frontend/src/**/*.test.tsx`) |
+| ✅ Verified | Pre-coach safety disclosure | Appears every time, must be acknowledged. |
+| ✅ Verified | Crisis / emergency bar | 911, 988, Alzheimer's Helpline as real `tel:` links on every screen tested. |
+| ✅ Verified | Encryption at rest | Full write path (profile, coach messages, check-ins) round-trips through AES-256-GCM successfully. |
+| ✅ Verified | Backend test suite | **1584/1585 passing.** The one failure (`test_rag.py`) needs a missing dev-only package (`html2text`) — confirmed pre-existing and unrelated to any app code, unchanged all day. |
+| ✅ Fixed | Frontend test suite | **241/248 passing, 1 skipped** (was 198/248 at the start of today — see below). |
 
 ## Personalization, language & access
 
 | Status | Feature | Evidence |
 | --- | --- | --- |
-| ✅ Verified | Dark mode | Toggled from the header; every screen re-themed cleanly, text stayed legible. (`frontend/src/lib/theme.ts`) |
-| ✅ Verified | Multilingual UI (en / es / hi) | Loaded the home screen in all three locales — chrome fully translated in Spanish and Hindi. User-entered content correctly stays untranslated. (`frontend/locales/{en,es,hi}`, `backend/app/routers/languages.py:17`) |
-| ⚠️ Wired, not heard | Voice input / read-aloud | Mic and "Read aloud" buttons are present and clickable with no errors in the coach view. Real Web Speech API wrapper. Couldn't confirm actual audio in/out in this headless browser session. (`frontend/src/hooks/useSpeechRecognition.ts`, `useSpeechSynthesis.ts`) |
-| ❌ Stale copy | Landing-page "Voice — in development" badge | This is what started the check: the badge is hardcoded marketing copy, not a real flag. The feature above already ships and is wired into three screens. Copy was never updated after launch. (`frontend/locales/en/common.json:242-246`) |
+| ✅ Verified | Dark mode | Confirmed on both the app shell and the landing page. |
+| ✅ Verified | Multilingual UI (en / es / hi) | All three locales confirmed live on the landing page and app shell; the client-side locale-switch bug above was specifically caught testing this. |
+| ⚠️ Wired, not heard | Voice input / read-aloud | Buttons present, no console errors on click. Actual audio in/out still unconfirmed in this browser-automation environment. |
+| ✅ Fixed | Stale "Voice — in development" landing badge | Retired as part of the landing rebuild — voice is now listed as a real, shipped bullet in the "3am experience" section instead of a standalone "in development" claim. |
 
 ## Facility (B2B) & infrastructure
 
 | Status | Feature | Evidence |
 | --- | --- | --- |
-| ⚠️ Renders only | Facility staff login | Page loads correctly — facility-code and admin/DON email paths both present. No seeded facility/staff credentials in this environment to complete an actual login. (`frontend/src/app/[locale]/facility/login/page.tsx`) |
-| 🔲 Not reached | Facility dashboard, trends, residents, audit log, PDF export | All gated behind the staff login above — same limitation, not individually exercised. (`backend/app/routers/facility_*.py`) |
-| 🔲 Not populated | RAG-backed retrieval | Checked directly: no document/embedding table exists in this local database at all — the ingestion pipeline (`python -m rag.pipeline`) has never been run here. The coach and scenario responses above are real, but running on the LLM's own knowledge, not retrieved content. (`backend/app/routers/coach.py:63-96`) |
+| ⚠️ Renders only | Facility staff login | Page loads correctly; no seeded facility/staff credentials in this environment to complete an actual login. |
+| 🔲 Not reached | Facility dashboard, trends, residents, audit log, PDF export | Gated behind the login above. |
+| 🔲 Not populated | RAG-backed retrieval | No document/embedding table exists in this local DB — the ingestion pipeline has never been run here. Coach/scenario responses are real but run on the LLM's own knowledge, not retrieved content. |
 
-## Bugs found and fixed along the way
+## Dead code removed today
 
-1. **Logo not rendering anywhere in the app.** Next's image optimizer sends `Content-Disposition: attachment`, which Chromium silently refuses to paint inside an `<img>`. Fixed via `images.contentDispositionType: "inline"` in `frontend/next.config.ts`.
-2. **Hydration-mismatch console error on every page load.** A pre-hydration script intentionally tags `<html>` with theme/layout attributes the server can't know ahead of time. Missing `suppressHydrationWarning` on that element — added it.
-3. **Backend wouldn't boot at all.** `CONVERSATION_ENCRYPTION_KEY` in `backend/.env` was missing its base64 padding. Fixing it changed the literal secret used to hash invite codes, which silently orphaned the first batch generated earlier — caught via a failed live validation, regenerated a clean batch.
-4. **Scenario page test failure is a test artifact, not a real bug.** Vitest's mocked `useTranslations` lacks a `.has()` method that the real next-intl hook has. Confirmed the actual scenario page renders fine in the browser.
-5. **Minor copy typo.** Scenario title reads "Evening Agitation (Sundownning)" — double n.
+All of the following were confirmed via a full cross-reference sweep of every
+`.tsx`/`.ts` file in `frontend/src` (checking both `@/`-alias and relative
+imports) — nothing was removed on a guess.
+
+**4 orphaned component files** (present unchanged since the very first commit,
+zero references anywhere, no tests — clearly superseded scaffolding, not
+in-progress work):
+- `frontend/src/features/profile/BehavioralAnchorStage.tsx` — superseded by `StepDiseaseStage.tsx`
+- `frontend/src/features/incidents/PatternInsightsDetail.tsx` — superseded by `PatternInsights.tsx` / `IncidentPatternCard.tsx`
+- `frontend/src/components/facility/TopBar.tsx` — superseded by `FacilityNav.tsx`
+- `frontend/src/components/facility/Sidebar.tsx` — superseded by `FacilityNav.tsx`
+
+**Orphaned locale keys** removed from `locales/{en,es,hi}/*.json` (each
+confirmed zero references before removal):
+- `landing.problem`, `landing.rag`, `landing.dice`, `landing.voice`, `landing.partnership` (whole objects) — superseded by the landing-page rebuild's new section structure (§18 of `design/design.md` explains what each was folded into or why it was dropped)
+- `landing.about.eyebrow` / `landing.about.title` — the acknowledgments section is now a compact footer paragraph (`landing.about.body` only)
+- `profile.anchor_early` / `anchor_middle` / `anchor_late` / `anchor_unsure` — only ever used by the deleted `BehavioralAnchorStage.tsx`
+- `incidents.patterns.frequency` / `what_works` / `what_doesnt` — only ever used by the deleted `PatternInsightsDetail.tsx` (`patterns.title` and the rest of that object are still live in `IncidentPatternCard.tsx` and were left untouched)
+
+**Typo fix:** scenario title "Evening Agitation (Sundownning)" → "Sundowning" (double-n), in `locales/en/learn.json` and `mobile/locales/en/learn.json`.
+
+**Checked and confirmed NOT dead** (ruled out false positives before touching anything): `src/i18n/request.ts` (referenced by `next.config.ts` as a string path, not a TS import) and `backend/app/services/safety_redteam.py` (used by `backend/tests/test_safety_redteam_harness.py`).
+
+## Test suite cleanup
+
+Frontend `vitest` went from 198/248 → 241/248 passing (1 skipped) today, via
+two real fixes plus a background pass over 9 pre-existing broken test files:
+
+1. **Global mock gap:** `vitest.setup.ts`'s `next-intl` mock never implemented `.has()`, which `ScenarioInteraction.tsx` calls — this alone was cascading into ~16 failures across the suite. Fixed once, globally.
+2. **9 files of test/implementation drift** (components refactored, tests never updated to match — e.g. `Chip` now renders `role="radio"` but its test still looked for `role="option"`; `Button`'s secondary variant now uses an `.outline-button` utility class instead of a literal `border-primary` string): fixed test-only, no component behavior changed. Full reasoning per file is in the delegated agent's report; nothing was changed by guessing — every fix traced the actual current component behavior first.
+
+**Left deliberately unfixed** (real judgment calls, not test drift — flagged rather than guessed at while unsupervised):
+- `ThemeToggle.test.tsx` (6 tests) — the button's `aria-label` describes the *target* state on click ("Switch to dark mode") and never contains the word "theme"; the test expects a name matching `/theme/i`. Deciding which one is "correct" is a content/UX call.
+- `Card.test.tsx` (1 test, skipped) — the `elevated` variant's style map is byte-for-byte identical to `default` in `globals.css` — no shadow is actually implemented anywhere for it. Genuine unimplemented feature, not a test bug.
+- `StepChipSelector.tsx` — wraps `Chip` (which renders `role="radio"`) in a container with `role="listbox" aria-multiselectable="true"`, which is an invalid ARIA combination. Spotted while fixing the `Chip` test; not fixed since it touches real component markup.
+
+## Known issues carried forward (not fixed this pass)
+
+1. Voice input/output audio still unconfirmed (tooling limitation, not evidence of a bug).
+2. Facility/B2B flows past login untested (no seeded credentials in this environment).
+3. RAG has zero ingested documents locally — coach/scenario quality is genuinely good but not retrieval-backed here.
+4. The three items in "Left deliberately unfixed" above.
+5. Backend's one `test_rag.py` failure needs `pip install html2text` in the dev environment — not an app bug.
+
+## Checks run this pass
+
+- `cd backend && python -m pytest -q` → 1584 passed, 1 pre-existing failure
+- `cd frontend && npx vitest run` → 241 passed, 6 failed (all `ThemeToggle`, flagged above), 1 skipped
+- `cd frontend && npx tsc --noEmit` → clean
+- All 6 touched locale JSON files (`en`/`es`/`hi` × `common`/`profile`/`incidents`/`learn`) validated with `python -m json.load`
+- Live re-verification in the running app: landing page (all locales, light/dark), invite-code gate, profile wizard, login flow, home screen with incident pattern card, Moment Coach chat, facility login page — no console errors beyond known pre-existing dev-tooling CSP noise

@@ -194,19 +194,6 @@
       "desc": "CalmGuide combines what you tell it with your loved one's context, behavioral history, and trusted dementia-care knowledge — screened through safety pathways and refined by your feedback — to offer guidance built for the moment you're in.",
       "checklist": ["Caregiver input", "Patient context", "Behavioral history", "Trusted dementia-care knowledge", "Safety pathways", "Caregiver feedback"]
     },
-    "problem": {
-      "eyebrow": "The problem",
-      "title": "Difficult moments don't wait for office hours.",
-      "subtitle": "Dementia caregiving means facing hard moments alone, often at 3 a.m., without a clinician on the phone.",
-      "items": {
-        "agitation": { "title": "Agitation", "desc": "Sudden distress or anger that's hard to de-escalate in the moment." },
-        "confusion": { "title": "Confusion", "desc": "Disorientation about time, place, or familiar people." },
-        "wandering": { "title": "Wandering", "desc": "The urge to leave, pace, or search for somewhere else to be." },
-        "sleep": { "title": "Sleep disruption", "desc": "Restlessness, waking, or day-night reversal." },
-        "refusal": { "title": "Care refusal", "desc": "Resisting help with meals, medication, or hygiene." },
-        "behavior_change": { "title": "Sudden behavior change", "desc": "A shift that's new, unexplained, and worrying." }
-      }
-    },
     "how": {
       "eyebrow": "How it works",
       "title": "How CalmGuide works",
@@ -232,36 +219,12 @@
       "desc": "CalmGuide can factor in recurring triggers, strategies that have worked before, and feedback you've given — so guidance builds on what you've already learned. Not unlimited memory, just a working picture of what helps.",
       "items": ["Recurring triggers", "Previous episodes", "Strategies that helped", "Caregiver feedback", "Recent patterns"]
     },
-    "rag": {
-      "eyebrow": "Under the hood",
-      "title": "How guidance gets built",
-      "subtitle": "Every response passes through a structured pipeline before it reaches you.",
-      "steps": ["Caregiver Input", "Safety Screening", "Patient Context", "Behavioral Context", "Trusted Knowledge (RAG)", "AI Orchestration", "Structured Guidance"]
-    },
     "safety": {
       "eyebrow": "Safety",
       "title": "Safety should not depend on a single AI response.",
       "subtitle": "CalmGuide screens every input through deterministic checks before any AI-generated guidance is shown.",
       "steps": ["Caregiver Input", "Safety Screening", "Acute-Change Check", "Coach or Escalation"],
       "disclaimer": "CalmGuide is not a diagnostic tool. It does not replace clinicians, emergency services, or the Alzheimer's Association 24/7 Helpline."
-    },
-    "dice": {
-      "eyebrow": "Coaching framework",
-      "title": "Built on the DICE approach",
-      "subtitle": "Describe, Investigate, Create, Evaluate — a structure for working through behavioral moments.",
-      "steps": {
-        "describe": { "title": "Describe", "desc": "What's happening, exactly." },
-        "investigate": { "title": "Investigate", "desc": "What might be causing it." },
-        "create": { "title": "Create", "desc": "A plan to try." },
-        "evaluate": { "title": "Evaluate", "desc": "What worked, what didn't." }
-      },
-      "caveat": "DICE structures CalmGuide's coaching approach. It is not a clinically validated diagnostic framework."
-    },
-    "voice": {
-      "eyebrow": "Voice",
-      "title": "Voice-friendly experience — in development",
-      "desc": "Speak your question and have responses read back to you, for moments when typing isn't practical.",
-      "badge": "In development"
     },
     "three_am": {
       "eyebrow": "Built for 3 a.m.",
@@ -280,14 +243,7 @@
       "items": ["Next.js", "React", "TypeScript", "FastAPI", "Python", "PostgreSQL", "pgvector", "Retrieval-Augmented Generation (RAG)", "Server-Sent Events (SSE)", "React Native & Expo"]
     },
     "partner_line": "Partnered with Leap of Faith",
-    "partnership": {
-      "eyebrow": "Partnership",
-      "title": "Partnered with Leap of Faith",
-      "desc": "CalmGuide is developed in partnership with Leap of Faith Technologies."
-    },
     "about": {
-      "eyebrow": "Acknowledgments",
-      "title": "With thanks",
       "body": "CalmGuide is built with guidance and support from Leap of Faith Technologies, Frank Naeymi-Rad PhD MBA, John Trzesniak, and David M. Liebovitz MD."
     },
     "final_cta": {

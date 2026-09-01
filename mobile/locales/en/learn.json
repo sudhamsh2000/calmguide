@@ -32,7 +32,7 @@
   },
   "scenarios": {
     "sundowning-evening": {
-      "title": "Evening Agitation (Sundownning)",
+      "title": "Evening Agitation (Sundowning)",
       "description": "Your loved one becomes increasingly anxious and confused as evening approaches. They insist on 'going home' even though they are home."
     },
     "refusal-to-bathe": {

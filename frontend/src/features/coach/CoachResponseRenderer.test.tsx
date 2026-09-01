@@ -43,7 +43,10 @@ describe('CoachResponseRenderer', () => {
   it('renders RIGHT NOW section with primary background styling', () => {
     render(<CoachResponseRenderer sections={makeSections(['right-now'])} />);
     const region = screen.getByRole('region', { name: /right now/i });
-    expect(region.className).toMatch(/bg-primary/);
+    // The primary-tinted background comes from the `card-shell-selected`
+    // utility class (rgba primary background-color, see globals.css), not a
+    // literal Tailwind `bg-primary` class.
+    expect(region.className).toMatch(/card-shell-selected/);
   });
 
   it('renders RIGHT NOW section with elevated shadow', () => {

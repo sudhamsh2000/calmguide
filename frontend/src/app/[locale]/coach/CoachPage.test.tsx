@@ -2,6 +2,20 @@ import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 
+// Mock next/navigation (same pattern as ProfileWizard.test.tsx) — CoachPage
+// reads `profile_id` off the search params.
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => ({ get: () => null }),
+}));
+
+// CoachPage wraps its content in <MedicalDisclaimer>, which gates children
+// behind localStorage's disclaimer-accepted flag (see src/lib/storage.ts).
+// In jsdom that flag is unset by default, so without this mock the page
+// only ever renders the disclaimer gate instead of Phase 1/2 content.
+vi.mock('@/lib/storage', () => ({
+  getDisclaimerAccepted: () => true,
+}));
+
 vi.mock('@/features/coach/useStreamingChat', () => ({
   useStreamingChat: () => ({
     response: '',

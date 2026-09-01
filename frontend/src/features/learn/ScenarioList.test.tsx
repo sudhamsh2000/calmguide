@@ -4,10 +4,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ScenarioList } from './ScenarioList';
 import type { Scenario } from '@/lib/api';
 
-// Mock next/navigation
+// ScenarioList uses the locale-aware router from next-intl's navigation
+// wrapper (@/i18n/navigation), not next/navigation directly. BackButton (a
+// child of ScenarioList) also pulls `Link` from the same module, so it
+// needs a stub too — `importOriginal` isn't usable here because next-intl's
+// createNavigation() internally imports 'next/navigation' in a way vitest's
+// mock hoisting can't resolve.
 const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
+vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  Link: ({ href, children, ...props }: { href: string; children?: import('react').ReactNode }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 // Mock the API module
@@ -133,12 +143,12 @@ describe('ScenarioList', () => {
   it('renders category filter chips', async () => {
     render(<ScenarioList />);
 
-    expect(screen.getByRole('option', { name: 'All' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Behavioral' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Daily Care' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Safety' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Communication' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Self Care' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Behavioral' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Daily Care' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Safety' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Communication' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Self Care' })).toBeInTheDocument();
   });
 
   it('filters scenarios when a category chip is selected', async () => {
@@ -147,7 +157,7 @@ describe('ScenarioList', () => {
     await screen.findByText('Sundowning Agitation');
 
     // Click "Safety" filter
-    await user.click(screen.getByRole('option', { name: 'Safety' }));
+    await user.click(screen.getByRole('radio', { name: 'Safety' }));
 
     // Only safety scenario should remain visible
     expect(screen.getByText('Wandering at Night')).toBeInTheDocument();
@@ -161,11 +171,11 @@ describe('ScenarioList', () => {
     await screen.findByText('Sundowning Agitation');
 
     // Filter to safety
-    await user.click(screen.getByRole('option', { name: 'Safety' }));
+    await user.click(screen.getByRole('radio', { name: 'Safety' }));
     expect(screen.queryByText('Sundowning Agitation')).not.toBeInTheDocument();
 
     // Click All to show all again
-    await user.click(screen.getByRole('option', { name: 'All' }));
+    await user.click(screen.getByRole('radio', { name: 'All' }));
     expect(screen.getByText('Sundowning Agitation')).toBeInTheDocument();
     expect(screen.getByText('Wandering at Night')).toBeInTheDocument();
   });
@@ -201,7 +211,7 @@ describe('ScenarioList', () => {
     await screen.findByText('Sundowning Agitation');
 
     // Filter to safety — no matches
-    await user.click(screen.getByRole('option', { name: 'Safety' }));
+    await user.click(screen.getByRole('radio', { name: 'Safety' }));
 
     expect(screen.getByText(/No scenarios found/)).toBeInTheDocument();
   });

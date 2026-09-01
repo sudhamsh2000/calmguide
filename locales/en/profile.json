@@ -16,11 +16,7 @@
     "middle_title": "Middle Stage",
     "middle_description": "Increasing confusion, difficulty recognizing people, behavioral changes, needs help with daily activities like dressing and bathing.",
     "late_title": "Late Stage",
-    "late_description": "Severe memory loss, limited communication, needs full-time assistance with all daily activities, may not recognize family members.",
-    "anchor_early": "Can have conversations and manage some daily tasks with reminders. May repeat questions or misplace items.",
-    "anchor_middle": "Needs help with most daily tasks. May not always recognize familiar people. May wander or resist care.",
-    "anchor_late": "Needs help with all daily tasks. Limited or no speech. May not recognize family.",
-    "anchor_unsure": "I'm not sure"
+    "late_description": "Severe memory loss, limited communication, needs full-time assistance with all daily activities, may not recognize family members."
   },
   "behavioral_patterns": {
     "label": "Common behaviors you've noticed",

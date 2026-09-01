@@ -54,7 +54,9 @@ describe('Input', () => {
   it('applies error styling when error is present', () => {
     render(<Input label="Name" error="Error" />);
     const input = screen.getByLabelText('Name');
-    expect(input.className).toContain('border-error');
+    // Error border comes from the `field-shell-error` utility class
+    // (see globals.css), not a literal Tailwind `border-error` class.
+    expect(input.className).toContain('field-shell-error');
   });
 
   it('forwards placeholder attribute', () => {

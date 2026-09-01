@@ -62,6 +62,11 @@ vi.mock('next-intl', () => ({
       return value;
     };
     t.raw = (key: string) => getNestedValue(messages, key);
+    // Real next-intl's t.has() reports whether a key resolves to an actual
+    // translation. getNestedValue() returns the key itself as a fallback
+    // sentinel when nothing is found, so "did we get back the key we asked
+    // for" is the same signal, without needing a second lookup path.
+    t.has = (key: string) => getNestedValue(messages, key) !== key;
     return t;
   },
   useLocale: () => 'en',

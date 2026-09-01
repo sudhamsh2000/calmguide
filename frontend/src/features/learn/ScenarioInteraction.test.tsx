@@ -4,9 +4,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ScenarioInteraction } from './ScenarioInteraction';
 import type { Scenario } from '@/lib/api';
 
-// Mock next/navigation
+// ScenarioInteraction uses the locale-aware router from next-intl's
+// navigation wrapper (@/i18n/navigation), not next/navigation directly.
 const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
+vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
