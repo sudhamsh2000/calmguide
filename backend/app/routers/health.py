@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_session
 from app.services.availability import get_llm_status
 from app.services.response_timing import get_timing_stats
+from app.services.token_usage import get_token_stats
 
 router = APIRouter(tags=["health"])
 
@@ -36,6 +37,14 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
     duration). Same per-process caveat as `llm` above; informational only,
     never gates the HTTP status code. A metric with no recent traffic
     reports `"samples": 0` and `null` percentiles rather than an error.
+
+    `tokens` reflects `app.services.token_usage`'s rolling window of LLM
+    token consumption, for prompt-cost visibility. Same per-process,
+    informational-only caveats. `cache_hit_rate` is the share of prompt
+    tokens the provider served from its own cache — a persistently low value
+    on a large prompt indicates the cacheable prefix is being broken early
+    (see that module's docstring), which is a prompt-*structure* problem
+    rather than a prompt-*length* one.
     """
     db_status = "connected"
     try:
@@ -55,4 +64,5 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
         "database": db_status,
         "llm": llm_status,
         "timing": get_timing_stats(),
+        "tokens": get_token_stats(),
     }
