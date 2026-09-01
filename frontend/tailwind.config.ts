@@ -12,6 +12,7 @@ const config: Config = {
           DEFAULT: 'var(--color-primary)',
           light: 'var(--color-primary-light)',
           dark: 'var(--color-primary-dark)',
+          soft: 'var(--color-primary-soft)',
         },
         background: {
           DEFAULT: 'var(--color-background)',
@@ -20,10 +21,42 @@ const config: Config = {
           DEFAULT: 'var(--color-foreground)',
           muted: 'var(--color-foreground-muted)',
         },
-        surface: 'var(--color-surface)',
-        success: 'var(--color-success)',
-        warning: 'var(--color-warning)',
-        error: 'var(--color-error)',
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          elevated: 'var(--color-surface-elevated)',
+        },
+        navy: 'var(--color-navy)',
+        ink: 'var(--color-ink)',
+        success: {
+          DEFAULT: 'var(--color-success)',
+          bg: 'var(--color-success-bg)',
+          text: 'var(--color-success-text)',
+        },
+        warning: {
+          DEFAULT: 'var(--color-warning)',
+          bg: 'var(--color-warning-bg)',
+          text: 'var(--color-warning-text)',
+        },
+        error: {
+          DEFAULT: 'var(--color-error)',
+          bg: 'var(--color-error-bg)',
+        },
+        emergency: {
+          DEFAULT: 'var(--color-emergency)',
+          bg: 'var(--color-emergency-bg)',
+        },
+        accent: {
+          mint: 'var(--color-accent-mint)',
+          aqua: 'var(--color-accent-aqua)',
+          lavender: 'var(--color-accent-lavender)',
+          peach: 'var(--color-accent-peach)',
+          blue: 'var(--color-accent-blue)',
+        },
+        footer: {
+          DEFAULT: 'var(--color-footer-bg)',
+          text: 'var(--color-footer-text)',
+          muted: 'var(--color-footer-text-muted)',
+        },
       },
       fontFamily: {
         sans: ['var(--font-body)', 'Nunito', 'system-ui', 'sans-serif'],
@@ -40,6 +73,11 @@ const config: Config = {
       },
       borderColor: {
         'theme': 'var(--color-border)',
+        'theme-soft': 'var(--color-border-soft)',
+        'theme-strong': 'var(--color-border-strong)',
+      },
+      maxWidth: {
+        'landing': '1200px',
       },
       keyframes: {
         breathing: {

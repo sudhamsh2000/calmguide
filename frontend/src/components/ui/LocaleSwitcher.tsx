@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, isRtl, type SupportedLocale } from '@/lib/locale';
 
-export function LocaleSwitcher() {
+export function LocaleSwitcher({ triggerClassName = 'text-foreground-muted hover:text-foreground' }: { triggerClassName?: string }) {
   const currentLocale = useLocale() as SupportedLocale;
   const pathname = usePathname();
   const router = useRouter();
@@ -24,7 +24,7 @@ export function LocaleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="text-sm text-foreground-muted hover:text-foreground transition-colors !min-h-0"
+        className={`text-sm transition-colors !min-h-0 ${triggerClassName}`}
       >
         <span dir="auto">{currentLabel}</span>
       </button>

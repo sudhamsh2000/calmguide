@@ -154,5 +154,153 @@
     "dismiss_feedback": "Descartar comentarios",
     "send_message": "Enviar mensaje",
     "delete": "Eliminar"
+  },
+  "landing": {
+    "nav": {
+      "what_we_do": "Qué Hacemos",
+      "how_it_works": "Cómo Funciona",
+      "safety": "Seguridad",
+      "technology": "Tecnología",
+      "for_caregivers": "Para Cuidadores",
+      "for_healthcare": "Para Profesionales de Salud",
+      "about": "Acerca de",
+      "cta": "Probar CalmGuide",
+      "menu": "Menú",
+      "close_menu": "Cerrar menú",
+      "skip_to_content": "Saltar al contenido"
+    },
+    "hero": {
+      "eyebrow": "Para cuidadores familiares y profesionales",
+      "title_pre": "Orientación cuando ",
+      "title_highlight": "el cuidado",
+      "title_post": " se vuelve difícil.",
+      "subtitle": "CalmGuide ayuda a los cuidadores familiares a afrontar momentos difíciles relacionados con la demencia con orientación estructurada, sensible al contexto y consciente de la seguridad.",
+      "cta_primary": "Probar CalmGuide",
+      "cta_secondary": "Ver Cómo Funciona",
+      "disclaimer": "Herramienta educativa y de apoyo emocional. No es un dispositivo médico ni sustituye a los servicios de emergencia."
+    },
+    "value_strip": {
+      "title": "Orientación calmada. Cuidado con confianza.",
+      "items": {
+        "ai_guided": { "title": "Apoyo guiado por IA", "desc": "Orientación estructurada, paso a paso, para el momento que estás viviendo." },
+        "personalized": { "title": "Contexto personalizado", "desc": "Orientación adaptada a la etapa, la historia y lo que le ha funcionado a tu ser querido." },
+        "multilingual": { "title": "Soporte multilingüe", "desc": "Disponible en inglés, español e hindi." },
+        "privacy": { "title": "Privacidad ante todo", "desc": "El contenido de las conversaciones se cifra en reposo." }
+      }
+    },
+    "what_is": {
+      "eyebrow": "Qué es CalmGuide",
+      "title": "Apoyo en los momentos que más importan.",
+      "desc": "CalmGuide combina lo que le cuentas con el contexto de tu ser querido, su historial conductual y conocimiento confiable sobre el cuidado de la demencia —filtrado por vías de seguridad y perfeccionado con tus comentarios— para ofrecer orientación pensada para el momento que estás viviendo.",
+      "checklist": ["Lo que cuenta el cuidador", "Contexto del paciente", "Historial conductual", "Conocimiento confiable sobre demencia", "Vías de seguridad", "Comentarios del cuidador"]
+    },
+    "problem": {
+      "eyebrow": "El problema",
+      "title": "Los momentos difíciles no esperan al horario de oficina.",
+      "subtitle": "Cuidar a alguien con demencia significa enfrentar momentos difíciles a solas, muchas veces a las 3 de la madrugada, sin un profesional de salud al teléfono.",
+      "items": {
+        "agitation": { "title": "Agitación", "desc": "Angustia o enojo repentino, difícil de calmar en el momento." },
+        "confusion": { "title": "Confusión", "desc": "Desorientación respecto al tiempo, el lugar o las personas conocidas." },
+        "wandering": { "title": "Deambulación", "desc": "El impulso de irse, caminar sin rumbo o buscar otro lugar donde estar." },
+        "sleep": { "title": "Alteraciones del sueño", "desc": "Inquietud, despertares o inversión del ciclo día-noche." },
+        "refusal": { "title": "Rechazo del cuidado", "desc": "Resistencia a recibir ayuda con las comidas, la medicación o la higiene." },
+        "behavior_change": { "title": "Cambio repentino de comportamiento", "desc": "Un cambio nuevo, inexplicable y preocupante." }
+      }
+    },
+    "how": {
+      "eyebrow": "Cómo funciona",
+      "title": "Cómo funciona CalmGuide",
+      "steps": {
+        "describe": { "title": "Cuentas lo que está pasando", "desc": "Cuéntale a CalmGuide lo que está pasando, con tus propias palabras o por voz." },
+        "context": { "title": "CalmGuide considera el contexto relevante", "desc": "CalmGuide toma en cuenta la historia de tu ser querido y lo que ha funcionado antes." },
+        "guidance": { "title": "CalmGuide ofrece orientación estructurada", "desc": "Obtén una guía calmada, paso a paso, pensada para el momento que estás viviendo." },
+        "feedback": { "title": "Tus comentarios mejoran el apoyo futuro", "desc": "Tus comentarios mejoran la orientación la próxima vez." }
+      }
+    },
+    "coach": {
+      "eyebrow": "Moment Coach",
+      "title": "Descubre lo que ofrece Moment Coach",
+      "subtitle": "Una vista previa de la estructura detrás de cada respuesta, no una demostración en vivo.",
+      "right_now": { "title": "En Este Momento", "desc": "Pasos inmediatos y concretos para este momento." },
+      "why": { "title": "Por Qué Podría Estar Pasando Esto", "desc": "Posibles desencadenantes y contexto a considerar." },
+      "when_help": { "title": "Cuándo Buscar Más Ayuda", "desc": "Señales que indican que es momento de pedir apoyo." },
+      "not_to_do": { "title": "Qué No Hacer", "desc": "Respuestas comunes que pueden empeorar la situación." }
+    },
+    "behavioral_context": {
+      "eyebrow": "Contexto conductual",
+      "title": "Orientación que no empieza desde cero",
+      "desc": "CalmGuide puede tener en cuenta los desencadenantes recurrentes, las estrategias que han funcionado antes y los comentarios que has dado, para que la orientación se construya sobre lo que ya has aprendido. No es una memoria ilimitada, solo una idea práctica de lo que ayuda.",
+      "items": ["Desencadenantes recurrentes", "Episodios anteriores", "Estrategias que funcionaron", "Comentarios del cuidador", "Patrones recientes"]
+    },
+    "rag": {
+      "eyebrow": "Cómo funciona por dentro",
+      "title": "Cómo se construye la orientación",
+      "subtitle": "Cada respuesta pasa por un proceso estructurado antes de llegar a ti.",
+      "steps": ["Entrada del Cuidador", "Filtro de Seguridad", "Contexto del Paciente", "Contexto Conductual", "Conocimiento Confiable (RAG)", "Orquestación de IA", "Orientación Estructurada"]
+    },
+    "safety": {
+      "eyebrow": "Seguridad",
+      "title": "La seguridad no debería depender de una sola respuesta de IA.",
+      "subtitle": "CalmGuide filtra cada entrada mediante verificaciones deterministas antes de mostrar cualquier orientación generada por IA.",
+      "steps": ["Entrada del Cuidador", "Filtro de Seguridad", "Detección de Cambios Agudos", "Acompañamiento o Derivación"],
+      "disclaimer": "CalmGuide no es una herramienta de diagnóstico. No reemplaza a los profesionales de salud, los servicios de emergencia ni la Línea de Ayuda 24/7 de la Asociación de Alzheimer."
+    },
+    "dice": {
+      "eyebrow": "Marco de acompañamiento",
+      "title": "Basado en el enfoque DICE",
+      "subtitle": "Describir, Investigar, Crear, Evaluar: una estructura para abordar los momentos conductuales.",
+      "steps": {
+        "describe": { "title": "Describir", "desc": "Qué está pasando, exactamente." },
+        "investigate": { "title": "Investigar", "desc": "Qué podría estar causándolo." },
+        "create": { "title": "Crear", "desc": "Un plan para probar." },
+        "evaluate": { "title": "Evaluar", "desc": "Qué funcionó y qué no." }
+      },
+      "caveat": "DICE estructura el enfoque de acompañamiento de CalmGuide. No es un marco de diagnóstico validado clínicamente."
+    },
+    "voice": {
+      "eyebrow": "Voz",
+      "title": "Experiencia por voz — en desarrollo",
+      "desc": "Habla tu pregunta y escucha las respuestas en voz alta, para los momentos en que escribir no es práctico.",
+      "badge": "En desarrollo"
+    },
+    "three_am": {
+      "eyebrow": "Pensado para las 3 de la madrugada",
+      "title": "Diseñado para la vida real. En cualquier momento, en cualquier lugar.",
+      "items": ["Modo oscuro", "Controles grandes", "Experiencia por voz", "Acceso a emergencias", "Disponible en móvil y web"]
+    },
+    "interop": {
+      "eyebrow": "Interoperabilidad",
+      "title": "Diseñado con los estándares de datos clínicos en mente",
+      "desc": "La arquitectura de CalmGuide considera FHIR, HL7, OMOP, SNOMED CT y LOINC como estándares de diseño para una futura integración clínica.",
+      "caveat": "Hoy en día esto no es una integración universal con sistemas de historia clínica electrónica; son estándares con los que el modelo de datos de CalmGuide está diseñado para ser compatible."
+    },
+    "technology": {
+      "eyebrow": "Tecnología",
+      "title": "Construido sobre una infraestructura moderna y transparente",
+      "items": ["Next.js", "React", "TypeScript", "FastAPI", "Python", "PostgreSQL", "pgvector", "Generación Aumentada por Recuperación (RAG)", "Server-Sent Events (SSE)", "React Native & Expo"]
+    },
+    "partner_line": "En asociación con Leap of Faith",
+    "partnership": {
+      "eyebrow": "Alianza",
+      "title": "En asociación con Leap of Faith",
+      "desc": "CalmGuide se desarrolla en asociación con Leap of Faith Technologies."
+    },
+    "about": {
+      "eyebrow": "Agradecimientos",
+      "title": "Con gratitud",
+      "body": "CalmGuide se construyó con la orientación y el apoyo de Leap of Faith Technologies, Frank Naeymi-Rad PhD MBA, John Trzesniak, y David M. Liebovitz MD."
+    },
+    "final_cta": {
+      "title": "¿Listo para explorar CalmGuide?",
+      "desc": "Los usuarios aprobados pueden acceder a CalmGuide con un código de autenticación."
+    },
+    "footer": {
+      "nav_heading": "Explorar",
+      "for_you_heading": "Para Ti",
+      "resources_heading": "Recursos",
+      "rights": "Todos los derechos reservados.",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    }
   }
 }

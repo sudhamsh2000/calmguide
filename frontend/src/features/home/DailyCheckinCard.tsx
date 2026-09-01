@@ -65,7 +65,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
             key={s}
             type="button"
             onClick={() => handleSeverity(s)}
-            className={`flex-1 rounded-xl py-2.5 text-xs font-medium transition-colors ${
+            className={`flex-1 min-h-tap rounded-xl py-2.5 text-sm font-medium transition-colors ${
               severity === s ? severityStyles[s].active : 'bg-background text-foreground-muted border border-foreground/10'
             }`}
           >
@@ -84,7 +84,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
                   key={slot}
                   type="button"
                   onClick={() => setTimeSlot(slot)}
-                  className={`flex-1 rounded-lg py-1.5 text-xs transition-colors ${
+                  className={`flex-1 min-h-tap rounded-lg py-1.5 text-sm transition-colors ${
                     timeSlot === slot
                       ? 'bg-primary/15 text-primary ring-1 ring-primary'
                       : 'bg-background text-foreground-muted border border-foreground/10'
@@ -104,7 +104,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag)}
-                  className={`rounded-full px-3 py-2 text-xs font-medium transition-colors ${
+                  className={`min-h-tap rounded-full px-3 py-2 text-sm font-medium transition-colors ${
                     selectedTags.includes(tag)
                       ? 'card-shell-selected text-primary'
                       : 'card-shell bg-background text-foreground-muted'
@@ -119,7 +119,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
           <button
             type="button"
             onClick={handleDone}
-            className="rounded-xl bg-primary px-5 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors min-h-[44px]"
+            className="min-h-tap rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
           >
             {t('done')}
           </button>

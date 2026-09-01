@@ -143,15 +143,7 @@ export default function SettingsPage() {
                 >
                   <option value="en-US">English</option>
                   <option value="es-ES">Español</option>
-                  <option value="zh-CN">中文</option>
-                  <option value="fr-FR">Français</option>
-                  <option value="de-DE">Deutsch</option>
-                  <option value="ja-JP">日本語</option>
-                  <option value="ko-KR">한국어</option>
-                  <option value="pt-BR">Português</option>
                   <option value="hi-IN">हिन्दी</option>
-                  <option value="ta-IN">தமிழ்</option>
-                  <option value="ar-SA">العربية</option>
                 </select>
               </div>
 

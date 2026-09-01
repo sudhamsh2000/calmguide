@@ -103,6 +103,18 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  images: {
+    // Next's default for the image optimizer route is
+    // `Content-Disposition: attachment`, which some Chromium builds treat as
+    // a download signal for the *entire* response -- including when the
+    // resource is requested by an <img>/<Image> element rather than a
+    // top-level navigation. The practical effect: optimized images (e.g. the
+    // header logo, which is `priority`-loaded through next/image) never fire
+    // `load` or `error` and simply never render, with no console error to
+    // point at. Serving them inline fixes rendering without weakening the
+    // CSP already applied to the route (see securityHeaders above).
+    contentDispositionType: "inline",
+  },
   async headers() {
     return [
       {

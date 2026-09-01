@@ -5,15 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 const EMERGENCY_NUMBERS: Record<string, { emergency: string; helpline: string; helplineName: string }> = {
   en: { emergency: '911', helpline: '1-800-272-3900', helplineName: "Alzheimer's Association 24/7 Helpline" },
   es: { emergency: '911', helpline: '1-800-272-3900', helplineName: 'Línea de Ayuda de Alzheimer 24/7' },
-  fr: { emergency: '15', helpline: '01 42 04 28 50', helplineName: 'France Alzheimer' },
-  de: { emergency: '112', helpline: '030 259 37 95 14', helplineName: 'Deutsche Alzheimer Gesellschaft' },
-  'pt-BR': { emergency: '192', helpline: '0800-272-3900', helplineName: 'ABRAz' },
-  ja: { emergency: '119', helpline: '0120-279-338', helplineName: '認知症の人と家族の会' },
-  ko: { emergency: '119', helpline: '1899-9988', helplineName: '치매상담콜센터' },
-  zh: { emergency: '120', helpline: '400-610-0020', helplineName: '中国阿尔茨海默病协会' },
   hi: { emergency: '112', helpline: '1800-11-0031', helplineName: 'ARDSI हेल्पलाइन' },
-  ta: { emergency: '112', helpline: '1800-11-0031', helplineName: 'ARDSI உதவி எண்' },
-  ar: { emergency: '911', helpline: '920033360', helplineName: 'خط مساعدة الزهايمر' },
 };
 
 export function SafetyDisclosure() {

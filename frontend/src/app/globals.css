@@ -7,6 +7,7 @@
     --color-primary: #2B7A78;
     --color-primary-light: #3AAFA9;
     --color-primary-dark: #17252A;
+    --color-primary-soft: #EAF7F6;
     --color-background: #FAFAF5;
     --color-foreground: #2D3436;
     --color-foreground-muted: #636E72;
@@ -15,6 +16,38 @@
     --color-error: #B84C36;
     --color-surface: #FFFFFF;
     --color-border: rgba(0, 0, 0, 0.1);
+
+    /* --- Design-system extensions (design/design.md) ---------------------
+     * Additive only — nothing above this line changed value or meaning, so
+     * every existing `bg-primary`, `text-foreground-muted`, etc. class still
+     * resolves exactly as before. These new tokens exist for the landing
+     * page and for future primitive refinement; see design/design.md §3 for
+     * the full table and rationale. */
+    --color-navy: #183B56;      /* deep brand navy — marketing headline accent, light mode only */
+    --color-ink: #1A2E3B;       /* deep ink — alt strong heading tone */
+    --color-surface-elevated: #FFFFFF;
+    --color-border-soft: #E9EEEC;
+    --color-border-strong: #C9D5D2;
+    --color-success-bg: #E8F8F3;
+    --color-success-text: #087A64;
+    --color-warning-bg: #FFF7E3;
+    --color-warning-text: #805F18;
+    --color-error-bg: #FBEDEA;
+    --color-emergency: #A63D2C;
+    --color-emergency-bg: #FFF1EE;
+    --color-accent-mint: #EFF8F5;
+    --color-accent-aqua: #EAF7F6;
+    --color-accent-lavender: #F3F1F8;
+    --color-accent-peach: #F7E4DC;
+    --color-accent-blue: #EAF4FB;   /* landing-page only — hero blob gradient */
+
+    /* Landing-page footer band — deliberately a fixed deep navy regardless
+     * of site theme (a common marketing-site pattern), so these are defined
+     * once here and NOT overridden under `.dark` below. */
+    --color-footer-bg: #1A2332;
+    --color-footer-text: #F5F6F8;
+    --color-footer-text-muted: #A7B3C4;
+    --color-footer-border: rgba(255, 255, 255, 0.08);
   }
 
   .dark {
@@ -24,6 +57,26 @@
     --color-surface: #243447;
     --color-border: rgba(255, 255, 255, 0.045);
     --color-error: #F0937F;
+
+    --color-primary-soft: #244C4C;
+    --color-navy: var(--color-foreground);
+    --color-ink: var(--color-foreground);
+    --color-surface-elevated: #2A3D52;
+    --color-border-soft: #33465c;
+    --color-border-strong: #4A5D70;
+    --color-success: #43C9A8;
+    --color-success-bg: rgba(67, 201, 168, 0.14);
+    --color-success-text: #43C9A8;
+    --color-warning: #F4C96B;
+    --color-warning-bg: rgba(244, 201, 107, 0.14);
+    --color-warning-text: #F4C96B;
+    --color-error-bg: rgba(240, 147, 127, 0.12);
+    --color-emergency: #F0937F;
+    --color-emergency-bg: #4A2928;
+    --color-accent-mint: rgba(67, 201, 168, 0.12);
+    --color-accent-aqua: rgba(58, 175, 169, 0.12);
+    --color-accent-lavender: rgba(154, 140, 209, 0.14);
+    --color-accent-peach: rgba(240, 147, 127, 0.12);
   }
 
   html {
@@ -192,6 +245,23 @@
     border-color: var(--color-border);
   }
 
+  /* Landing-page-only decorative gradients (design/design.md §18/§3.6). */
+  .landing-gradient-hero {
+    background: linear-gradient(135deg, #EAF7F6 0%, #EAF4FB 55%, #F3F1F8 100%);
+  }
+
+  .dark .landing-gradient-hero {
+    background: linear-gradient(135deg, rgba(58, 175, 169, 0.16) 0%, rgba(88, 157, 214, 0.14) 55%, rgba(154, 140, 209, 0.16) 100%);
+  }
+
+  .landing-gradient-cta {
+    background: linear-gradient(100deg, #13B8AA 0%, #079EB4 45%, #0877B7 100%);
+  }
+
+  .landing-gradient-footer {
+    background: linear-gradient(120deg, #102D4E 0%, #0A3155 55%, #08294B 100%);
+  }
+
   .dark .card-shell {
     border-color: #31445f;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(26, 35, 50, 0.14);
@@ -227,23 +297,23 @@
 
   .outline-button {
     @apply border text-primary transition-colors;
-    border-color: rgba(43, 122, 120, 0.35);
-    background-color: rgba(43, 122, 120, 0.02);
+    border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary) 2%, transparent);
   }
 
   .outline-button:hover {
-    border-color: rgba(43, 122, 120, 0.48);
-    background-color: rgba(43, 122, 120, 0.06);
+    border-color: color-mix(in srgb, var(--color-primary) 48%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary) 6%, transparent);
   }
 
   .outline-button:active {
-    background-color: rgba(43, 122, 120, 0.1);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
   }
 
   .outline-button:disabled {
-    border-color: rgba(43, 122, 120, 0.2);
-    color: rgb(43 122 120 / 0.55);
-    background-color: rgba(43, 122, 120, 0.015);
+    border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary) 1.5%, transparent);
   }
 
   .dark .outline-button {
@@ -314,6 +384,45 @@ html[data-facility] #root-chrome-footer {
   display: none !important;
 }
 
+/* Landing page — public marketing entry point opts out of the app shell's
+ * fixed header/footer and constrained, non-scrolling column (design/design.md §18).
+ * Set before hydration via the beforeInteractive script in [locale]/layout.tsx. */
+html[data-landing] #root-chrome-header,
+html[data-landing] #root-chrome-footer {
+  display: none !important;
+}
+
+html[data-landing] #root-content {
+  max-width: none;
+}
+
+html[data-landing] #root-shell {
+  height: auto;
+  overflow: visible;
+}
+
+html[data-landing],
+html[data-landing] body {
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Landing-page-only accent override, 2026-09-01 — every `bg-primary` /
+ * `text-primary` / `border-primary` use on the landing page (buttons, step
+ * badges, checkmarks, links, the highlighted hero word) resolves from
+ * `#E1BFFB` instead of the app-wide teal, scoped via `[data-landing]` so no
+ * other screen is affected. Light/dark/soft variants are derived from that
+ * same base via `color-mix()` (matching the pattern already used elsewhere
+ * in this file) rather than hand-picked, so nothing beyond the one supplied
+ * hex was invented. */
+html[data-landing] {
+  --color-primary: #E1BFFB;
+  --color-primary-light: color-mix(in srgb, #E1BFFB 85%, white);
+  --color-primary-dark: color-mix(in srgb, #E1BFFB 65%, black);
+  --color-primary-soft: color-mix(in srgb, #E1BFFB 22%, white);
+}
+
 /* RTL support */
 [dir="rtl"] {
   direction: rtl;
@@ -343,23 +452,6 @@ html[data-facility] #root-chrome-footer {
   background-position: left 8px center;
   padding-inline-start: 2rem;
   padding-inline-end: 0.75rem;
-}
-
-/* Language-specific font families */
-[lang^="ar"] {
-  font-family: var(--font-arabic), var(--font-body), sans-serif;
-}
-
-[lang^="ja"] {
-  font-family: var(--font-jp), var(--font-body), sans-serif;
-}
-
-[lang^="ko"] {
-  font-family: var(--font-kr), var(--font-body), sans-serif;
-}
-
-[lang^="zh"] {
-  font-family: var(--font-sc), var(--font-body), sans-serif;
 }
 
 @layer utilities {

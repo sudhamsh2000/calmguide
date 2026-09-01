@@ -11,15 +11,7 @@ interface UseSpeechRecognitionOptions {
 const LOCALE_TO_BCP47: Record<string, string> = {
   en: "en-US",
   es: "es-ES",
-  fr: "fr-FR",
-  de: "de-DE",
-  "pt-BR": "pt-BR",
-  ja: "ja-JP",
-  ko: "ko-KR",
-  zh: "zh-CN",
   hi: "hi-IN",
-  ta: "ta-IN",
-  ar: "ar-SA",
 };
 
 interface UseSpeechRecognitionReturn {

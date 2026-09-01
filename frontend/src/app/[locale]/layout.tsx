@@ -1,5 +1,4 @@
 import { Nunito, Nunito_Sans } from "next/font/google";
-import { Noto_Sans_Arabic, Noto_Sans_JP, Noto_Sans_KR, Noto_Sans_SC } from "next/font/google";
 import Script from "next/script";
 import "../globals.css";
 import type { Metadata, Viewport } from "next";
@@ -24,30 +23,6 @@ const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-display",
-});
-
-const notoArabic = Noto_Sans_Arabic({
-  subsets: ["arabic"],
-  display: "swap",
-  variable: "--font-arabic",
-});
-
-const notoJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-jp",
-});
-
-const notoKR = Noto_Sans_KR({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-kr",
-});
-
-const notoSC = Noto_Sans_SC({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sc",
 });
 
 export const metadata: Metadata = {
@@ -103,7 +78,13 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={rtl ? "rtl" : "ltr"}
-      className={`${nunito.variable} ${nunitoSans.variable} ${notoArabic.variable} ${notoJP.variable} ${notoKR.variable} ${notoSC.variable}${isDark ? " dark" : ""}`}
+      className={`${nunito.variable} ${nunitoSans.variable}${isDark ? " dark" : ""}`}
+      // The beforeInteractive scripts below add `dark`/`data-facility`/`data-landing`
+      // to this element before React hydrates (to avoid a flash of unstyled
+      // content), based on client-only state (OS theme preference, pathname)
+      // the server render can't know. That's an intentional, expected
+      // mismatch on this element only -- suppress it rather than the render.
+      suppressHydrationWarning
     >
       <head>
         {useSystemTheme && (
@@ -119,6 +100,14 @@ export default async function LocaleLayout({
           try {
             if (/\\/facility(\\/|$)/.test(window.location.pathname) && !/\\/facility\\/login/.test(window.location.pathname)) {
               document.documentElement.setAttribute('data-facility', '');
+            }
+          } catch (e) {}
+        `}</Script>
+        {/* Locale list below must stay in sync with SUPPORTED_LOCALES in src/lib/locale.ts. */}
+        <Script id="landing-layout-detect" strategy="beforeInteractive">{`
+          try {
+            if (/^\\/(en-US|es-ES|hi-IN)\\/?$/.test(window.location.pathname)) {
+              document.documentElement.setAttribute('data-landing', '');
             }
           } catch (e) {}
         `}</Script>
@@ -140,7 +129,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <LocaleDocumentSync />
           <ProfileProvider>
-            <div className="h-dvh flex flex-col overflow-hidden">
+            <div id="root-shell" className="h-dvh flex flex-col overflow-hidden">
               <div id="root-chrome-header" className="mx-auto w-full max-w-lg flex items-center justify-between px-5 py-3 shrink-0">
                 <PageBrand />
                 <ThemeToggle className="h-10 w-10" />
