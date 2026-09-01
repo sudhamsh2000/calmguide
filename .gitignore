@@ -33,6 +33,7 @@ frontend/tsconfig.tsbuildinfo
 *.swo
 *~
 .DS_Store
+.Rhistory
 
 # Testing
 coverage/
