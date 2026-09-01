@@ -140,7 +140,7 @@ export default function BehavioralCardPage() {
               <h2 className="text-base font-bold text-foreground mb-3">
                 {t("escalation_pattern")}
               </h2>
-              <div className="rounded-xl border border-foreground/10 bg-surface px-4 py-3">
+              <div className="card-shell rounded-xl px-4 py-3">
                 <p className="text-sm text-foreground leading-relaxed">
                   {card.escalation_pattern}
                 </p>
@@ -158,7 +158,7 @@ export default function BehavioralCardPage() {
                 {card.recent_incidents.map((inc, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-foreground/10 bg-surface px-4 py-3"
+                    className="card-shell rounded-xl px-4 py-3"
                   >
                     <p className="text-sm font-medium text-foreground">
                       {translateCategory(inc.category)}

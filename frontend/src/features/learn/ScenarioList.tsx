@@ -112,16 +112,18 @@ export function ScenarioList({ className = '' }: ScenarioListProps) {
         </div>
       )}
 
-      {/* Scenario Cards */}
+      {/* Scenario Cards — single column on phones; two up from `sm` so
+        * desktop uses the horizontal space the wider shell now provides
+        * instead of running one long ribbon of cards. */}
       {!loading && !error && filteredScenarios.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {filteredScenarios.map((scenario) => (
             <button
               key={scenario.id}
               type="button"
               data-testid="scenario-card"
               onClick={() => router.push(`/learn/${scenario.id}`)}
-              className="flex flex-col items-start gap-2 rounded-2xl border border-foreground/10 bg-surface p-4 text-start transition-all hover:border-primary/40 hover:shadow-md cursor-pointer focus-ring"
+              className="card-shell flex h-full flex-col items-start gap-2 p-5 text-start transition-all hover:border-primary/40 hover:shadow-md cursor-pointer focus-ring"
             >
               <div className="flex items-center gap-2">
                 <CategoryBadge category={scenario.category} />

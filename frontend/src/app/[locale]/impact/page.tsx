@@ -13,7 +13,7 @@ async function fetchImpact(): Promise<ImpactResponse | null> {
 
 function Stat({ value, label, sub }: { value: string | number; label: string; sub?: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-foreground/10 bg-surface px-5 py-6">
+    <div className="card-shell flex flex-col items-center gap-1.5 px-5 py-6">
       <span className="text-4xl font-bold tracking-tight text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
         {value}
       </span>
@@ -35,7 +35,7 @@ export default async function ImpactPage() {
   ]);
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-4 pb-24 sm:px-5 sm:py-6">
+    <main className="mx-auto w-full max-w-lg px-4 py-4 pb-24 sm:px-5 sm:py-6 lg:max-w-app">
       <div className="mb-4">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
       </div>
@@ -48,7 +48,7 @@ export default async function ImpactPage() {
 
       {data ? (
         <>
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Stat
               value={data.families_supported.toLocaleString()}
               label={t('families_supported')}

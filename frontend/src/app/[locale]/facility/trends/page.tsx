@@ -89,7 +89,7 @@ export default function TrendsPage() {
                 <h2 className="text-base font-bold text-foreground mb-3">
                   {t("time_distribution")}
                 </h2>
-                <div className="rounded-xl border border-foreground/10 bg-surface p-4 space-y-3">
+                <div className="card-shell rounded-xl p-4 space-y-3">
                   {(["overnight", "morning", "afternoon", "evening"] as const).map((slot) => {
                     const total = Object.values(data.time_distribution).reduce((a, b) => a + b, 0) || 1;
                     const count = data.time_distribution[slot] ?? 0;

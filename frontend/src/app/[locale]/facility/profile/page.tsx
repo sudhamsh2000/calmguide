@@ -41,7 +41,7 @@ export default function FacilityProfilePage() {
           </p>
         </header>
 
-        <section className="rounded-2xl border border-foreground/10 bg-surface px-4 py-4">
+        <section className="card-shell px-4 py-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">
             Appearance
           </p>

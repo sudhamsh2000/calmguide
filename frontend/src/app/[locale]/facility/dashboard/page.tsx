@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 <span className="text-yellow-600">⚠</span>
                 {t("escalating_residents")}
               </h2>
-              <div className="rounded-xl border border-foreground/10 bg-surface divide-y divide-foreground/5">
+              <div className="card-shell rounded-xl divide-y divide-foreground/5">
                 {data.escalating_residents.map((r, i) => (
                   <div key={i} className="px-4 py-3">
                     <p className="text-sm font-medium text-foreground">
@@ -144,7 +144,7 @@ export default function DashboardPage() {
               <h2 className="text-base font-bold text-foreground mb-3">
                 {t("family_activity")}
               </h2>
-              <div className="rounded-xl border border-foreground/10 bg-surface px-4 py-3">
+              <div className="card-shell rounded-xl px-4 py-3">
                 <p className="text-sm text-foreground">
                   {data.family_sessions.count} {t("family_sessions")}
                 </p>

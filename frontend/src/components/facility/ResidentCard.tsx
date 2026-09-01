@@ -53,7 +53,7 @@ export function ResidentCard({ resident, locale, className = "" }: ResidentCardP
           risk: resident.risk_level,
         }).filter(([, v]) => v != null) as [string, string][]
       ).toString()}`}
-      className={`block rounded-xl border border-foreground/10 bg-surface px-4 py-3 hover:border-primary/30 hover:shadow-sm active:bg-foreground/[.02] transition-all ${className}`}
+      className={`block card-shell rounded-xl px-4 py-3 hover:border-primary/30 hover:shadow-sm active:bg-foreground/[.02] transition-all ${className}`}
     >
       {/* Header: room + risk dot */}
       <div className="flex items-center justify-between mb-2 gap-2">
