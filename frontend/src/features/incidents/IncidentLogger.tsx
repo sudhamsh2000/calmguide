@@ -33,36 +33,110 @@ const BEHAVIOR_CATEGORIES: BehaviorCategory[] = [
   "other",
 ];
 
-const CATEGORY_LABELS: Record<BehaviorCategory, string> = {
-  aggression_anger: "A",
-  confusion_disorientation: "?",
-  wandering_exit_seeking: "W",
-  refusing_care: "X",
-  sleep_problems: "Z",
-  hallucinations: "E",
-  repetitive_behavior: "R",
-  other: "...",
+/* Line icons in soft-tinted circles, matching the supplied Incident Log
+ * reference. Previously these were single-letter placeholders ("A", "?",
+ * "W"...) which read as codes rather than categories — the icons carry the
+ * meaning faster under stress, which is the whole point of this screen. Each
+ * is drawn on the same 24px grid at the same stroke weight as the rest of the
+ * app's iconography, so nothing here is pulled from an external icon set. */
+const CATEGORY_ICONS: Record<BehaviorCategory, React.ReactNode> = {
+  // Distressed face
+  aggression_anger: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 15.5c1-1 5-1 7 0M8.5 9.5l1.5 1M15.5 9.5L14 10.5" />
+    </>
+  ),
+  // Question mark — disorientation
+  confusion_disorientation: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.3" />
+      <path d="M12 17.2h.01" />
+    </>
+  ),
+  // Walking figure — wandering / exit-seeking
+  wandering_exit_seeking: (
+    <>
+      <circle cx="13" cy="4.5" r="1.6" />
+      <path d="M11 21l1.5-5.5-2.5-2 1-4.5 3 2 2.5 1" />
+      <path d="M10 12.5L7.5 14 6 19" />
+    </>
+  ),
+  // Open palm — refusing care
+  refusing_care: (
+    <>
+      <path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11" />
+      <path d="M12 10.5V4.8a1.5 1.5 0 0 1 3 0V11" />
+      <path d="M15 11V7a1.5 1.5 0 0 1 3 0v6.5a7 7 0 0 1-7 7h-.5a6 6 0 0 1-4.4-2L4 16.2a1.6 1.6 0 0 1 2.4-2.1L9 16.5" />
+    </>
+  ),
+  // Moon — sleep problems
+  sleep_problems: (
+    <>
+      <path d="M20 14.5A8.2 8.2 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
+    </>
+  ),
+  // Ear — seeing / hearing things
+  hallucinations: (
+    <>
+      <path d="M7 8.5a5 5 0 0 1 10 0c0 2.6-2 3.5-3 5-.6.9-.4 2.4-1.8 2.9" />
+      <path d="M10.2 9a1.9 1.9 0 0 1 3.7.4" />
+      <path d="M9 19.5c.8.7 1.8 1 2.8.9" />
+    </>
+  ),
+  // Circular arrow — repetitive behavior
+  repetitive_behavior: (
+    <>
+      <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+      <path d="M20 4v4.5h-4.5" />
+    </>
+  ),
+  // Ellipsis — other
+  other: (
+    <>
+      <circle cx="6" cy="12" r="1.4" />
+      <circle cx="12" cy="12" r="1.4" />
+      <circle cx="18" cy="12" r="1.4" />
+    </>
+  ),
 };
 
+/* Category accent colours. Kept close to the previous set (so existing
+ * incident history stays visually recognisable) but pulled toward the
+ * CalmGuide palette. These are intentionally per-category rather than
+ * tokenised: they encode *which behaviour*, not a semantic app state, and a
+ * caregiver learns them by hue. */
 const CATEGORY_COLORS: Record<BehaviorCategory, string> = {
-  aggression_anger: "#DC4E4E",
-  confusion_disorientation: "#D4893A",
-  wandering_exit_seeking: "#3A7D5C",
-  refusing_care: "#8B5E3C",
+  aggression_anger: "#B84C36",
+  confusion_disorientation: "#6F7FD8",
+  wandering_exit_seeking: "#2B7A78",
+  refusing_care: "#C1762F",
   sleep_problems: "#5B6ABF",
   hallucinations: "#7B5EA7",
-  repetitive_behavior: "#4A90A4",
+  repetitive_behavior: "#3AAFA9",
   other: "#6B7280",
 };
 
 function CategoryIcon({ category }: { category: BehaviorCategory }) {
   return (
     <span
-      className="flex h-10 w-10 items-center justify-center rounded-full text-base font-bold"
-      style={{ backgroundColor: CATEGORY_COLORS[category] + "15", color: CATEGORY_COLORS[category] }}
+      className="flex h-11 w-11 items-center justify-center rounded-full"
+      style={{ backgroundColor: CATEGORY_COLORS[category] + "1F", color: CATEGORY_COLORS[category] }}
       aria-hidden="true"
     >
-      {CATEGORY_LABELS[category]}
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {CATEGORY_ICONS[category]}
+      </svg>
     </span>
   );
 }
@@ -279,7 +353,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
 
         {/* Step 1: Category */}
         {!category && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {BEHAVIOR_CATEGORIES.map((cat) => (
               <button
                 key={cat}

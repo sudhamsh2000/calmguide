@@ -131,11 +131,16 @@ export default async function LocaleLayout({
           <LocaleDocumentSync />
           <ProfileProvider>
             <div id="root-shell" className="h-dvh flex flex-col overflow-hidden">
-              <div id="root-chrome-header" className="mx-auto w-full max-w-lg flex items-center justify-between px-5 py-3 shrink-0">
+              {/* The shell stays a single narrow column on phones (correct for
+                * a one-handed, 3am tool) but is allowed to widen from `lg` up
+                * so desktop screens can use horizontal space instead of
+                * rendering a 512px ribbon on a 1440px display. Screens that
+                * should stay narrow constrain themselves internally. */}
+              <div id="root-chrome-header" className="mx-auto w-full max-w-lg lg:max-w-app flex items-center justify-between px-5 py-3 shrink-0">
                 <PageBrand />
                 <ThemeToggle className="h-10 w-10" />
               </div>
-              <div id="root-content" className="mx-auto w-full max-w-lg flex-1 flex flex-col min-h-0">{children}</div>
+              <div id="root-content" className="mx-auto w-full max-w-lg lg:max-w-app flex-1 flex flex-col min-h-0">{children}</div>
               <div id="root-chrome-footer">
                 <EmergencyBar />
                 <BottomNav />

@@ -213,11 +213,21 @@ export function HomeScreen({ className = "" }: HomeScreenProps) {
   const behaviorCount = state.profile?.behavioral_patterns?.length ?? 0;
 
   return (
-    <div className={`flex flex-col gap-5 px-5 pt-5 pb-8 ${className}`}>
-      {/* Profile Switcher */}
-      {hasMultipleProfiles && (
-        <ProfileSwitcher onSwitch={() => window.location.reload()} />
-      )}
+    /* Desktop (lg+) splits into two columns per the design brief: the left
+     * column keeps the primary "act now" experience (greeting, who we're
+     * caring for, Moment Coach, quick actions, today's check-in) and the
+     * right column carries supporting context (patterns, history, journey
+     * links). Below lg it collapses to one column — and because sections
+     * 1-7 already precede 8-11 in the source order, the mobile stacking
+     * order is byte-for-byte what it was before this split. */
+    <div
+      className={`px-5 pt-5 pb-8 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 ${className}`}
+    >
+      <div className="flex flex-col gap-5">
+        {/* Profile Switcher */}
+        {hasMultipleProfiles && (
+          <ProfileSwitcher onSwitch={() => window.location.reload()} />
+        )}
 
       {/* 1. GREETING — orients the user, confirms right profile */}
       <div>
@@ -323,6 +333,10 @@ export function HomeScreen({ className = "" }: HomeScreenProps) {
       {!checkedInToday && !visitedCrisis && (
         <DailyCheckinCard onSubmit={handleCheckin} />
       )}
+      </div>
+
+      {/* ---- Secondary column (lg+): supporting context and history ---- */}
+      <div className="flex flex-col gap-5 mt-5 lg:mt-0">
 
       {/* 8. PATTERN INSIGHTS — behavioral trends and incident patterns */}
       {insights && <PatternInsights insights={insights} />}
@@ -411,6 +425,7 @@ export function HomeScreen({ className = "" }: HomeScreenProps) {
           <p className="text-sm text-error">{state.error}</p>
         </div>
       )}
+      </div>
     </div>
   );
 }

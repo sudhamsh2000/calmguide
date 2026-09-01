@@ -78,6 +78,10 @@ const config: Config = {
       },
       maxWidth: {
         'landing': '1200px',
+        // Desktop width for the caregiver app shell. Wide enough for the
+        // two-column screens to breathe, deliberately short of the landing
+        // page's 1200px so reading columns never get uncomfortably long.
+        'app': '1040px',
       },
       keyframes: {
         breathing: {
