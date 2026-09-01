@@ -16,6 +16,50 @@ interface UseSpeechSynthesisReturn {
   isSupported: boolean;
 }
 
+/**
+ * Warmer, calmer delivery than the browser's raw defaults (rate 1 / pitch 1
+ * reads flat and clinical — exactly the "system voiceover" feel we don't
+ * want for a caregiver at 3am). Subtle on purpose: slowed down slightly for
+ * a calm pace, pitch nudged up just enough to sound friendly rather than
+ * flat, without tipping into cartoonish.
+ */
+const SPEECH_RATE = 0.95;
+const SPEECH_PITCH = 1.05;
+
+/**
+ * Name fragments (case-insensitive) of voices that are known to sound
+ * natural rather than robotic, roughly in preference order, across the
+ * platforms CalmGuide actually ships on (macOS/iOS Safari, Chrome/Edge on
+ * Windows and Android). The Web Speech API gives no reliable quality
+ * signal — `localService` doesn't correlate with quality consistently
+ * across platforms — so this is a maintained allowlist rather than a
+ * heuristic. Falls back to the platform default for the locale if none of
+ * these are installed.
+ */
+const PREFERRED_VOICE_NAMES = [
+  // macOS / iOS Safari — Siri and other high-quality system voices
+  "Ava", "Samantha", "Allison", "Susan", "Zoe", "Nicky", // en
+  "Mónica", "Paulina", // es
+  // Chrome/Edge — network-backed voices, notably better than the local ones
+  "Google US English", "Google UK English Female", "Google español",
+  "Microsoft Aria", "Microsoft Jenny", "Microsoft Sonia",
+];
+
+function pickVoice(voices: SpeechSynthesisVoice[], locale: string): SpeechSynthesisVoice | undefined {
+  const localeMatches = voices.filter((v) => v.lang.toLowerCase().startsWith(locale.toLowerCase()));
+  if (localeMatches.length === 0) return undefined;
+
+  for (const preferred of PREFERRED_VOICE_NAMES) {
+    const match = localeMatches.find((v) => v.name.toLowerCase().includes(preferred.toLowerCase()));
+    if (match) return match;
+  }
+
+  // No known-good voice installed — prefer a network-backed voice over a
+  // compact on-device one where the platform actually tells us which is
+  // which (Chrome does; Safari reports everything as local).
+  return localeMatches.find((v) => !v.localService) ?? localeMatches[0];
+}
+
 export function useSpeechSynthesis(
   options: UseSpeechSynthesisOptions = {},
 ): UseSpeechSynthesisReturn {
@@ -26,7 +70,17 @@ export function useSpeechSynthesis(
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
-    setIsSupported(typeof window !== "undefined" && !!window.speechSynthesis);
+    const supported = typeof window !== "undefined" && !!window.speechSynthesis;
+    setIsSupported(supported);
+    if (!supported) return;
+
+    // Chrome (and some other browsers) return an empty voice list until
+    // they've asynchronously loaded the platform's voices and fired
+    // `voiceschanged` — calling getVoices() once here warms that cache so
+    // the first real speak() call already has the full list to choose
+    // from, instead of silently falling back to whatever default voice
+    // happens to be active before loading finishes.
+    window.speechSynthesis.getVoices();
   }, []);
 
   const stop = useCallback(() => {
@@ -43,10 +97,12 @@ export function useSpeechSynthesis(
 
       const utterance = new SpeechSynthesisUtterance(text);
       utteranceRef.current = utterance;
+      utterance.rate = SPEECH_RATE;
+      utterance.pitch = SPEECH_PITCH;
 
       if (locale) {
         const voices = window.speechSynthesis.getVoices();
-        const match = voices.find((v) => v.lang.startsWith(locale));
+        const match = pickVoice(voices, locale);
         if (match) utterance.voice = match;
         utterance.lang = locale;
       }
