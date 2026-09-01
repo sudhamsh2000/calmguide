@@ -961,10 +961,17 @@ one column below `lg` reproduces the previous mobile order exactly.
   infrastructure is intact and none of this pass's markup would break it,
   but no currently-shipping locale exercises it. Re-adding Arabic is a
   product call, not a redesign call.
-- Phases not yet done in this pass: Learn/Resources (§7), Impact/Insights
-  (§8), and the facility consistency sweep (§9) still use the previous
-  styling. They are visually consistent with the app, just not yet moved
-  onto the reference's card/chip language.
+- **Desktop density is conservative.** Home is the only screen with a true
+  two-column layout. Learn and Impact use responsive grids; the remaining
+  screens (Coach, Check-In, Incident Log, Profile) centre a single column
+  in the wider shell rather than inventing a second column of content that
+  doesn't exist. That is deliberate — these are focused, one-task screens —
+  but it does mean desktop has more whitespace than the references imply.
+- **`ThemeToggle` still has 6 failing tests**, unchanged by this pass. Its
+  `aria-label` describes the *target* state ("Switch to dark mode") while
+  the test expects a name matching `/theme/i`. Which is correct is a
+  content decision, so it was left alone here too — see
+  `docs/feature-audit-2026-09-01.md`.
 
 ---
 
