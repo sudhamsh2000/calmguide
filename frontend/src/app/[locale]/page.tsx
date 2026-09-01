@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { WelcomeGate } from '@/components/auth/WelcomeGate';
+import { LandingChromeSync } from '@/components/landing/LandingChromeSync';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher';
 
@@ -95,6 +96,7 @@ export default async function LandingPage() {
 
   return (
     <WelcomeGate>
+      <LandingChromeSync />
       <div className="animate-page-enter">
         <LandingNav />
 
