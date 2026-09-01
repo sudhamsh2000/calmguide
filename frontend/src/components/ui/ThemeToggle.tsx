@@ -47,7 +47,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   }
 
   if (!mounted) {
-    return <div className={`h-10 w-10 ${className}`} />;
+    return <div className={`h-11 w-11 ${className}`} />;
   }
 
   const label = preference === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
@@ -58,7 +58,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
       onClick={handleToggle}
       aria-label={label}
       className={[
-        'inline-flex items-center justify-center h-10 w-10 rounded-full',
+        'inline-flex items-center justify-center h-11 w-11 rounded-full',
         'bg-foreground/5 hover:bg-foreground/10 transition-colors',
         'text-foreground-muted hover:text-foreground',
         'focus-ring cursor-pointer',

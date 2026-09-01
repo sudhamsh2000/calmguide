@@ -138,7 +138,7 @@ export default async function LocaleLayout({
                 * should stay narrow constrain themselves internally. */}
               <div id="root-chrome-header" className="mx-auto w-full max-w-lg lg:max-w-app flex items-center justify-between px-5 py-3 shrink-0">
                 <PageBrand />
-                <ThemeToggle className="h-10 w-10" />
+                <ThemeToggle className="h-12 w-12" />
               </div>
               <div id="root-content" className="mx-auto w-full max-w-lg lg:max-w-app flex-1 flex flex-col min-h-0">{children}</div>
               <div id="root-chrome-footer">

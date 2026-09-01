@@ -362,7 +362,7 @@ export function HomeScreen({ className = "" }: HomeScreenProps) {
             <p className="text-sm font-semibold text-foreground">
               Recent incidents
             </p>
-            <Link href="/incidents" className="text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
+            <Link href="/incidents" className="focus-ring inline-flex min-h-tap items-center rounded px-2 text-sm font-medium text-primary hover:underline">
               See all
             </Link>
           </div>
@@ -411,7 +411,7 @@ export function HomeScreen({ className = "" }: HomeScreenProps) {
       <div className="mt-2 text-center">
         <Link
           href="/impact"
-          className="text-xs text-foreground-muted underline underline-offset-2 hover:text-foreground"
+          className="focus-ring inline-flex min-h-tap items-center rounded px-2 text-sm text-foreground-muted underline underline-offset-2 hover:text-foreground"
         >
           {t('impact_link')}
         </Link>

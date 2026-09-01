@@ -48,7 +48,7 @@ export function PageBrand({ className = '' }: PageBrandProps) {
     <div className={` ${className}`}>
       <Link
         href={href}
-        className="text-base font-bold tracking-tight text-primary hover:text-primary-light transition-colors"
+        className="focus-ring inline-flex min-h-tap items-center text-base font-bold tracking-tight text-primary transition-colors hover:text-primary-light"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         Calm<span className="font-light">Guide</span>
