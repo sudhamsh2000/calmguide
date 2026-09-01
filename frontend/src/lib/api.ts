@@ -35,6 +35,10 @@ export interface CreateProfileData {
   behavioral_patterns: string[];
   calming_strategies: string[];
   safety_concerns: string[];
+  /** Pre-generated invite code required while the app is in private
+   * testing (Settings.INVITE_CODE_REQUIRED on the backend). Ignored by the
+   * server once that gate is turned off. */
+  invite_code: string;
 }
 
 export interface UpdateProfileData {
@@ -155,6 +159,23 @@ export async function createProfile(
   return request<CreateProfileResponse>('/api/profiles', {
     method: 'POST',
     body: JSON.stringify(data),
+  });
+}
+
+export interface ValidateInviteCodeResponse {
+  valid: boolean;
+}
+
+/** Checks an invite code without consuming it or creating a profile — used
+ * by the signup wizard's invite-code step for immediate feedback. The
+ * server re-validates independently in createProfile(), so this is purely
+ * a UX convenience, not the actual enforcement point. */
+export async function validateInviteCode(
+  code: string,
+): Promise<ValidateInviteCodeResponse> {
+  return request<ValidateInviteCodeResponse>('/api/invite-codes/validate', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
   });
 }
 

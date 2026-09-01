@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     # attacks on the stored hashes. Falls back to CONVERSATION_ENCRYPTION_KEY
     # when unset so existing deployments keep working.
     ACCESS_CODE_HMAC_SECRET: str = ""
+    # Gate B2C signup (POST /profiles) behind a pre-generated, shared invite
+    # code while the app is in private testing (see app.models.invite_code
+    # and scripts/generate_invite_codes.py). Flip to False — no migration or
+    # code change needed — once the app is ready for open public signup.
+    INVITE_CODE_REQUIRED: bool = True
     # Operational retention window, in days, for inactive profiles. This is a
     # deployment-configurable knob, not a claim about any legal/regulatory
     # retention requirement — no automatic sweep runs off it yet; a deployer

@@ -6,9 +6,10 @@ import { useRouter } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { createProfile, updateProfile } from '@/lib/api';
+import { createProfile, updateProfile, validateInviteCode } from '@/lib/api';
 import { setPatientName, setAccessCode, getPatientName, getAccessCode } from '@/lib/storage';
 import { useProfile } from '@/context/ProfileContext';
+import { StepInviteCode } from './StepInviteCode';
 import { StepPatientName } from './StepPatientName';
 import { StepDiseaseStage } from './StepDiseaseStage';
 import { StepChipSelector } from './StepChipSelector';
@@ -19,8 +20,6 @@ import {
   CALMING_STRATEGIES,
   SAFETY_CONCERNS,
 } from './types';
-
-const TOTAL_STEPS = 5;
 
 export interface ProfileWizardProps {
   className?: string;
@@ -34,25 +33,44 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
   const isEditing = searchParams.get('edit') === 'true';
   const { state, dispatch } = useProfile();
 
+  // New signups go through an extra invite-code gate step (private testing);
+  // editing an existing profile skips it entirely — that user already got
+  // in once. `stepOffset` shifts all the pre-existing step numbers down by
+  // one when the invite step is present, without touching their logic.
+  const TOTAL_STEPS = isEditing ? 5 : 6;
+  const stepOffset = isEditing ? 0 : 1;
+
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [checkingInviteCode, setCheckingInviteCode] = useState(false);
+  const [inviteCodeError, setInviteCodeError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successCode, setSuccessCode] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [formData, setFormData] = useState<WizardFormData>({
+    inviteCode: '',
     patientName: '',
     diseaseStage: null,
     behavioralPatterns: [],
     calmingStrategies: [],
     safetyConcerns: [],
   });
-  const progressLabels = [
-    t('progress.name'),
-    t('progress.stage'),
-    t('progress.behaviors'),
-    t('progress.calming'),
-    t('progress.safety'),
-  ];
+  const progressLabels = isEditing
+    ? [
+        t('progress.name'),
+        t('progress.stage'),
+        t('progress.behaviors'),
+        t('progress.calming'),
+        t('progress.safety'),
+      ]
+    : [
+        t('progress.invite_code'),
+        t('progress.name'),
+        t('progress.stage'),
+        t('progress.behaviors'),
+        t('progress.calming'),
+        t('progress.safety'),
+      ];
 
   // Pre-populate form when editing an existing profile
   useEffect(() => {
@@ -63,6 +81,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
 
     if (existingName || profile) {
       setFormData((prev) => ({
+        inviteCode: prev.inviteCode,
         patientName: existingName ?? prev.patientName,
         diseaseStage: (profile?.disease_stage as DiseaseStage) ?? prev.diseaseStage,
         behavioralPatterns: profile?.behavioral_patterns ?? prev.behavioralPatterns,
@@ -73,7 +92,10 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
   }, [isEditing, state.profile]);
 
   const isStepValid = useCallback((): boolean => {
-    switch (step) {
+    if (!isEditing && step === 1) {
+      return formData.inviteCode.trim().length > 0;
+    }
+    switch (step - stepOffset) {
       case 1:
         return formData.patientName.trim().length > 0;
       case 2:
@@ -87,14 +109,34 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
       default:
         return false;
     }
-  }, [step, formData]);
+  }, [step, formData, isEditing, stepOffset]);
 
   function handleBack() {
     if (step > 1) setStep(step - 1);
   }
 
-  function handleNext() {
-    if (isStepValid() && step < TOTAL_STEPS) {
+  async function handleNext() {
+    if (!isStepValid()) return;
+
+    if (!isEditing && step === 1) {
+      setCheckingInviteCode(true);
+      setInviteCodeError(null);
+      try {
+        const { valid } = await validateInviteCode(formData.inviteCode.trim());
+        if (!valid) {
+          setInviteCodeError(t('errors.invalid_invite_code'));
+          setCheckingInviteCode(false);
+          return;
+        }
+      } catch {
+        setInviteCodeError(t('errors.generic'));
+        setCheckingInviteCode(false);
+        return;
+      }
+      setCheckingInviteCode(false);
+    }
+
+    if (step < TOTAL_STEPS) {
       setStep(step + 1);
     }
   }
@@ -111,6 +153,9 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         behavioral_patterns: formData.behavioralPatterns,
         calming_strategies: formData.calmingStrategies,
         safety_concerns: formData.safetyConcerns,
+        // Unused by updateProfile (ProfileUpdate has no invite_code field);
+        // only createProfile below actually needs it.
+        invite_code: formData.inviteCode.trim(),
       };
 
       if (isEditing) {
@@ -230,14 +275,25 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         stepLabels={progressLabels}
       />
 
-      {step === 1 && (
+      {!isEditing && step === 1 && (
+        <StepInviteCode
+          inviteCode={formData.inviteCode}
+          onChange={(code) => {
+            setFormData({ ...formData, inviteCode: code });
+            setInviteCodeError(null);
+          }}
+          error={inviteCodeError ?? undefined}
+        />
+      )}
+
+      {step === 1 + stepOffset && (
         <StepPatientName
           patientName={formData.patientName}
           onChange={(name) => setFormData({ ...formData, patientName: name })}
         />
       )}
 
-      {step === 2 && (
+      {step === 2 + stepOffset && (
         <StepDiseaseStage
           selectedStage={formData.diseaseStage}
           onSelect={(stage: DiseaseStage) =>
@@ -246,7 +302,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         />
       )}
 
-      {step === 3 && (
+      {step === 3 + stepOffset && (
         <StepChipSelector
           title={t('steps.behavioral.title')}
           description={t('steps.behavioral.description')}
@@ -259,7 +315,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         />
       )}
 
-      {step === 4 && (
+      {step === 4 + stepOffset && (
         <StepChipSelector
           title={t('steps.calming.title')}
           description={t('steps.calming.description')}
@@ -272,7 +328,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         />
       )}
 
-      {step === 5 && (
+      {step === 5 + stepOffset && (
         <StepChipSelector
           title={t('steps.safety.title')}
           description={t('steps.safety.description')}
@@ -309,7 +365,8 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
             variant="primary"
             size="lg"
             onClick={handleNext}
-            disabled={!isStepValid()}
+            disabled={!isStepValid() || checkingInviteCode}
+            loading={checkingInviteCode}
             className="flex-1"
           >
             {t('actions.next')}

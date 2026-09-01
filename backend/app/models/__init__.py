@@ -14,11 +14,12 @@ from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.models.facility_patient_link import FacilityPatientLink
 from app.models.audit_log import AuditLog
 from app.models.safety_event import SafetyEvent
+from app.models.invite_code import InviteCode
 
 __all__ = [
     "Base", "Profile", "Conversation", "ProfileInsights",
     "ResponseFeedback", "DailyCheckin", "CrossPatientStrategies",
     "Incident", "BehavioralDossier", "CareChangeEvent",
     "Facility", "Staff", "StaffPatientAssignment",
-    "FacilityPatientLink", "AuditLog", "SafetyEvent",
+    "FacilityPatientLink", "AuditLog", "SafetyEvent", "InviteCode",
 ]

@@ -44,6 +44,11 @@ def test_settings() -> Settings:
         CONVERSATION_ENCRYPTION_KEY=base64.b64encode(b"\x00" * 32).decode(),
         JWT_SECRET_KEY="test-jwt-secret-key-at-least-32-characters-long",
         RATE_LIMIT_ENABLED=False,
+        # Off by default so the other ~47 call sites across the suite that
+        # POST /profiles without an invite_code keep working unmodified.
+        # Tests that specifically exercise the invite-code gate turn it back
+        # on for themselves (see test_invite_codes.py).
+        INVITE_CODE_REQUIRED=False,
     )
 
 
@@ -61,6 +66,7 @@ def override_get_settings(test_settings, monkeypatch):
     )
     monkeypatch.setenv("JWT_SECRET_KEY", test_settings.JWT_SECRET_KEY)
     monkeypatch.setenv("RATE_LIMIT_ENABLED", "false")
+    monkeypatch.setenv("INVITE_CODE_REQUIRED", "false")
     config.get_settings.cache_clear()
     yield
     config.get_settings.cache_clear()

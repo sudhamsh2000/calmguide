@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.db import get_session
 from app.models.behavioral_dossier import BehavioralDossier
 from app.models.care_change_event import CareChangeEvent
@@ -16,6 +17,7 @@ from app.models.conversation import Conversation
 from app.models.daily_checkin import DailyCheckin
 from app.models.facility_patient_link import FacilityPatientLink
 from app.models.incident import Incident
+from app.models.invite_code import InviteCode
 from app.models.profile import Profile
 from app.models.profile_insights import ProfileInsights
 from app.models.response_feedback import ResponseFeedback
@@ -25,6 +27,8 @@ from app.services.auth import hash_access_code
 from app.services.crypto import decrypt, encrypt
 from app.schemas.profile import (
     ErrorResponse,
+    InviteCodeCheck,
+    InviteCodeCheckResponse,
     ProfileCreate,
     ProfileCreateResponse,
     ProfileResponse,
@@ -60,16 +64,67 @@ async def _find_profile_by_code(session: AsyncSession, access_code: str) -> Prof
     return result.scalar_one_or_none()
 
 
+async def _find_invite_code(session: AsyncSession, code: str) -> InviteCode | None:
+    """Look up an active invite code by its plaintext value.
+
+    Reuses the same keyed HMAC hashing as B2C access codes and facility
+    codes (app.services.auth.hash_access_code) — same threat model, no need
+    for a separate secret or algorithm.
+    """
+    if not code:
+        return None
+    code_hash = hash_access_code(code)
+    result = await session.execute(
+        select(InviteCode).where(
+            InviteCode.code_hash == code_hash,
+            InviteCode.is_active.is_(True),
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+@router.post(
+    "/invite-codes/validate",
+    response_model=InviteCodeCheckResponse,
+)
+async def validate_invite_code(
+    payload: InviteCodeCheck,
+    session: AsyncSession = Depends(get_session),
+):
+    """Check an invite code without consuming it or creating a profile.
+
+    Lets the signup wizard give immediate feedback on a bad code before the
+    user fills out the rest of the form. Codes are shared/reusable, so this
+    check has no side effects — POST /profiles re-validates independently.
+    """
+    if not get_settings().INVITE_CODE_REQUIRED:
+        return InviteCodeCheckResponse(valid=True)
+    invite = await _find_invite_code(session, payload.code.strip())
+    return InviteCodeCheckResponse(valid=invite is not None)
+
+
 @router.post(
     "/profiles",
     response_model=ProfileCreateResponse,
     status_code=201,
-    responses={409: {"model": ErrorResponse}},
+    responses={403: {"model": ErrorResponse}, 409: {"model": ErrorResponse}},
 )
 async def create_profile(
     payload: ProfileCreate,
     session: AsyncSession = Depends(get_session),
 ):
+    # Private-testing gate: require a valid, active, pre-generated invite
+    # code before allowing signup. Re-checked here even though the wizard
+    # already validated it client-side, since that check is bypassable.
+    invite: InviteCode | None = None
+    if get_settings().INVITE_CODE_REQUIRED:
+        invite = await _find_invite_code(session, payload.invite_code.strip())
+        if invite is None:
+            raise HTTPException(
+                status_code=403,
+                detail={"error": "Invalid or inactive invite code", "code": "INVALID_INVITE_CODE"},
+            )
+
     # Generate collision-free access code
     for _ in range(10):
         code = _generate_access_code()
@@ -93,6 +148,8 @@ async def create_profile(
         safety_concerns=encrypt(json.dumps(payload.safety_concerns)),
     )
     session.add(profile)
+    if invite is not None:
+        invite.use_count += 1
     await session.commit()
     await session.refresh(profile)
 

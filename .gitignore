@@ -85,3 +85,7 @@ mobile/android/
 /uploads/
 backend/data/
 backend/uploads/
+
+# Plaintext invite/access codes — only ever shown once at generation time,
+# never recoverable from the DB; keep local only.
+access-codes.md

@@ -13,6 +13,11 @@ class ProfileCreate(BaseModel):
     behavioral_patterns: list[str] = Field(..., min_length=1)
     calming_strategies: list[str] = Field(..., min_length=1)
     safety_concerns: list[str] = Field(..., min_length=1)
+    # Required only when Settings.INVITE_CODE_REQUIRED is True (private
+    # testing). Ignored otherwise. Empty string accepted so existing
+    # clients/tests that predate this field don't hard-fail on validation —
+    # the router enforces presence itself when the gate is on.
+    invite_code: str = ""
 
 
 class ProfileUpdate(BaseModel):
@@ -40,3 +45,11 @@ class ProfileCreateResponse(ProfileResponse):
 class ErrorResponse(BaseModel):
     error: str
     code: str
+
+
+class InviteCodeCheck(BaseModel):
+    code: str = Field(..., min_length=1)
+
+
+class InviteCodeCheckResponse(BaseModel):
+    valid: bool

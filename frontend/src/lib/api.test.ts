@@ -38,6 +38,7 @@ describe('createProfile', () => {
       behavioral_patterns: ['sundowning'],
       calming_strategies: ['music'],
       safety_concerns: ['wandering'],
+      invite_code: 'TESTCODE',
     };
     const responseData = {
       id: '1',
@@ -71,6 +72,7 @@ describe('createProfile', () => {
       behavioral_patterns: [],
       calming_strategies: [],
       safety_concerns: [],
+      invite_code: 'TESTCODE',
     })).rejects.toThrow(ApiError);
   });
 });

@@ -1,6 +1,7 @@
 export type DiseaseStage = 'early' | 'middle' | 'late';
 
 export interface WizardFormData {
+  inviteCode: string;
   patientName: string;
   diseaseStage: DiseaseStage | null;
   behavioralPatterns: string[];
