@@ -40,26 +40,40 @@ describe('CoachResponseRenderer', () => {
     expect(screen.getByText('Hello caregiver')).toBeInTheDocument();
   });
 
-  it('renders RIGHT NOW section with primary background styling', () => {
+  // Each section carries a distinct semantic tint (globals.css
+  // `.coach-section-*`) rather than Tailwind colour literals, so the four-part
+  // hierarchy is visually separable at a glance. Asserting the utility class
+  // is the closest we can get in jsdom, which doesn't resolve CSS variables.
+  it('renders RIGHT NOW section with the act-now (teal) tint', () => {
     render(<CoachResponseRenderer sections={makeSections(['right-now'])} />);
     const region = screen.getByRole('region', { name: /right now/i });
-    // The primary-tinted background comes from the `card-shell-selected`
-    // utility class (rgba primary background-color, see globals.css), not a
-    // literal Tailwind `bg-primary` class.
-    expect(region.className).toMatch(/card-shell-selected/);
+    expect(region.className).toMatch(/coach-section-now/);
   });
 
-  it('renders RIGHT NOW section with elevated shadow', () => {
-    render(<CoachResponseRenderer sections={makeSections(['right-now'])} />);
-    const region = screen.getByRole('region', { name: /right now/i });
-    expect(region.className).toMatch(/shadow/);
+  it('renders WHY with the context (lavender) tint', () => {
+    render(<CoachResponseRenderer sections={makeSections(['why'])} />);
+    const region = screen.getByRole('region', { name: /why/i });
+    expect(region.className).toMatch(/coach-section-why/);
   });
 
-  it('renders WHAT NOT TO DO with red inline-start border', () => {
+  it('renders WHAT NOT TO DO with the avoid (coral) tint', () => {
     render(<CoachResponseRenderer sections={makeSections(['what-not-to-do'])} />);
     const region = screen.getByRole('region', { name: /what not to do/i });
-    expect(region.className).toMatch(/border-s-4/);
-    expect(region.className).toMatch(/border-error/);
+    expect(region.className).toMatch(/coach-section-avoid/);
+  });
+
+  it('gives each of the four sections a distinct tint', () => {
+    render(
+      <CoachResponseRenderer
+        sections={makeSections(['right-now', 'why', 'what-not-to-do', 'escalation'])}
+      />,
+    );
+    const tints = screen
+      .getAllByRole('region')
+      .map((r) => r.className.match(/coach-section-[a-z]+/)?.[0])
+      .filter(Boolean);
+    expect(tints).toHaveLength(4);
+    expect(new Set(tints).size).toBe(4);
   });
 
   it('renders no emoji characters in any section title', () => {

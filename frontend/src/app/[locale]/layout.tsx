@@ -9,6 +9,7 @@ import { ProfileProvider } from "@/context/ProfileContext";
 import { PageBrand } from "@/components/ui/PageBrand";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { EmergencyBar } from "@/components/ui/EmergencyBar";
+import { BottomNav } from "@/components/ui/BottomNav";
 import { LocaleDocumentSync } from "@/components/ui/LocaleDocumentSync";
 import { THEME_COOKIE } from "@/lib/theme";
 import { isRtl, SUPPORTED_LOCALES } from "@/lib/locale";
@@ -135,7 +136,10 @@ export default async function LocaleLayout({
                 <ThemeToggle className="h-10 w-10" />
               </div>
               <div id="root-content" className="mx-auto w-full max-w-lg flex-1 flex flex-col min-h-0">{children}</div>
-              <div id="root-chrome-footer"><EmergencyBar /></div>
+              <div id="root-chrome-footer">
+                <EmergencyBar />
+                <BottomNav />
+              </div>
             </div>
           </ProfileProvider>
         </NextIntlClientProvider>

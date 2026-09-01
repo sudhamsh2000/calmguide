@@ -13,6 +13,13 @@
     "privacy": "Política de privacidad",
     "back": "Volver"
   },
+  "bottom_nav": {
+    "label": "Secciones principales",
+    "coach": "Guía",
+    "insights": "Datos",
+    "resources": "Recursos",
+    "more": "Más"
+  },
   "actions": {
     "send": "Enviar",
     "submit": "Confirmar",
@@ -182,54 +189,114 @@
     "value_strip": {
       "title": "Orientación calmada. Cuidado con confianza.",
       "items": {
-        "ai_guided": { "title": "Apoyo guiado por IA", "desc": "Orientación estructurada, paso a paso, para el momento que estás viviendo." },
-        "personalized": { "title": "Contexto personalizado", "desc": "Orientación adaptada a la etapa, la historia y lo que le ha funcionado a tu ser querido." },
-        "multilingual": { "title": "Soporte multilingüe", "desc": "Disponible en inglés, español e hindi." },
-        "privacy": { "title": "Privacidad ante todo", "desc": "El contenido de las conversaciones se cifra en reposo." }
+        "ai_guided": {
+          "title": "Apoyo guiado por IA",
+          "desc": "Orientación estructurada, paso a paso, para el momento que estás viviendo."
+        },
+        "personalized": {
+          "title": "Contexto personalizado",
+          "desc": "Orientación adaptada a la etapa, la historia y lo que le ha funcionado a tu ser querido."
+        },
+        "multilingual": {
+          "title": "Soporte multilingüe",
+          "desc": "Disponible en inglés, español e hindi."
+        },
+        "privacy": {
+          "title": "Privacidad ante todo",
+          "desc": "El contenido de las conversaciones se cifra en reposo."
+        }
       }
     },
     "what_is": {
       "eyebrow": "Qué es CalmGuide",
       "title": "Apoyo en los momentos que más importan.",
       "desc": "CalmGuide combina lo que le cuentas con el contexto de tu ser querido, su historial conductual y conocimiento confiable sobre el cuidado de la demencia —filtrado por vías de seguridad y perfeccionado con tus comentarios— para ofrecer orientación pensada para el momento que estás viviendo.",
-      "checklist": ["Lo que cuenta el cuidador", "Contexto del paciente", "Historial conductual", "Conocimiento confiable sobre demencia", "Vías de seguridad", "Comentarios del cuidador"]
+      "checklist": [
+        "Lo que cuenta el cuidador",
+        "Contexto del paciente",
+        "Historial conductual",
+        "Conocimiento confiable sobre demencia",
+        "Vías de seguridad",
+        "Comentarios del cuidador"
+      ]
     },
     "how": {
       "eyebrow": "Cómo funciona",
       "title": "Cómo funciona CalmGuide",
       "steps": {
-        "describe": { "title": "Cuentas lo que está pasando", "desc": "Cuéntale a CalmGuide lo que está pasando, con tus propias palabras o por voz." },
-        "context": { "title": "CalmGuide considera el contexto relevante", "desc": "CalmGuide toma en cuenta la historia de tu ser querido y lo que ha funcionado antes." },
-        "guidance": { "title": "CalmGuide ofrece orientación estructurada", "desc": "Obtén una guía calmada, paso a paso, pensada para el momento que estás viviendo." },
-        "feedback": { "title": "Tus comentarios mejoran el apoyo futuro", "desc": "Tus comentarios mejoran la orientación la próxima vez." }
+        "describe": {
+          "title": "Cuentas lo que está pasando",
+          "desc": "Cuéntale a CalmGuide lo que está pasando, con tus propias palabras o por voz."
+        },
+        "context": {
+          "title": "CalmGuide considera el contexto relevante",
+          "desc": "CalmGuide toma en cuenta la historia de tu ser querido y lo que ha funcionado antes."
+        },
+        "guidance": {
+          "title": "CalmGuide ofrece orientación estructurada",
+          "desc": "Obtén una guía calmada, paso a paso, pensada para el momento que estás viviendo."
+        },
+        "feedback": {
+          "title": "Tus comentarios mejoran el apoyo futuro",
+          "desc": "Tus comentarios mejoran la orientación la próxima vez."
+        }
       }
     },
     "coach": {
       "eyebrow": "Moment Coach",
       "title": "Descubre lo que ofrece Moment Coach",
       "subtitle": "Una vista previa de la estructura detrás de cada respuesta, no una demostración en vivo.",
-      "right_now": { "title": "En Este Momento", "desc": "Pasos inmediatos y concretos para este momento." },
-      "why": { "title": "Por Qué Podría Estar Pasando Esto", "desc": "Posibles desencadenantes y contexto a considerar." },
-      "when_help": { "title": "Cuándo Buscar Más Ayuda", "desc": "Señales que indican que es momento de pedir apoyo." },
-      "not_to_do": { "title": "Qué No Hacer", "desc": "Respuestas comunes que pueden empeorar la situación." }
+      "right_now": {
+        "title": "En Este Momento",
+        "desc": "Pasos inmediatos y concretos para este momento."
+      },
+      "why": {
+        "title": "Por Qué Podría Estar Pasando Esto",
+        "desc": "Posibles desencadenantes y contexto a considerar."
+      },
+      "when_help": {
+        "title": "Cuándo Buscar Más Ayuda",
+        "desc": "Señales que indican que es momento de pedir apoyo."
+      },
+      "not_to_do": {
+        "title": "Qué No Hacer",
+        "desc": "Respuestas comunes que pueden empeorar la situación."
+      }
     },
     "behavioral_context": {
       "eyebrow": "Contexto conductual",
       "title": "Orientación que no empieza desde cero",
       "desc": "CalmGuide puede tener en cuenta los desencadenantes recurrentes, las estrategias que han funcionado antes y los comentarios que has dado, para que la orientación se construya sobre lo que ya has aprendido. No es una memoria ilimitada, solo una idea práctica de lo que ayuda.",
-      "items": ["Desencadenantes recurrentes", "Episodios anteriores", "Estrategias que funcionaron", "Comentarios del cuidador", "Patrones recientes"]
+      "items": [
+        "Desencadenantes recurrentes",
+        "Episodios anteriores",
+        "Estrategias que funcionaron",
+        "Comentarios del cuidador",
+        "Patrones recientes"
+      ]
     },
     "safety": {
       "eyebrow": "Seguridad",
       "title": "La seguridad no debería depender de una sola respuesta de IA.",
       "subtitle": "CalmGuide filtra cada entrada mediante verificaciones deterministas antes de mostrar cualquier orientación generada por IA.",
-      "steps": ["Entrada del Cuidador", "Filtro de Seguridad", "Detección de Cambios Agudos", "Acompañamiento o Derivación"],
+      "steps": [
+        "Entrada del Cuidador",
+        "Filtro de Seguridad",
+        "Detección de Cambios Agudos",
+        "Acompañamiento o Derivación"
+      ],
       "disclaimer": "CalmGuide no es una herramienta de diagnóstico. No reemplaza a los profesionales de salud, los servicios de emergencia ni la Línea de Ayuda 24/7 de la Asociación de Alzheimer."
     },
     "three_am": {
       "eyebrow": "Pensado para las 3 de la madrugada",
       "title": "Diseñado para la vida real. En cualquier momento, en cualquier lugar.",
-      "items": ["Modo oscuro", "Controles grandes", "Experiencia por voz", "Acceso a emergencias", "Disponible en móvil y web"]
+      "items": [
+        "Modo oscuro",
+        "Controles grandes",
+        "Experiencia por voz",
+        "Acceso a emergencias",
+        "Disponible en móvil y web"
+      ]
     },
     "interop": {
       "eyebrow": "Interoperabilidad",
@@ -240,7 +307,18 @@
     "technology": {
       "eyebrow": "Tecnología",
       "title": "Construido sobre una infraestructura moderna y transparente",
-      "items": ["Next.js", "React", "TypeScript", "FastAPI", "Python", "PostgreSQL", "pgvector", "Generación Aumentada por Recuperación (RAG)", "Server-Sent Events (SSE)", "React Native & Expo"]
+      "items": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "FastAPI",
+        "Python",
+        "PostgreSQL",
+        "pgvector",
+        "Generación Aumentada por Recuperación (RAG)",
+        "Server-Sent Events (SSE)",
+        "React Native & Expo"
+      ]
     },
     "partner_line": "En asociación con Leap of Faith",
     "about": {

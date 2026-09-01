@@ -48,13 +48,39 @@
     --color-footer-text: #F5F6F8;
     --color-footer-text-muted: #A7B3C4;
     --color-footer-border: rgba(255, 255, 255, 0.08);
+
+    /* Moment Coach response sections (design/design.md §25). Each of the four
+     * sections gets a fixed semantic colour so the hierarchy is readable at a
+     * glance under stress: teal = act now, lavender = context/explanation,
+     * coral = avoid, muted navy = escalation. Defined as tokens (rather than
+     * per-component classes) so the same four colours can be reused by any
+     * surface that mirrors this structure. */
+    --color-coach-now-bg: #EAF7F6;
+    --color-coach-now-text: #1F5F5D;
+    --color-coach-why-bg: #F3F1F8;
+    --color-coach-why-text: #3F3A63;
+    --color-coach-avoid-bg: #FBEDEA;
+    --color-coach-avoid-text: #8F3A28;
+    --color-coach-escalate-bg: #EEF2F5;
+    --color-coach-escalate-text: #2C4457;
   }
 
   .dark {
     --color-background: #1A2332;
     --color-foreground: #E8E8E8;
-    --color-foreground-muted: #A0AEC0;
+    --color-foreground-muted: #B8C3CC;
     --color-surface: #243447;
+
+    /* Section tints re-derived for dark: low-alpha washes of the same hues so
+     * they read as the same four categories without glowing on a dark ground. */
+    --color-coach-now-bg: rgba(58, 175, 169, 0.14);
+    --color-coach-now-text: #6FD3CD;
+    --color-coach-why-bg: rgba(154, 140, 209, 0.16);
+    --color-coach-why-text: #B9AEE6;
+    --color-coach-avoid-bg: rgba(240, 147, 127, 0.14);
+    --color-coach-avoid-text: #F0937F;
+    --color-coach-escalate-bg: rgba(184, 199, 214, 0.10);
+    --color-coach-escalate-text: #B8C3CC;
     --color-border: rgba(255, 255, 255, 0.045);
     --color-error: #F0937F;
 
@@ -243,6 +269,29 @@
   .card-shell {
     @apply rounded-2xl border bg-surface;
     border-color: var(--color-border);
+  }
+
+  /* Moment Coach section surfaces. Colour only — no layout — so the response
+   * renderer keeps full control of spacing/typography and these can be reused
+   * anywhere the same four-part hierarchy appears. */
+  .coach-section-now {
+    background-color: var(--color-coach-now-bg);
+    color: var(--color-coach-now-text);
+  }
+
+  .coach-section-why {
+    background-color: var(--color-coach-why-bg);
+    color: var(--color-coach-why-text);
+  }
+
+  .coach-section-avoid {
+    background-color: var(--color-coach-avoid-bg);
+    color: var(--color-coach-avoid-text);
+  }
+
+  .coach-section-escalate {
+    background-color: var(--color-coach-escalate-bg);
+    color: var(--color-coach-escalate-text);
   }
 
   /* Landing-page-only decorative gradients (design/design.md §18/§3.6). */

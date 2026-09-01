@@ -19,26 +19,31 @@ interface SectionStyle {
   labelKey: 'sections.right_now' | 'sections.why' | 'sections.what_not_to_do' | 'sections.escalation';
 }
 
+/* Each section carries its own semantic tint (globals.css) so the four-part
+ * hierarchy reads at a glance under stress — teal = act now, lavender =
+ * why/context, coral = avoid, muted navy = escalate. Titles inherit the
+ * section's own text colour via `currentColor`; body copy stays on
+ * `text-foreground` for maximum contrast, since the tints are backgrounds
+ * rather than full-surface colour swaps. */
 const SECTION_STYLES: Record<CoachSectionId, SectionStyle> = {
   'right-now': {
-    containerClass:
-      'card-shell-selected rounded-2xl p-5 shadow-sm',
-    titleClass: 'text-primary-dark dark:text-primary-light font-bold',
+    containerClass: 'coach-section-now rounded-2xl p-5',
+    titleClass: 'font-bold',
     labelKey: 'sections.right_now',
   },
   why: {
-    containerClass: 'card-shell rounded-2xl p-5',
-    titleClass: 'text-foreground font-semibold',
+    containerClass: 'coach-section-why rounded-2xl p-5',
+    titleClass: 'font-bold',
     labelKey: 'sections.why',
   },
   'what-not-to-do': {
-    containerClass: 'bg-surface border-s-4 border-error rounded-2xl p-5',
-    titleClass: 'text-error font-bold',
+    containerClass: 'coach-section-avoid rounded-2xl p-5',
+    titleClass: 'font-bold',
     labelKey: 'sections.what_not_to_do',
   },
   escalation: {
-    containerClass: 'card-shell rounded-2xl p-5',
-    titleClass: 'text-foreground-muted font-semibold',
+    containerClass: 'coach-section-escalate rounded-2xl p-5',
+    titleClass: 'font-bold',
     labelKey: 'sections.escalation',
   },
 };

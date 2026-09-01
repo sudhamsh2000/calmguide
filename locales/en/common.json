@@ -13,6 +13,13 @@
     "privacy": "Privacy Policy",
     "back": "Back"
   },
+  "bottom_nav": {
+    "label": "Main sections",
+    "coach": "Coach",
+    "insights": "Insights",
+    "resources": "Resources",
+    "more": "More"
+  },
   "actions": {
     "send": "Send",
     "submit": "Submit",
@@ -182,54 +189,114 @@
     "value_strip": {
       "title": "Calm guidance. Confident care.",
       "items": {
-        "ai_guided": { "title": "AI-guided support", "desc": "Structured, step-by-step guidance for the moment you're in." },
-        "personalized": { "title": "Personalized context", "desc": "Guidance shaped by your loved one's stage, history, and what's worked before." },
-        "multilingual": { "title": "Multilingual support", "desc": "Available in English, Spanish, and Hindi." },
-        "privacy": { "title": "Privacy first", "desc": "Conversation content is encrypted at rest." }
+        "ai_guided": {
+          "title": "AI-guided support",
+          "desc": "Structured, step-by-step guidance for the moment you're in."
+        },
+        "personalized": {
+          "title": "Personalized context",
+          "desc": "Guidance shaped by your loved one's stage, history, and what's worked before."
+        },
+        "multilingual": {
+          "title": "Multilingual support",
+          "desc": "Available in English, Spanish, and Hindi."
+        },
+        "privacy": {
+          "title": "Privacy first",
+          "desc": "Conversation content is encrypted at rest."
+        }
       }
     },
     "what_is": {
       "eyebrow": "What is CalmGuide",
       "title": "Support in the moments that matter most.",
       "desc": "CalmGuide combines what you tell it with your loved one's context, behavioral history, and trusted dementia-care knowledge — screened through safety pathways and refined by your feedback — to offer guidance built for the moment you're in.",
-      "checklist": ["Caregiver input", "Patient context", "Behavioral history", "Trusted dementia-care knowledge", "Safety pathways", "Caregiver feedback"]
+      "checklist": [
+        "Caregiver input",
+        "Patient context",
+        "Behavioral history",
+        "Trusted dementia-care knowledge",
+        "Safety pathways",
+        "Caregiver feedback"
+      ]
     },
     "how": {
       "eyebrow": "How it works",
       "title": "How CalmGuide works",
       "steps": {
-        "describe": { "title": "You describe what's happening", "desc": "Tell CalmGuide what's happening, in your own words or by voice." },
-        "context": { "title": "CalmGuide considers relevant context", "desc": "CalmGuide factors in your loved one's history and what's worked before." },
-        "guidance": { "title": "CalmGuide provides structured guidance", "desc": "Receive calm, step-by-step guidance built for the moment you're in." },
-        "feedback": { "title": "Feedback helps refine future support", "desc": "Your feedback shapes better guidance next time." }
+        "describe": {
+          "title": "You describe what's happening",
+          "desc": "Tell CalmGuide what's happening, in your own words or by voice."
+        },
+        "context": {
+          "title": "CalmGuide considers relevant context",
+          "desc": "CalmGuide factors in your loved one's history and what's worked before."
+        },
+        "guidance": {
+          "title": "CalmGuide provides structured guidance",
+          "desc": "Receive calm, step-by-step guidance built for the moment you're in."
+        },
+        "feedback": {
+          "title": "Feedback helps refine future support",
+          "desc": "Your feedback shapes better guidance next time."
+        }
       }
     },
     "coach": {
       "eyebrow": "Moment Coach",
       "title": "See what Moment Coach offers",
       "subtitle": "A preview of the structure behind every response — not a live demo.",
-      "right_now": { "title": "Right Now", "desc": "Immediate, concrete steps for this moment." },
-      "why": { "title": "Why This May Be Happening", "desc": "Possible triggers and context to consider." },
-      "when_help": { "title": "When To Get More Help", "desc": "Signs that mean it's time to call for support." },
-      "not_to_do": { "title": "What Not To Do", "desc": "Common responses that can make things harder." }
+      "right_now": {
+        "title": "Right Now",
+        "desc": "Immediate, concrete steps for this moment."
+      },
+      "why": {
+        "title": "Why This May Be Happening",
+        "desc": "Possible triggers and context to consider."
+      },
+      "when_help": {
+        "title": "When To Get More Help",
+        "desc": "Signs that mean it's time to call for support."
+      },
+      "not_to_do": {
+        "title": "What Not To Do",
+        "desc": "Common responses that can make things harder."
+      }
     },
     "behavioral_context": {
       "eyebrow": "Behavioral context",
       "title": "Guidance that doesn't start from zero",
       "desc": "CalmGuide can factor in recurring triggers, strategies that have worked before, and feedback you've given — so guidance builds on what you've already learned. Not unlimited memory, just a working picture of what helps.",
-      "items": ["Recurring triggers", "Previous episodes", "Strategies that helped", "Caregiver feedback", "Recent patterns"]
+      "items": [
+        "Recurring triggers",
+        "Previous episodes",
+        "Strategies that helped",
+        "Caregiver feedback",
+        "Recent patterns"
+      ]
     },
     "safety": {
       "eyebrow": "Safety",
       "title": "Safety should not depend on a single AI response.",
       "subtitle": "CalmGuide screens every input through deterministic checks before any AI-generated guidance is shown.",
-      "steps": ["Caregiver Input", "Safety Screening", "Acute-Change Check", "Coach or Escalation"],
+      "steps": [
+        "Caregiver Input",
+        "Safety Screening",
+        "Acute-Change Check",
+        "Coach or Escalation"
+      ],
       "disclaimer": "CalmGuide is not a diagnostic tool. It does not replace clinicians, emergency services, or the Alzheimer's Association 24/7 Helpline."
     },
     "three_am": {
       "eyebrow": "Built for 3 a.m.",
       "title": "Designed for real life. Anytime, anywhere.",
-      "items": ["Dark mode", "Large touch targets", "Voice-friendly experience", "Emergency access", "Mobile & web support"]
+      "items": [
+        "Dark mode",
+        "Large touch targets",
+        "Voice-friendly experience",
+        "Emergency access",
+        "Mobile & web support"
+      ]
     },
     "interop": {
       "eyebrow": "Interoperability",
@@ -240,7 +307,18 @@
     "technology": {
       "eyebrow": "Technology",
       "title": "Built on a modern, transparent stack",
-      "items": ["Next.js", "React", "TypeScript", "FastAPI", "Python", "PostgreSQL", "pgvector", "Retrieval-Augmented Generation (RAG)", "Server-Sent Events (SSE)", "React Native & Expo"]
+      "items": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "FastAPI",
+        "Python",
+        "PostgreSQL",
+        "pgvector",
+        "Retrieval-Augmented Generation (RAG)",
+        "Server-Sent Events (SSE)",
+        "React Native & Expo"
+      ]
     },
     "partner_line": "Partnered with Leap of Faith",
     "about": {
