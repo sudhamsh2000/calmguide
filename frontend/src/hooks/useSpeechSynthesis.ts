@@ -35,12 +35,27 @@ const SPEECH_PITCH = 1.05;
  * across platforms — so this is a maintained allowlist rather than a
  * heuristic. Falls back to the platform default for the locale if none of
  * these are installed.
+ *
+ * "Samantha" for English is confirmed good (tested, not flagged) and stays
+ * top priority so this change doesn't touch a voice nobody complained
+ * about. "Mónica" for Spanish was tested and reported as not friendly
+ * enough, so for es specifically, Apple's newer cross-language voice set
+ * (macOS Ventura+ / iOS 16+, shipped under the same names in every
+ * language — a generation newer and generally warmer than the classic
+ * single-name voices) gets a chance to win instead, ahead of Mónica as a
+ * fallback. Skipped "Grandma"/"Grandpa" from that same newer set on
+ * purpose — warm, but age-codes the voice in a way that doesn't fit every
+ * response.
  */
 const PREFERRED_VOICE_NAMES = [
-  // macOS / iOS Safari — Siri and other high-quality system voices
+  // macOS / iOS Safari classic high-quality voices, per language
   "Ava", "Samantha", "Allison", "Susan", "Zoe", "Nicky", // en
-  "Mónica", "Paulina", // es
-  // Chrome/Edge — network-backed voices, notably better than the local ones
+  // Newer cross-language voice set — currently only tried for es (Mónica
+  // wasn't warm enough); see note above before widening this to other
+  // locales without it being requested.
+  "Reed", "Shelley", "Flo",
+  "Mónica", "Paulina", // es fallback
+  // Chrome/Edge network-backed voices, notably better than local ones
   "Google US English", "Google UK English Female", "Google español",
   "Microsoft Aria", "Microsoft Jenny", "Microsoft Sonia",
 ];
