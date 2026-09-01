@@ -830,7 +830,162 @@ Safe, repo-verified public language:
 
 ---
 
+## 25. Web + Responsive Mobile Redesign (2026-09-01)
+
+Applies the approved CalmGuide mobile screen references
+(`design/references/landing-page/product-screens/`) to the **in-app**
+caregiver experience — desktop and responsive mobile web. Visual system
+only: no backend, route, parsing, SSE, auth, or persistence changes.
+
+### 25.1 Mobile reference → web screen mapping
+
+| Reference screen | Web route / component | Treatment |
+|---|---|---|
+| Home / Coach | `/home` (`HomeScreen`) | Restyled; 2-column on `lg+` |
+| Moment Coach response | `CoachResponseRenderer` | Four semantic section tints (§25.3) |
+| Why This Is Happening | same component | Same — it's one of the four sections |
+| Behavior Profile | `/profile` (`ProfileView`) | Card language + chip treatment (§25.5) |
+| Daily Check-In | `DailyCheckinCard` | Icon selector + chips (§25.5) |
+| Incident Log | `/incidents/new` (`IncidentLogger`) | Real line icons, 8 categories 1:1 |
+
+**Two references could not be implemented literally**, and were adapted to
+real data by explicit decision rather than by inventing fields:
+
+- **Behavior Profile** draws a patient photo, "Age 78 • Alzheimer's Disease",
+  "↓25% vs last week", and "Overall Stability 78%". None of that exists: the
+  profile model stores disease stage, behavioral patterns, calming strategies
+  and safety concerns, and the patient's name is deliberately **device-local,
+  never sent to the server**. The reference's *card language* was adopted —
+  "What Works Best" → calming strategies as teal chips, "What to Avoid" →
+  safety concerns as coral chips — with no invented metrics (§22).
+- **Daily Check-In** draws a 5-point *caregiver* mood scale and loved-one
+  state chips (Slept well / Ate well / Took medications). The app records a
+  3-point *loved-one* severity (`calm` / `mild` / `tough`) and tags that are
+  *caregiver interventions* (music, redirection, calm approach) — a different
+  subject entirely. The reference's selector treatment was adopted over the
+  three real levels; no new fields were added.
+
+### 25.2 Navigation
+
+New `BottomNav` (`components/ui/BottomNav.tsx`), mobile only (`lg:hidden`),
+mapped onto **existing routes** — no new pages, no route changes:
+
+| Tab | Route |
+|---|---|
+| Coach | `/coach` |
+| Insights | `/incidents` |
+| Resources | `/learn` |
+| More | `/profile` |
+
+Nested routes keep their section active (`/incidents/new` → Insights lit).
+Hidden on the landing page and all `/facility` routes, which have their own
+chrome (`shouldShowBottomNav`). The references show a 5th "Log" tab on the
+Incident Log screen only and disagree on tab count between screens; we
+standardised on four everywhere rather than a nav bar that changes shape
+per screen, which is exactly the cognitive load §1 argues against.
+
+### 25.3 Moment Coach section colours
+
+Four fixed semantic tints so the hierarchy reads at a glance under stress.
+Tokens in `globals.css`, applied via `.coach-section-*` utility classes.
+
+| Section | Light bg / text | Meaning | Contrast |
+|---|---|---|---|
+| Right Now | `#EAF7F6` / `#1F5F5D` | act now | 6.71:1 |
+| Why This Is Happening | `#F3F1F8` / `#3F3A63` | context | 9.39:1 |
+| What Not To Do | `#FBEDEA` / `#8F3A28` | avoid | 6.56:1 |
+| When To Get More Help | `#EEF2F5` / `#2C4457` | escalate | 9.01:1 |
+
+All four pass WCAG AA for **normal** text, not just large. Dark mode
+re-derives each as a low-alpha wash of the same hue (see `.dark` block) so
+they stay recognisably the same four categories without glowing.
+
+Not exposed as Tailwind colour utilities on purpose: `text-coach` is already
+a `fontSize` token, so a `coach` colour namespace would collide.
+
+### 25.4 Responsive strategy
+
+| Breakpoint | Shell width | Layout |
+|---|---|---|
+| Mobile 320–430 | `max-w-lg` (512px) | single column, bottom nav |
+| Tablet 768–1024 | `max-w-lg` | single column, wider grids inside |
+| Desktop 1280+ | `max-w-app` (**1040px**, new token) | 2-column where useful, no bottom nav |
+
+The shell previously rendered a 512px column at *every* width — the single
+biggest "desktop is just stretched mobile" gap. `max-w-app` is deliberately
+narrower than the landing page's 1200px so reading columns don't get
+uncomfortably long.
+
+**Home 2-column split (`lg+`, 7fr/5fr):** left = the primary act-now path
+(greeting, patient card, Moment Coach, quick actions, today's check-in);
+right = supporting context (patterns, incident history, journey links).
+Because sections 1–7 already preceded 8–11 in source order, collapsing to
+one column below `lg` reproduces the previous mobile order exactly.
+
+### 25.5 Card, chip and button patterns
+
+- **Cards** — `.card-shell` (`rounded-2xl`, 1px themed border, surface bg).
+  `p-5` for content cards. Profile sections converted from divider-separated
+  blocks to discrete cards, matching the references.
+- **Chips** — `rounded-full`, `min-h-tap`, `px-4 py-2.5`. Selected = solid
+  `bg-primary` + white; unselected = `card-shell` on background. Semantic
+  variants: teal (`success-bg`/`success-text`) for what helps, coral
+  (`error-bg`/`error`) for what to avoid.
+- **Category tiles** (Incident Log) — line icon in a soft-tinted circle
+  (`h-11 w-11`, category colour at 12% alpha), label beneath, `min-h-[100px]`,
+  2-col on mobile → 4-col from `sm`. Replaced single-letter placeholders
+  ("A", "?", "W") which read as codes rather than categories.
+- **Primary button** — `bg-primary`, white text, `rounded-xl`, `min-h-tap`,
+  full-width when it's the screen's single commit action.
+- **Icons** — all drawn in-repo on a 24px grid at 1.75 stroke weight. No
+  external icon set is used anywhere in this pass.
+
+### 25.6 Accessibility rules applied
+
+- Touch targets `min-h-tap` (48px) on every interactive control added or
+  restyled — above the 44px floor.
+- All four Moment Coach sections verified ≥ 6.5:1 (AA normal text).
+- Toggle controls (severity, time slot, tags) now expose `aria-pressed`;
+  previously selection was conveyed by a `✓` glued onto the label text,
+  which screen readers announced as part of the name.
+- Chip groups wrapped in `role="group"` with an accessible name.
+- Bottom nav uses `aria-current="page"` for the active section.
+- Icons are `aria-hidden`; the accessible name always comes from real text.
+- No RTL-unsafe directional utilities introduced — logical properties only.
+
+### 25.7 Known gaps
+
+- **RTL is dormant, not broken.** `isRtl()` returns true only for `ar`, and
+  Arabic was removed from `SUPPORTED_LOCALES` in the earlier 3-locale
+  reduction (a product decision, not part of this pass). The RTL
+  infrastructure is intact and none of this pass's markup would break it,
+  but no currently-shipping locale exercises it. Re-adding Arabic is a
+  product call, not a redesign call.
+- Phases not yet done in this pass: Learn/Resources (§7), Impact/Insights
+  (§8), and the facility consistency sweep (§9) still use the previous
+  styling. They are visually consistent with the app, just not yet moved
+  onto the reference's card/chip language.
+
+---
+
 ## 24. Change Log
+
+### 2026-09-01 — Web + responsive mobile redesign (phases 1–6)
+
+Applied the approved mobile references to the in-app caregiver experience.
+Full detail in §25. Summary: new `max-w-app` desktop shell width and a
+2-column Home; four semantic Moment Coach section tints; a mobile bottom
+nav mapped onto existing routes; real line icons on the Incident Log; card
++ chip treatment on Profile and Daily Check-In.
+
+Two references were adapted rather than copied because they depict data the
+app does not store (Behavior Profile's age/diagnosis/stability metrics,
+Daily Check-In's 5-point caregiver mood and loved-one state chips) — see
+§25.1. No backend, route, parsing, SSE, auth or persistence changes.
+
+**Functionality changed: none.** Tests: 242 passed, 1 skipped, 6 failed —
+all six pre-existing `ThemeToggle` failures documented in
+`docs/feature-audit-2026-09-01.md`. `tsc --noEmit` clean.
 
 ### 2026-09-01 — Landing-page palette pass + Leap of Faith logo fix
 

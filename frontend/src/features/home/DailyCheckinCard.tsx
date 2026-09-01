@@ -49,46 +49,103 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
 
   const TIME_SLOTS = ['overnight', 'morning', 'afternoon', 'evening'] as const;
 
-  const severityStyles = {
-    calm: { active: 'bg-primary/15 text-primary ring-1 ring-primary', label: t('severity_calm') },
-    mild: { active: 'bg-primary/15 text-primary ring-1 ring-primary', label: t('severity_mild') },
-    tough: { active: 'bg-primary/15 text-primary ring-1 ring-primary', label: t('severity_tough') },
-  };
+  /* Severity is presented as three icon cards, echoing the Daily Check-In
+   * reference's mood selector. The reference draws five faces; the app records
+   * three levels (calm / mild / tough) and adding levels would mean changing
+   * what's persisted, so the visual treatment is adopted without inventing
+   * options that the backend can't store. Icons read faster than text alone
+   * under stress, and the label stays visible for clarity and screen readers. */
+  const SEVERITY_OPTIONS = [
+    {
+      id: 'calm' as const,
+      label: t('severity_calm'),
+      icon: (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8.5 14.2c1.2 1.1 5.8 1.1 7 0" />
+          <path d="M9.2 9.8h.01M14.8 9.8h.01" />
+        </>
+      ),
+    },
+    {
+      id: 'mild' as const,
+      label: t('severity_mild'),
+      icon: (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8.5 14.5h7" />
+          <path d="M9.2 9.8h.01M14.8 9.8h.01" />
+        </>
+      ),
+    },
+    {
+      id: 'tough' as const,
+      label: t('severity_tough'),
+      icon: (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8.5 15.5c1.2-1.2 5.8-1.2 7 0" />
+          <path d="M9.2 9.8h.01M14.8 9.8h.01" />
+        </>
+      ),
+    },
+  ];
+
+  const chipBase =
+    'min-h-tap rounded-full px-4 py-2.5 text-sm font-medium transition-colors focus-ring';
+  const chipOn = 'bg-primary text-white';
+  const chipOff = 'card-shell bg-background text-foreground hover:border-primary/30';
 
   return (
-    <div className="rounded-2xl border border-foreground/10 bg-surface p-4 space-y-3">
-      <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
+    <div className="card-shell p-5 space-y-4">
+      <h3 className="text-base font-semibold text-foreground">{t('title')}</h3>
 
-      <div className="flex gap-2">
-        {(['calm', 'mild', 'tough'] as const).map(s => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => handleSeverity(s)}
-            className={`flex-1 min-h-tap rounded-xl py-2.5 text-sm font-medium transition-colors ${
-              severity === s ? severityStyles[s].active : 'bg-background text-foreground-muted border border-foreground/10'
-            }`}
-          >
-            {severityStyles[s].label}
-          </button>
-        ))}
+      <div className="grid grid-cols-3 gap-2.5" role="group" aria-label={t('title')}>
+        {SEVERITY_OPTIONS.map(opt => {
+          const isOn = severity === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              aria-pressed={isOn}
+              onClick={() => handleSeverity(opt.id)}
+              className={`focus-ring flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 px-2 py-3 text-sm font-medium transition-colors ${
+                isOn
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-theme-soft bg-background text-foreground hover:border-primary/30'
+              }`}
+            >
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {opt.icon}
+              </svg>
+              <span className="leading-tight">{opt.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {severity && severity !== 'calm' && (
         <>
-          <div className="space-y-1.5">
-            <p className="text-xs text-foreground-muted">{t('when')}</p>
-            <div className="flex gap-1.5">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">{t('when')}</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label={t('when')}>
               {TIME_SLOTS.map(slot => (
                 <button
                   key={slot}
                   type="button"
+                  aria-pressed={timeSlot === slot}
                   onClick={() => setTimeSlot(slot)}
-                  className={`flex-1 min-h-tap rounded-lg py-1.5 text-sm transition-colors ${
-                    timeSlot === slot
-                      ? 'bg-primary/15 text-primary ring-1 ring-primary'
-                      : 'bg-background text-foreground-muted border border-foreground/10'
-                  }`}
+                  className={`${chipBase} ${timeSlot === slot ? chipOn : chipOff}`}
                 >
                   {t(`time_${slot}`)}
                 </button>
@@ -96,21 +153,18 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <p className="text-xs text-foreground-muted">{t('what_helped')}</p>
-            <div className="flex flex-wrap gap-2">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">{t('what_helped')}</p>
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t('what_helped')}>
               {PREDEFINED_TAGS.map(tag => (
                 <button
                   key={tag}
                   type="button"
+                  aria-pressed={selectedTags.includes(tag)}
                   onClick={() => toggleTag(tag)}
-                  className={`min-h-tap rounded-full px-3 py-2 text-sm font-medium transition-colors ${
-                    selectedTags.includes(tag)
-                      ? 'card-shell-selected text-primary'
-                      : 'card-shell bg-background text-foreground-muted'
-                  }`}
+                  className={`${chipBase} ${selectedTags.includes(tag) ? chipOn : chipOff}`}
                 >
-                  {tagLabel(tag)}{selectedTags.includes(tag) ? ' ✓' : ''}
+                  {tagLabel(tag)}
                 </button>
               ))}
             </div>
@@ -119,7 +173,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
           <button
             type="button"
             onClick={handleDone}
-            className="min-h-tap rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+            className="focus-ring min-h-tap w-full rounded-xl bg-primary px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
           >
             {t('done')}
           </button>

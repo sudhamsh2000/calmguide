@@ -130,7 +130,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       </div>
 
       {/* Dementia Stage */}
-      <div className="mt-6 pb-4 border-b border-foreground/10">
+      <div className="card-shell mt-5 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-2">
           {t('view.dementia_stage')}
         </p>
@@ -140,7 +140,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       </div>
 
       {/* Behavioral Patterns */}
-      <div className="mt-5 pb-4 border-b border-foreground/10">
+      <div className="card-shell mt-4 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
           {t('view.behavioral_patterns')}
         </p>
@@ -160,28 +160,49 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
         </div>
       </div>
 
-      {/* Calming Strategies */}
-      <div className="mt-5 pb-4 border-b border-foreground/10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-2">
+      {/* Calming Strategies — the reference's "What Works Best" card. Rendered
+        * as teal chips rather than a comma-joined sentence so each strategy is
+        * individually scannable, matching how the reference presents them. */}
+      <div className="card-shell mt-4 p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
           {t('view.calming_strategies')}
         </p>
-        <p className="text-base text-foreground leading-relaxed">
-          {(profile?.calming_strategies ?? []).length > 0
-            ? (profile?.calming_strategies ?? []).map((s) => translateProfileOption('calming', s)).join(', ')
-            : t('view.none_recorded')}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          {(profile?.calming_strategies ?? []).length > 0 ? (
+            (profile?.calming_strategies ?? []).map((s) => (
+              <span
+                key={s}
+                className="inline-flex items-center rounded-full bg-success-bg px-3.5 py-1.5 text-sm font-medium text-success-text"
+              >
+                {translateProfileOption('calming', s)}
+              </span>
+            ))
+          ) : (
+            <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
+          )}
+        </div>
       </div>
 
-      {/* Safety Concerns */}
-      <div className="mt-5 pb-4 border-b border-foreground/10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-2">
+      {/* Safety Concerns — the reference's "What to Avoid" card, in the app's
+        * safety-coral family so it reads as caution without alarming. */}
+      <div className="card-shell mt-4 p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
           {t('view.safety_concerns')}
         </p>
-        <p className="text-base text-foreground leading-relaxed">
-          {(profile?.safety_concerns ?? []).length > 0
-            ? (profile?.safety_concerns ?? []).map((s) => translateProfileOption('safety', s)).join(', ')
-            : t('view.none_recorded')}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          {(profile?.safety_concerns ?? []).length > 0 ? (
+            (profile?.safety_concerns ?? []).map((s) => (
+              <span
+                key={s}
+                className="inline-flex items-center rounded-full bg-error-bg px-3.5 py-1.5 text-sm font-medium text-error"
+              >
+                {translateProfileOption('safety', s)}
+              </span>
+            ))
+          ) : (
+            <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
+          )}
+        </div>
       </div>
 
       {/* Access Code Card */}
