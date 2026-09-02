@@ -10,6 +10,7 @@ import { PageBrand } from "@/components/ui/PageBrand";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { EmergencyBar } from "@/components/ui/EmergencyBar";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { SignOutButton } from "@/components/ui/SignOutButton";
 import { LocaleDocumentSync } from "@/components/ui/LocaleDocumentSync";
 import { THEME_COOKIE } from "@/lib/theme";
 import { isRtl, SUPPORTED_LOCALES } from "@/lib/locale";
@@ -138,7 +139,14 @@ export default async function LocaleLayout({
                 * should stay narrow constrain themselves internally. */}
               <div id="root-chrome-header" className="mx-auto w-full max-w-lg lg:max-w-app flex items-center justify-between px-5 py-3 shrink-0">
                 <PageBrand />
-                <ThemeToggle className="h-12 w-12" />
+                <div className="flex items-center gap-1">
+                  <ThemeToggle className="h-12 w-12" />
+                  {/* Sign out is also the only route back to the landing page —
+                    * WelcomeGate redirects any stored session away from it.
+                    * Confirmation-guarded, since an accidental 3am tap would
+                    * send an exhausted caregiver hunting for their code. */}
+                  <SignOutButton variant="icon" />
+                </div>
               </div>
               <div id="root-content" className="mx-auto w-full max-w-lg lg:max-w-app flex-1 flex flex-col min-h-0">{children}</div>
               <div id="root-chrome-footer">

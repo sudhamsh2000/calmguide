@@ -4,11 +4,11 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useProfile } from '@/context/ProfileContext';
-import { getPatientName, getAccessCode, clearAll } from '@/lib/storage';
+import { getPatientName, getAccessCode } from '@/lib/storage';
 import { getProfile } from '@/lib/api';
 import { BackButton } from '@/components/ui/BackButton';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { SignOutButton } from '@/components/ui/SignOutButton';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, type SupportedLocale } from '@/lib/locale';
 
 export interface ProfileViewProps {
@@ -31,7 +31,6 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   const [patientName, setPatientNameState] = useState<string | null>(null);
   const [accessCode, setAccessCodeState] = useState<string | null>(null);
   const [langOpen, setLangOpen] = useState(false);
-  const [signOutOpen, setSignOutOpen] = useState(false);
   const langMenuId = useId();
   const langButtonRef = useRef<HTMLButtonElement>(null);
   const langOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -83,11 +82,6 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   const formattedCode = accessCode.length === 8
     ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}`
     : accessCode;
-
-  const handleSignOut = () => {
-    clearAll();
-    router.push('/');
-  };
 
   const handleLanguageChange = (newLocale: SupportedLocale) => {
     setLangOpen(false);
@@ -325,24 +319,9 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       </div>
 
       {/* Sign Out */}
-      <button
-        type="button"
-        onClick={() => setSignOutOpen(true)}
-        className="danger-outline-button mt-5 flex min-h-tap items-center justify-center rounded-2xl px-6 py-3.5 text-base font-semibold focus-ring cursor-pointer"
-      >
-        {t('sign_out.title')}
-      </button>
-
-      <ConfirmDialog
-        open={signOutOpen}
-        title={t('sign_out.title')}
-        message={t('sign_out.message')}
-        confirmLabel={t('sign_out.confirm')}
-        cancelLabel={t('sign_out.cancel')}
-        variant="danger"
-        onConfirm={handleSignOut}
-        onCancel={() => setSignOutOpen(false)}
-      />
+      {/* Sign out also returns to the landing page — WelcomeGate redirects any
+        * stored session away from it, so this is the only route back. */}
+      <SignOutButton className="mt-5 w-full" />
 
       {/* Legal Links */}
       <div className="mt-6 flex items-center justify-center gap-4 pb-4">
