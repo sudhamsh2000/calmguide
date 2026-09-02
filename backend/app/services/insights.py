@@ -1,9 +1,10 @@
 """Behavioral pattern insights — derived from conversation history per profile."""
+
 import json
 import re
 import uuid
 from collections import Counter
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +16,11 @@ from app.models.profile_insights import ProfileInsights
 from app.models.response_feedback import ResponseFeedback
 from app.services.care_window import is_excluded, pre_change_cutoff
 from app.services.crypto import decrypt, encrypt
-from app.services.pattern_detector import detect_episode_cycle, compute_risk_score, care_level_from_score
+from app.services.pattern_detector import (
+    care_level_from_score,
+    compute_risk_score,
+    detect_episode_cycle,
+)
 
 # How far back behavioural analysis looks. Long enough for cycle detection
 # (which needs >=5 episodes over >=14 days) and seasonal-ish drift, short
@@ -23,21 +28,93 @@ from app.services.pattern_detector import detect_episode_cycle, compute_risk_sco
 ANALYSIS_WINDOW_DAYS = 90
 
 _STOPWORDS = {
-    "the", "and", "for", "that", "this", "with", "from", "have", "has", "had",
-    "was", "are", "not", "but", "they", "what", "when", "will", "just", "does",
-    "doesn", "didn", "won", "isn", "wasn", "aren", "weren", "hasn", "hadn",
-    "him", "her", "his", "she", "you", "your", "our", "their", "don",
-    "can", "about", "been", "were", "more", "than", "then", "into", "over",
-    "also", "some", "very", "much", "said", "like", "know", "help", "going",
-    "gets", "keep", "come", "back", "still", "down", "even", "time",
-    "where", "here", "there", "really", "again", "night", "want", "need",
-    "think", "make", "made", "take", "took", "tell", "told", "gave", "give",
+    "the",
+    "and",
+    "for",
+    "that",
+    "this",
+    "with",
+    "from",
+    "have",
+    "has",
+    "had",
+    "was",
+    "are",
+    "not",
+    "but",
+    "they",
+    "what",
+    "when",
+    "will",
+    "just",
+    "does",
+    "doesn",
+    "didn",
+    "won",
+    "isn",
+    "wasn",
+    "aren",
+    "weren",
+    "hasn",
+    "hadn",
+    "him",
+    "her",
+    "his",
+    "she",
+    "you",
+    "your",
+    "our",
+    "their",
+    "don",
+    "can",
+    "about",
+    "been",
+    "were",
+    "more",
+    "than",
+    "then",
+    "into",
+    "over",
+    "also",
+    "some",
+    "very",
+    "much",
+    "said",
+    "like",
+    "know",
+    "help",
+    "going",
+    "gets",
+    "keep",
+    "come",
+    "back",
+    "still",
+    "down",
+    "even",
+    "time",
+    "where",
+    "here",
+    "there",
+    "really",
+    "again",
+    "night",
+    "want",
+    "need",
+    "think",
+    "make",
+    "made",
+    "take",
+    "took",
+    "tell",
+    "told",
+    "gave",
+    "give",
 }
 
 
 async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     """Compute behavioral pattern insights from a profile's conversation history."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     week_ago = now - timedelta(days=7)
     two_weeks_ago = now - timedelta(days=14)
     window_start = now - timedelta(days=ANALYSIS_WINDOW_DAYS)
@@ -45,8 +122,9 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     # Session count spans all history — it is a "how long have we been doing
     # this" number for the caregiver — but it is a COUNT, not a row fetch.
     total_result = await db.execute(
-        select(func.count(distinct(Conversation.session_id)))
-        .where(Conversation.profile_id == profile_id)
+        select(func.count(distinct(Conversation.session_id))).where(
+            Conversation.profile_id == profile_id
+        )
     )
     total = total_result.scalar_one() or 0
 
@@ -73,7 +151,7 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     session_times: dict[str, datetime] = {}
     for sid, msgs in sessions.items():
         first = min(
-            m.created_at.replace(tzinfo=timezone.utc) if m.created_at.tzinfo is None else m.created_at
+            m.created_at.replace(tzinfo=UTC) if m.created_at.tzinfo is None else m.created_at
             for m in msgs
         )
         session_times[sid] = first
@@ -119,13 +197,8 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     # Measured against the sessions in the window, not the lifetime count, so
     # older sessions can't dilute a rate computed from recent ones.
     windowed_sessions = len(sessions)
-    resolved = sum(
-        1 for msgs in sessions.values()
-        if sum(1 for m in msgs if m.role == "user") == 1
-    )
-    resolution_rate = (
-        round(resolved / windowed_sessions, 2) if windowed_sessions > 0 else 0.0
-    )
+    resolved = sum(1 for msgs in sessions.values() if sum(1 for m in msgs if m.role == "user") == 1)
+    resolution_rate = round(resolved / windowed_sessions, 2) if windowed_sessions > 0 else 0.0
 
     # Top trigger keywords from user messages
     words: list[str] = []
@@ -134,8 +207,7 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
             if m.role == "user":
                 text = decrypt(m.content)
                 words.extend(
-                    w for w in re.findall(r"[a-z]{4,}", text.lower())
-                    if w not in _STOPWORDS
+                    w for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _STOPWORDS
                 )
     top_triggers = [w for w, _ in Counter(words).most_common(5)]
 
@@ -193,7 +265,7 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     cutoff = pre_change_cutoff(care_changes_result.scalars().all(), now.date())
 
     episode_dates: list[date_type] = []
-    for sid, t in session_times.items():
+    for _sid, t in session_times.items():
         episode_day = t.date() if isinstance(t, datetime) else t
         if not is_excluded(episode_day, cutoff):
             episode_dates.append(episode_day)
@@ -216,7 +288,9 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     care_level = care_level_from_score(care_score_val) if care_score_val > 0 else None
 
     # Top strategies from effective_strategies (feedback), sorted by count
-    top_strategies = sorted(effective_strategies.keys(), key=lambda k: effective_strategies[k], reverse=True)[:3]
+    top_strategies = sorted(
+        effective_strategies.keys(), key=lambda k: effective_strategies[k], reverse=True
+    )[:3]
 
     return {
         "crisis_frequency": {
@@ -241,7 +315,7 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
 async def upsert_profile_insights(profile_id: str, payload: dict, db: AsyncSession) -> None:
     """Upsert profile_insights — one row per profile, updated on each computation."""
     encrypted = encrypt(json.dumps(payload))
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     # Try to get existing row
     existing = await db.execute(
@@ -250,12 +324,14 @@ async def upsert_profile_insights(profile_id: str, payload: dict, db: AsyncSessi
     row = existing.scalar_one_or_none()
 
     if row is None:
-        db.add(ProfileInsights(
-            id=str(uuid.uuid4()),
-            profile_id=profile_id,
-            computed_at=now,
-            insights_json=encrypted,
-        ))
+        db.add(
+            ProfileInsights(
+                id=str(uuid.uuid4()),
+                profile_id=profile_id,
+                computed_at=now,
+                insights_json=encrypted,
+            )
+        )
     else:
         row.computed_at = now
         row.insights_json = encrypted

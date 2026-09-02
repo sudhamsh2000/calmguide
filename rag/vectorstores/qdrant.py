@@ -67,7 +67,7 @@ class QdrantStore(VectorStore):
                 vector=emb,
                 payload={"content": text, **meta},
             )
-            for chunk_id, text, emb, meta in zip(ids, texts, embeddings, metadatas)
+            for chunk_id, text, emb, meta in zip(ids, texts, embeddings, metadatas, strict=True)
         ]
         await client.upsert(collection_name=self._collection, points=points)
 
@@ -114,14 +114,8 @@ class QdrantStore(VectorStore):
             collection_name=self._collection,
             points_selector=FilterSelector(
                 filter=Filter(
-                    must=[
-                        FieldCondition(
-                            key="source_url", match=MatchAny(any=source_urls)
-                        )
-                    ],
-                    must_not=(
-                        [HasIdCondition(has_id=keep_ids)] if keep_ids else []
-                    ),
+                    must=[FieldCondition(key="source_url", match=MatchAny(any=source_urls))],
+                    must_not=([HasIdCondition(has_id=keep_ids)] if keep_ids else []),
                 )
             ),
         )

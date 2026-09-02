@@ -272,6 +272,7 @@ class PgVectorStore(VectorStore):
                 row_count = await conn.fetchval("SELECT COUNT(*) FROM rag_chunks")
                 if row_count > 0:
                     import math
+
                     lists = max(1, min(int(math.sqrt(row_count)), row_count // 3))
                     await conn.execute(_CREATE_VECTOR_INDEX.format(lists=lists))
             await conn.execute(_CREATE_TEXT_INDEX)
@@ -296,7 +297,7 @@ class PgVectorStore(VectorStore):
                 meta["source_domain"],
                 emb,
             )
-            for chunk_id, text, emb, meta in zip(ids, texts, embeddings, metadatas)
+            for chunk_id, text, emb, meta in zip(ids, texts, embeddings, metadatas, strict=True)
         ]
         async with pool.acquire() as conn:
             await conn.executemany(_INSERT, rows)

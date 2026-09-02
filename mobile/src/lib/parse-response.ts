@@ -67,6 +67,3 @@ export function parseCoachResponse(text: string): CoachSection[] {
 
   return sections;
 }
-
-/** @deprecated Use parseCoachResponse instead */
-export const parseCrisisResponse = parseCoachResponse;

@@ -11,6 +11,10 @@ import re
 from pathlib import Path
 from typing import Any
 
+from jinja2 import Environment, FileSystemLoader
+
+from app.services.pii_scrubber import scrub_third_party_pii
+
 
 def _parse_json_object(raw: str) -> dict:
     """Parse a JSON object from an LLM response, tolerating ```json fences and
@@ -27,9 +31,6 @@ def _parse_json_object(raw: str) -> dict:
             return json.loads(match.group(0))
         raise
 
-from jinja2 import Environment, FileSystemLoader
-
-from app.services.pii_scrubber import scrub_third_party_pii
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +45,24 @@ _env = Environment(
 CONFIDENCE_THRESHOLD = 0.60
 
 NEGATIVE_STRATEGY_PATTERNS = [
-    "physical restraint", "held down", "pinned",
-    "held her down", "held him down", "hold her down", "hold him down",
-    "locked in", "locked her in", "locked him in",
-    "isolation", "locked room", "locked the door",
-    "withholding food", "withholding medication",
-    "threatening", "intimidating", "yelling at",
+    "physical restraint",
+    "held down",
+    "pinned",
+    "held her down",
+    "held him down",
+    "hold her down",
+    "hold him down",
+    "locked in",
+    "locked her in",
+    "locked him in",
+    "isolation",
+    "locked room",
+    "locked the door",
+    "withholding food",
+    "withholding medication",
+    "threatening",
+    "intimidating",
+    "yelling at",
     "sedating without prescription",
 ]
 
@@ -117,9 +130,7 @@ async def extract_incident_from_conversation(
     )
 
     try:
-        raw_extraction = await _call_extraction_llm(
-            system_prompt, conversation_text, llm_provider
-        )
+        raw_extraction = await _call_extraction_llm(system_prompt, conversation_text, llm_provider)
     except NotImplementedError:
         raise
     except Exception:

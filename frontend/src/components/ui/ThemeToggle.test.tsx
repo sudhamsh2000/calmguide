@@ -26,22 +26,39 @@ describe('ThemeToggle', () => {
     mockResolveTheme.mockReturnValue('light');
   });
 
-  it('renders a button with accessible label', () => {
+  it('labels the button with the action it will take, from translations', () => {
+    mockResolveTheme.mockReturnValue('light');
     render(<ThemeToggle />);
-    const button = screen.getByRole('button', { name: /theme/i });
-    expect(button).toBeInTheDocument();
+    // Showing light, so the button offers dark. The string comes from
+    // common.json's accessibility block, not a hardcoded literal.
+    expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
+  });
+
+  it('offers the opposite direction when the resolved theme is dark', () => {
+    mockResolveTheme.mockReturnValue('dark');
+    render(<ThemeToggle />);
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeInTheDocument();
+  });
+
+  it('labels by resolved theme, not preference, when preference is auto', () => {
+    // The regression this pins: 'auto' resolving to dark used to still read
+    // "Switch to dark mode" while a click actually set light.
+    mockGetThemePreference.mockReturnValue('auto');
+    mockResolveTheme.mockReturnValue('dark');
+    render(<ThemeToggle />);
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeInTheDocument();
   });
 
   it('shows light indicator when preference is light', () => {
     mockGetThemePreference.mockReturnValue('light');
     render(<ThemeToggle />);
-    expect(screen.getByLabelText(/light/i)).toBeInTheDocument();
+    expect(screen.getByTestId('theme-icon-light')).toBeInTheDocument();
   });
 
   it('shows dark indicator when preference is dark', () => {
     mockGetThemePreference.mockReturnValue('dark');
     render(<ThemeToggle />);
-    expect(screen.getByLabelText(/dark/i)).toBeInTheDocument();
+    expect(screen.getByTestId('theme-icon-dark')).toBeInTheDocument();
   });
 
   it('toggles light -> dark on click when resolved theme is light', async () => {
@@ -50,8 +67,7 @@ describe('ThemeToggle', () => {
     mockResolveTheme.mockReturnValue('light');
     render(<ThemeToggle />);
 
-    const button = screen.getByRole('button', { name: /theme/i });
-    await user.click(button);
+    await user.click(screen.getByRole('button'));
 
     expect(mockSetThemePreference).toHaveBeenCalledWith('dark');
     expect(mockApplyTheme).toHaveBeenCalledWith('dark');
@@ -63,8 +79,7 @@ describe('ThemeToggle', () => {
     mockResolveTheme.mockReturnValue('dark');
     render(<ThemeToggle />);
 
-    const button = screen.getByRole('button', { name: /theme/i });
-    await user.click(button);
+    await user.click(screen.getByRole('button'));
 
     expect(mockSetThemePreference).toHaveBeenCalledWith('light');
     expect(mockApplyTheme).toHaveBeenCalledWith('light');
@@ -83,7 +98,6 @@ describe('ThemeToggle', () => {
 
   it('accepts and applies custom className', () => {
     render(<ThemeToggle className="my-custom" />);
-    const button = screen.getByRole('button', { name: /theme/i });
-    expect(button.className).toContain('my-custom');
+    expect(screen.getByRole('button').className).toContain('my-custom');
   });
 });

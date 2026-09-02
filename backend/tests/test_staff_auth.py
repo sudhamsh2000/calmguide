@@ -3,13 +3,14 @@
 import os
 import time
 
+import jwt
 import pytest
 
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-unit-tests-only")
 os.environ.setdefault("CONVERSATION_ENCRYPTION_KEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
 
+from app.services.facility_auth import hash_password, hash_pin, verify_password, verify_pin
 from app.services.jwt_service import create_token, verify_token
-from app.services.facility_auth import hash_pin, verify_pin, hash_password, verify_password
 
 
 def test_jwt_roundtrip():
@@ -23,7 +24,7 @@ def test_jwt_roundtrip():
 def test_jwt_expired():
     token = create_token(staff_id="s1", facility_id="f1", role="staff", expiry_seconds=0)
     time.sleep(1)
-    with pytest.raises(Exception):
+    with pytest.raises(jwt.ExpiredSignatureError):
         verify_token(token)
 
 

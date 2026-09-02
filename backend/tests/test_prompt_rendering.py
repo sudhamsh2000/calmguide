@@ -29,7 +29,6 @@ from app.services.prompt import (
     resolve_model_for_locale,
 )
 
-
 # ---------------------------------------------------------------------------
 # Shared test data helpers
 # ---------------------------------------------------------------------------
@@ -65,6 +64,7 @@ FULL_COACH_KWARGS = {
 # ---------------------------------------------------------------------------
 # Coach prompt — structural invariants
 # ---------------------------------------------------------------------------
+
 
 def test_coach_prompt_renders_without_error():
     prompt = render_coach_prompt(**MINIMAL_COACH_KWARGS)
@@ -156,6 +156,7 @@ def test_coach_prompt_rag_section_absent_when_empty():
 # Contraindicated interventions injection
 # ---------------------------------------------------------------------------
 
+
 def test_coach_prompt_contraindicated_block_absent_when_empty():
     prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "contraindicated": []})
     assert "CONTRAINDICATED INTERVENTIONS" not in prompt
@@ -194,6 +195,7 @@ def test_coach_prompt_multiple_contraindicated_items_all_rendered():
 # Delirium and pain flag sections
 # ---------------------------------------------------------------------------
 
+
 def test_coach_prompt_delirium_section_absent_when_no_flags():
     prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "delirium_flags": None})
     assert "DELIRIUM SCREENING" not in prompt
@@ -207,16 +209,12 @@ def test_coach_prompt_delirium_section_absent_when_sudden_change_false():
 
 
 def test_coach_prompt_delirium_section_present_when_sudden_change_true():
-    prompt = render_coach_prompt(
-        **{**FULL_COACH_KWARGS, "delirium_flags": {"sudden_change": True}}
-    )
+    prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "delirium_flags": {"sudden_change": True}})
     assert "DELIRIUM SCREENING REQUIRED" in prompt
 
 
 def test_coach_prompt_delirium_section_contains_screening_questions():
-    prompt = render_coach_prompt(
-        **{**FULL_COACH_KWARGS, "delirium_flags": {"sudden_change": True}}
-    )
+    prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "delirium_flags": {"sudden_change": True}})
     # Should include questions about sudden onset, fluctuation, etc.
     assert "suddenly" in prompt.lower() or "Did this come on" in prompt
 
@@ -244,6 +242,7 @@ def test_coach_prompt_pain_section_present_when_suspected():
 # Dossier text injection
 # ---------------------------------------------------------------------------
 
+
 def test_coach_prompt_dossier_absent_when_empty():
     prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "dossier_text": ""})
     assert "Behavioral History Dossier" not in prompt
@@ -259,6 +258,7 @@ def test_coach_prompt_dossier_present_when_provided():
 # ---------------------------------------------------------------------------
 # Relevant past incidents
 # ---------------------------------------------------------------------------
+
 
 def test_coach_prompt_incidents_absent_when_empty():
     prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "relevant_incidents": []})
@@ -287,23 +287,30 @@ def test_coach_prompt_incidents_rendered_when_provided():
 # Coach prompt — language sections for non-English
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("locale,language,should_have_constraint", [
-    ("es", "Spanish", False),
-    ("fr", "French", False),
-    ("de", "German", False),
-    ("pt-br", "Brazilian Portuguese", False),
-    ("ja", "Japanese", True),
-    ("ko", "Korean", True),
-    ("zh", "Mandarin Chinese", True),
-    ("hi", "Hindi", True),
-    ("ta", "Tamil", True),
-    ("ar", "Arabic", True),
-])
+
+@pytest.mark.parametrize(
+    "locale,language,should_have_constraint",
+    [
+        ("es", "Spanish", False),
+        ("fr", "French", False),
+        ("de", "German", False),
+        ("pt-br", "Brazilian Portuguese", False),
+        ("ja", "Japanese", True),
+        ("ko", "Korean", True),
+        ("zh", "Mandarin Chinese", True),
+        ("hi", "Hindi", True),
+        ("ta", "Tamil", True),
+        ("ar", "Arabic", True),
+    ],
+)
 def test_coach_prompt_non_english_locale_contains_language_instruction(
     locale, language, should_have_constraint
 ):
-    from app.services.prompt import resolve_language, resolve_language_constraint, resolve_locale_code
-    resolved_locale = resolve_locale_code(locale)
+    from app.services.prompt import (
+        resolve_language,
+        resolve_language_constraint,
+    )
+
     lang = resolve_language(locale)
     constraint = resolve_language_constraint(locale)
 
@@ -314,7 +321,7 @@ def test_coach_prompt_non_english_locale_contains_language_instruction(
             "language_constraint": constraint,
         }
     )
-    assert f"Response Language" in prompt
+    assert "Response Language" in prompt
     assert language in prompt
     if should_have_constraint:
         assert len(constraint) > 0
@@ -348,6 +355,7 @@ def test_coach_prompt_non_english_includes_local_emergency_numbers_note():
 # Coach prompt — cross-patient strategies
 # ---------------------------------------------------------------------------
 
+
 def test_coach_prompt_cross_patient_section_absent_when_empty():
     prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "cross_patient_strategies": []})
     assert "Similar Patients" not in prompt
@@ -358,9 +366,7 @@ def test_coach_prompt_cross_patient_strategies_rendered():
         {"tag": "soft_music", "helped": 8, "total": 10},
         {"tag": "short_walk", "helped": 6, "total": 9},
     ]
-    prompt = render_coach_prompt(
-        **{**FULL_COACH_KWARGS, "cross_patient_strategies": strategies}
-    )
+    prompt = render_coach_prompt(**{**FULL_COACH_KWARGS, "cross_patient_strategies": strategies})
     assert "Similar Patients" in prompt
     assert "soft music" in prompt.lower() or "soft_music" in prompt.lower()
 
@@ -368,6 +374,7 @@ def test_coach_prompt_cross_patient_strategies_rendered():
 # ---------------------------------------------------------------------------
 # Learn prompt
 # ---------------------------------------------------------------------------
+
 
 def test_learn_prompt_renders_without_error():
     prompt = render_learn_prompt(disease_stage="middle")
@@ -449,6 +456,7 @@ def test_learn_prompt_non_english_uses_local_crisis_resources():
 # Checkin prompt
 # ---------------------------------------------------------------------------
 
+
 def test_checkin_prompt_renders_without_error():
     prompt = render_checkin_prompt()
     assert isinstance(prompt, str)
@@ -473,7 +481,9 @@ def test_checkin_prompt_non_english_uses_local_resources():
 
 
 def test_checkin_prompt_non_english_language_section_present():
-    prompt = render_checkin_prompt(language="Mandarin Chinese", language_constraint="Write in Simplified Chinese.")
+    prompt = render_checkin_prompt(
+        language="Mandarin Chinese", language_constraint="Write in Simplified Chinese."
+    )
     assert "Mandarin Chinese" in prompt
     assert "Response Language" in prompt
 
@@ -504,8 +514,10 @@ def test_checkin_prompt_contains_off_topic_handling():
 # Extraction prompt — via Jinja2 direct render
 # ---------------------------------------------------------------------------
 
+
 def test_extraction_prompt_renders_with_patient_context():
     from pathlib import Path
+
     from jinja2 import Environment, FileSystemLoader
 
     prompts_dir = Path(__file__).resolve().parent.parent / "app" / "prompts"
@@ -530,6 +542,7 @@ def test_extraction_prompt_renders_with_patient_context():
 
 def test_extraction_prompt_contains_json_schema():
     from pathlib import Path
+
     from jinja2 import Environment, FileSystemLoader
 
     prompts_dir = Path(__file__).resolve().parent.parent / "app" / "prompts"
@@ -555,6 +568,7 @@ def test_extraction_prompt_contains_json_schema():
 
 def test_extraction_prompt_contains_safety_principles():
     from pathlib import Path
+
     from jinja2 import Environment, FileSystemLoader
 
     prompts_dir = Path(__file__).resolve().parent.parent / "app" / "prompts"
@@ -577,6 +591,7 @@ def test_extraction_prompt_contains_safety_principles():
 
 def test_extraction_prompt_contains_few_shot_examples():
     from pathlib import Path
+
     from jinja2 import Environment, FileSystemLoader
 
     prompts_dir = Path(__file__).resolve().parent.parent / "app" / "prompts"
@@ -601,57 +616,67 @@ def test_extraction_prompt_contains_few_shot_examples():
 # Locale resolution helpers
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("input_header,expected_locale", [
-    ("en", "en"),
-    ("en-US", "en-us"),    # Full variant code returned when it's in the map
-    ("es", "es"),
-    ("es-ES", "es-es"),
-    ("zh-CN", "zh-cn"),
-    ("pt-br", "pt-br"),
-    ("ja-JP", "ja-jp"),
-    ("ko-KR", "ko-kr"),
-    ("hi-IN", "hi-in"),
-    ("ta-IN", "ta-in"),
-    ("ar-SA", "ar-sa"),
-    ("unknown-lang", "en"),  # Falls back to English
-    (None, "en"),
-])
+
+@pytest.mark.parametrize(
+    "input_header,expected_locale",
+    [
+        ("en", "en"),
+        ("en-US", "en-us"),  # Full variant code returned when it's in the map
+        ("es", "es"),
+        ("es-ES", "es-es"),
+        ("zh-CN", "zh-cn"),
+        ("pt-br", "pt-br"),
+        ("ja-JP", "ja-jp"),
+        ("ko-KR", "ko-kr"),
+        ("hi-IN", "hi-in"),
+        ("ta-IN", "ta-in"),
+        ("ar-SA", "ar-sa"),
+        ("unknown-lang", "en"),  # Falls back to English
+        (None, "en"),
+    ],
+)
 def test_resolve_locale_code(input_header, expected_locale):
     result = resolve_locale_code(input_header)
     assert result == expected_locale
 
 
-@pytest.mark.parametrize("locale,expected_language", [
-    ("en", "English"),
-    ("es", "Spanish"),
-    ("fr", "French"),
-    ("de", "German"),
-    ("pt-br", "Brazilian Portuguese"),
-    ("ja", "Japanese"),
-    ("ko", "Korean"),
-    ("zh", "Mandarin Chinese"),
-    ("hi", "Hindi"),
-    ("ta", "Tamil"),
-    ("ar", "Arabic"),
-])
+@pytest.mark.parametrize(
+    "locale,expected_language",
+    [
+        ("en", "English"),
+        ("es", "Spanish"),
+        ("fr", "French"),
+        ("de", "German"),
+        ("pt-br", "Brazilian Portuguese"),
+        ("ja", "Japanese"),
+        ("ko", "Korean"),
+        ("zh", "Mandarin Chinese"),
+        ("hi", "Hindi"),
+        ("ta", "Tamil"),
+        ("ar", "Arabic"),
+    ],
+)
 def test_resolve_language(locale, expected_language):
     result = resolve_language(locale)
     assert result == expected_language
 
 
-@pytest.mark.parametrize("locale,should_have_constraint", [
-    ("en", False),
-    ("es", False),
-    ("fr", False),
-    ("de", False),
-    ("pt-br", False),
-    ("ar", True),
-    ("hi", True),
-    ("ja", True),
-    ("ko", True),
-    ("ta", True),
-    ("zh", True),
-])
+@pytest.mark.parametrize(
+    "locale,should_have_constraint",
+    [
+        ("en", False),
+        ("es", False),
+        ("fr", False),
+        ("de", False),
+        ("pt-br", False),
+        ("ar", True),
+        ("hi", True),
+        ("ja", True),
+        ("ko", True),
+        ("ta", True),
+        ("zh", True),
+    ],
+)
 def test_resolve_language_constraint(locale, should_have_constraint):
     result = resolve_language_constraint(locale)
     if should_have_constraint:

@@ -21,20 +21,22 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import httpx
-import html2text
-from bs4 import BeautifulSoup
+
+# html2text and beautifulsoup4 are imported lazily, inside the two functions
+# that use them. They are scraping-only dependencies listed in
+# rag/requirements.txt, and the backend deliberately does not install them — it
+# only ever reaches into rag.retrieve / rag.vectorstores. Importing them at
+# module scope made `rag.pipeline` unimportable in the backend environment,
+# which broke an unrelated test that just wanted make_chunk_id().
 
 # Last verified: 2026-03-27.
 # All sources are government (public domain) or nonprofit (educational use).
 SEED_URLS: list[str] = [
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  ALZ.ORG — Alzheimer's Association (nonprofit)                      ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     # Caregiving overview
     "https://www.alz.org/help-support/caregiving",
-
     # Daily care
     "https://www.alz.org/help-support/caregiving/daily-care",
     "https://www.alz.org/help-support/caregiving/daily-care/daily-care-plan",
@@ -42,7 +44,6 @@ SEED_URLS: list[str] = [
     "https://www.alz.org/help-support/caregiving/daily-care/dressing-grooming",
     "https://www.alz.org/help-support/caregiving/daily-care/food-eating",
     "https://www.alz.org/help-support/caregiving/daily-care/incontinence",
-
     # Stages & behaviors
     "https://www.alz.org/help-support/caregiving/stages-behaviors",
     "https://www.alz.org/help-support/caregiving/stages-behaviors/early-stage",
@@ -56,55 +57,43 @@ SEED_URLS: list[str] = [
     "https://www.alz.org/help-support/caregiving/stages-behaviors/sleep-issues-sundowning",
     "https://www.alz.org/help-support/caregiving/stages-behaviors/suspicions-delusions",
     "https://www.alz.org/help-support/caregiving/stages-behaviors/wandering",
-
     # Safety
     "https://www.alz.org/help-support/caregiving/safety",
     "https://www.alz.org/help-support/caregiving/safety/home-safety",
-
     # Caregiver health
     "https://www.alz.org/help-support/caregiving/caregiver-health",
     "https://www.alz.org/help-support/caregiving/caregiver-health/caregiver-stress",
     "https://www.alz.org/help-support/caregiving/caregiver-health/caregiver-depression",
     "https://www.alz.org/help-support/caregiving/caregiver-health/be_a_healthy_caregiver",
-
     # Disease stages & treatments
     "https://www.alz.org/alzheimers-dementia/stages",
     "https://www.alz.org/alzheimers-dementia/treatments",
     "https://www.alz.org/alzheimers-dementia/treatments/medications-for-memory",
     "https://www.alz.org/alzheimers-dementia/treatments/treatments-for-behavior",
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  NIA.NIH.GOV — blocked (405 Not Allowed). Re-check periodically.   ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  MAYOCLINIC.ORG — Mayo Clinic (nonprofit)                           ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     "https://www.mayoclinic.org/diseases-conditions/alzheimers-disease/in-depth/alzheimers/art-20047832",
     "https://www.mayoclinic.org/diseases-conditions/alzheimers-disease/in-depth/alzheimers-stages/art-20048448",
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  HELPGUIDE.ORG — HelpGuide (nonprofit)                             ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     "https://www.helpguide.org/aging/dementia/alzheimers-behavior-management",
     "https://www.helpguide.org/aging/dementia/tips-for-alzheimers-caregivers",
     "https://www.helpguide.org/aging/dementia/stages-of-alzheimers-disease",
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  CAREGIVER.ORG — Family Caregiver Alliance (nonprofit)             ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     "https://www.caregiver.org/resource/caregivers-guide-understanding-dementia-behaviors/",
     "https://www.caregiver.org/resource/ten-real-life-strategies-dementia-caregiving/",
     "https://www.caregiver.org/resource/alzheimers-disease-caregiving/",
     "https://www.caregiver.org/resource/caregiver-health/",
-
     # ╔═══════════════════════════════════════════════════════════════════════╗
     # ║  CDC.GOV — Centers for Disease Control (US gov, public domain)     ║
     # ╚═══════════════════════════════════════════════════════════════════════╝
-
     "https://www.cdc.gov/caregiving/resources/helping-alzheimers-caregivers.html",
     "https://www.cdc.gov/caregiving/guidelines/index.html",
     "https://www.cdc.gov/caregiving/about/index.html",
@@ -121,9 +110,21 @@ _HEADERS = {
 
 # Tags to strip before extracting text
 _REMOVE_TAGS = [
-    "nav", "footer", "header", "script", "style", "noscript",
-    "aside", "form", "iframe", ".nav", ".footer", ".sidebar",
-    ".cookie-banner", ".alert", ".breadcrumb",
+    "nav",
+    "footer",
+    "header",
+    "script",
+    "style",
+    "noscript",
+    "aside",
+    "form",
+    "iframe",
+    ".nav",
+    ".footer",
+    ".sidebar",
+    ".cookie-banner",
+    ".alert",
+    ".breadcrumb",
 ]
 
 _SOURCE_NAMES = {
@@ -160,6 +161,8 @@ _BOILERPLATE_PATTERNS = [
 
 
 def _html_to_markdown(html: str) -> str:
+    import html2text  # noqa: PLC0415 — scraping-only dep, see module header
+
     converter = html2text.HTML2Text()
     converter.ignore_links = True
     converter.ignore_images = True
@@ -202,6 +205,8 @@ async def _fetch_page(client: httpx.AsyncClient, url: str) -> ScrapedPage | None
     except Exception as exc:
         print(f"  [skip] {url} — {exc}")
         return None
+
+    from bs4 import BeautifulSoup  # noqa: PLC0415 — scraping-only dep, see module header
 
     soup = BeautifulSoup(resp.text, "html.parser")
 

@@ -1,5 +1,10 @@
+import hashlib
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
+from httpx import ASGITransport, AsyncClient
 from pydantic import ValidationError
+
 from app.schemas.checkin import CheckInRequest
 from app.services.prompt import render_checkin_prompt
 
@@ -40,9 +45,6 @@ def test_render_checkin_prompt_returns_string():
 # ---------------------------------------------------------------------------
 # Router integration tests
 # ---------------------------------------------------------------------------
-import hashlib
-from httpx import AsyncClient, ASGITransport
-from unittest.mock import AsyncMock, MagicMock
 
 
 @pytest.mark.asyncio
@@ -74,6 +76,7 @@ async def test_checkin_endpoint_streams_response():
         yield mock_db
 
     from app.db import get_session
+
     app.dependency_overrides[get_session] = override_get_session
 
     try:
@@ -103,6 +106,7 @@ async def test_checkin_endpoint_returns_404_for_unknown_code():
         yield mock_db
 
     from app.db import get_session
+
     app.dependency_overrides[get_session] = override_get_session
 
     try:

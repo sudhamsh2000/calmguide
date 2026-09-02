@@ -83,15 +83,6 @@ export function setThemePreference(pref: ThemePreference): void {
 }
 
 /**
- * Toggles between light and dark (always sets an explicit preference).
- */
-export function toggleTheme(): void {
-  const next: ThemeMode = resolveTheme() === 'dark' ? 'light' : 'dark';
-  writeThemeCookie(next);
-  applyTheme(next);
-}
-
-/**
  * Initializes the theme on page load and listens for system preference changes.
  * Returns a cleanup function.
  */
@@ -110,6 +101,3 @@ export function initTheme(): () => void {
   mediaQuery.addEventListener('change', handleChange);
   return () => mediaQuery.removeEventListener('change', handleChange);
 }
-
-/** @deprecated Use initTheme instead */
-export const initializeTheme = initTheme;

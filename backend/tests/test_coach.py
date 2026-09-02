@@ -4,7 +4,6 @@ import json
 
 import pytest
 
-
 VALID_PROFILE = {
     "disease_stage": "middle",
     "behavioral_patterns": ["sundowning", "wandering"],
@@ -44,7 +43,7 @@ async def test_coach_chat_streams_response(client):
     chunks = []
     for line in response.text.splitlines():
         if line.startswith("data: "):
-            data = line[len("data: "):]
+            data = line[len("data: ") :]
             if data == "[DONE]":
                 break
             parsed = json.loads(data)
@@ -68,7 +67,7 @@ async def test_coach_chat_returns_session_id(client):
     # The first SSE event should contain the session_id
     for line in response.text.splitlines():
         if line.startswith("data: "):
-            data = json.loads(line[len("data: "):])
+            data = json.loads(line[len("data: ") :])
             if "session_id" in data:
                 assert len(data["session_id"]) > 0
                 return
@@ -137,7 +136,7 @@ async def test_conversations_grouped_by_session(client):
     session_id_1 = None
     for line in resp1.text.splitlines():
         if line.startswith("data: "):
-            parsed = json.loads(line[len("data: "):])
+            parsed = json.loads(line[len("data: ") :])
             if "session_id" in parsed:
                 session_id_1 = parsed["session_id"]
                 break
@@ -207,8 +206,9 @@ async def test_conversations_limited_to_10(client):
 
 async def test_coach_chat_patient_name_not_stored(client, db_session):
     """Patient name must never appear in conversation history."""
-    from app.models.conversation import Conversation
     from sqlalchemy import select
+
+    from app.models.conversation import Conversation
 
     code = await _create_profile(client)
     payload = {
@@ -230,24 +230,31 @@ async def test_coach_chat_patient_name_not_stored(client, db_session):
 async def test_conversation_content_encrypted_in_db(client, db_session):
     """User and assistant messages must be stored encrypted."""
     from sqlalchemy import select
+
     from app.models.conversation import Conversation
 
     # Create profile first
-    profile_resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["wandering"],
-        "calming_strategies": ["music"],
-        "safety_concerns": ["fall risk"],
-    })
+    profile_resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["wandering"],
+            "calming_strategies": ["music"],
+            "safety_concerns": ["fall risk"],
+        },
+    )
     assert profile_resp.status_code == 201
     access_code = profile_resp.json()["access_code"]
 
     # Send coach message and consume the stream
-    resp = await client.post("/api/coach/chat", json={
-        "access_code": access_code,
-        "patient_name": "Dad",
-        "message": "Dad is wandering at night",
-    })
+    resp = await client.post(
+        "/api/coach/chat",
+        json={
+            "access_code": access_code,
+            "patient_name": "Dad",
+            "message": "Dad is wandering at night",
+        },
+    )
     assert resp.status_code == 200
     async for _ in resp.aiter_lines():
         pass
@@ -265,20 +272,26 @@ async def test_conversation_history_decrypted_for_llm(client, mock_llm):
     """Prior messages passed to the LLM must be plaintext, not ciphertext."""
     import json as _json
 
-    profile_resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["sundowning"],
-        "calming_strategies": ["soft music"],
-        "safety_concerns": ["fall risk"],
-    })
+    profile_resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["sundowning"],
+            "calming_strategies": ["soft music"],
+            "safety_concerns": ["fall risk"],
+        },
+    )
     access_code = profile_resp.json()["access_code"]
 
     # First message — capture session_id from SSE stream
-    resp1 = await client.post("/api/coach/chat", json={
-        "access_code": access_code,
-        "patient_name": "Dad",
-        "message": "Dad is confused",
-    })
+    resp1 = await client.post(
+        "/api/coach/chat",
+        json={
+            "access_code": access_code,
+            "patient_name": "Dad",
+            "message": "Dad is confused",
+        },
+    )
     session_id = None
     async for line in resp1.aiter_lines():
         if line.startswith("data:") and "[DONE]" not in line:
@@ -292,18 +305,22 @@ async def test_conversation_history_decrypted_for_llm(client, mock_llm):
     assert session_id is not None
 
     # Second message in same session — LLM should receive plaintext history
-    await client.post("/api/coach/chat", json={
-        "access_code": access_code,
-        "patient_name": "Dad",
-        "message": "He is calm now",
-        "session_id": session_id,
-    })
+    await client.post(
+        "/api/coach/chat",
+        json={
+            "access_code": access_code,
+            "patient_name": "Dad",
+            "message": "He is calm now",
+            "session_id": session_id,
+        },
+    )
 
     # The LLM received messages — none should be ENC: blobs
     assert mock_llm.last_messages is not None
     for msg in mock_llm.last_messages:
-        assert not msg["content"].startswith("ENC:"), \
+        assert not msg["content"].startswith("ENC:"), (
             f"LLM received encrypted content: {msg['content'][:60]}"
+        )
 
 
 @pytest.mark.asyncio
@@ -311,19 +328,25 @@ async def test_messages_endpoint_returns_decrypted(client):
     """GET /conversations/{code}/{sid}/messages must return decrypted content."""
     import json as _json
 
-    profile_resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["sundowning"],
-        "calming_strategies": ["soft music"],
-        "safety_concerns": ["fall risk"],
-    })
+    profile_resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["sundowning"],
+            "calming_strategies": ["soft music"],
+            "safety_concerns": ["fall risk"],
+        },
+    )
     access_code = profile_resp.json()["access_code"]
 
-    resp = await client.post("/api/coach/chat", json={
-        "access_code": access_code,
-        "patient_name": "Dad",
-        "message": "Dad is wandering",
-    })
+    resp = await client.post(
+        "/api/coach/chat",
+        json={
+            "access_code": access_code,
+            "patient_name": "Dad",
+            "message": "Dad is wandering",
+        },
+    )
     session_id = None
     async for line in resp.aiter_lines():
         if line.startswith("data:") and "[DONE]" not in line:
@@ -340,8 +363,9 @@ async def test_messages_endpoint_returns_decrypted(client):
     messages = msgs_resp.json()["messages"]
     assert len(messages) >= 1
     for msg in messages:
-        assert not msg["content"].startswith("ENC:"), \
+        assert not msg["content"].startswith("ENC:"), (
             f"Message content still encrypted: {msg['content'][:60]}"
+        )
     user_msg = next(m for m in messages if m["role"] == "user")
     assert user_msg["content"] == "Dad is wandering"
 
@@ -350,18 +374,23 @@ async def test_messages_endpoint_returns_decrypted(client):
 async def test_locale_code_saved_to_conversation(client, db_session):
     """locale_code must be persisted from the request header."""
     from sqlalchemy import select
+
     from app.models.conversation import Conversation
 
-    profile_resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["sundowning"],
-        "calming_strategies": ["music"],
-        "safety_concerns": ["fall risk"],
-    })
+    profile_resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["sundowning"],
+            "calming_strategies": ["music"],
+            "safety_concerns": ["fall risk"],
+        },
+    )
     assert profile_resp.status_code == 201
     access_code = profile_resp.json()["access_code"]
 
-    resp = await client.post("/api/coach/chat",
+    resp = await client.post(
+        "/api/coach/chat",
         json={"access_code": access_code, "patient_name": "Dad", "message": "test"},
         headers={"X-App-Locale": "ta"},
     )
@@ -379,36 +408,43 @@ async def test_locale_code_saved_to_conversation(client, db_session):
 async def test_suggested_tags_stored_on_assistant_message(client, db_session):
     """After a coach response, suggested_tags should be stored on the assistant message."""
     from sqlalchemy import select
+
     from app.models.conversation import Conversation
     from app.services.crypto import decrypt
 
-    profile_resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["wandering"],
-        "calming_strategies": ["music"],
-        "safety_concerns": ["falling"],
-    })
+    profile_resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["wandering"],
+            "calming_strategies": ["music"],
+            "safety_concerns": ["falling"],
+        },
+    )
     access_code = profile_resp.json()["access_code"]
 
-    resp = await client.post("/api/coach/chat", json={
-        "access_code": access_code,
-        "patient_name": "Dad",
-        "message": "Dad is wandering at night",
-    })
+    resp = await client.post(
+        "/api/coach/chat",
+        json={
+            "access_code": access_code,
+            "patient_name": "Dad",
+            "message": "Dad is wandering at night",
+        },
+    )
     async for _ in resp.aiter_lines():
         pass
 
     import asyncio
+
     await asyncio.sleep(0.5)
 
     await db_session.commit()
-    result = await db_session.execute(
-        select(Conversation).where(Conversation.role == "assistant")
-    )
+    result = await db_session.execute(select(Conversation).where(Conversation.role == "assistant"))
     assistant_msg = result.scalars().first()
     assert assistant_msg is not None
     assert assistant_msg.suggested_tags is not None
     import json
+
     tags = json.loads(decrypt(assistant_msg.suggested_tags))
     assert isinstance(tags, list)
     assert "calm_approach" in tags

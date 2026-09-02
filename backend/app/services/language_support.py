@@ -5,9 +5,16 @@ committing to support and prioritize for review), not a claim that clinical or
 linguistic validation has actually been completed. Whether specific
 safety-critical content has been reviewed by a native speaker is tracked
 separately per language via `native_review_pending` — see
-mobile/locales/REVIEW_STATUS.md, which is the source of truth this mirrors.
+locales/REVIEW_STATUS.md, which is the source of truth this mirrors.
 As of this writing, safety-critical content (crisis guidance) has pending
 native review for every non-English language, including the MVP-validated ones.
+
+Scope note: this registry lists the languages the *model* may be asked to
+answer in. It is deliberately wider than the set of languages with translated
+UI chrome — the apps ship `en`, `es`, and `hi` only (see
+frontend/src/lib/locale.ts). Every EXPERIMENTAL entry below therefore has no
+translation files; its UI falls back to English while model output follows the
+requested language.
 """
 
 from dataclasses import dataclass
@@ -21,13 +28,15 @@ class ValidationTier(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class LanguageSupport:
-    code: str  # BCP-47, matches frontend/src/lib/locale.ts SUPPORTED_LOCALES
+    # BCP-47. The MVP_VALIDATED codes match frontend/src/lib/locale.ts
+    # SUPPORTED_LOCALES; the EXPERIMENTAL ones intentionally do not — see the
+    # scope note in the module docstring.
+    code: str
     name: str
     tier: ValidationTier
     # True if native-speaker review of safety-critical content (e.g. crisis
     # guidance) is not yet complete for this language. See
-    # mobile/locales/REVIEW_STATUS.md for the file-level detail this
-    # summarizes.
+    # locales/REVIEW_STATUS.md for the file-level detail this summarizes.
     native_review_pending: bool
 
 
@@ -35,11 +44,15 @@ LANGUAGES: tuple[LanguageSupport, ...] = (
     LanguageSupport("en-US", "English", ValidationTier.MVP_VALIDATED, native_review_pending=False),
     LanguageSupport("es-ES", "Spanish", ValidationTier.MVP_VALIDATED, native_review_pending=True),
     LanguageSupport("hi-IN", "Hindi", ValidationTier.MVP_VALIDATED, native_review_pending=True),
-    LanguageSupport("zh-CN", "Mandarin Chinese", ValidationTier.EXPERIMENTAL, native_review_pending=True),
+    LanguageSupport(
+        "zh-CN", "Mandarin Chinese", ValidationTier.EXPERIMENTAL, native_review_pending=True
+    ),
     LanguageSupport("ta-IN", "Tamil", ValidationTier.EXPERIMENTAL, native_review_pending=True),
     LanguageSupport("ar-SA", "Arabic", ValidationTier.EXPERIMENTAL, native_review_pending=True),
     LanguageSupport("fr-FR", "French", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport("pt-BR", "Brazilian Portuguese", ValidationTier.EXPERIMENTAL, native_review_pending=True),
+    LanguageSupport(
+        "pt-BR", "Brazilian Portuguese", ValidationTier.EXPERIMENTAL, native_review_pending=True
+    ),
     LanguageSupport("ja-JP", "Japanese", ValidationTier.EXPERIMENTAL, native_review_pending=True),
     LanguageSupport("de-DE", "German", ValidationTier.EXPERIMENTAL, native_review_pending=True),
     LanguageSupport("ko-KR", "Korean", ValidationTier.EXPERIMENTAL, native_review_pending=True),

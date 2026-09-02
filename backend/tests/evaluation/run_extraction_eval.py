@@ -20,7 +20,6 @@ from collections import defaultdict
 
 from tests.evaluation.labeled_conversations import LABELED_CONVERSATIONS
 
-
 F1_TARGETS = {
     "behavior_category": 0.80,
     "antecedent_category": 0.65,
@@ -29,14 +28,12 @@ F1_TARGETS = {
 }
 
 
-def compute_field_accuracy(
-    predictions: list[dict], labels: list[dict], field: str
-) -> dict:
+def compute_field_accuracy(predictions: list[dict], labels: list[dict], field: str) -> dict:
     correct = 0
     total = 0
     missing = 0
 
-    for pred, label in zip(predictions, labels):
+    for pred, label in zip(predictions, labels, strict=True):
         expected = label.get(field)
         if expected is None:
             continue
@@ -88,4 +85,6 @@ def print_report(results: dict) -> None:
 if __name__ == "__main__":
     print(f"Labeled conversations available: {len(LABELED_CONVERSATIONS)}")
     print("Run with --live to evaluate against actual LLM extraction.")
-    print("This script provides the framework; populate labeled_conversations.py with 50+ examples.")
+    print(
+        "This script provides the framework; populate labeled_conversations.py with 50+ examples."
+    )

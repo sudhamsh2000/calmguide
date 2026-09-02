@@ -11,9 +11,7 @@ from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.services.jwt_service import verify_token
 
 
-async def staff_can_access_profile(
-    session: AsyncSession, staff: Staff, profile_id: str
-) -> bool:
+async def staff_can_access_profile(session: AsyncSession, staff: Staff, profile_id: str) -> bool:
     """Object-level authorization: may this staff member access this profile?
 
     admin/owner may reach any profile actively linked to their own facility;
@@ -53,11 +51,11 @@ def _set_facility_rls(session: AsyncSession, facility_id: str):
         return None
     try:
         safe_id = str(UUID(str(facility_id)))
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as err:
         raise HTTPException(
             status_code=500,
             detail={"error": "Invalid facility context", "code": "BAD_FACILITY_ID"},
-        )
+        ) from err
     return session.execute(text(f"SET LOCAL app.current_facility_id = '{safe_id}'"))
 
 
@@ -72,11 +70,11 @@ async def get_current_staff(
     token = auth_header[7:]
     try:
         payload = verify_token(token)
-    except Exception:
+    except Exception as err:
         raise HTTPException(
             status_code=401,
             detail={"error": "Invalid or expired token", "code": "INVALID_TOKEN"},
-        )
+        ) from err
     request.state.token_payload = payload
 
     result = await session.execute(
@@ -114,6 +112,7 @@ def require_role(*roles: str):
                 detail={"error": "Insufficient permissions", "code": "FORBIDDEN"},
             )
         return staff
+
     return dependency
 
 

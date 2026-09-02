@@ -1,6 +1,7 @@
 """Unit tests for the per-IP rate limiter dependency."""
 
 import pytest
+from fastapi import HTTPException
 
 from app import config
 from app.services import rate_limit as rl
@@ -46,8 +47,9 @@ async def test_separate_ips_have_separate_budgets():
     # b is unaffected by a's usage
     await dep(b)
     await dep(b)
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPException) as exc:
         await dep(a)
+    assert exc.value.status_code == 429
 
 
 async def test_disabled_flag_never_blocks(monkeypatch):
@@ -64,5 +66,6 @@ async def test_uses_forwarded_for_first_hop():
     req = _FakeRequest(host="proxy", forwarded="9.9.9.9, 10.0.0.1")
     await dep(req)
     # Same forwarded client is now over budget
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPException) as exc:
         await dep(_FakeRequest(host="proxy", forwarded="9.9.9.9, 10.0.0.1"))
+    assert exc.value.status_code == 429
