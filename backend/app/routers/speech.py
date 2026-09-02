@@ -11,7 +11,6 @@ from pydantic import BaseModel, Field
 
 from app.services.rate_limit import rate_limit
 from app.services.speech import (
-    MAX_TTS_CHARS,
     TTS_MEDIA_TYPE,
     TTSUnavailable,
     is_tts_configured,
@@ -21,8 +20,18 @@ from app.services.speech import (
 router = APIRouter(tags=["speech"])
 
 
+# Hard abuse ceiling, deliberately well above MAX_TTS_CHARS. The service layer
+# truncates anything longer than MAX_TTS_CHARS so a caregiver still hears the
+# start of a long response; this bound only exists to reject payloads that are
+# obviously not a coach response. Rejecting at MAX_TTS_CHARS instead would
+# defeat that truncation — a full four-section Moment Coach answer routinely
+# runs past it, which silently dropped read-aloud back to the robotic system
+# voice on exactly the screen it matters most.
+_MAX_REQUEST_CHARS = 20_000
+
+
 class SpeechRequest(BaseModel):
-    text: str = Field(..., min_length=1, max_length=MAX_TTS_CHARS)
+    text: str = Field(..., min_length=1, max_length=_MAX_REQUEST_CHARS)
 
 
 @router.get("/speech/status")

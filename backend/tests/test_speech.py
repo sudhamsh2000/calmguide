@@ -73,12 +73,52 @@ async def test_rejects_empty_text(client, tts_enabled):
     assert response.status_code == 422
 
 
-async def test_rejects_text_over_the_cap(client, tts_enabled):
-    """Bounded so a malformed or hostile request can't become an unbounded
-    synthesis bill."""
+async def test_long_text_is_truncated_not_rejected(client, tts_enabled, monkeypatch):
+    """A full Moment Coach response runs past MAX_TTS_CHARS.
+
+    Regression test: the endpoint originally validated `max_length` at
+    MAX_TTS_CHARS, so long coach answers were 422'd and the client silently
+    fell back to the robotic system voice — on exactly the screen where the
+    natural voice matters most. Long input must synthesize (truncated), not
+    fail.
+    """
+    seen: dict[str, str] = {}
+
+    async def _capture(text: str) -> bytes:
+        seen["text"] = text
+        return b"audio"
+
+    monkeypatch.setattr("app.routers.speech.synthesize_speech", _capture)
+
     response = await client.post(
-        "/api/speech", json={"text": "a" * (speech.MAX_TTS_CHARS + 1)}
+        "/api/speech", json={"text": "a" * (speech.MAX_TTS_CHARS + 2000)}
     )
+    assert response.status_code == 200
+    # The router forwards the full text; the service is what truncates.
+    assert len(seen["text"]) == speech.MAX_TTS_CHARS + 2000
+
+
+async def test_service_truncates_over_long_text(monkeypatch, tts_enabled):
+    """The truncation itself lives in the service layer."""
+    captured: dict[str, str] = {}
+
+    class _FakeSpeech:
+        async def create(self, **kwargs):
+            captured["input"] = kwargs["input"]
+            return type("R", (), {"content": b"audio"})()
+
+    class _FakeClient:
+        audio = type("A", (), {"speech": _FakeSpeech()})()
+
+    monkeypatch.setattr("app.services.speech.AsyncOpenAI", lambda **_: _FakeClient())
+
+    await speech.synthesize_speech("a" * (speech.MAX_TTS_CHARS + 5000))
+    assert len(captured["input"]) == speech.MAX_TTS_CHARS
+
+
+async def test_rejects_absurdly_large_payload(client, tts_enabled):
+    """A hard ceiling well above MAX_TTS_CHARS still rejects obvious abuse."""
+    response = await client.post("/api/speech", json={"text": "a" * 25_000})
     assert response.status_code == 422
 
 
