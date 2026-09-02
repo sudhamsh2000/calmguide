@@ -15,8 +15,26 @@ interface UseSpeechSynthesisReturn {
   resume: () => void;
   isSpeaking: boolean;
   isPaused: boolean;
+  /** Whether the browser's own Web Speech API is present. */
   isSupported: boolean;
+  /**
+   * Whether read-aloud can happen at all, by either path. Neural playback uses
+   * an <audio> element and does not touch the Web Speech API, so a browser
+   * without speechSynthesis can still read aloud perfectly well. UI should gate
+   * on this rather than `isSupported`, which would hide the control on those
+   * browsers even though the server-side voice works.
+   */
+  canSpeak: boolean;
 }
+
+/**
+ * Chrome silently stops speechSynthesis roughly 15 seconds into an utterance.
+ * A full Moment Coach response read through the local fallback runs far past
+ * that, so it would cut off mid-sentence with no error and no `onend`. Calling
+ * resume() periodically keeps it going; it is a no-op on engines without the
+ * bug, so it costs nothing elsewhere.
+ */
+const CHROME_RESUME_INTERVAL_MS = 10_000;
 
 /**
  * Warmer, calmer delivery than the browser's raw defaults (rate 1 / pitch 1
@@ -111,6 +129,17 @@ export function useSpeechSynthesis(
   // Guards against an out-of-order response: if the user stops or starts a new
   // read while synthesis is still in flight, the stale audio must not play.
   const requestIdRef = useRef(0);
+  // Keep-alive for Chrome's 15s cutoff, and a flag so it never fights a pause
+  // the caregiver asked for.
+  const keepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const userPausedRef = useRef(false);
+
+  const clearKeepAlive = useCallback(() => {
+    if (keepAliveRef.current !== null) {
+      clearInterval(keepAliveRef.current);
+      keepAliveRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     const supported = typeof window !== 'undefined' && !!window.speechSynthesis;
@@ -124,6 +153,18 @@ export function useSpeechSynthesis(
     // from, instead of silently falling back to whatever default voice
     // happens to be active before loading finishes.
     window.speechSynthesis.getVoices();
+
+    // Warming is not enough on its own: on a cold load the list can still be
+    // empty at this point, and nothing would re-read it. Listening for
+    // `voiceschanged` means a caregiver who presses read-aloud early gets the
+    // preferred voice on their next press rather than the flat default.
+    const onVoicesChanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+    window.speechSynthesis.addEventListener?.('voiceschanged', onVoicesChanged);
+    return () => {
+      window.speechSynthesis.removeEventListener?.('voiceschanged', onVoicesChanged);
+    };
   }, []);
 
   useEffect(() => {
@@ -148,11 +189,13 @@ export function useSpeechSynthesis(
 
   const stop = useCallback(() => {
     requestIdRef.current += 1; // invalidate any synthesis still in flight
+    clearKeepAlive();
+    userPausedRef.current = false;
     stopNeural();
     if (isSupported) window.speechSynthesis.cancel();
     setIsSpeaking(false);
     setIsPaused(false);
-  }, [isSupported, stopNeural]);
+  }, [isSupported, stopNeural, clearKeepAlive]);
 
   /** Browser-local speech. Always available as the fallback path. */
   const speakLocal = useCallback(
@@ -175,12 +218,24 @@ export function useSpeechSynthesis(
       utterance.onstart = () => {
         setIsSpeaking(true);
         setIsPaused(false);
+        // See CHROME_RESUME_INTERVAL_MS. Only nudges when the caregiver has not
+        // deliberately paused, so this can't undo their own pause.
+        clearKeepAlive();
+        keepAliveRef.current = setInterval(() => {
+          if (!userPausedRef.current && window.speechSynthesis.speaking) {
+            window.speechSynthesis.resume();
+          }
+        }, CHROME_RESUME_INTERVAL_MS);
       };
       utterance.onend = () => {
+        clearKeepAlive();
+        userPausedRef.current = false;
         setIsSpeaking(false);
         setIsPaused(false);
       };
       utterance.onerror = () => {
+        clearKeepAlive();
+        userPausedRef.current = false;
         setIsSpeaking(false);
         setIsPaused(false);
       };
@@ -189,7 +244,7 @@ export function useSpeechSynthesis(
 
       window.speechSynthesis.speak(utterance);
     },
-    [isSupported, locale],
+    [isSupported, locale, clearKeepAlive],
   );
 
   /**
@@ -252,6 +307,7 @@ export function useSpeechSynthesis(
   );
 
   const pause = useCallback(() => {
+    userPausedRef.current = true;
     if (neuralRef.current) {
       neuralRef.current.audio.pause();
       setIsPaused(true);
@@ -262,6 +318,7 @@ export function useSpeechSynthesis(
   }, [isSupported]);
 
   const resume = useCallback(() => {
+    userPausedRef.current = false;
     if (neuralRef.current) {
       void neuralRef.current.audio.play();
       setIsPaused(false);
@@ -273,10 +330,20 @@ export function useSpeechSynthesis(
 
   useEffect(() => {
     return () => {
+      clearKeepAlive();
       stopNeural();
       if (isSupported) window.speechSynthesis?.cancel();
     };
-  }, [isSupported, stopNeural]);
+  }, [isSupported, stopNeural, clearKeepAlive]);
 
-  return { speak, stop, pause, resume, isSpeaking, isPaused, isSupported };
+  return {
+    speak,
+    stop,
+    pause,
+    resume,
+    isSpeaking,
+    isPaused,
+    isSupported,
+    canSpeak: isSupported || neuralAvailable,
+  };
 }

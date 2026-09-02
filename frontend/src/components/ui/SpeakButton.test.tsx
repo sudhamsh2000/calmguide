@@ -8,6 +8,14 @@ vi.mock('next-intl', () => ({
   useLocale: () => 'en',
 }));
 
+// Neural TTS availability is probed over the network on mount; drive it
+// explicitly so both read-aloud paths can be exercised.
+const mockGetSpeechStatus = vi.fn<() => Promise<boolean>>().mockResolvedValue(false);
+vi.mock('@/lib/api', () => ({
+  getSpeechStatus: () => mockGetSpeechStatus(),
+  synthesizeSpeech: vi.fn().mockResolvedValue(null),
+}));
+
 const mockSpeak = vi.fn();
 const mockCancel = vi.fn();
 const mockPause = vi.fn();
@@ -42,6 +50,7 @@ function setupSpeechSynthesis() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockGetSpeechStatus.mockResolvedValue(false);
   setupSpeechSynthesis();
 });
 
@@ -51,7 +60,7 @@ describe('SpeakButton', () => {
     expect(screen.getByRole('button', { name: /read aloud/i })).toBeInTheDocument();
   });
 
-  it('does not render when speechSynthesis is unavailable', () => {
+  it('does not render when neither read-aloud path is available', () => {
     Object.defineProperty(window, 'speechSynthesis', {
       value: undefined,
       writable: true,
@@ -61,6 +70,22 @@ describe('SpeakButton', () => {
     // so we need to render fresh with no speechSynthesis
     const { container } = render(<SpeakButton text="Hello" />);
     expect(container.firstChild).toBeNull();
+  });
+
+  it('still renders without speechSynthesis when neural TTS is available', async () => {
+    // The regression this pins: the button used to be gated on the Web Speech
+    // API alone. Neural read-aloud plays through an <audio> element and does
+    // not need speechSynthesis at all, so gating on it silently removed a
+    // working feature from browsers that lack the API.
+    mockGetSpeechStatus.mockResolvedValue(true);
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+
+    render(<SpeakButton text="Hello" />);
+    expect(await screen.findByRole('button', { name: /read aloud/i })).toBeInTheDocument();
   });
 
   it('calls speechSynthesis.speak on click', async () => {

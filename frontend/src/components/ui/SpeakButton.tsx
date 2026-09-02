@@ -11,7 +11,7 @@ export interface SpeakButtonProps {
 
 export function SpeakButton({ text, className = '' }: SpeakButtonProps) {
   const locale = useLocale();
-  const { speak, stop, isSpeaking, isPaused, pause, resume, isSupported } = useSpeechSynthesis({
+  const { speak, isSpeaking, isPaused, pause, resume, canSpeak } = useSpeechSynthesis({
     locale,
   });
 
@@ -25,7 +25,11 @@ export function SpeakButton({ text, className = '' }: SpeakButtonProps) {
     }
   }, [isSpeaking, isPaused, speak, pause, resume, text]);
 
-  if (!isSupported) return null;
+  // Gated on canSpeak, not isSupported: neural read-aloud plays through an
+  // <audio> element, so a browser with no Web Speech API can still read the
+  // response aloud. Hiding on isSupported removed the control from those
+  // browsers even though the feature worked.
+  if (!canSpeak) return null;
 
   return (
     <button
