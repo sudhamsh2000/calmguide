@@ -93,6 +93,46 @@ eas build --profile preview  --platform all   # internal testing
 eas build --profile production --platform all # store submission
 ```
 
+### Building an Android APK locally (no Expo account needed)
+
+EAS is not required for Android. A release APK can be built on any machine with
+the Android SDK, and it is signed with the debug keystore — installable for
+testing, but not publishable to Play.
+
+React Native's Gradle plugin compiles against a **Java 17 toolchain**. A newer
+JDK as `JAVA_HOME` is fine, but a 17 must exist somewhere on the machine or
+Gradle tries to auto-download one and crashes: the bundled Foojay resolver is
+incompatible with Gradle 9 and fails with a confusing
+`JvmVendorSpec … IBM_SEMERU` error that says nothing about Java versions.
+
+```bash
+brew install openjdk@17          # once
+
+npx expo prebuild --platform android --clean
+cd android
+ANDROID_HOME=~/Android/Sdk ./gradlew assembleRelease \
+  -Porg.gradle.java.installations.paths=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+```
+
+Homebrew's JDK is keg-only, so Gradle will not auto-detect it — hence the
+explicit `installations.paths`. The APK lands at
+`android/app/build/outputs/apk/release/app-release.apk`.
+
+Install it on an emulator or device:
+
+```bash
+~/Android/Sdk/platform-tools/adb install -r app-release.apk
+```
+
+Genymotion registers itself with adb once its ADB setting points at the same
+SDK (Settings → ADB → "Use custom Android SDK tools"). The build packages
+`arm64-v8a`, `armeabi-v7a`, `x86` and `x86_64`, so it installs on both ARM and
+x86 emulator images.
+
+Release builds are minified with R8. That can strip reflectively-used classes,
+so **smoke-test the APK after any dependency change** rather than assuming a
+green build means a working app.
+
 ### The two platforms are not symmetric
 
 **Android needs no developer account.** EAS generates and stores the signing
