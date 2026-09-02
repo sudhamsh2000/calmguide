@@ -9,27 +9,28 @@ from app.services.response_guard import (
     validate_response_respect,
 )
 
-# Realistic-length Tamil coach response for testing
-VALID_TAMIL_RESPONSE = (
+# Realistic-length Hindi coach response for testing
+VALID_HINDI_RESPONSE = (
     "[[SECTION:right-now]]\n"
-    "அப்பாவை அமைதியாக அணுகுங்கள். மெதுவாக பேசுங்கள். அருகில் இருங்கள். "
-    "அவரின் உணர்வை ஏற்றுக்கொள்ளுங்கள். அவருடன் நேரடியாக இருக்க வேண்டாம்.\n"
+    "उनके पास शांति से जाइए। धीरे और नरम आवाज़ में बात कीजिए। पास बैठिए। "
+    "उनकी भावना को स्वीकार कीजिए। उनके सामने सीधे मत खड़े होइए।\n"
     "[[SECTION:why-this-happens]]\n"
-    "அல்சைமர் நோயால் பாதிக்கப்பட்டவர்களுக்கு மாலை நேரத்தில் குழப்பம் அதிகமாகும். "
-    "இது சன்டவுனிங் என்று அழைக்கப்படுகிறது. சுற்றுச்சூழல் மாற்றங்கள் மற்றும் சோர்வு இதற்கு காரணமாக இருக்கலாம்.\n"
+    "अल्ज़ाइमर से पीड़ित लोगों में शाम के समय उलझन बढ़ जाती है। "
+    "इसे सनडाउनिंग कहते हैं। थकान और आसपास के बदलाव इसका कारण हो सकते हैं।\n"
     "[[SECTION:what-not-to-do]]\n"
-    "அவரை கட்டாயப்படுத்தாதீர்கள். அவருடன் வாதிடாதீர்கள். அவரின் குரலை உயர்த்தாதீர்கள்.\n"
-    "[[SECTION:when-to-escalate]]\n"
-    "அவர் தன்னை அல்லது மற்றவர்களை காயப்படுத்த முயற்சித்தால் உடனடியாக மருத்துவ உதவி பெறுங்கள்."
+    "उन्हें मजबूर मत कीजिए। उनसे बहस मत कीजिए। अपनी आवाज़ ऊँची मत कीजिए।\n"
+    "[[SECTION:escalation]]\n"
+    "अगर उलझन तीस मिनट से ज़्यादा बनी रहे, तो उनके डॉक्टर से संपर्क कीजिए।\n"
 )
 
-VALID_TAMIL_SHORT = "அப்பாவை அமைதியாக அணுகுங்கள். மெதுவாக பேசுங்கள். அருகில் இருங்கள்."
+VALID_HINDI_SHORT = "उनके पास शांति से जाइए। धीरे बोलिए। पास रहिए।"
 
-REPAIRED_TAMIL_RESPONSE = (
-    "அப்பாவை அமைதியாக அணுகுங்கள். அமைதியான குரலில் பேசுங்கள். "
-    "அவரின் உணர்வை ஏற்றுக்கொள்ளுங்கள். மெதுவாக பேசுங்கள். அருகில் இருங்கள். "
-    "அவருடன் நேரடியாக இருக்க வேண்டாம். சுற்றியுள்ள சத்தத்தை குறைக்கவும். "
-    "அவரை கட்டாயப்படுத்தாதீர்கள். அவருடன் வாதிடாதீர்கள்."
+REPAIRED_HINDI_RESPONSE = (
+    "उनके पास शांति से जाइए और शांत आवाज़ में बात कीजिए। "
+    "उनकी भावना को स्वीकार कीजिए और धीरे धीरे बोलिए। पास बैठिए और उनका हाथ पकड़िए। "
+    "उनके सामने सीधे मत खड़े होइए, बल्कि थोड़ा बगल से जाइए। आसपास का शोर कम कीजिए। "
+    "टेलीविज़न बंद कर दीजिए और रोशनी थोड़ी कम कीजिए। उन्हें किसी काम के लिए मजबूर मत कीजिए। "
+    "उनसे बहस मत कीजिए और उनकी बात को गलत मत ठहराइए। थोड़ा समय दीजिए ताकि वे शांत हो सकें।"
 )
 
 
@@ -54,13 +55,13 @@ class FakeLLM(LLMProvider):
         return self._completion_text
 
 
-def test_validate_response_language_accepts_valid_tamil():
-    result = validate_response_language(VALID_TAMIL_RESPONSE, "ta-IN")
+def test_validate_response_language_accepts_valid_hindi():
+    result = validate_response_language(VALID_HINDI_RESPONSE, "hi-IN")
     assert result.is_valid is True
 
 
 def test_validate_response_language_rejects_short_response():
-    result = validate_response_language(VALID_TAMIL_SHORT, "ta-IN")
+    result = validate_response_language(VALID_HINDI_SHORT, "hi-IN")
     assert result.is_valid is False
     assert result.reason == "response_too_short"
 
@@ -68,7 +69,7 @@ def test_validate_response_language_rejects_short_response():
 def test_validate_response_language_rejects_known_english_boilerplate():
     result = validate_response_language(
         "I am designed specifically for dementia caregiving support. If you need help with a caregiving situation, please share.",
-        "ta-IN",
+        "hi-IN",
     )
     assert result.is_valid is False
 
@@ -81,29 +82,29 @@ def test_validate_response_respect_rejects_english_disrespectful_wording():
     assert result.is_valid is False
 
 
-def test_validate_response_respect_rejects_tamil_disrespectful_wording():
+def test_validate_response_respect_rejects_hindi_disrespectful_wording():
     result = validate_response_respect(
-        "அவர் ஒரு பைத்தியம் போல் நடந்து கொள்கிறார்.",
-        "ta",
+        "वह पागल की तरह व्यवहार कर रहे हैं।",
+        "hi",
     )
     assert result.is_valid is False
 
 
-def test_validate_response_quality_accepts_respectful_tamil():
-    result = validate_response_quality(VALID_TAMIL_RESPONSE, "ta-IN")
+def test_validate_response_quality_accepts_respectful_hindi():
+    result = validate_response_quality(VALID_HINDI_RESPONSE, "hi-IN")
     assert result.is_valid is True
 
 
-async def test_guard_response_text_repairs_invalid_tamil_response():
-    llm = FakeLLM(REPAIRED_TAMIL_RESPONSE)
+async def test_guard_response_text_repairs_invalid_hindi_response():
+    llm = FakeLLM(REPAIRED_HINDI_RESPONSE)
     result = await guard_response_text(
         llm,
         mode="coach",
-        locale_code="ta-IN",
-        language="Tamil",
+        locale_code="hi-IN",
+        language="Hindi",
         text="I am designed specifically for dementia caregiving support.",
     )
-    assert "அப்பாவை அமைதியாக" in result
+    assert "उनके पास शांति से" in result
 
 
 async def test_guard_response_text_falls_back_when_repair_still_invalid():
@@ -111,23 +112,23 @@ async def test_guard_response_text_falls_back_when_repair_still_invalid():
     result = await guard_response_text(
         llm,
         mode="checkin",
-        locale_code="ta-IN",
-        language="Tamil",
+        locale_code="hi-IN",
+        language="Hindi",
         text="I am designed specifically for dementia caregiving support.",
     )
-    assert "மன்னிக்கவும்" in result
+    assert "क्षमा करें" in result
 
 
 async def test_guard_response_text_repairs_disrespectful_output():
-    llm = FakeLLM(REPAIRED_TAMIL_RESPONSE)
+    llm = FakeLLM(REPAIRED_HINDI_RESPONSE)
     result = await guard_response_text(
         llm,
         mode="coach",
-        locale_code="ta-IN",
-        language="Tamil",
+        locale_code="hi-IN",
+        language="Hindi",
         text="You need to control him and make him obey.",
     )
-    assert "அமைதியாக" in result
+    assert "शांत" in result
 
 
 def test_chunk_text_for_sse_preserves_full_content():

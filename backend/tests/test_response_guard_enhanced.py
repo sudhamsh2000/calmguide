@@ -154,26 +154,6 @@ def test_directive_after_sentence_boundary_is_flagged(text):
 
 
 # ---------------------------------------------------------------------------
-# Localized disrespectful phrases — Tamil (ta)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "அவர் பைத்தியம்",  # crazy
-        "அவர் பாரம் போல் இருக்கிறார்",  # like a burden
-        "அவரை கட்டுப்படுத்து",  # control them
-        "வாயை மூடு",  # shut up
-        "அடங்கு என்று சொல்",  # tell them to submit
-    ],
-)
-def test_disrespectful_tamil_phrases_are_flagged(phrase):
-    result = validate_response_respect(phrase, locale_code="ta")
-    assert result.is_valid is False, f"Tamil phrase '{phrase}' should be flagged as disrespectful"
-
-
-# ---------------------------------------------------------------------------
 # Localized disrespectful phrases — Hindi (hi)
 # ---------------------------------------------------------------------------
 
@@ -191,84 +171,6 @@ def test_disrespectful_tamil_phrases_are_flagged(phrase):
 def test_disrespectful_hindi_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="hi")
     assert result.is_valid is False, f"Hindi phrase '{phrase}' should be flagged as disrespectful"
-
-
-# ---------------------------------------------------------------------------
-# Localized disrespectful phrases — Arabic (ar)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "إنه مجنون",  # he's crazy
-        "هو عبء كبير",  # he's a big burden
-        "أسكته الآن",  # shut him up now
-        "سيطر عليه",  # control him
-        "أجبره على ذلك",  # force him
-    ],
-)
-def test_disrespectful_arabic_phrases_are_flagged(phrase):
-    result = validate_response_respect(phrase, locale_code="ar")
-    assert result.is_valid is False, f"Arabic phrase '{phrase}' should be flagged as disrespectful"
-
-
-# ---------------------------------------------------------------------------
-# Localized disrespectful phrases — Chinese (zh)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "他是个疯子",  # he's a crazy person
-        "老糊涂了",  # senile
-        "是个负担",  # is a burden
-        "控制他",  # control him
-        "强迫他做",  # force him to do it
-    ],
-)
-def test_disrespectful_chinese_phrases_are_flagged(phrase):
-    result = validate_response_respect(phrase, locale_code="zh")
-    assert result.is_valid is False, f"Chinese phrase '{phrase}' should be flagged as disrespectful"
-
-
-# ---------------------------------------------------------------------------
-# Localized disrespectful phrases — Japanese (ja)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "ボケ老人だから",  # because they're a senile old person
-        "負担になっている",  # they've become a burden
-        "おかしいんじゃないか",  # aren't they crazy
-    ],
-)
-def test_disrespectful_japanese_phrases_are_flagged(phrase):
-    result = validate_response_respect(phrase, locale_code="ja")
-    assert result.is_valid is False, (
-        f"Japanese phrase '{phrase}' should be flagged as disrespectful"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Localized disrespectful phrases — Korean (ko)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "phrase",
-    [
-        "미친 것 같아요",  # seems crazy
-        "짐이 되었어요",  # has become a burden
-        "치매 노인이니까",  # because they're a demented old person
-    ],
-)
-def test_disrespectful_korean_phrases_are_flagged(phrase):
-    result = validate_response_respect(phrase, locale_code="ko")
-    assert result.is_valid is False, f"Korean phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
@@ -316,19 +218,6 @@ def test_respectful_english_response_passes():
 # ---------------------------------------------------------------------------
 
 
-def test_japanese_response_with_correct_script_passes():
-    # A plausible short Japanese response (Hiragana/Kanji majority)
-    japanese_text = (
-        "マーガレットは今、混乱していて怖がっています。"
-        "まず深呼吸してください。穏やかな声でゆっくり話しかけましょう。"
-        "お気に入りの音楽を流すと落ち着く場合があります。"
-        "無理に何かをしようとせず、少し時間をおきましょう。"
-        "症状が30分以上続く場合は医師に相談してください。"
-    )
-    result = validate_response_language(japanese_text, locale_code="ja")
-    assert result.is_valid is True
-
-
 def test_english_response_when_japanese_expected_fails():
     """If locale is ja but response is entirely English, the script ratio check fails."""
     english_text = (
@@ -337,26 +226,13 @@ def test_english_response_when_japanese_expected_fails():
         "Do not force anything. Give her some space and time. "
         "If the behavior continues for more than thirty minutes, please contact the doctor."
     )
-    result = validate_response_language(english_text, locale_code="ja")
+    result = validate_response_language(english_text, locale_code="hi")
     assert result.is_valid is False
-
-
-def test_chinese_response_with_correct_script_passes():
-    # Must be long enough to exceed the 100-letter minimum threshold
-    chinese_text = (
-        "玛格丽特现在感到害怕和困惑。请先深呼吸，尽量保持冷静。"
-        "用平静缓慢的语气跟她说话，不要提高声音。可以播放她平时喜欢的音乐。"
-        "不要强迫她做任何事情。给她一些时间和空间来平静下来。"
-        "可以轻声说：'我在这里，你很安全。'这样的话可以帮助她放松。"
-        "如果症状持续超过三十分钟仍未缓解，请立即联系医生寻求帮助。"
-    )
-    result = validate_response_language(chinese_text, locale_code="zh")
-    assert result.is_valid is True
 
 
 def test_response_too_short_fails_for_non_latin_locales():
     """A very short response cannot be validated for script ratio — should fail."""
-    result = validate_response_language("短い", locale_code="ja")
+    result = validate_response_language("短い", locale_code="hi")
     assert result.is_valid is False
     assert result.reason == "response_too_short"
 
@@ -381,7 +257,7 @@ def test_romanized_japanese_response_fails():
         "Murika ni nani ka wo shiyou to sezu, sukoshi jikan wo okimashou. "
         "Shoujou ga sanjuppun ijou tsuzuku baai wa isha ni soudan shite kudasai."
     )
-    result = validate_response_language(romaji_text, locale_code="ja")
+    result = validate_response_language(romaji_text, locale_code="hi")
     assert result.is_valid is False
     # Either script_ratio (no Japanese chars) or romanised_output are valid failure modes
     assert "script_ratio" in result.reason or "romanised" in result.reason
@@ -414,7 +290,7 @@ def test_known_boilerplate_english_phrase_fails():
 def test_known_bad_phrase_also_fails_non_english_locale():
     """The English boilerplate check fires regardless of locale."""
     text = "I am designed specifically for dementia caregiving support only."
-    result = validate_response_language(text, locale_code="ja")
+    result = validate_response_language(text, locale_code="hi")
     assert result.is_valid is False
 
 
@@ -425,7 +301,7 @@ def test_known_bad_phrase_also_fails_non_english_locale():
 
 def test_quality_pipeline_language_failure_before_respect():
     """Language failure takes priority — short non-Latin text fails early."""
-    result = validate_response_quality("短い", locale_code="ja")
+    result = validate_response_quality("短い", locale_code="hi")
     assert result.is_valid is False
     assert result.reason == "response_too_short"
 
@@ -514,7 +390,7 @@ def test_script_ratio_reason_contains_ratio_value():
         "Margaret is scared right now and needs calm support from the caregiver. "
         "Please speak slowly and try playing favorite music to help her settle down."
     )
-    result = validate_response_language(english_as_japanese, locale_code="ja")
+    result = validate_response_language(english_as_japanese, locale_code="hi")
     assert result.is_valid is False
     # Either script_ratio or romanised_output reason
     assert "script_ratio" in result.reason or "romanised" in result.reason

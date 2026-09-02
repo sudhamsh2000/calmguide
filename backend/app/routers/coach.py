@@ -54,7 +54,12 @@ from app.services.response_guard import (
 from app.services.response_timing import record_llm_timing, record_rag_timing
 from app.services.retrieval_query import build_english_rag_query
 from app.services.safety_classifier import classify_message
-from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
+from app.services.safety_gate import (
+    SafetyGateType,
+    build_gate_response_text,
+    check_safety_gate,
+    resolve_emergency_locale,
+)
 from app.services.safety_log import log_safety_event
 
 logger = logging.getLogger(__name__)
@@ -514,6 +519,11 @@ async def coach_chat(
         request.headers.get("accept-language"),
     )
     locale_code = resolve_locale_code(locale_header)
+    # Which country's emergency numbers to surface. Resolved from the raw
+    # header rather than locale_code, which is capped at the three languages
+    # we answer in — a caregiver in France gets an English response but must
+    # still be told 15/112 rather than 911.
+    emergency_locale = resolve_emergency_locale(locale_header)
     language = resolve_language(locale_header)
     language_constraint = resolve_language_constraint(locale_header)
 
@@ -688,7 +698,7 @@ async def coach_chat(
     history = await _get_conversation_history(session, session_id, profile.id)
     messages = history + [{"role": "user", "content": payload.message}]
 
-    safety = check_safety_gate(payload.message, locale_code=locale_code)
+    safety = check_safety_gate(payload.message, locale_code=emergency_locale)
     safety_source = "deterministic_gate"
     classifier_confidence: float | None = None
 
@@ -706,7 +716,7 @@ async def coach_chat(
             safety = type(safety)(
                 triggered=True,
                 gate_type=gate_type,
-                response_text=build_gate_response_text(gate_type, locale_code),
+                response_text=build_gate_response_text(gate_type, emergency_locale),
             )
             safety_source = "classifier"
             classifier_confidence = classifier_result.confidence

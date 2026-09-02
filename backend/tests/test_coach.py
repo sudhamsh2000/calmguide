@@ -392,7 +392,7 @@ async def test_locale_code_saved_to_conversation(client, db_session):
     resp = await client.post(
         "/api/coach/chat",
         json={"access_code": access_code, "patient_name": "Dad", "message": "test"},
-        headers={"X-App-Locale": "ta"},
+        headers={"X-App-Locale": "hi"},
     )
     async for _ in resp.aiter_lines():
         pass
@@ -401,7 +401,7 @@ async def test_locale_code_saved_to_conversation(client, db_session):
     result = await db_session.execute(select(Conversation).where(Conversation.role == "user"))
     msg = result.scalars().first()
     assert msg is not None
-    assert msg.locale_code == "ta"
+    assert msg.locale_code == "hi"
 
 
 @pytest.mark.asyncio

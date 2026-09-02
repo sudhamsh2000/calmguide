@@ -18,7 +18,7 @@ from app.services.prompt import (
 from app.services.rate_limit import rate_limit
 from app.services.response_guard import guard_response_text
 from app.services.retrieval_query import build_english_rag_query
-from app.services.safety_gate import check_safety_gate
+from app.services.safety_gate import check_safety_gate, resolve_emergency_locale
 
 logger = logging.getLogger(__name__)
 
@@ -157,10 +157,12 @@ async def learn_interact(
         request.headers.get("accept-language"),
     )
     locale_code = resolve_locale_code(locale_header)
+    # Geographic, not language-scoped — see coach.py.
+    emergency_locale = resolve_emergency_locale(locale_header)
     language = resolve_language(locale_header)
     language_constraint = resolve_language_constraint(locale_header)
 
-    safety = check_safety_gate(payload.message, locale_code=locale_code)
+    safety = check_safety_gate(payload.message, locale_code=emergency_locale)
     if safety.triggered:
         return LearnInteractResponse(response=safety.response_text)
 

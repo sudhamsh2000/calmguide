@@ -21,18 +21,18 @@ class ScriptRule:
     min_ratio: float
 
 
+# Script checks for the non-Latin languages CalmGuide answers in. Hindi is the
+# only one — Devanagari, because the model will otherwise transliterate into
+# Latin letters and the response guard is what catches that.
+#
+# Unlike the emergency-number map in safety_gate.py, this follows the language
+# scope rather than geography: a rule can only ever fire for a locale we asked
+# the model to answer in, so rules for dropped languages were unreachable.
 SCRIPT_RULES: dict[str, ScriptRule] = {
-    "ar": ScriptRule(re.compile(r"[\u0600-\u06FF]"), min_letters=100, min_ratio=0.65),
     "hi": ScriptRule(re.compile(r"[\u0900-\u097F]"), min_letters=100, min_ratio=0.65),
-    "ja": ScriptRule(re.compile(r"[\u3040-\u30FF\u4E00-\u9FFF]"), min_letters=100, min_ratio=0.55),
-    "ko": ScriptRule(
-        re.compile(r"[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]"), min_letters=100, min_ratio=0.65
-    ),
-    "ta": ScriptRule(re.compile(r"[\u0B80-\u0BFF]"), min_letters=100, min_ratio=0.65),
-    "zh": ScriptRule(re.compile(r"[\u4E00-\u9FFF]"), min_letters=100, min_ratio=0.65),
 }
 
-LATIN_SCRIPT_LOCALES = {"de", "en", "es", "fr", "pt-br"}
+LATIN_SCRIPT_LOCALES = {"en", "es"}
 
 KNOWN_BAD_PHRASES = (
     "i am designed specifically for dementia caregiving support",
@@ -70,16 +70,14 @@ _DIRECTIVE_PATTERNS: list[re.Pattern[str]] = [
     ]
 ]
 
-# Non-English disrespectful phrases — keyed by base locale
+# Non-English disrespectful phrases — keyed by base locale.
+#
+# Hindi only, matching the languages CalmGuide answers in. Entries for Tamil,
+# Arabic, Chinese, Japanese and Korean were removed with those languages: the
+# guard is only ever called with a locale the model was asked to answer in, so
+# they could not fire. They are recoverable from git history if scope widens,
+# and would need native-speaker review before being trusted again anyway.
 LOCALIZED_DISRESPECTFUL_PHRASES: dict[str, tuple[str, ...]] = {
-    "ta": (
-        "பைத்தியம்",  # crazy
-        "மூளை கெட்டவர்",  # brain-damaged (pejorative)
-        "பாரம்",  # burden
-        "கட்டுப்படுத்து",  # control (imperative)
-        "வாயை மூடு",  # shut up
-        "அடங்கு",  # obey/submit
-    ),
     "hi": (
         "पागल",  # crazy
         "बोझ",  # burden
@@ -88,71 +86,23 @@ LOCALIZED_DISRESPECTFUL_PHRASES: dict[str, tuple[str, ...]] = {
         "काबू करो",  # control
         "जबरदस्ती",  # force
     ),
-    "ar": (
-        "مجنون",  # crazy
-        "عبء",  # burden
-        "أسكته",  # shut him up
-        "سيطر عليه",  # control him
-        "أجبره",  # force him
-    ),
-    "zh": (
-        "疯子",  # crazy
-        "老糊涂",  # senile
-        "负担",  # burden
-        "控制",  # control
-        "强迫",  # force
-    ),
-    "ja": (
-        "ボケ老人",  # senile old person
-        "負担",  # burden
-        "おかしい",  # crazy
-    ),
-    "ko": (
-        "미친",  # crazy
-        "짐",  # burden
-        "치매 노인",  # demented old person (pejorative)
-    ),
 }
 
 LOCALIZED_FALLBACKS: dict[str, dict[str, str]] = {
     "coach": {
         "en": "I’m sorry — I didn’t generate that correctly. Please ask again. If this is urgent, stay with your loved one, lower noise, and use a calm voice.",
         "es": "Lo siento, no generé esa respuesta correctamente. Vuelve a intentarlo. Si es urgente, quédate con tu ser querido, reduce el ruido y habla con calma.",
-        "zh": "抱歉，我刚才没有正确生成回复。请再试一次。如果情况紧急，请陪在亲人身边，降低周围噪音，并用平静的语气说话。",
         "hi": "क्षमा करें, मैं सही उत्तर नहीं दे पाया। कृपया फिर से पूछें। अगर स्थिति तुरंत ध्यान मांगती है, तो अपने प्रियजन के पास रहें, आसपास का शोर कम करें और शांत स्वर में बात करें।",
-        "ta": "மன்னிக்கவும், சரியான பதிலை உருவாக்க முடியவில்லை. தயவுசெய்து மீண்டும் கேளுங்கள். நிலை அவசரமாக இருந்தால், உங்கள் அன்புக்குரியவருடன் அருகில் இருங்கள், சுற்றியுள்ள சத்தத்தை குறைக்கவும், அமைதியான குரலில் பேசவும்.",
-        "ar": "عذرًا، لم أُنشئ الرد بشكل صحيح. يرجى المحاولة مرة أخرى. إذا كان الوضع عاجلًا، ابقَ مع الشخص الذي ترعاه، وخفّض الضوضاء من حوله، وتحدث بصوت هادئ.",
-        "fr": "Désolé, je n’ai pas généré cette réponse correctement. Veuillez réessayer. Si la situation est urgente, restez près de votre proche, réduisez le bruit autour de lui et parlez d’une voix calme.",
-        "pt-br": "Desculpe, não gerei essa resposta corretamente. Tente novamente. Se a situação for urgente, fique perto do seu ente querido, reduza o barulho ao redor e fale com calma.",
-        "ja": "申し訳ありません。適切な回答を生成できませんでした。もう一度お試しください。緊急の場合は、本人のそばにいて、周囲の音を減らし、落ち着いた声で話してください。",
-        "de": "Entschuldigung, ich habe diese Antwort nicht korrekt erzeugt. Bitte versuche es noch einmal. Wenn es dringend ist, bleib bei deinem Angehörigen, reduziere Umgebungsgeräusche und sprich mit ruhiger Stimme.",
-        "ko": "죄송합니다. 답변을 올바르게 생성하지 못했습니다. 다시 시도해 주세요. 상황이 급하면 가족 곁에 머물고, 주변 소음을 줄이며, 차분한 목소리로 말해 주세요.",
     },
     "checkin": {
         "en": "I’m sorry — I didn’t generate that correctly. Please try again and tell me how you’re feeling right now.",
         "es": "Lo siento, no generé esa respuesta correctamente. Inténtalo de nuevo y cuéntame cómo te sientes ahora mismo.",
-        "zh": "抱歉，我刚才没有正确生成回复。请再试一次，告诉我你现在的感受。",
         "hi": "क्षमा करें, मैं सही उत्तर नहीं दे पाया। कृपया फिर से बताइए कि आप अभी कैसा महसूस कर रहे हैं।",
-        "ta": "மன்னிக்கவும், சரியான பதிலை உருவாக்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சித்து, இப்போது நீங்கள் எப்படி உணர்கிறீர்கள் என்று சொல்லுங்கள்.",
-        "ar": "عذرًا، لم أُنشئ الرد بشكل صحيح. حاول مرة أخرى وأخبرني كيف تشعر الآن.",
-        "fr": "Désolé, je n’ai pas généré cette réponse correctement. Réessaie et dis-moi comment tu te sens en ce moment.",
-        "pt-br": "Desculpe, não gerei essa resposta corretamente. Tente novamente e me diga como você está se sentindo agora.",
-        "ja": "申し訳ありません。適切な回答を生成できませんでした。もう一度試して、今の気持ちを教えてください。",
-        "de": "Entschuldigung, ich habe diese Antwort nicht korrekt erzeugt. Versuche es bitte noch einmal und sag mir, wie du dich gerade fühlst.",
-        "ko": "죄송합니다. 답변을 올바르게 생성하지 못했습니다. 다시 시도하시고 지금 어떤 기분인지 말씀해 주세요.",
     },
     "learn": {
         "en": "I’m sorry — I didn’t generate that feedback correctly. Please try again with your response.",
         "es": "Lo siento, no generé esa retroalimentación correctamente. Vuelve a intentarlo con tu respuesta.",
-        "zh": "抱歉，我刚才没有正确生成反馈。请用你的回答再试一次。",
         "hi": "क्षमा करें, मैं सही प्रतिक्रिया नहीं दे पाया। कृपया अपने उत्तर के साथ फिर से प्रयास करें।",
-        "ta": "மன்னிக்கவும், சரியான பின்னூட்டத்தை உருவாக்க முடியவில்லை. உங்கள் பதிலுடன் மீண்டும் முயற்சிக்கவும்.",
-        "ar": "عذرًا، لم أُنشئ هذه الملاحظات بشكل صحيح. يرجى المحاولة مرة أخرى مع ردك.",
-        "fr": "Désolé, je n’ai pas généré ce retour correctement. Réessaie avec ta réponse.",
-        "pt-br": "Desculpe, não gerei esse feedback corretamente. Tente novamente com a sua resposta.",
-        "ja": "申し訳ありません。適切なフィードバックを生成できませんでした。あなたの回答でもう一度お試しください。",
-        "de": "Entschuldigung, ich habe dieses Feedback nicht korrekt erzeugt. Versuche es bitte mit deiner Antwort noch einmal.",
-        "ko": "죄송합니다. 피드백을 올바르게 생성하지 못했습니다. 답변과 함께 다시 시도해 주세요.",
     },
 }
 

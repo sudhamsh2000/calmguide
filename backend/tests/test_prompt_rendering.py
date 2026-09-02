@@ -292,15 +292,7 @@ def test_coach_prompt_incidents_rendered_when_provided():
     "locale,language,should_have_constraint",
     [
         ("es", "Spanish", False),
-        ("fr", "French", False),
-        ("de", "German", False),
-        ("pt-br", "Brazilian Portuguese", False),
-        ("ja", "Japanese", True),
-        ("ko", "Korean", True),
-        ("zh", "Mandarin Chinese", True),
         ("hi", "Hindi", True),
-        ("ta", "Tamil", True),
-        ("ar", "Arabic", True),
     ],
 )
 def test_coach_prompt_non_english_locale_contains_language_instruction(
@@ -624,15 +616,18 @@ def test_extraction_prompt_contains_few_shot_examples():
         ("en-US", "en-us"),  # Full variant code returned when it's in the map
         ("es", "es"),
         ("es-ES", "es-es"),
-        ("zh-CN", "zh-cn"),
-        ("pt-br", "pt-br"),
-        ("ja-JP", "ja-jp"),
-        ("ko-KR", "ko-kr"),
         ("hi-IN", "hi-in"),
-        ("ta-IN", "ta-in"),
-        ("ar-SA", "ar-sa"),
         ("unknown-lang", "en"),  # Falls back to English
         (None, "en"),
+        # Out of scope since the product narrowed to three languages. These must
+        # resolve to English rather than being answered in an unsupported
+        # language whose safety copy was never reviewed.
+        ("fr-FR", "en"),
+        ("de", "en"),
+        ("zh-CN", "en"),
+        ("ja-JP", "en"),
+        ("ar-SA", "en"),
+        ("ta-IN", "en"),
     ],
 )
 def test_resolve_locale_code(input_header, expected_locale):
@@ -645,15 +640,16 @@ def test_resolve_locale_code(input_header, expected_locale):
     [
         ("en", "English"),
         ("es", "Spanish"),
-        ("fr", "French"),
-        ("de", "German"),
-        ("pt-br", "Brazilian Portuguese"),
-        ("ja", "Japanese"),
-        ("ko", "Korean"),
-        ("zh", "Mandarin Chinese"),
         ("hi", "Hindi"),
-        ("ta", "Tamil"),
-        ("ar", "Arabic"),
+        # Everything else is answered in English.
+        ("fr", "English"),
+        ("de", "English"),
+        ("pt-br", "English"),
+        ("ja", "English"),
+        ("ko", "English"),
+        ("zh", "English"),
+        ("ta", "English"),
+        ("ar", "English"),
     ],
 )
 def test_resolve_language(locale, expected_language):
@@ -666,15 +662,14 @@ def test_resolve_language(locale, expected_language):
     [
         ("en", False),
         ("es", False),
+        ("hi", True),
+        # Out of scope, so no constraint — they resolve to English anyway.
         ("fr", False),
         ("de", False),
-        ("pt-br", False),
-        ("ar", True),
-        ("hi", True),
-        ("ja", True),
-        ("ko", True),
-        ("ta", True),
-        ("zh", True),
+        ("ar", False),
+        ("ja", False),
+        ("zh", False),
+        ("ta", False),
     ],
 )
 def test_resolve_language_constraint(locale, should_have_constraint):

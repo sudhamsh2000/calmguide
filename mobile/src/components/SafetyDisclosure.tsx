@@ -3,6 +3,20 @@ import { Linking, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 
+/**
+ * Emergency numbers for the locales the app ships in.
+ *
+ * Keyed by bare language code and looked up via localeNumbers() below, which
+ * normalises first. i18n.language is a full tag ("es-ES", "hi-IN"), so indexing
+ * this map with it directly missed every time and silently fell back to the
+ * English entry — every Spanish and Hindi caregiver was shown US 911 and the US
+ * helpline. That is the bug the normalisation exists to prevent.
+ *
+ * The backend keeps a wider map (app/services/safety_gate.py) because browser
+ * traffic can arrive with any Accept-Language and emergency numbers are a
+ * matter of geography, not of which language we answer in. The app has no such
+ * signal — its locale is only ever one of these three.
+ */
 const EMERGENCY_NUMBERS: Record<
   string,
   { emergency: string; helpline: string; helplineName: string }
@@ -17,26 +31,19 @@ const EMERGENCY_NUMBERS: Record<
     helpline: '1-800-272-3900',
     helplineName: 'Línea de Ayuda de Alzheimer 24/7',
   },
-  fr: { emergency: '15', helpline: '01 42 04 28 50', helplineName: 'France Alzheimer' },
-  de: {
-    emergency: '112',
-    helpline: '030 259 37 95 14',
-    helplineName: 'Deutsche Alzheimer Gesellschaft',
-  },
-  'pt-BR': { emergency: '192', helpline: '0800-272-3900', helplineName: 'ABRAz' },
-  ja: { emergency: '119', helpline: '0120-279-338', helplineName: '認知症の人と家族の会' },
-  ko: { emergency: '119', helpline: '1899-9988', helplineName: '치매상담콜센터' },
-  zh: { emergency: '120', helpline: '400-610-0020', helplineName: '中国阿尔茨海默病协会' },
   hi: { emergency: '112', helpline: '1800-11-0031', helplineName: 'ARDSI हेल्पलाइन' },
-  ta: { emergency: '112', helpline: '1800-11-0031', helplineName: 'ARDSI உதவி எண்' },
-  ar: { emergency: '911', helpline: '920033360', helplineName: 'خط مساعدة الزهايمر' },
 };
 
+/** Resolve numbers for a full locale tag, falling back to English. */
+function localeNumbers(locale: string | undefined) {
+  const base = (locale ?? 'en').toLowerCase().split('-', 1)[0];
+  return EMERGENCY_NUMBERS[base] ?? EMERGENCY_NUMBERS.en;
+}
 export function SafetyDisclosure() {
   const { colors } = useTheme();
   const { t, i18n } = useTranslation('coach');
   const [expanded, setExpanded] = useState(false);
-  const numbers = EMERGENCY_NUMBERS[i18n.language] || EMERGENCY_NUMBERS.en;
+  const numbers = localeNumbers(i18n.language);
 
   return (
     <View

@@ -143,6 +143,16 @@ _ELDER_ABUSE_NEGLECT_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 
+# Emergency numbers by locale.
+#
+# This map is deliberately WIDER than the three languages CalmGuide answers in,
+# and must not be trimmed to match them. Language scope and emergency geography
+# are different things: a caregiver in Paris reading the English UI should still
+# be told 15/112, not 911. Every gate response below is English prose regardless
+# — the locale only selects which country's numbers appear in it.
+#
+# Callers therefore pass the *geographic* locale (resolve_emergency_locale),
+# not the language-scoped one from prompt.resolve_locale_code().
 LOCALE_EMERGENCY_NUMBERS: dict[str, dict[str, str]] = {
     "en": {
         "emergency": "911",
@@ -186,6 +196,28 @@ LOCALE_EMERGENCY_NUMBERS: dict[str, dict[str, str]] = {
         "crisis_text": None,
     },
 }
+
+
+def resolve_emergency_locale(accept_language: str | None) -> str:
+    """Pick the locale whose emergency numbers to show, from a raw header.
+
+    Separate from prompt.resolve_locale_code() on purpose. That one is capped at
+    the three languages CalmGuide answers in; this one resolves against the full
+    geography above, so narrowing language scope never silently starts telling a
+    caregiver in Berlin to call 911. Unknown locales fall back to "en".
+    """
+    if not accept_language:
+        return "en"
+    for entry in accept_language.split(","):
+        code = entry.strip().split(";")[0].strip().replace("_", "-").lower()
+        if not code:
+            continue
+        if code in LOCALE_EMERGENCY_NUMBERS:
+            return code
+        base = code.split("-", 1)[0]
+        if base in LOCALE_EMERGENCY_NUMBERS:
+            return base
+    return "en"
 
 
 def _get_locale_numbers(locale_code: str) -> dict[str, str]:

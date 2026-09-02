@@ -865,3 +865,47 @@ def test_unknown_locale_falls_back_to_english_numbers():
     result = check_safety_gate("She is not breathing", locale_code="sw")  # Swahili, not supported
     assert result.triggered is True
     assert "911" in result.response_text
+
+
+# ---------------------------------------------------------------------------
+# Language scope vs emergency geography
+# ---------------------------------------------------------------------------
+
+
+def test_emergency_locale_resolves_beyond_the_three_supported_languages():
+    """Narrowing to three languages must not narrow emergency numbers.
+
+    CalmGuide answers in English, Spanish and Hindi only. Emergency numbers are
+    a matter of where the caregiver is, not what language we speak to them in —
+    someone in Paris reading the English UI still needs 15/112, not 911. These
+    two resolvers are deliberately separate, and this pins that they are.
+    """
+    from app.services.prompt import resolve_locale_code
+    from app.services.safety_gate import resolve_emergency_locale
+
+    for header, expected_emergency in [
+        ("fr-FR", "fr"),
+        ("de-DE", "de"),
+        ("ja-JP", "ja"),
+        ("pt-BR", "pt-br"),
+    ]:
+        # Language falls back to English — the locale is out of scope.
+        assert resolve_locale_code(header) == "en"
+        # Emergency geography does not.
+        assert resolve_emergency_locale(header) == expected_emergency
+
+
+def test_emergency_response_uses_local_number_for_out_of_scope_locale():
+    """A French caregiver gets English prose containing French numbers."""
+    from app.services.safety_gate import build_gate_response_text, resolve_emergency_locale
+
+    text = build_gate_response_text(SafetyGateType.LIFE_THREAT, resolve_emergency_locale("fr-FR"))
+    assert "15 or 112" in text
+    assert "911" not in text
+
+
+def test_emergency_locale_falls_back_to_english_for_unknown():
+    from app.services.safety_gate import resolve_emergency_locale
+
+    assert resolve_emergency_locale("xx-XX") == "en"
+    assert resolve_emergency_locale(None) == "en"

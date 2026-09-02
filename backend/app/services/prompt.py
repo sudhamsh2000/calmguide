@@ -13,73 +13,39 @@ _env = Environment(
     lstrip_blocks=True,
 )
 
+# The languages CalmGuide answers in. Exactly three, matching locales/ and
+# SUPPORTED_LOCALES in both clients.
+#
+# This map is also what resolve_locale_code() matches Accept-Language against,
+# so it is the gate on response language for *browser* traffic too, not just
+# in-app locale switching. It previously listed eleven languages, which meant a
+# visitor whose browser sent `Accept-Language: fr` received a French AI response
+# — safety-critical copy, in a language with no reviewed translations and no
+# translated UI around it. Anything outside these three now resolves to English.
 LOCALE_TO_LANGUAGE: dict[str, str] = {
     "en": "English",
     "en-us": "English",
     "es": "Spanish",
     "es-es": "Spanish",
-    "zh": "Mandarin Chinese",
-    "zh-cn": "Mandarin Chinese",
     "hi": "Hindi",
     "hi-in": "Hindi",
-    "ta": "Tamil",
-    "ta-in": "Tamil",
-    "ar": "Arabic",
-    "ar-sa": "Arabic",
-    "fr": "French",
-    "fr-fr": "French",
-    "pt-br": "Brazilian Portuguese",
-    "ja": "Japanese",
-    "ja-jp": "Japanese",
-    "de": "German",
-    "de-de": "German",
-    "ko": "Korean",
-    "ko-kr": "Korean",
 }
 
+# Per-language delivery rules. Rules for the eight dropped languages were
+# removed with them — keeping unreachable prompt text invites it being
+# re-enabled without the translation review that would have to come with it.
+#
+# Only Hindi carries one, as before: it needs an explicit script instruction
+# because the model will otherwise transliterate into Latin letters. Spanish
+# deliberately has none, which is the behaviour that shipped — adding one here
+# would change Spanish output, and that is a prompt-tuning decision with its own
+# review, not part of narrowing scope.
 _LANGUAGE_CONSTRAINTS: dict[str, str] = {
-    "ar": (
-        "Write the entire response in Modern Standard Arabic (فصحى) using Arabic script. "
-        "Do not transliterate Arabic into Latin letters. Do not mix with English or any other language. "
-        "Use respectful formal Arabic appropriate for addressing a stressed family caregiver."
-    ),
     "hi": (
         "Write the entire response in standard Hindi using Devanagari script. "
         "Do not transliterate Hindi into Latin/Roman letters (no 'kya', 'aap' etc.). "
         "Do not mix Hindi with English or any other language. "
         "Use respectful formal Hindi (शुद्ध हिंदी). Use आप (not तुम or तू)."
-    ),
-    "ja": (
-        "Write the entire response in Japanese. Use polite form (です/ます体). "
-        "Do not switch to English or any other language."
-    ),
-    "ko": (
-        "Write the entire response in Korean using Hangul. Use polite formal style (합쇼체 or 해요체). "
-        "Do not switch to English or any other language."
-    ),
-    "ta": (
-        "Write the entire response in grammatically correct written Tamil (எழுத்துத் தமிழ்).\n"
-        "CRITICAL TAMIL RULES — follow every one:\n"
-        "1. Use ONLY written Tamil (எழுத்துத் தமிழ்). Do NOT use spoken/colloquial Tamil (பேச்சுத் தமிழ்).\n"
-        "2. Do NOT transliterate Tamil into Latin/Roman letters.\n"
-        "3. Do NOT mix Tamil with English, Hindi, or any other language.\n"
-        "4. Do NOT invent or guess Tamil words. If unsure of a word, rephrase using simpler Tamil you are confident is correct.\n"
-        "5. Use consistent respectful register: அவர் (not அவன்/அவள்) for the patient, உங்கள்/நீங்கள் (not உன்/நீ) for the caregiver.\n"
-        "6. Use proper Tamil sentence structure (Subject-Object-Verb).\n"
-        "7. Common vocabulary:\n"
-        "   - Wandering = அலைதல் or சுற்றுதல் (NOT புலம் பெயர்தல் which means 'migrate')\n"
-        "   - Caregiver = பராமரிப்பாளர்\n"
-        "   - Dementia = மறதி நோய் or அல்சைமர் நோய்\n"
-        "   - Agitation = கிளர்ச்சி or பதற்றம்\n"
-        "   - Comfort/soothe = ஆறுதல் அளித்தல்\n"
-        "   - Approach calmly = அமைதியாக அணுகுங்கள்\n"
-        "   - Speak softly = மெதுவாகப் பேசுங்கள்\n"
-        "8. After writing each sentence, verify it uses real Tamil words and correct grammar. Rewrite any sentence you are not confident about."
-    ),
-    "zh": (
-        "Write the entire response in Simplified Chinese (简体中文). "
-        "Do not switch to English, Traditional Chinese, or any other language. "
-        "Use respectful, warm tone appropriate for addressing a family caregiver."
     ),
 }
 
@@ -88,12 +54,7 @@ for _code, _constraint in _LANGUAGE_CONSTRAINTS.items():
     LOCALE_TO_LANGUAGE_CONSTRAINT[_code] = _constraint
     # Map common variant codes to the same constraint
 _VARIANT_MAP = {
-    "ar": "ar-sa",
     "hi": "hi-in",
-    "ja": "ja-jp",
-    "ko": "ko-kr",
-    "ta": "ta-in",
-    "zh": "zh-cn",
 }
 for _base, _variant in _VARIANT_MAP.items():
     if _base in _LANGUAGE_CONSTRAINTS:

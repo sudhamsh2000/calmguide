@@ -61,41 +61,50 @@ def test_learn_prompt_includes_language():
     assert "Response Language — Japanese" in result
 
 
-def test_resolve_language_supports_tamil():
-    assert resolve_language("ta") == "Tamil"
+def test_resolve_language_supports_hindi():
+    assert resolve_language("hi") == "Hindi"
 
 
-def test_resolve_language_supports_tamil_regional_tag():
-    assert resolve_language("ta-IN,ta;q=0.9,en-US;q=0.8") == "Tamil"
+def test_resolve_language_supports_hindi_regional_tag():
+    assert resolve_language("hi-IN,hi;q=0.9,en-US;q=0.8") == "Hindi"
 
 
-def test_resolve_language_supports_brazilian_portuguese_regional_tag():
-    assert resolve_language("pt-BR,pt;q=0.9,en;q=0.8") == "Brazilian Portuguese"
+def test_out_of_scope_languages_resolve_to_english():
+    """Scope is English, Spanish, Hindi.
+
+    A browser sending Accept-Language for anything else used to get an AI
+    response in that language — safety-critical copy, unreviewed, wrapped in
+    English UI because no translations existed for it. Out of scope now means
+    answered in English.
+    """
+    for header in ("ta-IN,ta;q=0.9,en-US;q=0.8", "pt-BR,pt;q=0.9,en;q=0.8", "fr-FR", "zh-CN"):
+        assert resolve_language(header) == "English"
+        assert resolve_language_constraint(header) == ""
 
 
-def test_resolve_language_constraint_for_tamil():
-    result = resolve_language_constraint("ta-IN,ta;q=0.9")
-    assert "எழுத்துத் தமிழ்" in result
-    assert "Do NOT mix Tamil with English" in result
+def test_resolve_language_constraint_for_hindi():
+    result = resolve_language_constraint("hi-IN,hi;q=0.9")
+    assert "देवनागरी" in result or "Devanagari" in result
+    assert "Do not mix Hindi with English" in result
 
 
 def test_render_coach_prompt_includes_language_constraint():
-    constraint = resolve_language_constraint("ta")
+    constraint = resolve_language_constraint("hi")
     result = render_coach_prompt(
         patient_name="Test",
         disease_stage="middle",
         behavioral_patterns=[],
         calming_strategies=[],
         safety_concerns=[],
-        language="Tamil",
+        language="Hindi",
         language_constraint=constraint,
     )
-    assert "எழுத்துத் தமிழ்" in result
-    assert "அவர்" in result  # respectful register guidance
+    assert "Devanagari" in result
+    assert "आप" in result  # respectful register guidance
 
 
 def test_request_locale_header_prefers_explicit_app_locale():
-    assert get_request_locale_header("ta-IN", "en-IN,en;q=0.8") == "ta-IN"
+    assert get_request_locale_header("hi-IN", "en-IN,en;q=0.8") == "hi-IN"
 
 
 def test_coach_prompt_includes_dossier_when_provided():
