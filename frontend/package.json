@@ -4,15 +4,17 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "predev": "mkdir -p ./locales && cp -r ../locales/. ./locales",
+    "predev": "rsync -a --delete ../locales/ ./locales/",
     "dev": "next dev --turbopack",
-    "prebuild": "mkdir -p ./locales && cp -r ../locales/. ./locales",
+    "prebuild": "rsync -a --delete ../locales/ ./locales/",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --ignore-path ../.prettierignore --write .",
+    "format:check": "prettier --ignore-path ../.prettierignore --check ."
   },
   "dependencies": {
     "@swc/helpers": "^0.5.20",
@@ -36,6 +38,7 @@
     "eslint-config-next": "^16.1.0",
     "jsdom": "^25.0.0",
     "postcss": "^8.4.0",
+    "prettier": "3.9.6",
     "react-grab": "^0.1.29",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.7.0",

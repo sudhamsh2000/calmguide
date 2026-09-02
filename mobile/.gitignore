@@ -3,3 +3,14 @@
 
 expo-env.d.ts
 # @end expo-cli
+
+# Native projects. This is a Continuous Native Generation setup: `ios/` and
+# `android/` are produced by `expo prebuild` from app.json and the config
+# plugins, and EAS regenerates them on every build. They are generated output,
+# not source — without this, one local prebuild drops several thousand
+# untracked files into the repo.
+/ios
+/android
+
+# Expo CLI local state (device history, dev-server metadata).
+.expo/

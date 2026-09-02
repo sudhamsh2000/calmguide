@@ -1,0 +1,54 @@
+# Ruff config for every Python package in the repo (backend/ and rag/).
+#
+# This lives at the root rather than in backend/pyproject.toml so that rag/ is
+# covered by the same rules. Ruff only treats a pyproject.toml as config if it
+# contains a [tool.ruff] section, so backend/pyproject.toml keeping only its
+# pytest settings means backend files resolve up to this file.
+
+# 100 matches the Prettier printWidth used on the TS/TSX side, so both
+# languages wrap at the same column. Measured p95 line length was 82, so this
+# reflows very little existing code.
+line-length = 100
+target-version = "py311"
+extend-exclude = ["backend/alembic/versions", "**/.venv", "**/node_modules"]
+
+# Import roots. Without these, isort resolves first-party packages relative to
+# this file and would classify `app` (which lives under backend/) as a
+# third-party import, reordering every backend module.
+src = ["backend", "."]
+
+[lint]
+# Deliberately narrow: pyflakes (real bugs — undefined names, unused imports),
+# pycodestyle errors, isort, flake8-bugbear, and pyupgrade. Broader rulesets
+# were not enabled because they would flag hundreds of pre-existing style
+# choices that are not defects.
+select = ["E", "F", "I", "B", "UP"]
+ignore = [
+    "E501",  # line length is enforced by the formatter, not the linter
+    "B008",  # FastAPI's Depends() in defaults is the framework's own idiom
+
+    # E711/E712 must stay off for this codebase. Every occurrence is a
+    # SQLAlchemy column comparison (`Facility.is_active == True`,
+    # `deleted_at == None`), where `== True` / `== None` build SQL expressions.
+    # Ruff's suggested `is True` / `is None` evaluate to a plain Python bool
+    # instead and silently break the query — the rewrite is a correctness bug
+    # here, not a cleanup.
+    "E711",
+    "E712",
+
+    # UP042 wants `class X(str, Enum)` rewritten as `StrEnum`. The five classes
+    # it flags are safety-path enums (SafetyGateType, SafetyRiskCategory,
+    # ValidationTier, ExpectedLabel, AcuteChangeScreenOutcome). They are never
+    # interpolated or str()'d and never Pydantic-serialized, so the rewrite is
+    # cosmetic — but StrEnum changes what str(member) returns, and that is not
+    # a semantic worth altering in safety code for no functional gain.
+    "UP042",
+]
+
+[lint.per-file-ignores]
+# Tests legitimately redefine fixtures and import for side effects.
+"backend/tests/*" = ["F811", "F401"]
+# main.py calls _configure_logging() before importing FastAPI and friends, so
+# that library loggers are created against the configured handler. The import
+# placement is load-bearing.
+"backend/app/main.py" = ["E402"]

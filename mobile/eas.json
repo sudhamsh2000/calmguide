@@ -27,7 +27,7 @@
     },
     "base": {
       "node": "22.14.0",
-      "prebuildCommand": "rsync -a --delete --exclude 'REVIEW_STATUS.md' ../locales/ ./locales/"
+      "prebuildCommand": "rsync -a --delete ../locales/ ./locales/"
     }
   },
   "submit": {

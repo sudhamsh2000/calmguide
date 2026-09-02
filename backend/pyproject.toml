@@ -1,3 +1,8 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+# Ruff configuration deliberately lives in the repo-root ruff.toml so that
+# backend/ and rag/ share one ruleset. Ruff only treats a pyproject.toml as
+# config when it has a [tool.ruff] section, so leaving that out here lets
+# resolution walk up to the root file.

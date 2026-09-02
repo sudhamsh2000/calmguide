@@ -22,3 +22,6 @@ pytest-asyncio>=0.24.0
 pytest-cov>=6.0.0
 aiosqlite>=0.20.0
 reportlab>=4.0
+
+# Linting / formatting — config in the repo-root ruff.toml, which also covers rag/
+ruff>=0.14
