@@ -414,8 +414,11 @@ Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, ex
 - [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) --- Deterministic safety gate + heuristic classifier design, the red-team evaluation harness, and known gaps pending clinical/native-speaker review
 - [docs/memory-graph-design.md](docs/memory-graph-design.md) --- Behavioral memory graph, cascading profile deletion, and retention configuration
 - [docs/DEFERRED.md](docs/DEFERRED.md) --- Deferred features and future roadmap (push notifications, key rotation, care team sharing, etc.)
-- [docs/superpowers/specs/](docs/superpowers/specs/) --- Design specs for each phase
-- [docs/superpowers/plans/](docs/superpowers/plans/) --- Implementation plans
+- [docs/AUDIT.md](docs/AUDIT.md) --- Running audit log: test/type/lint/build results, dependency CVEs, open findings and incidents, each stamped with the date and commit it was measured against
+- [docs/mobile-launch-checklist.md](docs/mobile-launch-checklist.md) --- Store submission checklist for Play and the App Store
+
+`docs/superpowers/` (design specs and implementation plans) is local scratch and
+is gitignored, so it is not present in a fresh clone.
 
 ## Clinical Safety Hardening Roadmap
 
