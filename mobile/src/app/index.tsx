@@ -1,7 +1,8 @@
-import { Button } from '@/components/Button';
 import { useTheme } from '@/components/ThemeContext';
 import { getAccessCode } from '@/lib/storage';
 import { router, Stack } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -24,6 +25,9 @@ import {
 } from '@/lib/i18n';
 
 const LOCALE_LIST = [...SUPPORTED_LOCALES];
+
+const CALMGUIDE_LOCKUP = require('../../assets/images/calmguide-lockup.png');
+const LEAP_OF_FAITH_LIGHT = require('../../assets/images/leap-of-faith-light.png');
 
 export default function WelcomeScreen() {
   const { colors } = useTheme();
@@ -78,178 +82,264 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Stack.Screen options={{ headerShown: false }} />
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingHorizontal: 28,
-          paddingVertical: 60,
-        }}
-      >
-        {/* Logo + headline */}
-        <View style={{ alignItems: 'center', marginBottom: 44 }}>
-          <Text style={{ fontSize: 42, letterSpacing: -1, marginBottom: 14 }}>
-            <Text style={{ fontWeight: '800', color: colors.primary }}>Calm</Text>
-            <Text style={{ fontWeight: '300', color: colors.primary }}>Guide</Text>
-          </Text>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+            paddingTop: 32,
+            paddingBottom: 24,
+          }}
+        >
+          {/* Brand. The mark carries the identity, so it is given real size and
+              quiet around it rather than being reduced to a line of text. */}
+          <View style={{ alignItems: 'center', marginBottom: 36 }}>
+            <Image
+              source={CALMGUIDE_LOCKUP}
+              style={{ width: 236, height: 44 }}
+              contentFit="contain"
+              accessibilityLabel="CalmGuide"
+            />
+          </View>
+
           <Text
             style={{
-              fontSize: 18,
-              color: colors.mutedForeground,
+              fontSize: 30,
+              lineHeight: 38,
+              fontWeight: '700',
+              letterSpacing: -0.6,
+              color: colors.foreground,
               textAlign: 'center',
-              lineHeight: 27,
-              maxWidth: 280,
+              marginBottom: 12,
             }}
           >
             {t('welcome.tagline')}
           </Text>
-        </View>
-
-        {/* CTAs */}
-        <View style={{ alignSelf: 'stretch', alignItems: 'center', gap: 12 }}>
-          <Button
-            size="lg"
-            variant="primary"
-            onPress={() => router.push('/profile/setup')}
-            style={{ alignSelf: 'stretch', minHeight: 52 }}
-          >
-            {t('welcome.get_started')}
-          </Button>
-          <Pressable
-            onPress={() => router.push('/login')}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.6 : 1,
-              paddingVertical: 12,
-              minHeight: 44,
-              justifyContent: 'center',
-            })}
-            accessibilityRole="link"
-          >
-            <Text style={{ fontSize: 16, color: colors.primary, fontWeight: '500' }}>
-              {t('welcome.have_access_code')}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => router.push('/facility/login')}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.6 : 1,
-              paddingVertical: 12,
-              minHeight: 44,
-              justifyContent: 'center',
-            })}
-            accessibilityRole="link"
-          >
-            <Text style={{ fontSize: 16, color: colors.mutedForeground, fontWeight: '500' }}>
-              {t('welcome.facility_login')}
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Footer */}
-        <View style={{ marginTop: 52, alignItems: 'center', gap: 12 }}>
           <Text
             style={{
-              fontSize: 14,
+              fontSize: 15,
+              lineHeight: 23,
               color: colors.mutedForeground,
               textAlign: 'center',
-              lineHeight: 21,
-              opacity: 0.85,
+              marginBottom: 36,
+              paddingHorizontal: 12,
             }}
           >
             {t('welcome.privacy_note')}
           </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+
+          {/* Actions, ranked by weight: one filled primary, one tinted
+              secondary, one plain link. */}
+          <View style={{ gap: 12 }}>
             <Pressable
-              onPress={() => router.push('/terms')}
-              style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}
+              onPress={() => router.push('/profile/setup')}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                backgroundColor: colors.primary,
+                borderRadius: 16,
+                minHeight: 56,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.9 : 1,
+                transform: [{ scale: pressed ? 0.99 : 1 }],
+                shadowColor: colors.primary,
+                shadowOpacity: 0.32,
+                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 8 },
+                elevation: 6,
+              })}
             >
-              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
-                {t('welcome.terms')}
+              <Text style={{ fontSize: 17, fontWeight: '700', color: '#FFFFFF' }}>
+                {t('welcome.get_started')}
               </Text>
             </Pressable>
-            <Text style={{ fontSize: 13, color: colors.mutedForeground, opacity: 0.4 }}>·</Text>
+
             <Pressable
-              onPress={() => router.push('/privacy')}
-              style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}
+              onPress={() => router.push('/login')}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                backgroundColor: pressed ? colors.tileIndigo : colors.surface,
+                borderRadius: 16,
+                minHeight: 56,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 1,
+                borderColor: colors.border,
+              })}
             >
-              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
-                {t('welcome.privacy')}
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.primaryText }}>
+                {t('welcome.have_access_code')}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.push('/facility/login')}
+              accessibilityRole="link"
+              style={({ pressed }) => ({
+                minHeight: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.6 : 1,
+              })}
+            >
+              <Text style={{ fontSize: 15, fontWeight: '500', color: colors.mutedForeground }}>
+                {t('welcome.facility_login')}
               </Text>
             </Pressable>
           </View>
-          <Pressable
-            onPress={() => setLangOpen(true)}
-            style={{ minHeight: 44, justifyContent: 'center', marginTop: 4 }}
-          >
-            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{currentLabel}</Text>
-          </Pressable>
-          <Modal
-            visible={langOpen}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setLangOpen(false)}
-          >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'rgba(0,0,0,0.4)',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
+
+          {/* Legal + language, deliberately quiet. */}
+          <View style={{ marginTop: 28, alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Pressable
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-                onPress={() => setLangOpen(false)}
-              />
+                onPress={() => router.push('/terms')}
+                style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 10 }}
+              >
+                <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+                  {t('welcome.terms')}
+                </Text>
+              </Pressable>
               <View
                 style={{
-                  backgroundColor: colors.surface,
-                  borderRadius: 16,
-                  width: 280,
-                  maxHeight: 440,
-                  overflow: 'hidden',
+                  width: 3,
+                  height: 3,
+                  borderRadius: 2,
+                  backgroundColor: colors.mutedForeground,
+                  opacity: 0.4,
                 }}
+              />
+              <Pressable
+                onPress={() => router.push('/privacy')}
+                style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 10 }}
               >
-                <FlatList
-                  data={LOCALE_LIST}
-                  keyExtractor={(item) => item}
-                  renderItem={({ item: locale }) => {
-                    const isActive = locale === currentLocale;
-                    return (
-                      <Pressable
-                        onPress={() => handleLanguageSelect(locale)}
-                        style={({ pressed }) => ({
-                          paddingHorizontal: 20,
-                          paddingVertical: 14,
-                          backgroundColor: isActive
-                            ? `${colors.primary}10`
-                            : pressed
-                              ? `${colors.foreground}08`
-                              : 'transparent',
-                        })}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: isActive ? colors.primary : colors.foreground,
-                            fontWeight: isActive ? '600' : '400',
-                          }}
-                        >
-                          {LOCALE_LABELS[locale]}
-                        </Text>
-                      </Pressable>
-                    );
-                  }}
-                />
-              </View>
+                <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+                  {t('welcome.privacy')}
+                </Text>
+              </Pressable>
             </View>
-          </Modal>
+            <Pressable
+              onPress={() => setLangOpen(true)}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                minHeight: 44,
+                justifyContent: 'center',
+                paddingHorizontal: 16,
+                borderRadius: 999,
+                backgroundColor: pressed ? colors.tileIndigo : 'transparent',
+              })}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '500', color: colors.mutedForeground }}>
+                {currentLabel}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      {/* Partner band, as in the approved product screens. The Leap of Faith
+          wordmark ships knocked out to white — the stock logo's near-black
+          wordmark disappears against this gradient. */}
+      <LinearGradient
+        colors={[colors.bandFrom, colors.bandTo]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <SafeAreaView edges={['bottom']}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 12,
+              paddingVertical: 16,
+              paddingHorizontal: 24,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: '600',
+                color: 'rgba(255,255,255,0.85)',
+                letterSpacing: 0.3,
+              }}
+            >
+              {t('welcome.partnered_with', 'Partnered with')}
+            </Text>
+            <Image
+              source={LEAP_OF_FAITH_LIGHT}
+              style={{ width: 118, height: 34 }}
+              contentFit="contain"
+              accessibilityLabel="Leap of Faith"
+            />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+
+      <Modal
+        visible={langOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLangOpen(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(6, 31, 96, 0.45)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Pressable
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            onPress={() => setLangOpen(false)}
+          />
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 20,
+              width: 280,
+              maxHeight: 440,
+              overflow: 'hidden',
+            }}
+          >
+            <FlatList
+              data={LOCALE_LIST}
+              keyExtractor={(item) => item}
+              renderItem={({ item: locale }) => {
+                const isActive = locale === currentLocale;
+                return (
+                  <Pressable
+                    onPress={() => handleLanguageSelect(locale)}
+                    style={({ pressed }) => ({
+                      paddingHorizontal: 20,
+                      paddingVertical: 15,
+                      backgroundColor: isActive
+                        ? colors.tileIndigo
+                        : pressed
+                          ? `${colors.foreground}08`
+                          : 'transparent',
+                    })}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: isActive ? colors.primaryText : colors.foreground,
+                        fontWeight: isActive ? '600' : '400',
+                      }}
+                    >
+                      {LOCALE_LABELS[locale]}
+                    </Text>
+                  </Pressable>
+                );
+              }}
+            />
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </Modal>
+    </View>
   );
 }

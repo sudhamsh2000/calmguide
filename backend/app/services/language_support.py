@@ -9,12 +9,17 @@ locales/REVIEW_STATUS.md, which is the source of truth this mirrors.
 As of this writing, safety-critical content (crisis guidance) has pending
 native review for every non-English language, including the MVP-validated ones.
 
-Scope note: this registry lists the languages the *model* may be asked to
-answer in. It is deliberately wider than the set of languages with translated
-UI chrome — the apps ship `en`, `es`, and `hi` only (see
-frontend/src/lib/locale.ts). Every EXPERIMENTAL entry below therefore has no
-translation files; its UI falls back to English while model output follows the
-requested language.
+Scope: CalmGuide supports exactly three languages — English, Spanish and Hindi.
+This registry, the translation files under locales/, and SUPPORTED_LOCALES in
+both clients all list the same three, and they are meant to stay in step.
+
+This previously also carried eight EXPERIMENTAL entries (zh, ta, ar, fr, pt-BR,
+ja, de, ko) left over from a wider scope. Their translation files had already
+been removed, so `GET /languages` was advertising languages the product could
+not render — English chrome with no explanation. Scope is now three languages,
+so the tier split no longer describes anything real; ValidationTier is kept
+because `native_review_pending` still varies per language and the endpoint's
+shape is part of its contract.
 """
 
 from dataclasses import dataclass
@@ -44,18 +49,6 @@ LANGUAGES: tuple[LanguageSupport, ...] = (
     LanguageSupport("en-US", "English", ValidationTier.MVP_VALIDATED, native_review_pending=False),
     LanguageSupport("es-ES", "Spanish", ValidationTier.MVP_VALIDATED, native_review_pending=True),
     LanguageSupport("hi-IN", "Hindi", ValidationTier.MVP_VALIDATED, native_review_pending=True),
-    LanguageSupport(
-        "zh-CN", "Mandarin Chinese", ValidationTier.EXPERIMENTAL, native_review_pending=True
-    ),
-    LanguageSupport("ta-IN", "Tamil", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport("ar-SA", "Arabic", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport("fr-FR", "French", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport(
-        "pt-BR", "Brazilian Portuguese", ValidationTier.EXPERIMENTAL, native_review_pending=True
-    ),
-    LanguageSupport("ja-JP", "Japanese", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport("de-DE", "German", ValidationTier.EXPERIMENTAL, native_review_pending=True),
-    LanguageSupport("ko-KR", "Korean", ValidationTier.EXPERIMENTAL, native_review_pending=True),
 )
 
 _BY_CODE: dict[str, LanguageSupport] = {lang.code.lower(): lang for lang in LANGUAGES}

@@ -19,7 +19,12 @@ export function EmergencyBar() {
 
   const isTabRoute = segments.includes('(tabs)');
   const hasStickyPrimaryAction = pathname === '/login' || pathname === '/profile/setup';
-  const bottomOffset = insets.bottom + (isTabRoute ? 68 : hasStickyPrimaryAction ? 92 : 14);
+  // The welcome screen ends in the Leap of Faith partner band. Without its own
+  // offset this button lands squarely on top of the partner logo, which is the
+  // one thing on that screen that must not be obscured.
+  const hasPartnerBand = pathname === '/';
+  const bottomOffset =
+    insets.bottom + (isTabRoute ? 68 : hasStickyPrimaryAction ? 92 : hasPartnerBand ? 80 : 14);
 
   function handleCall(number: string) {
     setExpanded(false);

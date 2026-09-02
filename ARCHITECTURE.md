@@ -801,17 +801,17 @@ vs. Daily Behavioral Log (POST /api/checkin/daily):
 
 ---
 
-## Internationalization (i18n) — 3 Translated Languages
+## Internationalization (i18n) — 3 Languages
 
-Two different counts appear in this codebase and they are not the same thing:
+CalmGuide supports exactly three languages: **English, Spanish, Hindi**.
 
-- **Translated UI: 3 languages** — `en`, `es`, `hi`. These are the locale
-  directories that exist, and the only values in `SUPPORTED_LOCALES`.
-- **Model response languages: 11** — the registry in
-  `backend/app/services/language_support.py` also tiers 8 `EXPERIMENTAL`
-  languages (fr, de, ar, ta, ja, ko, pt-BR, zh). The model may be asked to
-  answer in those; their UI chrome falls back to English because no translation
-  files exist for them.
+One count, everywhere. The locale directories under `locales/`,
+`SUPPORTED_LOCALES` in both clients, and the registry in
+`backend/app/services/language_support.py` all list the same three, and a test
+pins that they agree. An earlier version tiered eight additional
+"experimental" languages in the registry after their translation files had been
+removed, which meant `GET /languages` advertised languages whose UI silently
+fell back to English. Scope is three.
 
 ```
 Languages (translated UI): en, es, hi

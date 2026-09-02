@@ -138,11 +138,12 @@ react-navigation's `query-string`. They are build-time dependencies pinned by
 the Expo SDK; `npm audit fix --force` would break SDK 55 alignment and
 reintroduce the `expo-doctor` failure. Deliberately left.
 
-**7 — Language tiering is wider than the shipped UI.** `GET /languages`
-advertises 11 languages (3 MVP + 8 experimental); translated UI exists for 3.
-This is intentional and now documented, but the tiering is not surfaced to users
-anywhere — no client consumes `/languages`, so a caregiver on an experimental
-language gets English chrome with no explanation. See
+**7 — ~~Language tiering is wider than the shipped UI.~~ RESOLVED 2026-09-02.**
+`GET /languages` advertised 11 languages while translated UI existed for 3, so a
+caregiver on one of the other 8 would have got English chrome with no
+explanation. Product scope was confirmed as **three languages — English,
+Spanish, Hindi** — and the 8 extra entries were removed from the registry. A
+test now pins that the registry matches the shipped locales. See
 [../locales/REVIEW_STATUS.md](../locales/REVIEW_STATUS.md).
 
 **8 — Safety-critical translation review is incomplete.** `coach.json` review is

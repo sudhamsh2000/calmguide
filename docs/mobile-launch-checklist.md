@@ -84,10 +84,9 @@ Last updated: 2026-05-09
   - Moment Coach conversation
   - Incident logger
   - Learning mode
-- [ ] Short description (80 chars max). Do **not** claim 11 languages — the app
-      ships translated UI in 3 (English, Spanish, Hindi). Claiming 11 in a store
-      listing is a misrepresentation. e.g. "AI guidance for dementia caregivers,
-      in English, Spanish and Hindi" (63 chars).
+- [ ] Short description (80 chars max). The app supports **three** languages —
+      English, Spanish, Hindi. e.g. "AI guidance for dementia caregivers, in
+      English, Spanish and Hindi" (63 chars).
 - [ ] Full description (4000 chars max)
 
 ### Compliance
