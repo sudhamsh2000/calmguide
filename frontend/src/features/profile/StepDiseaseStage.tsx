@@ -12,7 +12,11 @@ export interface StepDiseaseStageProps {
 
 const stages: DiseaseStage[] = ['early', 'middle', 'late'];
 
-export function StepDiseaseStage({ selectedStage, onSelect, className = '' }: StepDiseaseStageProps) {
+export function StepDiseaseStage({
+  selectedStage,
+  onSelect,
+  className = '',
+}: StepDiseaseStageProps) {
   const t = useTranslations('profile');
 
   return (
@@ -20,7 +24,7 @@ export function StepDiseaseStage({ selectedStage, onSelect, className = '' }: St
       <div>
         <h2
           className="text-2xl font-bold tracking-tight text-ink"
-          style={{ fontFamily: "var(--font-display)" }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {t('setup.stage_heading')}
         </h2>
@@ -58,7 +62,9 @@ export function StepDiseaseStage({ selectedStage, onSelect, className = '' }: St
                 <div
                   className={[
                     'mt-0.5 h-5 w-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors',
-                    isSelected ? 'border-primary/70 bg-primary/85 shadow-[0_0_0_3px_rgba(58,175,169,0.06)]' : 'border-foreground/30 dark:border-white/12',
+                    isSelected
+                      ? 'border-primary/70 bg-primary/85 shadow-[0_0_0_3px_rgba(58,175,169,0.06)]'
+                      : 'border-foreground/30 dark:border-white/12',
                   ].join(' ')}
                 >
                   {isSelected && (
@@ -66,7 +72,9 @@ export function StepDiseaseStage({ selectedStage, onSelect, className = '' }: St
                   )}
                 </div>
                 <div>
-                  <h3 className={`text-lg font-semibold ${isSelected ? 'text-primary dark:text-primary-light' : 'text-foreground'}`}>
+                  <h3
+                    className={`text-lg font-semibold ${isSelected ? 'text-primary dark:text-primary-light' : 'text-foreground'}`}
+                  >
                     {t(`disease_stage.${stage}_title`)}
                   </h3>
                   <p className="mt-1 text-sm text-foreground-muted leading-relaxed">

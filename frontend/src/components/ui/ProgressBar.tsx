@@ -22,7 +22,13 @@ export function ProgressBar({
       <p className="text-sm font-display text-foreground-muted" aria-live="polite">
         {progressText}
       </p>
-      <div className="flex gap-1.5" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={totalSteps}>
+      <div
+        className="flex gap-1.5"
+        role="progressbar"
+        aria-valuenow={currentStep}
+        aria-valuemin={1}
+        aria-valuemax={totalSteps}
+      >
         {Array.from({ length: totalSteps }, (_, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <div

@@ -10,7 +10,12 @@ interface MarkdownTextProps {
 }
 
 // Render inline bold/italic within a string segment
-function InlineContent({ text, color, fontSize, lineHeight }: {
+function InlineContent({
+  text,
+  color,
+  fontSize,
+  lineHeight,
+}: {
   text: string;
   color: string;
   fontSize: number;
@@ -72,48 +77,73 @@ function MarkdownTextComponent({
 
       if (isOrderedList) {
         out.push(
-        <View key={bi} style={{ gap: 6, marginBottom: bi < blocks.length - 1 ? 8 : 0 }}>
-          {lines.map((line, li) => {
-            const match = /^\d+\.\s(.+)$/.exec(line.trim());
-            const content = match ? match[1] : line;
-            const num = li + 1;
-            return (
-              <View key={li} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-                <Text style={{ color: textColor, fontSize: baseSize, lineHeight, fontWeight: '700', minWidth: 20 }}>
-                  {num}.
-                </Text>
-                <View style={{ flex: 1 }}>
-                  <InlineContent text={content} color={textColor} fontSize={baseSize} lineHeight={lineHeight} />
+          <View key={bi} style={{ gap: 6, marginBottom: bi < blocks.length - 1 ? 8 : 0 }}>
+            {lines.map((line, li) => {
+              const match = /^\d+\.\s(.+)$/.exec(line.trim());
+              const content = match ? match[1] : line;
+              const num = li + 1;
+              return (
+                <View key={li} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
+                  <Text
+                    style={{
+                      color: textColor,
+                      fontSize: baseSize,
+                      lineHeight,
+                      fontWeight: '700',
+                      minWidth: 20,
+                    }}
+                  >
+                    {num}.
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <InlineContent
+                      text={content}
+                      color={textColor}
+                      fontSize={baseSize}
+                      lineHeight={lineHeight}
+                    />
+                  </View>
                 </View>
-              </View>
-            );
-          })}
-        </View>
-      );
-    } else if (isUnorderedList) {
-      out.push(
-        <View key={bi} style={{ gap: 6, marginBottom: bi < blocks.length - 1 ? 8 : 0 }}>
-          {lines.map((line, li) => {
-            const content = line.trim().replace(/^[-*]\s/, '');
-            return (
-              <View key={li} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-                <Text style={{ color: textColor, fontSize: baseSize, lineHeight, marginTop: 1 }}>•</Text>
-                <View style={{ flex: 1 }}>
-                  <InlineContent text={content} color={textColor} fontSize={baseSize} lineHeight={lineHeight} />
+              );
+            })}
+          </View>,
+        );
+      } else if (isUnorderedList) {
+        out.push(
+          <View key={bi} style={{ gap: 6, marginBottom: bi < blocks.length - 1 ? 8 : 0 }}>
+            {lines.map((line, li) => {
+              const content = line.trim().replace(/^[-*]\s/, '');
+              return (
+                <View key={li} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
+                  <Text style={{ color: textColor, fontSize: baseSize, lineHeight, marginTop: 1 }}>
+                    •
+                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <InlineContent
+                      text={content}
+                      color={textColor}
+                      fontSize={baseSize}
+                      lineHeight={lineHeight}
+                    />
+                  </View>
                 </View>
-              </View>
-            );
-          })}
-        </View>
-      );
-    } else {
-      // Regular paragraph — join lines with a space
-      const combined = lines.join(' ');
-      out.push(
-        <View key={bi} style={{ marginBottom: bi < blocks.length - 1 ? 6 : 0 }}>
-          <InlineContent text={combined} color={textColor} fontSize={baseSize} lineHeight={lineHeight} />
-        </View>
-      );
+              );
+            })}
+          </View>,
+        );
+      } else {
+        // Regular paragraph — join lines with a space
+        const combined = lines.join(' ');
+        out.push(
+          <View key={bi} style={{ marginBottom: bi < blocks.length - 1 ? 6 : 0 }}>
+            <InlineContent
+              text={combined}
+              color={textColor}
+              fontSize={baseSize}
+              lineHeight={lineHeight}
+            />
+          </View>,
+        );
       }
     }
 

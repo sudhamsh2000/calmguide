@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 
@@ -37,8 +37,8 @@ def create_token(
         "facility_id": facility_id,
         "role": role,
         "auth_method": auth_method,
-        "exp": datetime.now(timezone.utc) + timedelta(seconds=exp),
-        "iat": datetime.now(timezone.utc),
+        "exp": datetime.now(UTC) + timedelta(seconds=exp),
+        "iat": datetime.now(UTC),
     }
     return jwt.encode(payload, secret, algorithm=settings.JWT_ALGORITHM)
 

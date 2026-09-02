@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SpeakButton } from "./SpeakButton";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { SpeakButton } from './SpeakButton';
 
 // Mock next-intl
-vi.mock("next-intl", () => ({
-  useLocale: () => "en",
+vi.mock('next-intl', () => ({
+  useLocale: () => 'en',
 }));
 
 const mockSpeak = vi.fn();
@@ -16,7 +16,7 @@ const mockResume = vi.fn();
 function setupSpeechSynthesis() {
   // Mock SpeechSynthesisUtterance constructor
   global.SpeechSynthesisUtterance = vi.fn().mockImplementation(() => ({
-    lang: "",
+    lang: '',
     voice: null,
     onstart: null,
     onend: null,
@@ -25,7 +25,7 @@ function setupSpeechSynthesis() {
     onresume: null,
   })) as unknown as typeof SpeechSynthesisUtterance;
 
-  Object.defineProperty(window, "speechSynthesis", {
+  Object.defineProperty(window, 'speechSynthesis', {
     value: {
       speak: mockSpeak,
       cancel: mockCancel,
@@ -45,14 +45,14 @@ beforeEach(() => {
   setupSpeechSynthesis();
 });
 
-describe("SpeakButton", () => {
-  it("renders when speechSynthesis is available", () => {
+describe('SpeakButton', () => {
+  it('renders when speechSynthesis is available', () => {
     render(<SpeakButton text="Hello world" />);
-    expect(screen.getByRole("button", { name: /read aloud/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /read aloud/i })).toBeInTheDocument();
   });
 
-  it("does not render when speechSynthesis is unavailable", () => {
-    Object.defineProperty(window, "speechSynthesis", {
+  it('does not render when speechSynthesis is unavailable', () => {
+    Object.defineProperty(window, 'speechSynthesis', {
       value: undefined,
       writable: true,
       configurable: true,
@@ -63,10 +63,10 @@ describe("SpeakButton", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it("calls speechSynthesis.speak on click", async () => {
+  it('calls speechSynthesis.speak on click', async () => {
     const user = userEvent.setup();
     render(<SpeakButton text="Test text" />);
-    await user.click(screen.getByRole("button", { name: /read aloud/i }));
+    await user.click(screen.getByRole('button', { name: /read aloud/i }));
     expect(mockSpeak).toHaveBeenCalledTimes(1);
   });
 });

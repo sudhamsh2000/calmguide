@@ -5,7 +5,7 @@ incidents. Falls back to most-recent incidents if fewer than max_results
 match the detected categories.
 """
 
-from sqlalchemy import select, true
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.incident import Incident
@@ -13,32 +13,81 @@ from app.services.crypto import decrypt
 
 CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "aggression_anger": [
-        "hit", "hitting", "punch", "kick", "push", "threw", "aggressive",
-        "angry", "yelling", "screaming", "violent", "slap", "bite",
+        "hit",
+        "hitting",
+        "punch",
+        "kick",
+        "push",
+        "threw",
+        "aggressive",
+        "angry",
+        "yelling",
+        "screaming",
+        "violent",
+        "slap",
+        "bite",
     ],
     "wandering_exit_seeking": [
-        "leave", "leaving", "wander", "wandering", "door", "outside",
-        "escape", "elopement", "exit", "walk away", "trying to go",
+        "leave",
+        "leaving",
+        "wander",
+        "wandering",
+        "door",
+        "outside",
+        "escape",
+        "elopement",
+        "exit",
+        "walk away",
+        "trying to go",
     ],
     "confusion_disorientation": [
-        "confused", "confusion", "disoriented", "lost", "doesn't know",
-        "doesn't recognize", "where am i", "who are you",
+        "confused",
+        "confusion",
+        "disoriented",
+        "lost",
+        "doesn't know",
+        "doesn't recognize",
+        "where am i",
+        "who are you",
     ],
     "refusing_care": [
-        "refuse", "refusing", "won't take", "won't eat", "won't bathe",
-        "resists", "fighting", "medication", "won't let",
+        "refuse",
+        "refusing",
+        "won't take",
+        "won't eat",
+        "won't bathe",
+        "resists",
+        "fighting",
+        "medication",
+        "won't let",
     ],
     "sleep_problems": [
-        "sleep", "awake", "insomnia", "nighttime", "up all night",
-        "won't stay in bed", "3am", "2am", "middle of the night",
+        "sleep",
+        "awake",
+        "insomnia",
+        "nighttime",
+        "up all night",
+        "won't stay in bed",
+        "3am",
+        "2am",
+        "middle of the night",
     ],
     "hallucinations": [
-        "seeing things", "hearing things", "hallucin", "talking to someone",
-        "people who aren't there", "imaginary", "sees people",
+        "seeing things",
+        "hearing things",
+        "hallucin",
+        "talking to someone",
+        "people who aren't there",
+        "imaginary",
+        "sees people",
     ],
     "repetitive_behavior": [
-        "keeps asking", "same question", "pacing", "repetitive",
-        "over and over", "won't stop",
+        "keeps asking",
+        "same question",
+        "pacing",
+        "repetitive",
+        "over and over",
+        "won't stop",
     ],
 }
 
@@ -58,9 +107,7 @@ def format_incident_for_prompt(incident: Incident) -> dict:
         "behavior_category": incident.behavior_category,
         "severity": incident.severity,
         "antecedent": (
-            decrypt(incident.antecedent_description)
-            if incident.antecedent_description
-            else None
+            decrypt(incident.antecedent_description) if incident.antecedent_description else None
         ),
         "behavior": decrypt(incident.behavior_description),
         "intervention": (
@@ -101,9 +148,7 @@ async def get_relevant_incidents(
             .limit(remaining)
         )
         if existing_ids:
-            fallback_query = fallback_query.where(
-                Incident.id.notin_(existing_ids)
-            )
+            fallback_query = fallback_query.where(Incident.id.notin_(existing_ids))
         fallback_result = await session.execute(fallback_query)
         incidents.extend(fallback_result.scalars().all())
 

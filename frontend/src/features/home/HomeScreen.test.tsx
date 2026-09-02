@@ -15,7 +15,8 @@ vi.mock('next-intl', () => ({
       };
       return messages[key] ?? key;
     };
-    t.has = (key: string) => ['view.middle_stage', 'view.early_stage', 'view.late_stage'].includes(key);
+    t.has = (key: string) =>
+      ['view.middle_stage', 'view.early_stage', 'view.late_stage'].includes(key);
     return t;
   },
 }));
@@ -28,31 +29,23 @@ vi.mock('next/link', () => ({
 
 describe('HomeScreen components', () => {
   it('PatientCard renders patient name with possessive and stage', () => {
-    render(
-      <PatientCard patientName="Mom" diseaseStage="middle" behaviorCount={3} />,
-    );
+    render(<PatientCard patientName="Mom" diseaseStage="middle" behaviorCount={3} />);
     expect(screen.getByText(/Mom's Profile/)).toBeInTheDocument();
     expect(screen.getByText(/Middle stage/)).toBeInTheDocument();
     expect(screen.getByText(/3 behaviors tracked/)).toBeInTheDocument();
   });
 
   it('PatientCard shows avatar initial and edit link', () => {
-    render(
-      <PatientCard patientName="Dad" diseaseStage="early" />,
-    );
+    render(<PatientCard patientName="Dad" diseaseStage="early" />);
     expect(screen.getByText('D')).toBeInTheDocument();
     expect(screen.getByText('Edit')).toBeInTheDocument();
   });
 
   it('PatientCard shows correct stage labels', () => {
-    const { rerender } = render(
-      <PatientCard patientName="Mom" diseaseStage="early" />,
-    );
+    const { rerender } = render(<PatientCard patientName="Mom" diseaseStage="early" />);
     expect(screen.getByText(/Early stage/)).toBeInTheDocument();
 
-    rerender(
-      <PatientCard patientName="Mom" diseaseStage="late" />,
-    );
+    rerender(<PatientCard patientName="Mom" diseaseStage="late" />);
     expect(screen.getByText(/Late stage/)).toBeInTheDocument();
   });
 });

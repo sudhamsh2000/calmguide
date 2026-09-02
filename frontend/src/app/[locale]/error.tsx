@@ -16,10 +16,7 @@ export default function RootError({
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5 py-8">
-      <ErrorState
-        message="Something unexpected happened. Please try again."
-        onRetry={reset}
-      />
+      <ErrorState message="Something unexpected happened. Please try again." onRetry={reset} />
     </div>
   );
 }

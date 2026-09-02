@@ -1,16 +1,28 @@
 """Pydantic v2 schemas for feedback endpoints."""
+
 from pydantic import BaseModel, Field
 
-
 PREDEFINED_TAGS = [
-    "calm_approach", "music", "redirection", "physical_space",
-    "familiar_objects", "routine", "lighting", "simple_words",
-    "physical_touch", "called_for_help", "waited_it_out", "left_the_room",
+    "calm_approach",
+    "music",
+    "redirection",
+    "physical_space",
+    "familiar_objects",
+    "routine",
+    "lighting",
+    "simple_words",
+    "physical_touch",
+    "called_for_help",
+    "waited_it_out",
+    "left_the_room",
 ]
 
 NEGATIVE_REASON_TAGS = [
-    "too_generic", "wrong_situation", "didnt_understand",
-    "felt_unsafe", "already_tried",
+    "too_generic",
+    "wrong_situation",
+    "didnt_understand",
+    "felt_unsafe",
+    "already_tried",
 ]
 
 

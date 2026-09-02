@@ -1,6 +1,8 @@
 """Tests for tag generation from coach responses."""
-import pytest
+
 from unittest.mock import AsyncMock
+
+import pytest
 
 from app.schemas.feedback import PREDEFINED_TAGS
 

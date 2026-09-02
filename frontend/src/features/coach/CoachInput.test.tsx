@@ -78,9 +78,7 @@ describe('CoachInput', () => {
   });
 
   it('accepts className prop', () => {
-    const { container } = render(
-      <CoachInput onSubmit={vi.fn()} className="custom-class" />,
-    );
+    const { container } = render(<CoachInput onSubmit={vi.fn()} className="custom-class" />);
     expect(container.firstChild).toHaveClass('custom-class');
   });
 

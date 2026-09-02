@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { FacilityProvider } from "@/context/FacilityContext";
-import { FacilityNav } from "./FacilityNav";
-import { EmergencyBar } from "@/components/ui/EmergencyBar";
+import { useEffect } from 'react';
+import { FacilityProvider } from '@/context/FacilityContext';
+import { FacilityNav } from './FacilityNav';
+import { EmergencyBar } from '@/components/ui/EmergencyBar';
 
 function FacilityChromeEffect() {
   useEffect(() => {
-    document.documentElement.setAttribute("data-facility", "");
+    document.documentElement.setAttribute('data-facility', '');
     return () => {
-      document.documentElement.removeAttribute("data-facility");
+      document.documentElement.removeAttribute('data-facility');
     };
   }, []);
   return null;
@@ -31,9 +31,9 @@ export function FacilityModeShell({ children }: { children: React.ReactNode }) {
 export function useFacilityChrome(active: boolean) {
   useEffect(() => {
     if (!active) return;
-    document.documentElement.setAttribute("data-facility", "");
+    document.documentElement.setAttribute('data-facility', '');
     return () => {
-      document.documentElement.removeAttribute("data-facility");
+      document.documentElement.removeAttribute('data-facility');
     };
   }, [active]);
 }

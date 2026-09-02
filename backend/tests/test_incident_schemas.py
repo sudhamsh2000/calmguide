@@ -1,9 +1,10 @@
+from datetime import UTC, date, datetime, timezone
+
 import pytest
-from datetime import datetime, date, timezone
 from pydantic import ValidationError
 
-from app.schemas.incident import IncidentCreate, IncidentUpdate, IncidentResponse
 from app.schemas.care_change import CareChangeCreate, CareChangeResponse
+from app.schemas.incident import IncidentCreate, IncidentResponse, IncidentUpdate
 
 
 class TestIncidentCreate:
@@ -11,7 +12,7 @@ class TestIncidentCreate:
         data = IncidentCreate(
             behavior_category="aggression_anger",
             behavior_description="Patient hit caregiver",
-            incident_time=datetime.now(timezone.utc),
+            incident_time=datetime.now(UTC),
         )
         assert data.behavior_category == "aggression_anger"
         assert data.source == "manual"
@@ -21,7 +22,7 @@ class TestIncidentCreate:
             IncidentCreate(
                 behavior_category="invalid_category",
                 behavior_description="test",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
             )
 
     def test_rejects_empty_description(self):
@@ -29,14 +30,14 @@ class TestIncidentCreate:
             IncidentCreate(
                 behavior_category="other",
                 behavior_description="",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
             )
 
     def test_full(self):
         data = IncidentCreate(
             behavior_category="wandering_exit_seeking",
             behavior_description="Tried to leave through front door",
-            incident_time=datetime.now(timezone.utc),
+            incident_time=datetime.now(UTC),
             severity="moderate",
             duration_category="minutes",
             antecedent_description="Patient woke up confused",
@@ -56,7 +57,7 @@ class TestIncidentCreate:
             IncidentCreate(
                 behavior_category="other",
                 behavior_description="test",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
                 severity="critical",
             )
 
@@ -65,7 +66,7 @@ class TestIncidentCreate:
             IncidentCreate(
                 behavior_category="other",
                 behavior_description="test",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
                 intervention_outcome="fixed",
             )
 
@@ -74,21 +75,26 @@ class TestIncidentCreate:
             IncidentCreate(
                 behavior_category="other",
                 behavior_description="test",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
                 caregiver_role="doctor",
             )
 
     def test_all_behavior_categories_valid(self):
         categories = [
-            "aggression_anger", "confusion_disorientation", "wandering_exit_seeking",
-            "refusing_care", "sleep_problems", "hallucinations",
-            "repetitive_behavior", "other",
+            "aggression_anger",
+            "confusion_disorientation",
+            "wandering_exit_seeking",
+            "refusing_care",
+            "sleep_problems",
+            "hallucinations",
+            "repetitive_behavior",
+            "other",
         ]
         for cat in categories:
             data = IncidentCreate(
                 behavior_category=cat,
                 behavior_description="test",
-                incident_time=datetime.now(timezone.utc),
+                incident_time=datetime.now(UTC),
             )
             assert data.behavior_category == cat
 

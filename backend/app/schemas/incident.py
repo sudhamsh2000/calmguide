@@ -5,11 +5,15 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-
 BEHAVIOR_CATEGORIES = Literal[
-    "aggression_anger", "confusion_disorientation", "wandering_exit_seeking",
-    "refusing_care", "sleep_problems", "hallucinations",
-    "repetitive_behavior", "other",
+    "aggression_anger",
+    "confusion_disorientation",
+    "wandering_exit_seeking",
+    "refusing_care",
+    "sleep_problems",
+    "hallucinations",
+    "repetitive_behavior",
+    "other",
 ]
 
 SEVERITY_LEVELS = Literal["mild", "moderate", "severe"]
@@ -17,15 +21,27 @@ SEVERITY_LEVELS = Literal["mild", "moderate", "severe"]
 DURATION_CATEGORIES = Literal["seconds", "minutes", "about_an_hour", "longer"]
 
 ANTECEDENT_CATEGORIES = Literal[
-    "task_demand", "transition", "environmental", "social", "physical_state", "unknown",
+    "task_demand",
+    "transition",
+    "environmental",
+    "social",
+    "physical_state",
+    "unknown",
 ]
 
 INTERVENTION_OUTCOMES = Literal[
-    "resolved", "partially_resolved", "unresolved", "escalated",
+    "resolved",
+    "partially_resolved",
+    "unresolved",
+    "escalated",
 ]
 
 CAREGIVER_ROLES = Literal[
-    "spouse", "adult_child", "paid_aide", "other_family", "other",
+    "spouse",
+    "adult_child",
+    "paid_aide",
+    "other_family",
+    "other",
 ]
 
 

@@ -1,4 +1,5 @@
 """Daily behavioral check-in endpoints."""
+
 import json
 import logging
 from datetime import date
@@ -21,9 +22,7 @@ router = APIRouter(tags=["daily_checkin"])
 
 async def _get_profile(access_code: str, db: AsyncSession) -> Profile:
     code_hash = hash_access_code(access_code)
-    result = await db.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await db.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
     if profile is None:
         raise HTTPException(

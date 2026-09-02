@@ -47,10 +47,7 @@ function formatTimestamp(date: Date, locale: string): string {
   return `${monthDay} at ${timeStr}`;
 }
 
-export function ConversationHistory({
-  conversations,
-  className = '',
-}: ConversationHistoryProps) {
+export function ConversationHistory({ conversations, className = '' }: ConversationHistoryProps) {
   const t = useTranslations('home');
   const locale = useLocale();
 
@@ -62,17 +59,17 @@ export function ConversationHistory({
       <div className="flex flex-col gap-2">
         {conversations.length === 0 ? (
           <div className="rounded-2xl border border-foreground/10 bg-surface px-4 py-3.5">
-            <p className="text-sm text-foreground-muted">
-              {t('conversations.empty_detail')}
-            </p>
+            <p className="text-sm text-foreground-muted">{t('conversations.empty_detail')}</p>
           </div>
         ) : (
           conversations.map((conversation) => (
-            <Link key={conversation.id} href={`/coach?session_id=${conversation.id}`} className="block">
+            <Link
+              key={conversation.id}
+              href={`/coach?session_id=${conversation.id}`}
+              className="block"
+            >
               <div className="rounded-2xl border border-foreground/10 bg-surface px-4 py-3.5 transition-colors hover:border-primary/30 cursor-pointer">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {conversation.title}
-                </p>
+                <p className="text-sm font-medium text-foreground truncate">{conversation.title}</p>
                 <p className="text-xs text-foreground-muted mt-1">
                   {formatTimestamp(conversation.timestamp, locale)}
                 </p>

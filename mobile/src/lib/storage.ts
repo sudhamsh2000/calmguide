@@ -39,7 +39,7 @@ export async function setAccessCode(code: string): Promise<void> {
       await AsyncStorage.setItem(ACCESS_CODE_KEY, code);
     }
   } catch (err) {
-    if (__DEV__) console.warn("SecureStore unavailable — falling back to AsyncStorage:", err);
+    if (__DEV__) console.warn('SecureStore unavailable — falling back to AsyncStorage:', err);
     await AsyncStorage.setItem(ACCESS_CODE_KEY, code);
   }
 }
@@ -101,7 +101,7 @@ export async function clearAll(): Promise<void> {
   ]);
 }
 
-const PREFERRED_LANGUAGE_KEY = "calmguide_preferred_language";
+const PREFERRED_LANGUAGE_KEY = 'calmguide_preferred_language';
 
 export async function getPreferredLanguage(): Promise<string | null> {
   return AsyncStorage.getItem(PREFERRED_LANGUAGE_KEY);
@@ -127,25 +127,41 @@ export async function getProfiles(): Promise<StoredProfile[]> {
     if (SecureStore) {
       const secure = await SecureStore.getItemAsync(PROFILES_KEY);
       if (secure) {
-        try { return JSON.parse(secure) as StoredProfile[]; } catch { return []; }
+        try {
+          return JSON.parse(secure) as StoredProfile[];
+        } catch {
+          return [];
+        }
       }
       // Migration: read from AsyncStorage and promote to SecureStore
       const legacy = await AsyncStorage.getItem(PROFILES_KEY);
       if (legacy) {
         await SecureStore.setItemAsync(PROFILES_KEY, legacy);
         await AsyncStorage.removeItem(PROFILES_KEY);
-        try { return JSON.parse(legacy) as StoredProfile[]; } catch { return []; }
+        try {
+          return JSON.parse(legacy) as StoredProfile[];
+        } catch {
+          return [];
+        }
       }
     } else {
       const raw = await AsyncStorage.getItem(PROFILES_KEY);
       if (raw) {
-        try { return JSON.parse(raw) as StoredProfile[]; } catch { return []; }
+        try {
+          return JSON.parse(raw) as StoredProfile[];
+        } catch {
+          return [];
+        }
       }
     }
   } catch {
     const raw = await AsyncStorage.getItem(PROFILES_KEY);
     if (raw) {
-      try { return JSON.parse(raw) as StoredProfile[]; } catch { return []; }
+      try {
+        return JSON.parse(raw) as StoredProfile[];
+      } catch {
+        return [];
+      }
     }
   }
 

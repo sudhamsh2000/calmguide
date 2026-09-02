@@ -5,7 +5,7 @@ the previously-untested cross-tenant isolation (TEST-6).
 """
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest_asyncio
 
@@ -21,7 +21,9 @@ from app.services.jwt_service import create_token
 
 
 def _auth(staff):
-    return {"Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"}
+    return {
+        "Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"
+    }
 
 
 async def _profile(db_session, code, stage="middle"):
@@ -53,20 +55,32 @@ async def setup(db_session):
     p2 = await _profile(db_session, "RESTWO02", "late")
     other_p = await _profile(db_session, "OTHERP03")
 
-    db_session.add_all([
-        FacilityPatientLink(facility_id=fac.id, profile_id=p1.id, unit="U1", room="101", bed="A", is_active=True),
-        FacilityPatientLink(facility_id=fac.id, profile_id=p2.id, unit="U2", room="202", bed="B", is_active=True),
-        FacilityPatientLink(facility_id=other.id, profile_id=other_p.id, is_active=True),
-    ])
+    db_session.add_all(
+        [
+            FacilityPatientLink(
+                facility_id=fac.id, profile_id=p1.id, unit="U1", room="101", bed="A", is_active=True
+            ),
+            FacilityPatientLink(
+                facility_id=fac.id, profile_id=p2.id, unit="U2", room="202", bed="B", is_active=True
+            ),
+            FacilityPatientLink(facility_id=other.id, profile_id=other_p.id, is_active=True),
+        ]
+    )
 
     # p1 has 5 recent incidents -> high risk; p2 has none -> low
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for i in range(5):
-        db_session.add(Incident(
-            profile_id=p1.id, source="manual", incident_time=now - timedelta(days=1, hours=i),
-            time_slot="evening", behavior_category="aggression_anger",
-            behavior_description=encrypt("x"), intervention_outcome="resolved",
-        ))
+        db_session.add(
+            Incident(
+                profile_id=p1.id,
+                source="manual",
+                incident_time=now - timedelta(days=1, hours=i),
+                time_slot="evening",
+                behavior_category="aggression_anger",
+                behavior_description=encrypt("x"),
+                intervention_outcome="resolved",
+            )
+        )
     # nurse is assigned only to p1
     db_session.add(StaffPatientAssignment(staff_id=nurse.id, profile_id=p1.id, facility_id=fac.id))
     await db_session.commit()

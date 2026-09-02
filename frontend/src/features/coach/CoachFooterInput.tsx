@@ -24,7 +24,7 @@ export function CoachFooterInput({ onSubmit, disabled = false }: CoachFooterInpu
   const handleVoiceTranscript = useCallback((transcript: string) => {
     setInterimText('');
     setText((prev) => {
-      const updated = prev + (prev ? " " : "") + transcript;
+      const updated = prev + (prev ? ' ' : '') + transcript;
       return updated.slice(0, MAX_CHARS + 50);
     });
   }, []);
@@ -61,20 +61,24 @@ export function CoachFooterInput({ onSubmit, disabled = false }: CoachFooterInpu
   );
 
   return (
-    <div className={[
-      'flex items-end gap-1 rounded-xl border px-2 py-1.5 transition-all bg-surface',
-      isListening
-        ? 'field-shell-error'
-        : disabled
-          ? 'opacity-50 border-slate-300 dark:border-[#31445f]'
-          : 'border-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_1px_2px_rgba(23,37,42,0.06)] hover:border-slate-400 dark:border-[#31445f] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] dark:hover:border-[#3a4f6d] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(58,175,169,0.18)] dark:focus-within:border-[#57c7c2] dark:focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_0_0_1px_rgba(87,199,194,0.38),0_0_0_4px_rgba(43,122,120,0.16)]',
-    ].join(' ')}>
+    <div
+      className={[
+        'flex items-end gap-1 rounded-xl border px-2 py-1.5 transition-all bg-surface',
+        isListening
+          ? 'field-shell-error'
+          : disabled
+            ? 'opacity-50 border-slate-300 dark:border-[#31445f]'
+            : 'border-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_1px_2px_rgba(23,37,42,0.06)] hover:border-slate-400 dark:border-[#31445f] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] dark:hover:border-[#3a4f6d] focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(58,175,169,0.18)] dark:focus-within:border-[#57c7c2] dark:focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_0_0_1px_rgba(87,199,194,0.38),0_0_0_4px_rgba(43,122,120,0.16)]',
+      ].join(' ')}
+    >
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, MAX_CHARS + 50))}
         onKeyDown={handleKeyDown}
         disabled={disabled}
-        placeholder={isListening && !text ? (interimText || tc('actions.speak_now')) : t('followup_placeholder')}
+        placeholder={
+          isListening && !text ? interimText || tc('actions.speak_now') : t('followup_placeholder')
+        }
         rows={1}
         aria-label={t('followup_aria_label')}
         className={[

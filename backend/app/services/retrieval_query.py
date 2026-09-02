@@ -11,6 +11,7 @@ def _is_rag_configured() -> bool:
     """Check if the RAG pipeline is available without importing it."""
     try:
         from rag.retrieve import get_rag_context  # noqa: PLC0415, F401
+
         return True
     except Exception:
         return False
@@ -69,7 +70,14 @@ async def build_english_rag_query(
 
     rewritten = await llm.completion(
         "You convert multilingual caregiver requests into short English retrieval queries.",
-        [{"role": "user", "content": build_rewrite_prompt(locale_code=locale_code, user_text=user_text, context=context)}],
+        [
+            {
+                "role": "user",
+                "content": build_rewrite_prompt(
+                    locale_code=locale_code, user_text=user_text, context=context
+                ),
+            }
+        ],
     )
     sanitized = _sanitize_query(rewritten)
     return sanitized or _sanitize_query(user_text)

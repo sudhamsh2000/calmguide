@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useRequireRole } from "@/hooks/useRequireRole";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { KpiCard } from "@/components/facility/KpiCard";
-import { useFacility } from "@/context/FacilityContext";
-import { downloadReport, getDashboardSummary, FacilityApiError } from "@/lib/facility-api";
-import type { DashboardSummary } from "@/lib/facility-api";
+import { useCallback, useEffect, useState } from 'react';
+import { useRequireRole } from '@/hooks/useRequireRole';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { KpiCard } from '@/components/facility/KpiCard';
+import { useFacility } from '@/context/FacilityContext';
+import { downloadReport, getDashboardSummary, FacilityApiError } from '@/lib/facility-api';
+import type { DashboardSummary } from '@/lib/facility-api';
 
 export default function DashboardPage() {
-  const { allowed } = useRequireRole("admin", "owner");
+  const { allowed } = useRequireRole('admin', 'owner');
   if (!allowed) return null;
 
-  const t = useTranslations("facility.dashboard");
+  const t = useTranslations('facility.dashboard');
   const { state } = useFacility();
 
   const [data, setData] = useState<DashboardSummary | null>(null);
@@ -31,7 +31,7 @@ export default function DashboardPage() {
       if (err instanceof FacilityApiError && err.status === 401) {
         setError("You've been signed out for safety.");
       } else {
-        setError("Dashboard unavailable right now. Try refreshing in a moment.");
+        setError('Dashboard unavailable right now. Try refreshing in a moment.');
       }
     } finally {
       setLoading(false);
@@ -54,7 +54,7 @@ export default function DashboardPage() {
     try {
       await downloadReport(1);
     } catch {
-      setError("Could not export the report right now. Try again in a moment.");
+      setError('Could not export the report right now. Try again in a moment.');
     } finally {
       setExporting(false);
     }
@@ -65,22 +65,19 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
+          <h1 className="text-xl font-bold text-foreground">{t('title')}</h1>
           {state.facilityName && (
             <p className="text-sm text-foreground-muted">{state.facilityName}</p>
           )}
         </div>
         {state.staff && (
-          <Link
-            href="/facility/profile"
-            className="text-sm text-primary hover:underline"
-          >
-            {state.staff.name.split(" ")[0]} ↗
+          <Link href="/facility/profile" className="text-sm text-primary hover:underline">
+            {state.staff.name.split(' ')[0]} ↗
           </Link>
         )}
       </div>
 
-      <p className="text-sm text-foreground-muted mb-4">{t("last_24h")}</p>
+      <p className="text-sm text-foreground-muted mb-4">{t('last_24h')}</p>
 
       {loading && (
         <div className="grid grid-cols-2 gap-3">
@@ -102,20 +99,20 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 gap-3">
             <KpiCard
               value={data.incident_count.total}
-              label={t("incidents")}
-              sublabel={`${data.incident_count.severe} ${t("severe")}, ${data.incident_count.mild} ${t("mild")}`}
-              urgency={data.incident_count.severe > 0 ? "alert" : undefined}
+              label={t('incidents')}
+              sublabel={`${data.incident_count.severe} ${t('severe')}, ${data.incident_count.mild} ${t('mild')}`}
+              urgency={data.incident_count.severe > 0 ? 'alert' : undefined}
             />
             <KpiCard
               value={`${data.escalating_residents.length}`}
-              label={t("escalating")}
-              urgency={data.escalating_residents.length > 0 ? "warning" : undefined}
+              label={t('escalating')}
+              urgency={data.escalating_residents.length > 0 ? 'warning' : undefined}
             />
             <KpiCard
               value={`${data.staff_adoption.active_users}/${data.staff_adoption.total_staff}`}
-              label={t("staff_active")}
+              label={t('staff_active')}
               sublabel={`${data.staff_adoption.percentage}%`}
-              urgency={data.staff_adoption.percentage >= 80 ? "positive" : undefined}
+              urgency={data.staff_adoption.percentage >= 80 ? 'positive' : undefined}
             />
           </div>
 
@@ -124,7 +121,7 @@ export default function DashboardPage() {
             <section>
               <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
                 <span className="text-yellow-600">⚠</span>
-                {t("escalating_residents")}
+                {t('escalating_residents')}
               </h2>
               <div className="card-shell rounded-xl divide-y divide-foreground/5">
                 {data.escalating_residents.map((r, i) => (
@@ -141,12 +138,10 @@ export default function DashboardPage() {
           {/* Family activity */}
           {data.family_sessions.count > 0 && (
             <section>
-              <h2 className="text-base font-bold text-foreground mb-3">
-                {t("family_activity")}
-              </h2>
+              <h2 className="text-base font-bold text-foreground mb-3">{t('family_activity')}</h2>
               <div className="card-shell rounded-xl px-4 py-3">
                 <p className="text-sm text-foreground">
-                  {data.family_sessions.count} {t("family_sessions")}
+                  {data.family_sessions.count} {t('family_sessions')}
                 </p>
               </div>
             </section>
@@ -159,7 +154,7 @@ export default function DashboardPage() {
             disabled={exporting}
             className="focus-ring rounded-xl bg-primary text-white px-4 py-3 min-h-[48px] text-base font-semibold hover:bg-primary-light dark:hover:bg-primary-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {exporting ? `${t("export_pdf")}…` : t("export_pdf")}
+            {exporting ? `${t('export_pdf')}…` : t('export_pdf')}
           </button>
         </div>
       )}

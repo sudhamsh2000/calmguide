@@ -1,10 +1,10 @@
 """Unit tests for B2B identity models — no database required."""
 
+from app.models.audit_log import AuditLog
 from app.models.facility import Facility
+from app.models.facility_patient_link import FacilityPatientLink
 from app.models.staff import Staff
 from app.models.staff_patient_assignment import StaffPatientAssignment
-from app.models.facility_patient_link import FacilityPatientLink
-from app.models.audit_log import AuditLog
 from app.services.auth import hash_access_code
 
 

@@ -1,8 +1,4 @@
-import {
-  ACCESS_CODE_LENGTH,
-  sanitizeAccessCode,
-  validateLoginInput,
-} from '../login-validation';
+import { ACCESS_CODE_LENGTH, sanitizeAccessCode, validateLoginInput } from '../login-validation';
 
 describe('sanitizeAccessCode', () => {
   it('uppercases and strips non-alphanumeric characters', () => {

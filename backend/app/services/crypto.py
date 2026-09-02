@@ -31,11 +31,12 @@ def _get_cipher(key_b64: str) -> AESGCM:
 
 def _current_cipher() -> AESGCM:
     from app.config import get_settings
+
     key_b64 = get_settings().CONVERSATION_ENCRYPTION_KEY
     if not key_b64:
         raise ValueError(
             "CONVERSATION_ENCRYPTION_KEY is not set. "
-            "Generate with: python -c \"import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())\""
+            'Generate with: python -c "import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"'
         )
     return _get_cipher(key_b64)
 
@@ -44,13 +45,13 @@ def _decode_key(key_b64: str) -> bytes:
     if not key_b64:
         raise ValueError(
             "CONVERSATION_ENCRYPTION_KEY is not set. "
-            "Generate with: python -c \"import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())\""
+            'Generate with: python -c "import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"'
         )
     key = base64.b64decode(key_b64)
     if len(key) != 32:
         raise ValueError(
             f"CONVERSATION_ENCRYPTION_KEY must decode to exactly 32 bytes (got {len(key)}). "
-            "Generate with: python -c \"import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())\""
+            'Generate with: python -c "import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"'
         )
     return key
 
@@ -76,7 +77,7 @@ def decrypt(value: str) -> str:
             "Run the encryption migration to fix: alembic upgrade head"
         )
         return value
-    raw = base64.b64decode(value[len(_PREFIX):])
+    raw = base64.b64decode(value[len(_PREFIX) :])
     nonce, ciphertext = raw[:12], raw[12:]
     aesgcm = _current_cipher()
     return aesgcm.decrypt(nonce, ciphertext, None).decode("utf-8")

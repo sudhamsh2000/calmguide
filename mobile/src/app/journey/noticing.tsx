@@ -46,9 +46,7 @@ export default function NoticingScreen() {
           </Text>
           <Text style={p}>{t('noticing.p2')}</Text>
           <Text style={p}>{t('noticing.p3')}</Text>
-          <Text
-            style={{ ...p, fontSize: 13, fontStyle: 'italic', color: colors.mutedForeground }}
-          >
+          <Text style={{ ...p, fontSize: 13, fontStyle: 'italic', color: colors.mutedForeground }}>
             {t('noticing.footnote')}
           </Text>
         </>

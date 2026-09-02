@@ -26,14 +26,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.calmguide.app",
       "allowBackup": false,
-      "blockedPermissions": [
-        "android.permission.SYSTEM_ALERT_WINDOW"
-      ]
+      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW"]
     },
     "web": {
       "output": "static",
@@ -64,9 +60,7 @@
         {
           "microphonePermission": "CalmGuide needs microphone access so you can describe caregiving situations by voice.",
           "speechRecognitionPermission": "CalmGuide uses speech recognition to convert your voice to text.",
-          "androidSpeechServicePackages": [
-            "com.google.android.googlequicksearchbox"
-          ]
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
         }
       ],
       "expo-secure-store",

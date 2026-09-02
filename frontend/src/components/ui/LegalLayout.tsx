@@ -56,9 +56,13 @@ export function LegalLayout({ title, lastUpdated, sections, children }: LegalLay
 
       {/* Footer nav */}
       <div className="mt-12 pt-6 border-t border-theme flex gap-4 text-sm text-foreground-muted">
-        <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+        <Link href="/terms" className="hover:text-foreground transition-colors">
+          Terms of Service
+        </Link>
         <span aria-hidden>·</span>
-        <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+        <Link href="/privacy" className="hover:text-foreground transition-colors">
+          Privacy Policy
+        </Link>
       </div>
     </main>
   );

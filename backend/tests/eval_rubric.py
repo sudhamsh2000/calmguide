@@ -13,6 +13,7 @@ from dataclasses import dataclass
 @dataclass
 class RubricResult:
     """Result of a single rubric check."""
+
     name: str
     score: int  # 0 or 1
     reason: str
@@ -47,11 +48,13 @@ def check_has_all_sections(response: str) -> list[RubricResult]:
     results = []
     for name, (pattern, description) in _SECTION_PATTERNS.items():
         found = bool(re.search(pattern, response))
-        results.append(RubricResult(
-            name=name,
-            score=1 if found else 0,
-            reason=f"Found" if found else description,
-        ))
+        results.append(
+            RubricResult(
+                name=name,
+                score=1 if found else 0,
+                reason="Found" if found else description,
+            )
+        )
     return results
 
 
@@ -59,20 +62,29 @@ def check_has_all_sections(response: str) -> list[RubricResult]:
 # Patient personalization checks
 # ---------------------------------------------------------------------------
 
+
 def check_uses_patient_name(response: str, patient_name: str) -> RubricResult:
     """Check that the response uses the patient's name."""
     found = patient_name.lower() in response.lower()
     return RubricResult(
         name="uses_patient_name",
         score=1 if found else 0,
-        reason=f"Found '{patient_name}'" if found else f"Patient name '{patient_name}' not found in response",
+        reason=f"Found '{patient_name}'"
+        if found
+        else f"Patient name '{patient_name}' not found in response",
     )
 
 
 def check_references_disease_stage(response: str, disease_stage: str) -> RubricResult:
     """Check that the 'why' section references the disease stage."""
     stage_terms = {
-        "early": ["early stage", "early-stage", "mild cognitive", "early dementia", "beginning stages"],
+        "early": [
+            "early stage",
+            "early-stage",
+            "mild cognitive",
+            "early dementia",
+            "beginning stages",
+        ],
         "middle": ["middle stage", "mid-stage", "moderate", "middle dementia", "progressing"],
         "late": ["late stage", "late-stage", "advanced", "severe", "late dementia"],
     }
@@ -82,13 +94,13 @@ def check_references_disease_stage(response: str, disease_stage: str) -> RubricR
     return RubricResult(
         name="references_disease_stage",
         score=1 if found else 0,
-        reason=f"Found disease stage reference" if found else f"No reference to '{disease_stage}' stage found",
+        reason="Found disease stage reference"
+        if found
+        else f"No reference to '{disease_stage}' stage found",
     )
 
 
-def check_includes_calming_strategy(
-    response: str, calming_strategies: list[str]
-) -> RubricResult:
+def check_includes_calming_strategy(response: str, calming_strategies: list[str]) -> RubricResult:
     """Check that at least one known calming strategy is referenced."""
     response_lower = response.lower()
     for strategy in calming_strategies:
@@ -104,7 +116,7 @@ def check_includes_calming_strategy(
     return RubricResult(
         name="includes_calming_strategy",
         score=0,
-        reason=f"No calming strategies from profile found in response",
+        reason="No calming strategies from profile found in response",
     )
 
 
@@ -242,10 +254,34 @@ def check_tone_warm_and_calm(response: str) -> RubricResult:
 
 
 _ACTION_VERBS = [
-    "walk", "speak", "say", "move", "turn", "offer", "play",
-    "sit", "stand", "bring", "place", "guide", "gently", "calmly",
-    "approach", "step", "lower", "hand", "open", "close", "put",
-    "try", "ask", "give", "show", "call", "check", "redirect",
+    "walk",
+    "speak",
+    "say",
+    "move",
+    "turn",
+    "offer",
+    "play",
+    "sit",
+    "stand",
+    "bring",
+    "place",
+    "guide",
+    "gently",
+    "calmly",
+    "approach",
+    "step",
+    "lower",
+    "hand",
+    "open",
+    "close",
+    "put",
+    "try",
+    "ask",
+    "give",
+    "show",
+    "call",
+    "check",
+    "redirect",
 ]
 
 
@@ -269,6 +305,7 @@ def check_actions_are_concrete(response: str) -> RubricResult:
 # ---------------------------------------------------------------------------
 # Caregiver distress detection
 # ---------------------------------------------------------------------------
+
 
 def check_caregiver_crisis_resources(response: str, situation: str) -> RubricResult:
     """If the situation suggests caregiver distress, check that crisis resources are provided."""
@@ -315,6 +352,7 @@ def check_caregiver_crisis_resources(response: str, situation: str) -> RubricRes
 # ---------------------------------------------------------------------------
 # Full rubric evaluation
 # ---------------------------------------------------------------------------
+
 
 def evaluate_response(
     response: str,

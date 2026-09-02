@@ -88,8 +88,12 @@ for _code, _constraint in _LANGUAGE_CONSTRAINTS.items():
     LOCALE_TO_LANGUAGE_CONSTRAINT[_code] = _constraint
     # Map common variant codes to the same constraint
 _VARIANT_MAP = {
-    "ar": "ar-sa", "hi": "hi-in", "ja": "ja-jp",
-    "ko": "ko-kr", "ta": "ta-in", "zh": "zh-cn",
+    "ar": "ar-sa",
+    "hi": "hi-in",
+    "ja": "ja-jp",
+    "ko": "ko-kr",
+    "ta": "ta-in",
+    "zh": "zh-cn",
 }
 for _base, _variant in _VARIANT_MAP.items():
     if _base in _LANGUAGE_CONSTRAINTS:
@@ -142,6 +146,7 @@ def resolve_model_for_locale(locale_code: str) -> str | None:
     if base == "en":
         return None
     from app.config import get_settings
+
     settings = get_settings()
     if settings.LLM_PROVIDER == "openai":
         return settings.OPENAI_MULTILINGUAL_MODEL

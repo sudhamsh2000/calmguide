@@ -20,7 +20,9 @@ export function VerificationCard({ accessCode, pending, onDismiss }: Verificatio
   const handleApprove = useCallback(async () => {
     try {
       await verifyIncident(accessCode, pending.incident_id, { approved: true });
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     setDismissed(true);
     setTimeout(onDismiss, 100);
   }, [accessCode, pending.incident_id, onDismiss]);
@@ -28,7 +30,9 @@ export function VerificationCard({ accessCode, pending, onDismiss }: Verificatio
   const handleFix = useCallback(async () => {
     try {
       await verifyIncident(accessCode, pending.incident_id, { approved: true, corrections: null });
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     setDismissed(true);
     setTimeout(onDismiss, 100);
   }, [accessCode, pending.incident_id, onDismiss]);
@@ -53,7 +57,16 @@ export function VerificationCard({ accessCode, pending, onDismiss }: Verificatio
         elevation: 3,
       }}
     >
-      <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 1, color: colors.mutedForeground, marginBottom: 12, textTransform: 'uppercase' }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontWeight: '700',
+          letterSpacing: 1,
+          color: colors.mutedForeground,
+          marginBottom: 12,
+          textTransform: 'uppercase',
+        }}
+      >
         {t('verification.title')}
       </Text>
       <Text style={{ fontSize: 16, color: colors.foreground, lineHeight: 24, marginBottom: 16 }}>
@@ -71,8 +84,14 @@ export function VerificationCard({ accessCode, pending, onDismiss }: Verificatio
           </Button>
         </View>
       </View>
-      <Pressable onPress={handleDismiss} accessibilityRole="button" style={{ marginTop: 12, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('verification.dismiss')}</Text>
+      <Pressable
+        onPress={handleDismiss}
+        accessibilityRole="button"
+        style={{ marginTop: 12, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+          {t('verification.dismiss')}
+        </Text>
       </Pressable>
     </View>
   );

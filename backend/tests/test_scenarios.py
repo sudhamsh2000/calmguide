@@ -33,21 +33,34 @@ from tests.eval_rubric import (
 SCENARIOS_DIR = Path(__file__).parent / "scenarios"
 
 REQUIRED_SCENARIO_FIELDS = {
-    "id", "title", "category", "situation", "patient_profile",
-    "expected_elements", "notes",
+    "id",
+    "title",
+    "category",
+    "situation",
+    "patient_profile",
+    "expected_elements",
+    "notes",
 }
 
 REQUIRED_PROFILE_FIELDS = {
-    "name", "disease_stage", "behavioral_patterns",
-    "calming_strategies", "safety_concerns",
+    "name",
+    "disease_stage",
+    "behavioral_patterns",
+    "calming_strategies",
+    "safety_concerns",
 }
 
 REQUIRED_EXPECTED_FIELDS = {
-    "uses_patient_name", "references_disease_stage",
-    "has_60_second_actions", "has_why_section",
-    "has_what_not_to_do", "has_escalation_criteria",
-    "includes_calming_strategy", "no_reality_contradiction",
-    "no_medical_advice", "no_restraint_suggestion",
+    "uses_patient_name",
+    "references_disease_stage",
+    "has_60_second_actions",
+    "has_why_section",
+    "has_what_not_to_do",
+    "has_escalation_criteria",
+    "includes_calming_strategy",
+    "no_reality_contradiction",
+    "no_medical_advice",
+    "no_restraint_suggestion",
 }
 
 
@@ -113,7 +126,9 @@ It's understandable to feel scared in this moment. You're not alone in this.
 def _make_mock_response(scenario: dict) -> str:
     """Generate a mock response tailored to a scenario's profile."""
     profile = scenario["patient_profile"]
-    calming = profile["calming_strategies"][0] if profile["calming_strategies"] else "a familiar activity"
+    calming = (
+        profile["calming_strategies"][0] if profile["calming_strategies"] else "a familiar activity"
+    )
     return MOCK_GOOD_RESPONSE.format(
         name=profile["name"],
         stage=profile["disease_stage"],
@@ -169,9 +184,7 @@ class TestScenarioFiles:
     """Validate that all scenario JSON files are well-formed."""
 
     def test_minimum_scenario_count(self):
-        assert len(SCENARIOS) >= 20, (
-            f"Expected at least 20 scenarios, found {len(SCENARIOS)}"
-        )
+        assert len(SCENARIOS) >= 20, f"Expected at least 20 scenarios, found {len(SCENARIOS)}"
 
     @pytest.mark.parametrize(
         "scenario",
@@ -214,8 +227,13 @@ class TestScenarioFiles:
     def test_scenario_categories_cover_requirements(self):
         categories = {s["category"] for s in SCENARIOS}
         required_categories = {
-            "wandering", "aggression", "sundowning", "eating",
-            "repetitive_questions", "hallucinations", "hygiene",
+            "wandering",
+            "aggression",
+            "sundowning",
+            "eating",
+            "repetitive_questions",
+            "hallucinations",
+            "hygiene",
             "caregiver_distress",
         }
         missing = required_categories - categories
@@ -458,9 +476,7 @@ class TestRubricScoringBadResponse:
         assert result.score == 0
 
     def test_detects_missing_disease_stage(self):
-        result = check_references_disease_stage(
-            "This is common behavior.", "middle"
-        )
+        result = check_references_disease_stage("This is common behavior.", "middle")
         assert result.score == 0
 
 
@@ -498,12 +514,8 @@ class TestRubricCaregiverDistress:
 
         for scenario in distress_scenarios:
             response = _make_caregiver_distress_response(scenario)
-            result = check_caregiver_crisis_resources(
-                response, scenario["situation"]
-            )
-            assert result.score == 1, (
-                f"Scenario {scenario['id']}: {result.reason}"
-            )
+            result = check_caregiver_crisis_resources(response, scenario["situation"])
+            assert result.score == 1, f"Scenario {scenario['id']}: {result.reason}"
 
 
 class TestEvaluateResponse:

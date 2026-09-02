@@ -33,7 +33,7 @@ def make_chunk_id(source_url: str, content: str) -> str:
     rag/vectorstores/pgvector.py's _BACKFILL_CHUNK_IDS migration, so both new
     inserts and backfilled legacy rows agree on one canonical chunk_id.
     """
-    raw = f"{source_url}:{content}".encode("utf-8")
+    raw = f"{source_url}:{content}".encode()
     return hashlib.md5(raw).hexdigest()
 
 
@@ -125,7 +125,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="CalmGuide RAG ingestion pipeline")
     parser.add_argument("--urls", nargs="*", help="URLs to scrape (default: all alz.org seed URLs)")
     parser.add_argument("--clear", action="store_true", help="Clear all data before ingesting")
-    parser.add_argument("--dry-run", action="store_true", help="Scrape and chunk without embedding or storing")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Scrape and chunk without embedding or storing"
+    )
     args = parser.parse_args()
 
     asyncio.run(run_pipeline(urls=args.urls, clear=args.clear, dry_run=args.dry_run))

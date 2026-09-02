@@ -5,7 +5,7 @@ remove every row in the memory graph keyed to it — not just the anchor
 Profile row — and the access code must stop authenticating afterward.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -53,7 +53,7 @@ async def test_delete_profile_cascades_across_memory_graph(
         json={
             "behavior_category": "sundowning",
             "behavior_description": "Restless in the evening",
-            "incident_time": datetime.now(timezone.utc).isoformat(),
+            "incident_time": datetime.now(UTC).isoformat(),
             "intervention_description": "Played familiar music",
             "intervention_outcome": "resolved",
         },
@@ -87,9 +87,7 @@ async def test_delete_profile_cascades_across_memory_graph(
         await db_session.execute(select(Incident).where(Incident.profile_id == profile_id))
     ).scalars().all() == []
     assert (
-        await db_session.execute(
-            select(Conversation).where(Conversation.profile_id == profile_id)
-        )
+        await db_session.execute(select(Conversation).where(Conversation.profile_id == profile_id))
     ).scalars().all() == []
     assert (
         await db_session.execute(

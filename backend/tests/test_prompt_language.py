@@ -1,7 +1,7 @@
 from app.services.prompt import (
     get_request_locale_header,
-    render_coach_prompt,
     render_checkin_prompt,
+    render_coach_prompt,
     render_learn_prompt,
     resolve_language,
     resolve_language_constraint,
@@ -119,7 +119,11 @@ def test_coach_prompt_includes_contraindicated():
         calming_strategies=[],
         safety_concerns=[],
         contraindicated=[
-            {"description": "Physical redirection", "behavior": "aggression_anger", "incident_date": "2026-04-15"},
+            {
+                "description": "Physical redirection",
+                "behavior": "aggression_anger",
+                "incident_date": "2026-04-15",
+            },
         ],
     )
     assert "CONTRAINDICATED" in result

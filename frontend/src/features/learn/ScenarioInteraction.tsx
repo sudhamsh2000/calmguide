@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
-import ReactMarkdown from "react-markdown";
-import type { ComponentProps } from "react";
-import { getScenarios, interactWithScenario } from "@/lib/api";
-import type { Scenario } from "@/lib/api";
-import { useProfile } from "@/context/ProfileContext";
-import { CategoryBadge } from "@/components/ui/CategoryBadge";
-import { Button } from "@/components/ui/Button";
-import { SpeakButton } from "@/components/ui/SpeakButton";
-import { MicButton } from "@/components/ui/MicButton";
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import ReactMarkdown from 'react-markdown';
+import type { ComponentProps } from 'react';
+import { getScenarios, interactWithScenario } from '@/lib/api';
+import type { Scenario } from '@/lib/api';
+import { useProfile } from '@/context/ProfileContext';
+import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { Button } from '@/components/ui/Button';
+import { SpeakButton } from '@/components/ui/SpeakButton';
+import { MicButton } from '@/components/ui/MicButton';
 
 export interface ScenarioInteractionProps {
   scenarioId: string;
@@ -25,8 +25,8 @@ interface FeedbackSection {
 
 function parseFeedback(raw: string): FeedbackSection[] {
   const sections: FeedbackSection[] = [];
-  const lines = raw.split("\n");
-  let currentHeading = "";
+  const lines = raw.split('\n');
+  let currentHeading = '';
   let currentContent: string[] = [];
 
   for (const line of lines) {
@@ -35,7 +35,7 @@ function parseFeedback(raw: string): FeedbackSection[] {
       if (currentHeading && currentContent.length > 0) {
         sections.push({
           heading: currentHeading,
-          content: currentContent.join("\n").trim(),
+          content: currentContent.join('\n').trim(),
         });
       }
       currentHeading = headingMatch[1];
@@ -48,53 +48,40 @@ function parseFeedback(raw: string): FeedbackSection[] {
   if (currentHeading && currentContent.length > 0) {
     sections.push({
       heading: currentHeading,
-      content: currentContent.join("\n").trim(),
+      content: currentContent.join('\n').trim(),
     });
   }
 
   return sections;
 }
 
-const mdComponents: ComponentProps<typeof ReactMarkdown>["components"] = {
+const mdComponents: ComponentProps<typeof ReactMarkdown>['components'] = {
   p: ({ children }) => (
-    <p className="text-sm leading-relaxed text-foreground mb-2 last:mb-0">
-      {children}
-    </p>
+    <p className="text-sm leading-relaxed text-foreground mb-2 last:mb-0">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc ps-5 space-y-1 text-sm text-foreground">
-      {children}
-    </ul>
+    <ul className="list-disc ps-5 space-y-1 text-sm text-foreground">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal ps-5 space-y-1 text-sm text-foreground">
-      {children}
-    </ol>
+    <ol className="list-decimal ps-5 space-y-1 text-sm text-foreground">{children}</ol>
   ),
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-  strong: ({ children }) => (
-    <strong className="font-semibold">{children}</strong>
-  ),
+  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   h3: ({ children }) => (
-    <h3 className="font-semibold text-sm text-foreground mt-3 mb-1">
-      {children}
-    </h3>
+    <h3 className="font-semibold text-sm text-foreground mt-3 mb-1">{children}</h3>
   ),
 };
 
-export function ScenarioInteraction({
-  scenarioId,
-  className = "",
-}: ScenarioInteractionProps) {
-  const t = useTranslations("learn");
-  const tc = useTranslations("common");
+export function ScenarioInteraction({ scenarioId, className = '' }: ScenarioInteractionProps) {
+  const t = useTranslations('learn');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { state: profileState } = useProfile();
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [scenarioLoading, setScenarioLoading] = useState(true);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -112,13 +99,13 @@ export function ScenarioInteraction({
         if (found) {
           setScenario(found);
         } else {
-          setScenarioError(t("error.not_found"));
+          setScenarioError(t('error.not_found'));
         }
         setScenarioLoading(false);
       })
       .catch(() => {
         if (!cancelled) {
-          setScenarioError(t("error.load_failed"));
+          setScenarioError(t('error.load_failed'));
           setScenarioLoading(false);
         }
       });
@@ -129,7 +116,7 @@ export function ScenarioInteraction({
   }, [scenarioId]);
 
   const handleVoiceTranscript = useCallback((transcript: string) => {
-    setMessage((prev) => prev + (prev ? " " : "") + transcript);
+    setMessage((prev) => prev + (prev ? ' ' : '') + transcript);
   }, []);
 
   const handleListeningChange = useCallback((listening: boolean) => {
@@ -142,7 +129,7 @@ export function ScenarioInteraction({
     setSubmitting(true);
     setSubmitError(null);
 
-    const diseaseStage = profileState.profile?.disease_stage ?? "middle";
+    const diseaseStage = profileState.profile?.disease_stage ?? 'middle';
 
     try {
       const result = await interactWithScenario({
@@ -152,7 +139,7 @@ export function ScenarioInteraction({
       });
       setFeedback(result.response);
     } catch {
-      setSubmitError(t("error.feedback_failed"));
+      setSubmitError(t('error.feedback_failed'));
     } finally {
       setSubmitting(false);
     }
@@ -161,11 +148,9 @@ export function ScenarioInteraction({
   // Loading state
   if (scenarioLoading) {
     return (
-      <div
-        className={`flex flex-col items-center justify-center gap-4 py-16 ${className}`}
-      >
+      <div className={`flex flex-col items-center justify-center gap-4 py-16 ${className}`}>
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="text-foreground-muted">{t("loading")}</p>
+        <p className="text-foreground-muted">{t('loading')}</p>
       </div>
     );
   }
@@ -174,16 +159,11 @@ export function ScenarioInteraction({
   if (scenarioError || !scenario) {
     return (
       <div className={`flex flex-col gap-4 px-5 py-8 ${className}`}>
-        <div
-          className="rounded-xl bg-error/10 border border-error/30 p-4"
-          role="alert"
-        >
-          <p className="text-sm text-error">
-            {scenarioError ?? "Unable to load this scenario."}
-          </p>
+        <div className="rounded-xl bg-error/10 border border-error/30 p-4" role="alert">
+          <p className="text-sm text-error">{scenarioError ?? 'Unable to load this scenario.'}</p>
         </div>
-        <Button variant="ghost" onClick={() => router.push("/learn")}>
-          {tc("nav.back_to_scenarios")}
+        <Button variant="ghost" onClick={() => router.push('/learn')}>
+          {tc('nav.back_to_scenarios')}
         </Button>
       </div>
     );
@@ -196,9 +176,9 @@ export function ScenarioInteraction({
       {/* Back button */}
       <button
         type="button"
-        onClick={() => router.push("/learn")}
+        onClick={() => router.push('/learn')}
         className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary hover:underline min-h-tap"
-        aria-label={tc("nav.back_to_scenarios")}
+        aria-label={tc('nav.back_to_scenarios')}
       >
         <svg
           width="16"
@@ -214,7 +194,7 @@ export function ScenarioInteraction({
           <path d="M19 12H5" />
           <path d="M12 19l-7-7 7-7" />
         </svg>
-        {tc("nav.back_to_scenarios")}
+        {tc('nav.back_to_scenarios')}
       </button>
 
       {/* Scenario Header */}
@@ -222,55 +202,52 @@ export function ScenarioInteraction({
         <div className="flex items-center gap-2">
           <CategoryBadge category={scenario.category} />
           <span className="inline-flex items-center rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs font-medium text-foreground-muted capitalize">
-            {t("scenario.stage_label", { stage: t(`scenario.stages.${scenario.disease_stage}`) })}
+            {t('scenario.stage_label', { stage: t(`scenario.stages.${scenario.disease_stage}`) })}
           </span>
         </div>
         <h1
           className="text-2xl font-bold tracking-tight text-foreground"
-          style={{ fontFamily: "var(--font-display)" }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
-          {t.has(`scenarios.${scenario.id}.title`) ? t(`scenarios.${scenario.id}.title`) : scenario.title}
+          {t.has(`scenarios.${scenario.id}.title`)
+            ? t(`scenarios.${scenario.id}.title`)
+            : scenario.title}
         </h1>
       </div>
 
       {/* Scenario Situation Card */}
       <div className="card-shell rounded-2xl bg-primary/5 p-5">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-          {t("scenario.the_situation")}
+          {t('scenario.the_situation')}
         </p>
         <p className="text-base text-foreground leading-relaxed">
-          {t.has(`scenarios.${scenario.id}.description`) ? t(`scenarios.${scenario.id}.description`) : scenario.description}
+          {t.has(`scenarios.${scenario.id}.description`)
+            ? t(`scenarios.${scenario.id}.description`)
+            : scenario.description}
         </p>
       </div>
 
       {/* Response Area */}
       {!feedback && (
         <div className="flex flex-col gap-3">
-          <label
-            htmlFor="caregiver-response"
-            className="text-sm font-semibold text-foreground"
-          >
-            {t("scenario.your_response")}
+          <label htmlFor="caregiver-response" className="text-sm font-semibold text-foreground">
+            {t('scenario.your_response')}
           </label>
           <div className="relative">
             <textarea
               id="caregiver-response"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={isVoiceListening ? "" : t("scenario.response_placeholder")}
+              placeholder={isVoiceListening ? '' : t('scenario.response_placeholder')}
               rows={5}
               className={[
-                "field-shell w-full px-4 py-3 pb-10 text-base resize-none",
-                isVoiceListening
-                  ? "field-shell-error ring-2 ring-error/20"
-                  : "",
-              ].join(" ")}
+                'field-shell w-full px-4 py-3 pb-10 text-base resize-none',
+                isVoiceListening ? 'field-shell-error ring-2 ring-error/20' : '',
+              ].join(' ')}
             />
             {isVoiceListening && !message && (
               <div className="absolute top-3 start-4 end-4 pointer-events-none">
-                <p className="text-base text-error/60 animate-pulse">
-                  {tc("actions.speak_now")}
-                </p>
+                <p className="text-base text-error/60 animate-pulse">{tc('actions.speak_now')}</p>
               </div>
             )}
             <div className="absolute bottom-2 end-2 flex items-center gap-2">
@@ -297,20 +274,17 @@ export function ScenarioInteraction({
             loading={submitting}
             className="w-full"
           >
-            {submitting ? t("scenario.getting_feedback") : t("scenario.get_feedback")}
+            {submitting ? t('scenario.getting_feedback') : t('scenario.get_feedback')}
           </Button>
           <p className="text-xs text-foreground-muted/70 text-center leading-relaxed">
-            {tc("privacy_hint")}
+            {tc('privacy_hint')}
           </p>
         </div>
       )}
 
       {/* Submit Error */}
       {submitError && (
-        <div
-          className="rounded-xl bg-error/10 border border-error/30 p-4"
-          role="alert"
-        >
+        <div className="rounded-xl bg-error/10 border border-error/30 p-4" role="alert">
           <p className="text-sm text-error">{submitError}</p>
         </div>
       )}
@@ -320,9 +294,9 @@ export function ScenarioInteraction({
         <div className="flex flex-col gap-3">
           <h2
             className="text-lg font-bold text-foreground"
-            style={{ fontFamily: "var(--font-display)" }}
+            style={{ fontFamily: 'var(--font-display)' }}
           >
-            {t("scenario.your_feedback")}
+            {t('scenario.your_feedback')}
           </h2>
 
           {feedbackSections.length > 0 ? (
@@ -332,15 +306,11 @@ export function ScenarioInteraction({
                 className="rounded-2xl border border-foreground/10 bg-surface p-4"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-semibold text-primary mb-1.5">
-                    {section.heading}
-                  </p>
+                  <p className="text-sm font-semibold text-primary mb-1.5">{section.heading}</p>
                   <SpeakButton text={section.content} className="shrink-0" />
                 </div>
                 <div className="space-y-2">
-                  <ReactMarkdown components={mdComponents}>
-                    {section.content}
-                  </ReactMarkdown>
+                  <ReactMarkdown components={mdComponents}>{section.content}</ReactMarkdown>
                 </div>
               </div>
             ))
@@ -350,9 +320,7 @@ export function ScenarioInteraction({
                 <SpeakButton text={feedback} />
               </div>
               <div className="space-y-2">
-                <ReactMarkdown components={mdComponents}>
-                  {feedback}
-                </ReactMarkdown>
+                <ReactMarkdown components={mdComponents}>{feedback}</ReactMarkdown>
               </div>
             </div>
           )}
@@ -364,19 +332,15 @@ export function ScenarioInteraction({
               size="lg"
               onClick={() => {
                 setFeedback(null);
-                setMessage("");
+                setMessage('');
                 setSubmitError(null);
               }}
               className="w-full"
             >
-              {t("scenario.try_different")}
+              {t('scenario.try_different')}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/learn")}
-              className="w-full"
-            >
-              {tc("nav.back_to_scenarios")}
+            <Button variant="ghost" onClick={() => router.push('/learn')} className="w-full">
+              {tc('nav.back_to_scenarios')}
             </Button>
           </div>
         </div>

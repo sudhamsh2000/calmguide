@@ -46,19 +46,31 @@ export function IncidentPatternCard({ patterns }: IncidentPatternCardProps) {
         elevation: 3,
       }}
     >
-      <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 1, color: colors.mutedForeground, marginBottom: 12, textTransform: 'uppercase' }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontWeight: '700',
+          letterSpacing: 1,
+          color: colors.mutedForeground,
+          marginBottom: 12,
+          textTransform: 'uppercase',
+        }}
+      >
         {t('patterns.title')}
       </Text>
 
       <Text style={{ fontSize: 16, color: colors.foreground }}>
         <Text style={{ textTransform: 'capitalize' }}>{category.replace(/_/g, ' ')}</Text>
         {': '}
-        <Text style={{ fontWeight: '700' }}>{data.current_weekly ?? 0}x {t('patterns.this_week')}</Text>
+        <Text style={{ fontWeight: '700' }}>
+          {data.current_weekly ?? 0}x {t('patterns.this_week')}
+        </Text>
       </Text>
 
       {data.direction === 'increasing' && data.previous_weekly !== undefined && (
         <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
-          {'↑ '}{t('patterns.up_from', { count: data.previous_weekly })}
+          {'↑ '}
+          {t('patterns.up_from', { count: data.previous_weekly })}
         </Text>
       )}
 

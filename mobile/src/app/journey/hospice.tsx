@@ -47,8 +47,7 @@ export default function HospiceScreen() {
         <>
           <Text style={p}>{t('hospice.p1')}</Text>
           <Text style={p}>
-            <Text style={{ fontWeight: '700' }}>{t('hospice.p2_emph')}</Text>{' '}
-            {t('hospice.p2_tail')}
+            <Text style={{ fontWeight: '700' }}>{t('hospice.p2_emph')}</Text> {t('hospice.p2_tail')}
           </Text>
           <Text style={p}>{t('hospice.p3')}</Text>
         </>

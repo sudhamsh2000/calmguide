@@ -14,25 +14,25 @@ from app.db import get_session
 from app.models.profile import Profile
 from app.schemas.checkin import CheckInRequest
 from app.schemas.profile import ErrorResponse
+from app.services.auth import hash_access_code
+from app.services.availability import record_llm_failure, record_llm_success
 from app.services.prompt import (
     get_request_locale_header,
     render_checkin_prompt,
     resolve_language,
-    resolve_locale_code,
     resolve_language_constraint,
+    resolve_locale_code,
     resolve_model_for_locale,
 )
-from app.services.auth import hash_access_code
-from app.services.availability import record_llm_failure, record_llm_success
-from app.services.response_timing import record_llm_timing
 from app.services.rate_limit import rate_limit
 from app.services.response_guard import (
     get_localized_fallback,
     guard_response_text,
     validate_response_quality,
 )
-from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
+from app.services.response_timing import record_llm_timing
 from app.services.safety_classifier import classify_message
+from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
 from app.services.safety_log import log_safety_event
 
 logger = logging.getLogger(__name__)
@@ -68,9 +68,7 @@ async def caregiver_checkin(
 ):
     """Stream an empathetic response to a caregiver check-in message."""
     code_hash = hash_access_code(payload.access_code)
-    result = await session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
 
     if profile is None:
@@ -122,13 +120,20 @@ async def caregiver_checkin(
             _spawn_background(_log_safety_gate_event(), label="checkin-safety-log")
             yield f"data: {json.dumps({'text': safety.response_text})}\n\n"
             yield "data: [DONE]\n\n"
+
         return StreamingResponse(
             safety_stream(),
             media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
         )
 
-    system_prompt = render_checkin_prompt(language=language, language_constraint=language_constraint)
+    system_prompt = render_checkin_prompt(
+        language=language, language_constraint=language_constraint
+    )
     messages = [{"role": "user", "content": payload.message}]
     llm = request.app.state.llm_provider
     model_override = resolve_model_for_locale(locale_code)
@@ -139,14 +144,18 @@ async def caregiver_checkin(
         stream_start = time.monotonic()
         first_chunk_at: float | None = None
         try:
-            async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
+            async for chunk in llm.stream_completion(
+                system_prompt, messages, model_override=model_override
+            ):
                 if first_chunk_at is None:
                     first_chunk_at = time.monotonic()
                 full_response.append(chunk)
                 yield f"data: {json.dumps({'text': chunk})}\n\n"
             record_llm_success()
             total_ms = (time.monotonic() - stream_start) * 1000
-            ttfc_ms = (first_chunk_at - stream_start) * 1000 if first_chunk_at is not None else total_ms
+            ttfc_ms = (
+                (first_chunk_at - stream_start) * 1000 if first_chunk_at is not None else total_ms
+            )
             record_llm_timing(ttfc_ms, total_ms)
             logger.info("Checkin LLM stream timing ttfc_ms=%.0f total_ms=%.0f", ttfc_ms, total_ms)
         except Exception as exc:

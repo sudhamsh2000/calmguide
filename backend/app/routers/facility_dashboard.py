@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import distinct, func, select
@@ -8,10 +8,10 @@ from app.db import get_session
 from app.models.conversation import Conversation
 from app.models.facility_patient_link import FacilityPatientLink
 from app.models.incident import Incident
-from app.services.crypto import decrypt
 from app.models.staff import Staff
 from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.services.audit_service import log_audit
+from app.services.crypto import decrypt
 from app.services.rbac import require_role
 
 router = APIRouter(prefix="/facility/dashboard", tags=["facility-dashboard"])
@@ -23,14 +23,18 @@ async def dashboard_summary(
     staff: Staff = Depends(require_role("admin", "owner")),
     session: AsyncSession = Depends(get_session),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     since = now - timedelta(hours=hours)
     facility_id = staff.facility_id
 
-    linked_profiles = select(FacilityPatientLink.profile_id).where(
-        FacilityPatientLink.facility_id == facility_id,
-        FacilityPatientLink.is_active == True,
-    ).scalar_subquery()
+    linked_profiles = (
+        select(FacilityPatientLink.profile_id)
+        .where(
+            FacilityPatientLink.facility_id == facility_id,
+            FacilityPatientLink.is_active == True,
+        )
+        .scalar_subquery()
+    )
 
     total_result = await session.execute(
         select(func.count(Incident.id)).where(
@@ -112,10 +116,14 @@ async def _find_escalating_residents(
     window_length = now - since
     previous_since = since - window_length
 
-    linked_profiles = select(FacilityPatientLink.profile_id).where(
-        FacilityPatientLink.facility_id == facility_id,
-        FacilityPatientLink.is_active == True,
-    ).scalar_subquery()
+    linked_profiles = (
+        select(FacilityPatientLink.profile_id)
+        .where(
+            FacilityPatientLink.facility_id == facility_id,
+            FacilityPatientLink.is_active == True,
+        )
+        .scalar_subquery()
+    )
 
     recent_result = await session.execute(
         select(Incident.profile_id, Incident.behavior_category, func.count(Incident.id))
@@ -143,11 +151,13 @@ async def _find_escalating_residents(
     for (profile_id, category), recent_count in recent_counts.items():
         previous_count = previous_counts.get((profile_id, category), 0)
         if recent_count >= 2 and recent_count > previous_count * 2:
-            escalating.append({
-                "profile_id": profile_id,
-                "category": category,
-                "trend": "spike",
-            })
+            escalating.append(
+                {
+                    "profile_id": profile_id,
+                    "category": category,
+                    "trend": "spike",
+                }
+            )
     return escalating
 
 
@@ -158,19 +168,25 @@ async def dashboard_trends(
     session: AsyncSession = Depends(get_session),
 ):
     days = {"7d": 7, "30d": 30, "90d": 90}[period]
-    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
     facility_id = staff.facility_id
 
-    linked_profiles = select(FacilityPatientLink.profile_id).where(
-        FacilityPatientLink.facility_id == facility_id,
-        FacilityPatientLink.is_active == True,
-    ).scalar_subquery()
+    linked_profiles = (
+        select(FacilityPatientLink.profile_id)
+        .where(
+            FacilityPatientLink.facility_id == facility_id,
+            FacilityPatientLink.is_active == True,
+        )
+        .scalar_subquery()
+    )
 
     incidents_result = await session.execute(
-        select(Incident).where(
+        select(Incident)
+        .where(
             Incident.profile_id.in_(linked_profiles),
             Incident.created_at >= since,
-        ).order_by(Incident.created_at)
+        )
+        .order_by(Incident.created_at)
     )
     incidents = incidents_result.scalars().all()
 
@@ -198,11 +214,13 @@ async def dashboard_trends(
     effectiveness = []
     for intervention, stats in intervention_stats.items():
         rate = round(stats["success"] / stats["count"] * 100) if stats["count"] else 0
-        effectiveness.append({
-            "intervention": intervention,
-            "success_rate": rate,
-            "count": stats["count"],
-        })
+        effectiveness.append(
+            {
+                "intervention": intervention,
+                "success_rate": rate,
+                "count": stats["count"],
+            }
+        )
     effectiveness.sort(key=lambda x: x["success_rate"], reverse=True)
 
     await log_audit(staff, "READ", "facility_trends", session=session)
@@ -221,13 +239,15 @@ async def staff_activity(
     session: AsyncSession = Depends(get_session),
 ):
     facility_id = staff.facility_id
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
 
     staff_result = await session.execute(
-        select(Staff).where(
+        select(Staff)
+        .where(
             Staff.facility_id == facility_id,
             Staff.is_active == True,
-        ).order_by(Staff.name)
+        )
+        .order_by(Staff.name)
     )
     staff_members = staff_result.scalars().all()
     staff_ids = [s.id for s in staff_members]
@@ -254,22 +274,27 @@ async def staff_activity(
 
         assigned_rows = await session.execute(
             select(StaffPatientAssignment.staff_id, func.count(StaffPatientAssignment.id))
-            .where(StaffPatientAssignment.staff_id.in_(staff_ids), StaffPatientAssignment.ended_at == None)
+            .where(
+                StaffPatientAssignment.staff_id.in_(staff_ids),
+                StaffPatientAssignment.ended_at == None,
+            )
             .group_by(StaffPatientAssignment.staff_id)
         )
         assigned_by_staff = {sid: count for sid, count in assigned_rows.all()}
 
     activity = []
     for s in staff_members:
-        activity.append({
-            "id": s.id,
-            "name": s.name,
-            "role": s.role,
-            "sessions_this_week": sessions_by_staff.get(s.id, 0),
-            "incidents_logged": incidents_by_staff.get(s.id, 0),
-            "last_active": s.last_login_at.isoformat() if s.last_login_at else None,
-            "assigned_patients_count": assigned_by_staff.get(s.id, 0),
-        })
+        activity.append(
+            {
+                "id": s.id,
+                "name": s.name,
+                "role": s.role,
+                "sessions_this_week": sessions_by_staff.get(s.id, 0),
+                "incidents_logged": incidents_by_staff.get(s.id, 0),
+                "last_active": s.last_login_at.isoformat() if s.last_login_at else None,
+                "assigned_patients_count": assigned_by_staff.get(s.id, 0),
+            }
+        )
 
     await log_audit(staff, "READ", "staff_activity", session=session)
     await session.commit()

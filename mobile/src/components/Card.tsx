@@ -12,13 +12,7 @@ interface CardProps {
   padding?: number;
 }
 
-export function Card({
-  variant = 'default',
-  children,
-  style,
-  onPress,
-  padding = 16,
-}: CardProps) {
+export function Card({ variant = 'default', children, style, onPress, padding = 16 }: CardProps) {
   const { colors } = useTheme();
 
   const baseStyle: ViewStyle = {

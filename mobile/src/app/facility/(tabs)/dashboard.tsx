@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/components/ThemeContext';
@@ -71,7 +64,14 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -91,11 +91,17 @@ export default function DashboardScreen() {
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+          />
         }
         onScrollBeginDrag={recordActivity}
       >
-        <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 4 }}>
+        <Text
+          style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 4 }}
+        >
           {t('dashboard.title')}
         </Text>
         <Text style={{ fontSize: 14, color: colors.mutedForeground, marginBottom: 16 }}>
@@ -103,9 +109,20 @@ export default function DashboardScreen() {
         </Text>
 
         {error && (
-          <View style={{ backgroundColor: colors.surface, padding: 16, borderRadius: 12, marginBottom: 16, borderWidth: 1, borderColor: colors.error }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              padding: 16,
+              borderRadius: 12,
+              marginBottom: 16,
+              borderWidth: 1,
+              borderColor: colors.error,
+            }}
+          >
             <Text style={{ color: colors.error, fontSize: 14, textAlign: 'center' }}>{error}</Text>
-            <Button variant="secondary" onPress={handleRefresh} style={{ marginTop: 12 }}>{t('dashboard.retry')}</Button>
+            <Button variant="secondary" onPress={handleRefresh} style={{ marginTop: 12 }}>
+              {t('dashboard.retry')}
+            </Button>
           </View>
         )}
 
@@ -116,34 +133,76 @@ export default function DashboardScreen() {
                 value={String(data.incident_count.total)}
                 label={t('dashboard.incidents')}
                 sublabel={`${data.incident_count.severe} ${t('dashboard.severe')}`}
-                urgency={data.incident_count.severe > 0 ? 'alert' : data.incident_count.total > 5 ? 'warning' : undefined}
+                urgency={
+                  data.incident_count.severe > 0
+                    ? 'alert'
+                    : data.incident_count.total > 5
+                      ? 'warning'
+                      : undefined
+                }
               />
               <KpiCard
                 value={`${data.staff_adoption.active_users}/${data.staff_adoption.total_staff}`}
                 label={t('dashboard.staff_active')}
                 sublabel={`${data.staff_adoption.percentage}%`}
-                urgency={data.staff_adoption.percentage >= 80 ? 'positive' : data.staff_adoption.percentage < 50 ? 'warning' : undefined}
+                urgency={
+                  data.staff_adoption.percentage >= 80
+                    ? 'positive'
+                    : data.staff_adoption.percentage < 50
+                      ? 'warning'
+                      : undefined
+                }
               />
             </View>
 
             {data.escalating_residents.length > 0 && (
-              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: colors.border }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: colors.error, marginBottom: 8 }}>
+              <View
+                style={{
+                  backgroundColor: colors.surface,
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 16,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <Text
+                  style={{ fontSize: 16, fontWeight: '700', color: colors.error, marginBottom: 8 }}
+                >
                   {t('dashboard.escalating_residents')}
                 </Text>
                 {data.escalating_residents.map((r, i) => (
-                  <Text key={i} style={{ fontSize: 14, color: colors.foreground, paddingVertical: 4 }}>
+                  <Text
+                    key={i}
+                    style={{ fontSize: 14, color: colors.foreground, paddingVertical: 4 }}
+                  >
                     {/* The dashboard endpoint returns {profile_id, category, trend}
-                      * only — there is no `name` on this payload, so the previous
-                      * `r.name ?? …` was dead and always fell through to the id. */}
+                     * only — there is no `name` on this payload, so the previous
+                     * `r.name ?? …` was dead and always fell through to the id. */}
                     {r.profile_id} — {r.trend || t('dashboard.escalating')}
                   </Text>
                 ))}
               </View>
             )}
 
-            <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: colors.border }}>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 8 }}>
+            <View
+              style={{
+                backgroundColor: colors.surface,
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: colors.border,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: colors.foreground,
+                  marginBottom: 8,
+                }}
+              >
                 {t('dashboard.family_activity')}
               </Text>
               <Text style={{ fontSize: 14, color: colors.foreground }}>
@@ -174,7 +233,9 @@ export default function DashboardScreen() {
                     opacity: pressed ? 0.7 : 1,
                   })}
                 >
-                  <Text style={{ fontSize: 15, fontWeight: '600', color: colors.foreground, flex: 1 }}>
+                  <Text
+                    style={{ fontSize: 15, fontWeight: '600', color: colors.foreground, flex: 1 }}
+                  >
                     {item.label}
                   </Text>
                   <Text style={{ fontSize: 16, color: colors.mutedForeground }}>→</Text>

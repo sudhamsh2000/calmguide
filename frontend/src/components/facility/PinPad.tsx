@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PinPadLockout {
   locked: boolean;
@@ -19,12 +19,19 @@ interface PinPadProps {
 
 const PIN_LENGTH = 4;
 
-export function PinPad({ onComplete, error, disabled = false, lockout, onBackToStaffSelect, className = "" }: PinPadProps) {
-  const t = useTranslations("facility.login");
+export function PinPad({
+  onComplete,
+  error,
+  disabled = false,
+  lockout,
+  onBackToStaffSelect,
+  className = '',
+}: PinPadProps) {
+  const t = useTranslations('facility.login');
   const [digits, setDigits] = useState<string[]>([]);
   const [shake, setShake] = useState(false);
 
-  const isLocked = lockout?.locked || (error && error.toLowerCase().includes("locked"));
+  const isLocked = lockout?.locked || (error && error.toLowerCase().includes('locked'));
 
   const handleDigit = useCallback(
     (digit: string) => {
@@ -32,7 +39,7 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
       const next = [...digits, digit];
       setDigits(next);
       if (next.length === PIN_LENGTH) {
-        onComplete(next.join(""));
+        onComplete(next.join(''));
         setTimeout(() => setDigits([]), 300);
       }
     },
@@ -57,10 +64,10 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
   }
 
   const keys = [
-    ["1", "2", "3"],
-    ["4", "5", "6"],
-    ["7", "8", "9"],
-    ["", "0", "back"],
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['', '0', 'back'],
   ];
 
   if (isLocked) {
@@ -81,7 +88,7 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
         </svg>
         <h3 className="text-lg font-bold text-foreground">Account temporarily locked</h3>
         <p className="text-sm text-foreground-muted text-center max-w-xs">
-          {error || "Contact your charge nurse to reset, or wait 30 minutes."}
+          {error || 'Contact your charge nurse to reset, or wait 30 minutes.'}
         </p>
         {onBackToStaffSelect && (
           <button
@@ -100,7 +107,7 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
     <div className={`flex flex-col items-center gap-6 ${className}`}>
       {/* Dot indicators */}
       <div
-        className={`flex gap-3 ${shake ? "animate-shake" : ""}`}
+        className={`flex gap-3 ${shake ? 'animate-shake' : ''}`}
         role="status"
         aria-label={`${digits.length} of ${PIN_LENGTH} digits entered`}
       >
@@ -109,8 +116,8 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
             key={i}
             className={`size-4 rounded-full border-2 transition-colors ${
               i < digits.length
-                ? "bg-primary border-primary"
-                : "border-foreground/20 dark:border-white/12 bg-transparent"
+                ? 'bg-primary border-primary'
+                : 'border-foreground/20 dark:border-white/12 bg-transparent'
             }`}
           />
         ))}
@@ -126,19 +133,19 @@ export function PinPad({ onComplete, error, disabled = false, lockout, onBackToS
       {/* Keypad */}
       <div className="grid grid-cols-3 gap-4">
         {keys.flat().map((key, i) => {
-          if (key === "") {
+          if (key === '') {
             return <div key={i} className="size-20" />;
           }
-          if (key === "back") {
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={handleBackspace}
-                  disabled={disabled || digits.length === 0}
-                  className="size-20 flex items-center justify-center rounded-2xl text-foreground/70 border border-transparent hover:border-foreground/10 hover:bg-foreground/5 active:bg-foreground/10 disabled:opacity-30 transition-colors dark:hover:border-white/10"
-                  aria-label="Backspace"
-                >
+          if (key === 'back') {
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={handleBackspace}
+                disabled={disabled || digits.length === 0}
+                className="size-20 flex items-center justify-center rounded-2xl text-foreground/70 border border-transparent hover:border-foreground/10 hover:bg-foreground/5 active:bg-foreground/10 disabled:opacity-30 transition-colors dark:hover:border-white/10"
+                aria-label="Backspace"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"

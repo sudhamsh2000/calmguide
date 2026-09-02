@@ -91,9 +91,7 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
       dispatch({ type: 'UPDATE_SUCCESS', payload: response });
       router.push('/profile');
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t('errors.generic'),
-      );
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setSaving(false);
     }
@@ -128,10 +126,7 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
 
       {/* Disease Stage */}
       <div className="mt-6">
-        <StepDiseaseStage
-          selectedStage={diseaseStage}
-          onSelect={setDiseaseStage}
-        />
+        <StepDiseaseStage selectedStage={diseaseStage} onSelect={setDiseaseStage} />
       </div>
 
       {/* Behavioral Patterns */}
@@ -172,10 +167,7 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
 
       {/* Error */}
       {error && (
-        <div
-          className="mt-6 rounded-xl bg-error/10 border border-error/30 p-4"
-          role="alert"
-        >
+        <div className="mt-6 rounded-xl bg-error/10 border border-error/30 p-4" role="alert">
           <p className="text-sm text-error">{error}</p>
         </div>
       )}

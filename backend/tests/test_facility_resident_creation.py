@@ -30,10 +30,10 @@ from app.models.staff import Staff
 from app.services.auth import hash_access_code
 from app.services.jwt_service import create_token
 
-
 # ---------------------------------------------------------------------------
 # Helper fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest_asyncio.fixture
 async def facility(db_session, test_settings):
@@ -116,6 +116,7 @@ def _make_auth_headers(staff: Staff) -> dict[str, str]:
 # Successful creation tests
 # ---------------------------------------------------------------------------
 
+
 async def test_create_resident_minimal_payload_admin(client, facility, admin_staff):
     """Admin can create a resident with just disease_stage; returns required fields."""
     fac, facility_code = facility
@@ -179,6 +180,7 @@ async def test_create_resident_owner_role_allowed(client, facility, owner_staff)
 # Access code validity
 # ---------------------------------------------------------------------------
 
+
 async def test_created_access_code_is_8_chars(client, facility, admin_staff):
     fac, facility_code = facility
     headers = _make_auth_headers(admin_staff)
@@ -207,9 +209,7 @@ async def test_created_access_code_excludes_ambiguous_chars(client, facility, ad
         assert resp.status_code == 201
         code = resp.json()["access_code"]
         for char in code:
-            assert char not in "0O1IL", (
-                f"Ambiguous character '{char}' in code '{code}'"
-            )
+            assert char not in "0O1IL", f"Ambiguous character '{char}' in code '{code}'"
 
 
 async def test_created_access_code_is_alphanumeric(client, facility, admin_staff):
@@ -229,7 +229,10 @@ async def test_created_access_code_is_alphanumeric(client, facility, admin_staff
 # DB state verification
 # ---------------------------------------------------------------------------
 
-async def test_create_resident_creates_facility_patient_link(client, facility, admin_staff, db_session):
+
+async def test_create_resident_creates_facility_patient_link(
+    client, facility, admin_staff, db_session
+):
     """A FacilityPatientLink row must be inserted connecting resident to facility."""
     fac, facility_code = facility
     headers = _make_auth_headers(admin_staff)
@@ -258,7 +261,9 @@ async def test_create_resident_creates_facility_patient_link(client, facility, a
     assert link.is_active is True
 
 
-async def test_create_resident_link_stores_location_fields(client, facility, admin_staff, db_session):
+async def test_create_resident_link_stores_location_fields(
+    client, facility, admin_staff, db_session
+):
     """Unit, room, and bed must be persisted on the FacilityPatientLink."""
     fac, facility_code = facility
     headers = _make_auth_headers(admin_staff)
@@ -276,9 +281,7 @@ async def test_create_resident_link_stores_location_fields(client, facility, adm
     profile_id = resp.json()["profile_id"]
 
     link_result = await db_session.execute(
-        select(FacilityPatientLink).where(
-            FacilityPatientLink.profile_id == profile_id
-        )
+        select(FacilityPatientLink).where(FacilityPatientLink.profile_id == profile_id)
     )
     link = link_result.scalar_one()
     assert link.unit == "Wing-C"
@@ -286,7 +289,9 @@ async def test_create_resident_link_stores_location_fields(client, facility, adm
     assert link.bed == "Window"
 
 
-async def test_create_resident_link_records_staff_who_created(client, facility, admin_staff, db_session):
+async def test_create_resident_link_records_staff_who_created(
+    client, facility, admin_staff, db_session
+):
     """linked_by on FacilityPatientLink must be the creating staff member's ID."""
     fac, facility_code = facility
     headers = _make_auth_headers(admin_staff)
@@ -299,9 +304,7 @@ async def test_create_resident_link_records_staff_who_created(client, facility, 
     profile_id = resp.json()["profile_id"]
 
     link_result = await db_session.execute(
-        select(FacilityPatientLink).where(
-            FacilityPatientLink.profile_id == profile_id
-        )
+        select(FacilityPatientLink).where(FacilityPatientLink.profile_id == profile_id)
     )
     link = link_result.scalar_one()
     assert link.linked_by == admin_staff.id
@@ -327,6 +330,7 @@ async def test_create_resident_profile_accessible_by_access_code(client, facilit
 # ---------------------------------------------------------------------------
 # Authorization tests
 # ---------------------------------------------------------------------------
+
 
 async def test_create_resident_staff_role_rejected(client, facility, regular_staff):
     """Staff role (non-admin) must receive 403."""
@@ -372,6 +376,7 @@ async def test_create_resident_invalid_token_returns_401(client, facility):
 # Invalid facility code
 # ---------------------------------------------------------------------------
 
+
 async def test_create_resident_invalid_facility_code_returns_404(client, admin_staff):
     """Non-existent facility code must return 404."""
     headers = _make_auth_headers(admin_staff)
@@ -389,6 +394,7 @@ async def test_create_resident_invalid_facility_code_returns_404(client, admin_s
 # ---------------------------------------------------------------------------
 # Disease stage variants
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.parametrize("stage", ["early", "middle", "late", "unknown"])
 async def test_create_resident_all_disease_stages(client, facility, admin_staff, stage):
@@ -409,6 +415,7 @@ async def test_create_resident_all_disease_stages(client, facility, admin_staff,
 # ---------------------------------------------------------------------------
 # Location fields — null when not provided
 # ---------------------------------------------------------------------------
+
 
 async def test_create_resident_without_location_fields_returns_nulls(client, facility, admin_staff):
     """Omitting unit/room/bed results in null values in the response."""
@@ -432,7 +439,10 @@ async def test_create_resident_without_location_fields_returns_nulls(client, fac
 # Multiple residents — unique access codes
 # ---------------------------------------------------------------------------
 
-async def test_create_multiple_residents_each_gets_unique_access_code(client, facility, admin_staff):
+
+async def test_create_multiple_residents_each_gets_unique_access_code(
+    client, facility, admin_staff
+):
     """Creating multiple residents must yield distinct access codes."""
     fac, facility_code = facility
     headers = _make_auth_headers(admin_staff)

@@ -1,17 +1,17 @@
 const KEYS = {
-  FACILITY_CODE: "calmguide_facility_code",
-  FACILITY_NAME: "calmguide_facility_name",
-  FACILITY_LOGIN_MODE: "calmguide_facility_login_mode",
-  FACILITY_TOKEN: "calmguide_facility_token",
-  FACILITY_TOKEN_EXPIRES: "calmguide_facility_token_expires",
+  FACILITY_CODE: 'calmguide_facility_code',
+  FACILITY_NAME: 'calmguide_facility_name',
+  FACILITY_LOGIN_MODE: 'calmguide_facility_login_mode',
+  FACILITY_TOKEN: 'calmguide_facility_token',
+  FACILITY_TOKEN_EXPIRES: 'calmguide_facility_token_expires',
 } as const;
 
-export type StoredFacilityLoginMode = "facility-code" | "staff-select" | "email";
+export type StoredFacilityLoginMode = 'facility-code' | 'staff-select' | 'email';
 
 function isLocalStorageAvailable(): boolean {
   try {
-    const testKey = "__calmguide_fac_test__";
-    window.localStorage.setItem(testKey, "test");
+    const testKey = '__calmguide_fac_test__';
+    window.localStorage.setItem(testKey, 'test');
     window.localStorage.removeItem(testKey);
     return true;
   } catch {
@@ -58,7 +58,7 @@ export function setFacilityName(name: string): void {
 
 export function getFacilityLoginMode(): StoredFacilityLoginMode | null {
   const mode = getItem(KEYS.FACILITY_LOGIN_MODE);
-  if (mode === "facility-code" || mode === "staff-select" || mode === "email") {
+  if (mode === 'facility-code' || mode === 'staff-select' || mode === 'email') {
     return mode;
   }
   return null;
@@ -100,9 +100,9 @@ export function clearFacilitySession(): void {
   clearFacilityCode();
 }
 
-const STAFF_KEY = "calmguide_facility_staff";
+const STAFF_KEY = 'calmguide_facility_staff';
 
-export function getStoredStaff(): import("@/lib/facility-api").StaffInfo | null {
+export function getStoredStaff(): import('@/lib/facility-api').StaffInfo | null {
   const raw = getItem(STAFF_KEY);
   if (!raw) return null;
   try {
@@ -112,7 +112,7 @@ export function getStoredStaff(): import("@/lib/facility-api").StaffInfo | null 
   }
 }
 
-export function setStoredStaff(staff: import("@/lib/facility-api").StaffInfo): void {
+export function setStoredStaff(staff: import('@/lib/facility-api').StaffInfo): void {
   setItem(STAFF_KEY, JSON.stringify(staff));
 }
 

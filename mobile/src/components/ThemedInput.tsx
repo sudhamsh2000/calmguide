@@ -12,11 +12,7 @@ export function ThemedInput({ label, error, inputStyle, ...props }: ThemedInputP
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
 
-  const borderColor = error
-    ? colors.error
-    : focused
-      ? colors.primary
-      : colors.border;
+  const borderColor = error ? colors.error : focused ? colors.primary : colors.border;
 
   return (
     <View style={{ gap: 6 }}>
@@ -55,9 +51,7 @@ export function ThemedInput({ label, error, inputStyle, ...props }: ThemedInputP
         onBlur={() => setFocused(false)}
         {...props}
       />
-      {error ? (
-        <Text style={{ fontSize: 13, color: colors.error }}>{error}</Text>
-      ) : null}
+      {error ? <Text style={{ fontSize: 13, color: colors.error }}>{error}</Text> : null}
     </View>
   );
 }

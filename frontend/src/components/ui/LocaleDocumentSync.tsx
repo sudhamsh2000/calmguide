@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useLocale } from "next-intl";
-import { isRtl } from "@/lib/locale";
+import { useEffect } from 'react';
+import { useLocale } from 'next-intl';
+import { isRtl } from '@/lib/locale';
 
 export function LocaleDocumentSync() {
   const locale = useLocale();
@@ -10,7 +10,7 @@ export function LocaleDocumentSync() {
   useEffect(() => {
     const root = document.documentElement;
     root.lang = locale;
-    root.dir = isRtl(locale) ? "rtl" : "ltr";
+    root.dir = isRtl(locale) ? 'rtl' : 'ltr';
   }, [locale]);
 
   return null;

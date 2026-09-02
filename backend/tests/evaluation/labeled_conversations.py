@@ -16,9 +16,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_001",
         "description": "Nighttime wandering resolved with music",
         "messages": [
-            {"role": "user", "content": "Mom keeps trying to leave at 2am. She's very confused and keeps saying she needs to go to work."},
-            {"role": "assistant", "content": "I understand this is frightening. Let me help you through this right now."},
-            {"role": "user", "content": "I played Sinatra and she calmed down after about 10 minutes."},
+            {
+                "role": "user",
+                "content": "Mom keeps trying to leave at 2am. She's very confused and keeps saying she needs to go to work.",
+            },
+            {
+                "role": "assistant",
+                "content": "I understand this is frightening. Let me help you through this right now.",
+            },
+            {
+                "role": "user",
+                "content": "I played Sinatra and she calmed down after about 10 minutes.",
+            },
             {"role": "assistant", "content": "That's wonderful that the music worked."},
         ],
         "profile": {
@@ -39,9 +48,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_002",
         "description": "Aggression during bathing",
         "messages": [
-            {"role": "user", "content": "Dad hit me when I tried to help him shower. He looks scared and angry."},
-            {"role": "assistant", "content": "Your safety comes first. Step back and give him space."},
-            {"role": "user", "content": "I backed off and tried warm towels first. He eventually let me help."},
+            {
+                "role": "user",
+                "content": "Dad hit me when I tried to help him shower. He looks scared and angry.",
+            },
+            {
+                "role": "assistant",
+                "content": "Your safety comes first. Step back and give him space.",
+            },
+            {
+                "role": "user",
+                "content": "I backed off and tried warm towels first. He eventually let me help.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -60,9 +78,15 @@ LABELED_CONVERSATIONS = [
         "id": "eval_003",
         "description": "Refusing medication",
         "messages": [
-            {"role": "user", "content": "She won't take her evening pills. She keeps pushing the cup away and saying I'm trying to poison her."},
+            {
+                "role": "user",
+                "content": "She won't take her evening pills. She keeps pushing the cup away and saying I'm trying to poison her.",
+            },
             {"role": "assistant", "content": "I understand how frustrating this must be."},
-            {"role": "user", "content": "I tried crushing them in applesauce but she still refuses."},
+            {
+                "role": "user",
+                "content": "I tried crushing them in applesauce but she still refuses.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -81,9 +105,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_004",
         "description": "Repetitive questioning",
         "messages": [
-            {"role": "user", "content": "She keeps asking when her mother is coming. I've told her a hundred times her mother passed away years ago."},
-            {"role": "assistant", "content": "I know this is exhausting. The key is to avoid correcting her."},
-            {"role": "user", "content": "I tried redirecting to her photo album and that distracted her for a while."},
+            {
+                "role": "user",
+                "content": "She keeps asking when her mother is coming. I've told her a hundred times her mother passed away years ago.",
+            },
+            {
+                "role": "assistant",
+                "content": "I know this is exhausting. The key is to avoid correcting her.",
+            },
+            {
+                "role": "user",
+                "content": "I tried redirecting to her photo album and that distracted her for a while.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -102,9 +135,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_005",
         "description": "Sundowning with hallucinations",
         "messages": [
-            {"role": "user", "content": "It's 7pm and Dad is seeing people in the room who aren't there. He's getting agitated and won't sit down."},
-            {"role": "assistant", "content": "Visual hallucinations can be very distressing for both of you."},
-            {"role": "user", "content": "I turned up the lights and put on his favorite TV show. He finally sat down."},
+            {
+                "role": "user",
+                "content": "It's 7pm and Dad is seeing people in the room who aren't there. He's getting agitated and won't sit down.",
+            },
+            {
+                "role": "assistant",
+                "content": "Visual hallucinations can be very distressing for both of you.",
+            },
+            {
+                "role": "user",
+                "content": "I turned up the lights and put on his favorite TV show. He finally sat down.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -123,9 +165,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_006",
         "description": "Sleep disturbance - up all night",
         "messages": [
-            {"role": "user", "content": "Mom has been up since 1am. She's pacing around the house and rearranging furniture. I can't get her back to bed."},
-            {"role": "assistant", "content": "Nighttime wakefulness is very common in middle-stage dementia."},
-            {"role": "user", "content": "I gave her warm milk and sat with her. She fell asleep on the couch around 3am."},
+            {
+                "role": "user",
+                "content": "Mom has been up since 1am. She's pacing around the house and rearranging furniture. I can't get her back to bed.",
+            },
+            {
+                "role": "assistant",
+                "content": "Nighttime wakefulness is very common in middle-stage dementia.",
+            },
+            {
+                "role": "user",
+                "content": "I gave her warm milk and sat with her. She fell asleep on the couch around 3am.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -144,9 +195,15 @@ LABELED_CONVERSATIONS = [
         "id": "eval_007",
         "description": "Confusion and disorientation",
         "messages": [
-            {"role": "user", "content": "Dad doesn't know where he is. He keeps asking to go home even though he IS home. He's very upset."},
+            {
+                "role": "user",
+                "content": "Dad doesn't know where he is. He keeps asking to go home even though he IS home. He's very upset.",
+            },
             {"role": "assistant", "content": "This is a very common experience in dementia."},
-            {"role": "user", "content": "I showed him family photos and he seemed to settle a bit."},
+            {
+                "role": "user",
+                "content": "I showed him family photos and he seemed to settle a bit.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -165,9 +222,15 @@ LABELED_CONVERSATIONS = [
         "id": "eval_008",
         "description": "Aggression escalated to ER",
         "messages": [
-            {"role": "user", "content": "Mom threw a plate at me during dinner. She's been escalating all day."},
+            {
+                "role": "user",
+                "content": "Mom threw a plate at me during dinner. She's been escalating all day.",
+            },
             {"role": "assistant", "content": "Your safety is the priority right now."},
-            {"role": "user", "content": "I had to call the ambulance. She was completely out of control. Nothing I tried worked."},
+            {
+                "role": "user",
+                "content": "I had to call the ambulance. She was completely out of control. Nothing I tried worked.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",
@@ -185,9 +248,18 @@ LABELED_CONVERSATIONS = [
         "id": "eval_009",
         "description": "Mild repetitive behavior quickly resolved",
         "messages": [
-            {"role": "user", "content": "Dad keeps picking at his clothes and folding the same napkin over and over."},
-            {"role": "assistant", "content": "Repetitive actions can be soothing for some patients."},
-            {"role": "user", "content": "I gave him a basket of towels to fold and he seems content now."},
+            {
+                "role": "user",
+                "content": "Dad keeps picking at his clothes and folding the same napkin over and over.",
+            },
+            {
+                "role": "assistant",
+                "content": "Repetitive actions can be soothing for some patients.",
+            },
+            {
+                "role": "user",
+                "content": "I gave him a basket of towels to fold and he seems content now.",
+            },
         ],
         "profile": {
             "disease_stage": "late",
@@ -206,9 +278,15 @@ LABELED_CONVERSATIONS = [
         "id": "eval_010",
         "description": "Wandering with no resolution",
         "messages": [
-            {"role": "user", "content": "She's been trying to leave through every door for the past hour. I've redirected her 5 times but she keeps going back."},
+            {
+                "role": "user",
+                "content": "She's been trying to leave through every door for the past hour. I've redirected her 5 times but she keeps going back.",
+            },
             {"role": "assistant", "content": "Persistent exit-seeking can be very challenging."},
-            {"role": "user", "content": "Nothing is working. Music didn't help, snacks didn't help. She's still at it."},
+            {
+                "role": "user",
+                "content": "Nothing is working. Music didn't help, snacks didn't help. She's still at it.",
+            },
         ],
         "profile": {
             "disease_stage": "middle",

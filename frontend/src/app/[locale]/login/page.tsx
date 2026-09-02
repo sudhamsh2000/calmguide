@@ -64,9 +64,7 @@ export default function LoginPage() {
           </h1>
         </div>
 
-        <p className="text-base text-foreground-muted leading-relaxed">
-          {t('login.subtitle')}
-        </p>
+        <p className="text-base text-foreground-muted leading-relaxed">{t('login.subtitle')}</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Access Code */}
@@ -84,7 +82,10 @@ export default function LoginPage() {
               maxLength={CODE_LENGTH}
               value={code}
               onChange={(e) => {
-                const clean = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, CODE_LENGTH);
+                const clean = e.target.value
+                  .replace(/[^A-Za-z0-9]/g, '')
+                  .toUpperCase()
+                  .slice(0, CODE_LENGTH);
                 setCode(clean);
               }}
               placeholder="ABCD1234"
@@ -110,9 +111,7 @@ export default function LoginPage() {
               autoComplete="off"
               className="field-shell w-full px-4 py-3 text-base"
             />
-            <p className="text-sm text-foreground-muted">
-              {t('login.name_hint')}
-            </p>
+            <p className="text-sm text-foreground-muted">{t('login.name_hint')}</p>
           </div>
 
           {/* Error */}

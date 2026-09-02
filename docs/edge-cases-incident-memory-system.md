@@ -254,7 +254,7 @@ conversation.metadata["safety_gate_type"] = "caregiver_self_harm"
 # In compute_profile_insights
 conversations = select(Conversation).where(
     Conversation.profile_id == profile_id,
-    ~Conversation.metadata.contains({"safety_gate_type": "caregiver_self_harm"})
+    ~Conversation.metadata.contains({"safety_gate_type": "caregiver_self_harm"}),
 )
 ```
 
@@ -344,7 +344,7 @@ Old calming strategies based on verbal reasoning stop working when language comp
 ```python
 # On Profile model
 stage_changed_at: datetime | None  # Set when disease_stage changes
-previous_stage: str | None         # Retain for context
+previous_stage: str | None  # Retain for context
 ```
 
 **S-06b: Post-transition data weighting**
@@ -740,13 +740,13 @@ Add a `metadata` JSONB column to `Conversation` for structured flags:
 
 ```python
 metadata = {
-    "caregiver_role": "spouse",           # EC-05
+    "caregiver_role": "spouse",  # EC-05
     "safety_gate_type": "caregiver_self_harm",  # EC-04
-    "recall_confidence": "high",          # EC-11
-    "environmental_context": "holiday",   # EC-14
+    "recall_confidence": "high",  # EC-11
+    "environmental_context": "holiday",  # EC-14
     "profile_consistency": "mismatch_detected",  # EC-01
-    "abuse_indicator": false,             # EC-03
-    "language": "es"                      # EC-12
+    "abuse_indicator": false,  # EC-03
+    "language": "es",  # EC-12
 }
 ```
 
@@ -803,14 +803,14 @@ Every data point entering the behavioral dossier carries metadata:
 
 ```python
 class DataAttribution:
-    reported_by: str          # caregiver_role
-    occurred_at: datetime     # when the incident actually happened
-    logged_at: datetime       # when it was entered into the system
-    recall_confidence: str    # high/moderate/low/very_low
-    source: str              # auto_extracted/manual/voice/daily_checkin
+    reported_by: str  # caregiver_role
+    occurred_at: datetime  # when the incident actually happened
+    logged_at: datetime  # when it was entered into the system
+    recall_confidence: str  # high/moderate/low/very_low
+    source: str  # auto_extracted/manual/voice/daily_checkin
     context_flags: list[str]  # post_medication_change, post_stage_transition,
-                             # post_relocation, holiday_period, etc.
-    verified: bool           # caregiver confirmed extraction
+    # post_relocation, holiday_period, etc.
+    verified: bool  # caregiver confirmed extraction
     confidence_score: float  # extraction confidence (auto-extracted only)
 ```
 

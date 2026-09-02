@@ -1,4 +1,5 @@
 """Pydantic schemas for behavioral pattern insights."""
+
 from pydantic import BaseModel
 
 

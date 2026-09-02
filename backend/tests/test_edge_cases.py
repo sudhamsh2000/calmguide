@@ -6,28 +6,27 @@ EC-07 (care change observation windows), EC-08 (pattern thresholds),
 EC-11 (recall confidence).
 """
 
-import pytest
-import pytest_asyncio
-from datetime import datetime, date, timezone, timedelta
+from datetime import UTC, date, datetime, timedelta, timezone
 from unittest.mock import AsyncMock, patch
 
+import pytest
+import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.incident import Incident
-from app.models.conversation import Conversation
 from app.models.behavioral_dossier import BehavioralDossier
-from app.services.crypto import encrypt, decrypt
+from app.models.conversation import Conversation
+from app.models.incident import Incident
+from app.routers.incidents import _compute_recall_confidence
+from app.services.crypto import decrypt, encrypt
 from app.services.dossier import (
-    _apply_temporal_weight,
     _apply_stage_transition_weight,
-    compute_incident_weight,
+    _apply_temporal_weight,
     compute_dossier,
+    compute_incident_weight,
 )
 from app.services.incident_extractor import extract_incident_from_conversation
-from app.routers.incidents import _compute_recall_confidence
-
 
 VALID_PROFILE = {
     "disease_stage": "middle",
@@ -48,29 +47,29 @@ class TestRecallConfidence:
     """EC-11: Retrospective logging recall confidence."""
 
     def test_immediate_logging_high(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(minutes=30)
         assert _compute_recall_confidence(incident_time, now) == "high"
 
     def test_same_day_moderate(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(hours=8)
         assert _compute_recall_confidence(incident_time, now) == "moderate"
 
     def test_next_day_low(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(hours=36)
         assert _compute_recall_confidence(incident_time, now) == "low"
 
     def test_old_incident_very_low(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(days=3)
         assert _compute_recall_confidence(incident_time, now) == "very_low"
 
     @pytest.mark.asyncio
     async def test_api_assigns_recall_confidence(self, client: AsyncClient, seeded_profile):
         code, profile_id = seeded_profile
-        old_time = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+        old_time = (datetime.now(UTC) - timedelta(days=3)).isoformat()
         resp = await client.post(
             f"/api/incidents/{code}",
             json={
@@ -99,7 +98,7 @@ class TestStageTransitionWeighting:
             json={
                 "behavior_category": "wandering_exit_seeking",
                 "behavior_description": "Wandering at night",
-                "incident_time": datetime.now(timezone.utc).isoformat(),
+                "incident_time": datetime.now(UTC).isoformat(),
             },
         )
 
@@ -118,13 +117,13 @@ class TestStageTransitionWeighting:
         assert resp.json()["stage_changed_at"] is not None
 
     def test_pre_transition_weight_reduced(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stage_changed = now - timedelta(days=2)
         incident_before = now - timedelta(days=5)
         assert _apply_stage_transition_weight(incident_before, stage_changed) == 0.3
 
     def test_post_transition_weight_full(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stage_changed = now - timedelta(days=10)
         incident_after = now - timedelta(days=5)
         assert _apply_stage_transition_weight(incident_after, stage_changed) == 1.0
@@ -158,7 +157,11 @@ class TestNegativeStrategyTags:
                 conversation_messages=[
                     {"role": "user", "content": "She wouldn't take her pills"},
                 ],
-                profile={"disease_stage": "middle", "behavioral_patterns": [], "calming_strategies": []},
+                profile={
+                    "disease_stage": "middle",
+                    "behavioral_patterns": [],
+                    "calming_strategies": [],
+                },
                 patient_name="Mom",
             )
 
@@ -190,7 +193,11 @@ class TestNegativeStrategyTags:
                 conversation_messages=[
                     {"role": "user", "content": "She keeps trying to leave"},
                 ],
-                profile={"disease_stage": "middle", "behavioral_patterns": [], "calming_strategies": []},
+                profile={
+                    "disease_stage": "middle",
+                    "behavioral_patterns": [],
+                    "calming_strategies": [],
+                },
                 patient_name="Mom",
             )
 
@@ -222,7 +229,11 @@ class TestNegativeStrategyTags:
                 conversation_messages=[
                     {"role": "user", "content": "Mom tried to leave again"},
                 ],
-                profile={"disease_stage": "middle", "behavioral_patterns": [], "calming_strategies": []},
+                profile={
+                    "disease_stage": "middle",
+                    "behavioral_patterns": [],
+                    "calming_strategies": [],
+                },
                 patient_name="Mom",
             )
 
@@ -316,9 +327,7 @@ class TestDossierComputation:
     """Integration tests for dossier computation edge cases."""
 
     @pytest.mark.asyncio
-    async def test_dossier_with_no_incidents(
-        self, client: AsyncClient, db_session: AsyncSession
-    ):
+    async def test_dossier_with_no_incidents(self, client: AsyncClient, db_session: AsyncSession):
         resp = await client.post("/api/profiles", json=VALID_PROFILE)
         profile_id = resp.json()["id"]
 
@@ -339,7 +348,7 @@ class TestDossierComputation:
             json={
                 "behavior_category": "aggression_anger",
                 "behavior_description": "Hit caregiver",
-                "incident_time": datetime.now(timezone.utc).isoformat(),
+                "incident_time": datetime.now(UTC).isoformat(),
                 "intervention_description": "Tried to physically redirect",
                 "intervention_outcome": "escalated",
             },

@@ -12,13 +12,19 @@ interface ResidentContextBannerProps {
   riskLevel: RiskLevel;
 }
 
-const RISK_LIGHT: Record<RiskLevel, { bg: string; border: string; badgeBg: string; badgeText: string }> = {
+const RISK_LIGHT: Record<
+  RiskLevel,
+  { bg: string; border: string; badgeBg: string; badgeText: string }
+> = {
   high: { bg: '#FFFBFB', border: '#EF4444', badgeBg: '#FDECEA', badgeText: '#B84C36' },
   moderate: { bg: '#FFFDF8', border: '#F97316', badgeBg: '#FFF7ED', badgeText: '#C2410C' },
   low: { bg: '#FBFFFC', border: '#22C55E', badgeBg: '#E8F5E9', badgeText: '#2E7D32' },
 };
 
-const RISK_DARK: Record<RiskLevel, { bg: string; border: string; badgeBg: string; badgeText: string }> = {
+const RISK_DARK: Record<
+  RiskLevel,
+  { bg: string; border: string; badgeBg: string; badgeText: string }
+> = {
   high: { bg: '#2A1515', border: '#F87171', badgeBg: '#3D1A18', badgeText: '#F0937F' },
   moderate: { bg: '#2A1A0A', border: '#FB923C', badgeBg: '#431407', badgeText: '#FB923C' },
   low: { bg: '#0A2A15', border: '#4ADE80', badgeBg: '#0F2D14', badgeText: '#86EFAC' },
@@ -51,10 +57,15 @@ export function ResidentContextBanner({ unit, room, bed, riskLevel }: ResidentCo
       accessibilityRole="summary"
       accessibilityLabel={`Documenting for ${formatResidentLocation(unit, room, bed)}, ${RISK_LABELS[riskLevel]} risk`}
     >
-      <Text style={{ fontSize: 15, fontWeight: '700', color: colors.foreground }}>
-        {location}
-      </Text>
-      <View style={{ backgroundColor: risk.badgeBg, paddingHorizontal: 10, paddingVertical: 2, borderRadius: 6 }}>
+      <Text style={{ fontSize: 15, fontWeight: '700', color: colors.foreground }}>{location}</Text>
+      <View
+        style={{
+          backgroundColor: risk.badgeBg,
+          paddingHorizontal: 10,
+          paddingVertical: 2,
+          borderRadius: 6,
+        }}
+      >
         <Text style={{ fontSize: 11, fontWeight: '700', color: risk.badgeText }}>
           {RISK_LABELS[riskLevel]}
         </Text>

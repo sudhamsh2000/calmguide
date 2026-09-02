@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useRequireRole } from "@/hooks/useRequireRole";
-import { useTranslations } from "next-intl";
-import { useFacility } from "@/context/FacilityContext";
-import { getAuditLogs } from "@/lib/facility-api";
-import type { AuditLogEntry } from "@/lib/facility-api";
+import { useCallback, useEffect, useState } from 'react';
+import { useRequireRole } from '@/hooks/useRequireRole';
+import { useTranslations } from 'next-intl';
+import { useFacility } from '@/context/FacilityContext';
+import { getAuditLogs } from '@/lib/facility-api';
+import type { AuditLogEntry } from '@/lib/facility-api';
 
 const PAGE_SIZE = 50;
 const EXPORT_BATCH_SIZE = 200;
 
 function formatResourceType(raw: string): string {
-  return raw.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return raw.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function exportToCsv(logs: AuditLogEntry[]) {
-  const headers = ["Time", "User", "Action", "Outcome", "Resource"];
+  const headers = ['Time', 'User', 'Action', 'Outcome', 'Resource'];
   const rows = logs.map((log) => [
     new Date(log.timestamp).toISOString(),
     log.user_name,
     log.action,
     log.outcome,
-    `${log.resource_type}${log.resource_id ? ` (${log.resource_id.slice(0, 8)})` : ""}`,
+    `${log.resource_type}${log.resource_id ? ` (${log.resource_id.slice(0, 8)})` : ''}`,
   ]);
 
   const csv = [headers, ...rows]
-    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `audit-log-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
@@ -38,10 +38,10 @@ function exportToCsv(logs: AuditLogEntry[]) {
 }
 
 export default function AuditPage() {
-  const { allowed } = useRequireRole("admin", "owner");
+  const { allowed } = useRequireRole('admin', 'owner');
   if (!allowed) return null;
 
-  const t = useTranslations("facility.audit");
+  const t = useTranslations('facility.audit');
   const { state } = useFacility();
 
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -100,14 +100,14 @@ export default function AuditPage() {
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
+        <h1 className="text-xl font-bold text-foreground">{t('title')}</h1>
         <button
           type="button"
           onClick={handleExport}
           disabled={total === 0 || exporting}
           className="outline-button h-10 rounded-lg px-4 text-sm font-medium disabled:opacity-100"
         >
-          {exporting ? "Exporting..." : t("export_csv")}
+          {exporting ? 'Exporting...' : t('export_csv')}
         </button>
       </div>
 
@@ -123,10 +123,12 @@ export default function AuditPage() {
             <table className="w-full text-start text-sm">
               <thead className="bg-foreground/[.02] dark:bg-white/[.015]">
                 <tr>
-                  <th className="px-4 py-3 font-medium text-foreground-muted">{t("col_time")}</th>
-                  <th className="px-4 py-3 font-medium text-foreground-muted">{t("col_user")}</th>
-                  <th className="px-4 py-3 font-medium text-foreground-muted">{t("col_action")}</th>
-                  <th className="px-4 py-3 font-medium text-foreground-muted">{t("col_resource")}</th>
+                  <th className="px-4 py-3 font-medium text-foreground-muted">{t('col_time')}</th>
+                  <th className="px-4 py-3 font-medium text-foreground-muted">{t('col_user')}</th>
+                  <th className="px-4 py-3 font-medium text-foreground-muted">{t('col_action')}</th>
+                  <th className="px-4 py-3 font-medium text-foreground-muted">
+                    {t('col_resource')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/[.04] dark:divide-white/[.08]">
@@ -134,19 +136,21 @@ export default function AuditPage() {
                   <tr key={log.id} className="hover:bg-foreground/[.02] transition-colors">
                     <td className="px-4 py-3 text-foreground-muted text-xs whitespace-nowrap">
                       {new Date(log.timestamp).toLocaleString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
                       })}
                     </td>
                     <td className="px-4 py-3 text-foreground text-sm">{log.user_name}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                        log.outcome === "SUCCESS"
-                          ? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
-                          : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
-                      }`}>
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                          log.outcome === 'SUCCESS'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
+                        }`}
+                      >
                         {log.action}
                       </span>
                     </td>
@@ -161,7 +165,7 @@ export default function AuditPage() {
 
           <div className="flex items-center justify-between mt-4">
             <p className="text-xs text-foreground-muted">
-              {t("showing", {
+              {t('showing', {
                 start: offset + 1,
                 end: Math.min(offset + PAGE_SIZE, total),
                 total,
@@ -174,7 +178,7 @@ export default function AuditPage() {
                 disabled={offset === 0}
                 className="outline-button h-9 rounded-lg px-3 text-sm text-foreground disabled:opacity-100"
               >
-                {t("previous")}
+                {t('previous')}
               </button>
               <button
                 type="button"
@@ -182,7 +186,7 @@ export default function AuditPage() {
                 disabled={offset + PAGE_SIZE >= total}
                 className="outline-button h-9 rounded-lg px-3 text-sm text-foreground disabled:opacity-100"
               >
-                {t("next")}
+                {t('next')}
               </button>
             </div>
           </div>

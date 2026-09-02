@@ -22,9 +22,10 @@ export function StaffSelector({ staff, selectedId, onSelect }: StaffSelectorProp
   const { colors } = useTheme();
   const [query, setQuery] = useState('');
 
-  const filtered = staff.length >= 10 && query.trim().length > 0
-    ? staff.filter((m) => m.name.toLowerCase().includes(query.trim().toLowerCase()))
-    : staff;
+  const filtered =
+    staff.length >= 10 && query.trim().length > 0
+      ? staff.filter((m) => m.name.toLowerCase().includes(query.trim().toLowerCase()))
+      : staff;
 
   const activeId = selectedId;
 
@@ -59,12 +60,27 @@ export function StaffSelector({ staff, selectedId, onSelect }: StaffSelectorProp
       )}
 
       {staff.length >= 10 && query.trim().length > 0 && filtered.length === 0 && (
-        <Text style={{ textAlign: 'center', fontSize: 14, color: colors.mutedForeground, paddingVertical: 24 }}>
+        <Text
+          style={{
+            textAlign: 'center',
+            fontSize: 14,
+            color: colors.mutedForeground,
+            paddingVertical: 24,
+          }}
+        >
           {`No one named '${query.trim()}' found`}
         </Text>
       )}
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, paddingVertical: 12 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: 12,
+          paddingVertical: 12,
+        }}
+      >
         {filtered.map((member) => {
           const isActive = member.id === activeId;
           return (
@@ -112,7 +128,12 @@ export function StaffSelector({ staff, selectedId, onSelect }: StaffSelectorProp
                 </Text>
               </View>
               <Text
-                style={{ fontSize: 13, fontWeight: '600', color: isActive ? colors.primary : colors.foreground, textAlign: 'center' }}
+                style={{
+                  fontSize: 13,
+                  fontWeight: '600',
+                  color: isActive ? colors.primary : colors.foreground,
+                  textAlign: 'center',
+                }}
                 numberOfLines={2}
               >
                 {member.name}
@@ -121,7 +142,6 @@ export function StaffSelector({ staff, selectedId, onSelect }: StaffSelectorProp
           );
         })}
       </View>
-
     </View>
   );
 }

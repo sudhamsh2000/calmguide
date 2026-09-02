@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     chroma_collection: str = "calmguide_rag"
 
     # --- Scraping ---
-    scrape_delay: float = 1.5   # seconds between requests — be polite
+    scrape_delay: float = 1.5  # seconds between requests — be polite
     max_chunk_tokens: int = 400
     chunk_overlap_tokens: int = 50
 

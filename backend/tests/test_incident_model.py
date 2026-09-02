@@ -1,8 +1,9 @@
+from datetime import UTC, datetime, timezone
+
 import pytest
-from datetime import datetime, timezone
 
 from app.models.incident import Incident
-from app.services.crypto import encrypt, decrypt
+from app.services.crypto import decrypt, encrypt
 
 
 def test_incident_model_fields():
@@ -10,7 +11,7 @@ def test_incident_model_fields():
     incident = Incident(
         profile_id="test-profile-id",
         source="manual",
-        incident_time=datetime.now(timezone.utc),
+        incident_time=datetime.now(UTC),
         behavior_category="aggression_anger",
         behavior_description=encrypt("Patient hit caregiver during bathing"),
     )
@@ -26,7 +27,7 @@ def test_incident_encrypted_fields_roundtrip():
     incident = Incident(
         profile_id="p1",
         source="auto_extracted",
-        incident_time=datetime.now(timezone.utc),
+        incident_time=datetime.now(UTC),
         behavior_category="wandering_exit_seeking",
         behavior_description=encrypt("Tried to leave at 2am"),
         antecedent_description=encrypt("Patient woke up confused"),
@@ -42,7 +43,7 @@ def test_incident_nullable_fields():
     incident = Incident(
         profile_id="p1",
         source="manual",
-        incident_time=datetime.now(timezone.utc),
+        incident_time=datetime.now(UTC),
         behavior_category="other",
         behavior_description=encrypt("Something happened"),
     )
@@ -61,15 +62,20 @@ def test_incident_nullable_fields():
 def test_incident_valid_behavior_categories():
     """Behavior category must be one of the defined values."""
     valid_categories = [
-        "aggression_anger", "confusion_disorientation", "wandering_exit_seeking",
-        "refusing_care", "sleep_problems", "hallucinations",
-        "repetitive_behavior", "other",
+        "aggression_anger",
+        "confusion_disorientation",
+        "wandering_exit_seeking",
+        "refusing_care",
+        "sleep_problems",
+        "hallucinations",
+        "repetitive_behavior",
+        "other",
     ]
     for cat in valid_categories:
         incident = Incident(
             profile_id="p1",
             source="manual",
-            incident_time=datetime.now(timezone.utc),
+            incident_time=datetime.now(UTC),
             behavior_category=cat,
             behavior_description=encrypt("test"),
         )

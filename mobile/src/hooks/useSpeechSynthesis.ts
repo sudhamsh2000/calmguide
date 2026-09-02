@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import * as Speech from "expo-speech";
+import { useState, useCallback, useEffect } from 'react';
+import * as Speech from 'expo-speech';
 
 interface UseSpeechSynthesisOptions {
   locale?: string;
@@ -37,7 +37,9 @@ export function useSpeechSynthesis(
   }, []);
 
   useEffect(() => {
-    return () => { Speech.stop(); };
+    return () => {
+      Speech.stop();
+    };
   }, []);
 
   return { speak, stop, isSpeaking };

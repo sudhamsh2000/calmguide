@@ -43,7 +43,9 @@ export function TopBar({ facilityName, staffName, onQuickSwitch }: TopBarProps) 
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary, letterSpacing: 0.5 }}>
+        <Text
+          style={{ fontSize: 11, fontWeight: '700', color: colors.primary, letterSpacing: 0.5 }}
+        >
           CalmGuide
         </Text>
         <Text style={{ fontSize: 12, color: colors.mutedForeground }} numberOfLines={1}>
@@ -63,9 +65,7 @@ export function TopBar({ facilityName, staffName, onQuickSwitch }: TopBarProps) 
         <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
           {staffName}
         </Text>
-        <Text style={{ fontSize: 12, color: colors.primary }}>
-          Switch
-        </Text>
+        <Text style={{ fontSize: 12, color: colors.primary }}>Switch</Text>
       </Pressable>
     </View>
   );

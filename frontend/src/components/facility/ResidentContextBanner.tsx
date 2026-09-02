@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { formatResidentLocation } from "@/lib/facility-utils";
+import { formatResidentLocation } from '@/lib/facility-utils';
 
-type RiskLevel = "high" | "moderate" | "low";
+type RiskLevel = 'high' | 'moderate' | 'low';
 
 interface ResidentContextBannerProps {
   unit: string | null;
@@ -13,26 +13,26 @@ interface ResidentContextBannerProps {
 
 const RISK_BANNER: Record<RiskLevel, { bg: string; badgeBg: string; badgeText: string }> = {
   high: {
-    bg: "bg-[#FFFBFB] dark:bg-red-950/10",
-    badgeBg: "bg-red-100 dark:bg-red-950/40",
-    badgeText: "text-red-800 dark:text-red-300",
+    bg: 'bg-[#FFFBFB] dark:bg-red-950/10',
+    badgeBg: 'bg-red-100 dark:bg-red-950/40',
+    badgeText: 'text-red-800 dark:text-red-300',
   },
   moderate: {
-    bg: "bg-[#FFFDF8] dark:bg-orange-950/10",
-    badgeBg: "bg-orange-100 dark:bg-orange-950/40",
-    badgeText: "text-orange-800 dark:text-orange-300",
+    bg: 'bg-[#FFFDF8] dark:bg-orange-950/10',
+    badgeBg: 'bg-orange-100 dark:bg-orange-950/40',
+    badgeText: 'text-orange-800 dark:text-orange-300',
   },
   low: {
-    bg: "bg-[#FBFFFC] dark:bg-green-950/10",
-    badgeBg: "bg-green-100 dark:bg-green-950/40",
-    badgeText: "text-green-800 dark:text-green-300",
+    bg: 'bg-[#FBFFFC] dark:bg-green-950/10',
+    badgeBg: 'bg-green-100 dark:bg-green-950/40',
+    badgeText: 'text-green-800 dark:text-green-300',
   },
 };
 
 const RISK_LABELS: Record<RiskLevel, string> = {
-  high: "High",
-  moderate: "Moderate",
-  low: "Low",
+  high: 'High',
+  moderate: 'Moderate',
+  low: 'Low',
 };
 
 export function ResidentContextBanner({ unit, room, bed, riskLevel }: ResidentContextBannerProps) {
@@ -45,10 +45,15 @@ export function ResidentContextBanner({ unit, room, bed, riskLevel }: ResidentCo
       role="status"
       aria-label={`Documenting for ${formatResidentLocation(unit, room, bed)}, ${RISK_LABELS[riskLevel]} risk`}
     >
-      <span className="text-[15px] font-bold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+      <span
+        className="text-[15px] font-bold text-foreground"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
         {location}
       </span>
-      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${risk.badgeBg} ${risk.badgeText}`}>
+      <span
+        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${risk.badgeBg} ${risk.badgeText}`}
+      >
         {RISK_LABELS[riskLevel]}
       </span>
     </div>

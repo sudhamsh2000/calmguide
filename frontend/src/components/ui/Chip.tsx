@@ -9,13 +9,7 @@ export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,
   className?: string;
 }
 
-export function Chip({
-  label,
-  selected,
-  onToggle,
-  className = '',
-  ...props
-}: ChipProps) {
+export function Chip({ label, selected, onToggle, className = '', ...props }: ChipProps) {
   return (
     <button
       type="button"

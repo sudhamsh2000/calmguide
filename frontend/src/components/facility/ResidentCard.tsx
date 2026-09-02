@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import type { ResidentSummary } from "@/lib/facility-api";
-import { formatResidentLocation } from "@/lib/facility-utils";
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import type { ResidentSummary } from '@/lib/facility-api';
+import { formatResidentLocation } from '@/lib/facility-utils';
 
 interface ResidentCardProps {
   resident: ResidentSummary;
@@ -12,36 +12,36 @@ interface ResidentCardProps {
 }
 
 const RISK_DOT: Record<string, string> = {
-  high: "bg-red-500",
-  moderate: "bg-orange-500",
-  low: "bg-green-500",
+  high: 'bg-red-500',
+  moderate: 'bg-orange-500',
+  low: 'bg-green-500',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  aggression_anger: "Aggression",
-  confusion_disorientation: "Confusion",
-  wandering_exit_seeking: "Wandering",
-  refusing_care: "Refusing care",
-  sleep_problems: "Sleep issues",
-  hallucinations: "Hallucinations",
-  repetitive_behavior: "Repetitive behavior",
-  other: "Other",
+  aggression_anger: 'Aggression',
+  confusion_disorientation: 'Confusion',
+  wandering_exit_seeking: 'Wandering',
+  refusing_care: 'Refusing care',
+  sleep_problems: 'Sleep issues',
+  hallucinations: 'Hallucinations',
+  repetitive_behavior: 'Repetitive behavior',
+  other: 'Other',
 };
 
 function formatIncidentSummary(raw: string): string {
   const match = raw.match(/^(\w+)\s*\((\w+)\)$/);
   if (match) {
-    const category = CATEGORY_LABELS[match[1]] ?? match[1].replace(/_/g, " ");
-    const outcome = match[2].replace(/_/g, " ");
+    const category = CATEGORY_LABELS[match[1]] ?? match[1].replace(/_/g, ' ');
+    const outcome = match[2].replace(/_/g, ' ');
     return `${category} (${outcome})`;
   }
-  return raw.replace(/_/g, " ");
+  return raw.replace(/_/g, ' ');
 }
 
-export function ResidentCard({ resident, locale, className = "" }: ResidentCardProps) {
-  const t = useTranslations("facility.residents");
+export function ResidentCard({ resident, locale, className = '' }: ResidentCardProps) {
+  const t = useTranslations('facility.residents');
   const dot = RISK_DOT[resident.risk_level] ?? RISK_DOT.low;
-  const riskLabel = t(`risk_${resident.risk_level}` as "risk_high" | "risk_moderate" | "risk_low");
+  const riskLabel = t(`risk_${resident.risk_level}` as 'risk_high' | 'risk_moderate' | 'risk_low');
 
   return (
     <Link
@@ -51,7 +51,7 @@ export function ResidentCard({ resident, locale, className = "" }: ResidentCardP
           room: resident.room,
           bed: resident.bed,
           risk: resident.risk_level,
-        }).filter(([, v]) => v != null) as [string, string][]
+        }).filter(([, v]) => v != null) as [string, string][],
       ).toString()}`}
       className={`block card-shell rounded-xl px-4 py-3 hover:border-primary/30 hover:shadow-sm active:bg-foreground/[.02] transition-all ${className}`}
     >

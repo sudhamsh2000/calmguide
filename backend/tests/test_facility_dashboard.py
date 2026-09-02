@@ -6,7 +6,7 @@ staff-activity tests lock behavior before the 3N+1 -> bulk GROUP BY refactor
 """
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest_asyncio
 
@@ -23,7 +23,9 @@ from app.services.jwt_service import create_token
 
 
 def _auth(staff):
-    return {"Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"}
+    return {
+        "Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"
+    }
 
 
 def _profile(**overrides):
@@ -54,30 +56,64 @@ async def setup(db_session):
     await db_session.flush()
 
     admin = Staff(facility_id=fac.id, name="Admin", email="a@a.x", role="admin", is_active=True)
-    nurse_a = Staff(facility_id=fac.id, name="A Nurse", email="na@a.x", role="staff", is_active=True)
-    nurse_b = Staff(facility_id=fac.id, name="B Nurse", email="nb@a.x", role="staff", is_active=True)
+    nurse_a = Staff(
+        facility_id=fac.id, name="A Nurse", email="na@a.x", role="staff", is_active=True
+    )
+    nurse_b = Staff(
+        facility_id=fac.id, name="B Nurse", email="nb@a.x", role="staff", is_active=True
+    )
     db_session.add_all([admin, nurse_a, nurse_b])
     await db_session.flush()
 
     profile = Profile(
-        access_code_hash=hash_access_code("RESIDEA1"), disease_stage="middle",
-        behavioral_patterns=encrypt(json.dumps([])), calming_strategies=encrypt(json.dumps([])),
+        access_code_hash=hash_access_code("RESIDEA1"),
+        disease_stage="middle",
+        behavioral_patterns=encrypt(json.dumps([])),
+        calming_strategies=encrypt(json.dumps([])),
         safety_concerns=encrypt(json.dumps([])),
     )
     db_session.add(profile)
     await db_session.flush()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     # nurse_a: 2 incidents, 1 conversation session (2 msgs), 1 assignment
-    db_session.add_all([
-        Incident(profile_id=profile.id, source="manual", incident_time=now, time_slot="evening",
-                 behavior_category="aggression_anger", behavior_description=encrypt("x"), staff_id=nurse_a.id),
-        Incident(profile_id=profile.id, source="manual", incident_time=now, time_slot="evening",
-                 behavior_category="wandering_exit_seeking", behavior_description=encrypt("y"), staff_id=nurse_a.id),
-        Conversation(profile_id=profile.id, session_id="sess-1", role="user", content=encrypt("hi"), staff_id=nurse_a.id),
-        Conversation(profile_id=profile.id, session_id="sess-1", role="assistant", content=encrypt("ok"), staff_id=nurse_a.id),
-        StaffPatientAssignment(staff_id=nurse_a.id, profile_id=profile.id, facility_id=fac.id),
-    ])
+    db_session.add_all(
+        [
+            Incident(
+                profile_id=profile.id,
+                source="manual",
+                incident_time=now,
+                time_slot="evening",
+                behavior_category="aggression_anger",
+                behavior_description=encrypt("x"),
+                staff_id=nurse_a.id,
+            ),
+            Incident(
+                profile_id=profile.id,
+                source="manual",
+                incident_time=now,
+                time_slot="evening",
+                behavior_category="wandering_exit_seeking",
+                behavior_description=encrypt("y"),
+                staff_id=nurse_a.id,
+            ),
+            Conversation(
+                profile_id=profile.id,
+                session_id="sess-1",
+                role="user",
+                content=encrypt("hi"),
+                staff_id=nurse_a.id,
+            ),
+            Conversation(
+                profile_id=profile.id,
+                session_id="sess-1",
+                role="assistant",
+                content=encrypt("ok"),
+                staff_id=nurse_a.id,
+            ),
+            StaffPatientAssignment(staff_id=nurse_a.id, profile_id=profile.id, facility_id=fac.id),
+        ]
+    )
     await db_session.commit()
     return {"admin": admin, "nurse_a": nurse_a, "nurse_b": nurse_b}
 
@@ -115,18 +151,22 @@ async def escalation_setup(db_session):
     db_session.add_all([spiking, steady])
     await db_session.flush()
 
-    db_session.add_all([
-        FacilityPatientLink(facility_id=fac.id, profile_id=spiking.id, is_active=True),
-        FacilityPatientLink(facility_id=fac.id, profile_id=steady.id, is_active=True),
-    ])
+    db_session.add_all(
+        [
+            FacilityPatientLink(facility_id=fac.id, profile_id=spiking.id, is_active=True),
+            FacilityPatientLink(facility_id=fac.id, profile_id=steady.id, is_active=True),
+        ]
+    )
 
-    now = datetime.now(timezone.utc)
-    db_session.add_all([
-        _incident(spiking.id, now - timedelta(hours=1)),
-        _incident(spiking.id, now - timedelta(hours=2)),
-        _incident(steady.id, now - timedelta(hours=1)),
-        _incident(steady.id, now - timedelta(hours=30)),
-    ])
+    now = datetime.now(UTC)
+    db_session.add_all(
+        [
+            _incident(spiking.id, now - timedelta(hours=1)),
+            _incident(spiking.id, now - timedelta(hours=2)),
+            _incident(steady.id, now - timedelta(hours=1)),
+            _incident(steady.id, now - timedelta(hours=30)),
+        ]
+    )
     await db_session.commit()
     return {"admin": admin, "spiking": spiking, "steady": steady}
 

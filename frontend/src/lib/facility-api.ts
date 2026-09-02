@@ -1,6 +1,6 @@
-import { getFacilityToken, setFacilityToken, removeFacilityToken } from "./facility-storage";
+import { getFacilityToken, setFacilityToken, removeFacilityToken } from './facility-storage';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
 export class FacilityApiError extends Error {
   constructor(
@@ -9,18 +9,15 @@ export class FacilityApiError extends Error {
     public body?: unknown,
   ) {
     super(message);
-    this.name = "FacilityApiError";
+    this.name = 'FacilityApiError';
   }
 }
 
-async function facilityRequest<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function facilityRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const token = getFacilityToken();
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -46,7 +43,7 @@ async function facilityRequest<T>(
 
 // --- Types ---
 
-export type StaffRole = "staff" | "admin" | "owner";
+export type StaffRole = 'staff' | 'admin' | 'owner';
 
 export interface StaffInfo {
   id: string;
@@ -84,8 +81,8 @@ export interface FacilityInfo {
   created_at: string;
 }
 
-export type RiskLevel = "low" | "moderate" | "high";
-export type TrendDirection = "stable" | "increasing" | "decreasing" | "spike";
+export type RiskLevel = 'low' | 'moderate' | 'high';
+export type TrendDirection = 'stable' | 'increasing' | 'decreasing' | 'spike';
 
 export interface ResidentSummary {
   profile_id: string;
@@ -182,20 +179,17 @@ export async function pinLogin(
   staffId: string,
   pin: string,
 ): Promise<AuthResponse> {
-  const data = await facilityRequest<AuthResponse>("/api/facility/auth/pin", {
-    method: "POST",
+  const data = await facilityRequest<AuthResponse>('/api/facility/auth/pin', {
+    method: 'POST',
     body: JSON.stringify({ facility_code: facilityCode, staff_id: staffId, pin }),
   });
   setFacilityToken(data.token, data.expires_at);
   return data;
 }
 
-export async function emailLogin(
-  email: string,
-  password: string,
-): Promise<AuthResponse> {
-  const data = await facilityRequest<AuthResponse>("/api/facility/auth/login", {
-    method: "POST",
+export async function emailLogin(email: string, password: string): Promise<AuthResponse> {
+  const data = await facilityRequest<AuthResponse>('/api/facility/auth/login', {
+    method: 'POST',
     body: JSON.stringify({ email, password }),
   });
   setFacilityToken(data.token, data.expires_at);
@@ -203,8 +197,8 @@ export async function emailLogin(
 }
 
 export async function refreshToken(): Promise<AuthResponse> {
-  const data = await facilityRequest<AuthResponse>("/api/facility/auth/refresh", {
-    method: "POST",
+  const data = await facilityRequest<AuthResponse>('/api/facility/auth/refresh', {
+    method: 'POST',
   });
   setFacilityToken(data.token, data.expires_at);
   return data;
@@ -212,7 +206,7 @@ export async function refreshToken(): Promise<AuthResponse> {
 
 export async function logout(): Promise<void> {
   try {
-    await facilityRequest("/api/facility/auth/logout", { method: "POST" });
+    await facilityRequest('/api/facility/auth/logout', { method: 'POST' });
   } finally {
     removeFacilityToken();
   }
@@ -234,15 +228,13 @@ export async function verifyFacilityCode(
   const url = `${BASE_URL}/api/facilities/${encodeURIComponent(facilityCode)}/verify`;
   const response = await fetch(url);
   if (!response.ok) {
-    throw new FacilityApiError("Facility not found", response.status);
+    throw new FacilityApiError('Facility not found', response.status);
   }
   return response.json();
 }
 
 export async function getFacility(facilityCode: string): Promise<FacilityInfo> {
-  return facilityRequest<FacilityInfo>(
-    `/api/facilities/${encodeURIComponent(facilityCode)}`,
-  );
+  return facilityRequest<FacilityInfo>(`/api/facilities/${encodeURIComponent(facilityCode)}`);
 }
 
 export async function updateFacility(
@@ -253,19 +245,16 @@ export async function updateFacility(
     timezone: string;
   },
 ): Promise<FacilityInfo> {
-  return facilityRequest<FacilityInfo>(
-    `/api/facilities/${encodeURIComponent(facilityCode)}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    },
-  );
+  return facilityRequest<FacilityInfo>(`/api/facilities/${encodeURIComponent(facilityCode)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
 }
 
 // --- CNA Residents ---
 
 export async function getMyResidents(): Promise<{ residents: ResidentSummary[] }> {
-  return facilityRequest<{ residents: ResidentSummary[] }>("/api/facility/my-residents");
+  return facilityRequest<{ residents: ResidentSummary[] }>('/api/facility/my-residents');
 }
 
 export async function getBehavioralCard(profileId: string): Promise<BehavioralCard> {
@@ -277,23 +266,21 @@ export async function getBehavioralCard(profileId: string): Promise<BehavioralCa
 // --- Dashboard (DON) ---
 
 export async function getDashboardSummary(hours = 24): Promise<DashboardSummary> {
-  return facilityRequest<DashboardSummary>(
-    `/api/facility/dashboard/summary?hours=${hours}`,
-  );
+  return facilityRequest<DashboardSummary>(`/api/facility/dashboard/summary?hours=${hours}`);
 }
 
-export async function getTrends(period: "7d" | "30d" | "90d" = "7d"): Promise<TrendsData> {
+export async function getTrends(period: '7d' | '30d' | '90d' = '7d'): Promise<TrendsData> {
   return facilityRequest<TrendsData>(`/api/facility/dashboard/trends?period=${period}`);
 }
 
 export async function getStaffActivity(): Promise<StaffActivity> {
-  return facilityRequest<StaffActivity>("/api/facility/dashboard/staff-activity");
+  return facilityRequest<StaffActivity>('/api/facility/dashboard/staff-activity');
 }
 
 // --- Executive (Owner) ---
 
 export async function getExecutiveOverview(): Promise<ExecutiveOverview> {
-  return facilityRequest<ExecutiveOverview>("/api/facility/executive/overview");
+  return facilityRequest<ExecutiveOverview>('/api/facility/executive/overview');
 }
 
 // --- Audit ---
@@ -307,14 +294,14 @@ export async function getAuditLogs(params?: {
   offset?: number;
 }): Promise<AuditLogList> {
   const searchParams = new URLSearchParams();
-  if (params?.user_id) searchParams.set("user_id", params.user_id);
-  if (params?.resource_type) searchParams.set("resource_type", params.resource_type);
-  if (params?.since) searchParams.set("since", params.since);
-  if (params?.until) searchParams.set("until", params.until);
-  if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
-  if (params?.offset !== undefined) searchParams.set("offset", String(params.offset));
+  if (params?.user_id) searchParams.set('user_id', params.user_id);
+  if (params?.resource_type) searchParams.set('resource_type', params.resource_type);
+  if (params?.since) searchParams.set('since', params.since);
+  if (params?.until) searchParams.set('until', params.until);
+  if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+  if (params?.offset !== undefined) searchParams.set('offset', String(params.offset));
   const query = searchParams.toString();
-  return facilityRequest<AuditLogList>(`/api/facility/audit-logs${query ? `?${query}` : ""}`);
+  return facilityRequest<AuditLogList>(`/api/facility/audit-logs${query ? `?${query}` : ''}`);
 }
 
 // --- Staff Management (Admin) ---
@@ -336,10 +323,10 @@ export async function createStaff(
     language_preference?: string;
   },
 ): Promise<StaffInfo> {
-  return facilityRequest<StaffInfo>(
-    `/api/facilities/${encodeURIComponent(facilityCode)}/staff`,
-    { method: "POST", body: JSON.stringify(data) },
-  );
+  return facilityRequest<StaffInfo>(`/api/facilities/${encodeURIComponent(facilityCode)}/staff`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updateStaff(
@@ -349,14 +336,14 @@ export async function updateStaff(
 ): Promise<StaffInfo> {
   return facilityRequest<StaffInfo>(
     `/api/facilities/${encodeURIComponent(facilityCode)}/staff/${encodeURIComponent(staffId)}`,
-    { method: "PUT", body: JSON.stringify(data) },
+    { method: 'PUT', body: JSON.stringify(data) },
   );
 }
 
 export async function deleteStaff(facilityCode: string, staffId: string): Promise<void> {
   await facilityRequest(
     `/api/facilities/${encodeURIComponent(facilityCode)}/staff/${encodeURIComponent(staffId)}`,
-    { method: "DELETE" },
+    { method: 'DELETE' },
   );
 }
 
@@ -369,17 +356,14 @@ export async function linkPatient(
   room?: string,
   bed?: string,
 ): Promise<unknown> {
-  return facilityRequest(
-    `/api/facilities/${encodeURIComponent(facilityCode)}/patients`,
-    {
-      method: "POST",
-      body: JSON.stringify({ access_code: accessCode, unit, room, bed }),
-    },
-  );
+  return facilityRequest(`/api/facilities/${encodeURIComponent(facilityCode)}/patients`, {
+    method: 'POST',
+    body: JSON.stringify({ access_code: accessCode, unit, room, bed }),
+  });
 }
 
 export interface ResidentCreateData {
-  disease_stage: "early" | "middle" | "late" | "unknown";
+  disease_stage: 'early' | 'middle' | 'late' | 'unknown';
   behavioral_patterns?: string[];
   calming_strategies?: string[];
   safety_concerns?: string[];
@@ -404,7 +388,7 @@ export async function createResident(
   return facilityRequest<ResidentCreateResponse>(
     `/api/facilities/${encodeURIComponent(facilityCode)}/residents`,
     {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(data),
     },
   );
@@ -417,7 +401,7 @@ export async function createIncidentByProfile(
   return facilityRequest<{ id: string; created_at: string }>(
     `/api/incidents/by-profile/${encodeURIComponent(profileId)}`,
     {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(data),
     },
   );
@@ -437,14 +421,14 @@ export async function createAssignment(
 ): Promise<AssignmentResponse> {
   return facilityRequest<AssignmentResponse>(
     `/api/facilities/${encodeURIComponent(facilityCode)}/assignments`,
-    { method: "POST", body: JSON.stringify(data) },
+    { method: 'POST', body: JSON.stringify(data) },
   );
 }
 
 export async function deleteAssignment(facilityCode: string, assignmentId: string): Promise<void> {
   await facilityRequest(
     `/api/facilities/${encodeURIComponent(facilityCode)}/assignments/${encodeURIComponent(assignmentId)}`,
-    { method: "DELETE" },
+    { method: 'DELETE' },
   );
 }
 
@@ -452,7 +436,7 @@ export async function getAssignments(
   facilityCode: string,
   staffId?: string,
 ): Promise<{ assignments: AssignmentResponse[] }> {
-  const query = staffId ? `?staff_id=${encodeURIComponent(staffId)}` : "";
+  const query = staffId ? `?staff_id=${encodeURIComponent(staffId)}` : '';
   return facilityRequest<{ assignments: AssignmentResponse[] }>(
     `/api/facilities/${encodeURIComponent(facilityCode)}/assignments${query}`,
   );
@@ -466,7 +450,7 @@ export async function downloadReport(days: number = 30): Promise<void> {
   if (!res.ok) throw new FacilityApiError(`Report failed: ${res.status}`, res.status);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `calmguide-report-${new Date().toISOString().slice(0, 10)}.pdf`;
   document.body.appendChild(a);

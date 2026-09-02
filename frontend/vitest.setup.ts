@@ -40,8 +40,15 @@ const mockRouter = { push: mockRouterPush, replace: mockRouterReplace, back: moc
 vi.mock('@/i18n/navigation', async () => {
   const React = await import('react');
   return {
-    Link: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: unknown }) =>
-      React.createElement('a', { href, ...props }, children),
+    Link: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children: React.ReactNode;
+      [key: string]: unknown;
+    }) => React.createElement('a', { href, ...props }, children),
     useRouter: () => mockRouter,
     usePathname: () => '/',
     redirect: vi.fn(),
@@ -74,7 +81,10 @@ vi.mock('next-intl', () => ({
 
 // Polyfill localStorage for jsdom environments where it may be incomplete
 // (Node 25+ has a native localStorage global that conflicts with jsdom)
-if (typeof window !== 'undefined' && (!window.localStorage || typeof window.localStorage.clear !== 'function')) {
+if (
+  typeof window !== 'undefined' &&
+  (!window.localStorage || typeof window.localStorage.clear !== 'function')
+) {
   const store = new Map<string, string>();
   const localStorageMock: Storage = {
     getItem(key: string): string | null {

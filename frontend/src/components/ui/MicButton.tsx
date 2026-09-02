@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { useLocale } from "next-intl";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useCallback } from 'react';
+import { useLocale } from 'next-intl';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 export interface MicButtonProps {
   onTranscript: (text: string) => void;
@@ -17,7 +17,7 @@ export function MicButton({
   onInterim,
   onListeningChange,
   disabled = false,
-  className = "",
+  className = '',
 }: MicButtonProps) {
   const locale = useLocale();
   const { start, stop, isListening, isSupported } = useSpeechRecognition({
@@ -30,7 +30,7 @@ export function MicButton({
     if (isListening) {
       stop();
       onListeningChange?.(false);
-      onInterim?.("");
+      onInterim?.('');
     } else {
       start();
       onListeningChange?.(true);
@@ -44,12 +44,12 @@ export function MicButton({
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      aria-label={isListening ? "Stop voice input" : "Voice input"}
+      aria-label={isListening ? 'Stop voice input' : 'Voice input'}
       className={`inline-flex items-center justify-center h-9 w-9 rounded-lg transition-colors ${
         isListening
-          ? "bg-error/15 text-error"
-          : "text-foreground-muted/50 hover:text-foreground-muted hover:bg-foreground/10"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
+          ? 'bg-error/15 text-error'
+          : 'text-foreground-muted/50 hover:text-foreground-muted hover:bg-foreground/10'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
     >
       {isListening ? (
         <span className="relative flex h-5 w-5 items-center justify-center">

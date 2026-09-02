@@ -13,7 +13,7 @@ export function formatResidentLocation(
     if (r) return `Rm ${r}`;
     if (u) return u;
     if (b) return `Bed ${b}`;
-    return "Resident";
+    return 'Resident';
   }
   if (u && r && b) return `${u}, Room ${r}, Bed ${b}`;
   if (u && r) return `${u}, Room ${r}`;
@@ -21,7 +21,7 @@ export function formatResidentLocation(
   if (r) return `Room ${r}`;
   if (u) return u;
   if (b) return `Bed ${b}`;
-  return "Resident";
+  return 'Resident';
 }
 
 export function buildResidentLocationParams(
@@ -30,9 +30,9 @@ export function buildResidentLocationParams(
   bed: string | null | undefined,
 ): string {
   const params = new URLSearchParams();
-  if (unit) params.set("unit", unit);
-  if (room) params.set("room", room);
-  if (bed) params.set("bed", bed);
+  if (unit) params.set('unit', unit);
+  if (room) params.set('room', room);
+  if (bed) params.set('bed', bed);
   const str = params.toString();
-  return str ? `&${str}` : "";
+  return str ? `&${str}` : '';
 }

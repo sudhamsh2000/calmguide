@@ -28,9 +28,7 @@ export function resolvePageBrandHref({
   const isFacilityPath = pathname.includes('/facility');
 
   if (isFacilityPath) {
-    return facilityAuthenticated
-      ? resolveFacilityHome(facilityStaffRole)
-      : '/facility/login';
+    return facilityAuthenticated ? resolveFacilityHome(facilityStaffRole) : '/facility/login';
   }
 
   if (caregiverAccessCode && caregiverPatientName) {

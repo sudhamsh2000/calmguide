@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { getAccessCode } from "@/lib/storage";
-import { getIncident, updateIncident } from "@/lib/api";
-import type { IncidentResponse, IncidentUpdate } from "@/lib/api";
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { getAccessCode } from '@/lib/storage';
+import { getIncident, updateIncident } from '@/lib/api';
+import type { IncidentResponse, IncidentUpdate } from '@/lib/api';
 
 export interface IncidentDetailProps {
   incidentId: string;
@@ -15,11 +15,11 @@ export interface IncidentDetailProps {
 
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   });
 }
 
@@ -27,14 +27,16 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
   if (!value) return null;
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs font-semibold uppercase tracking-wide text-foreground-muted">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wide text-foreground-muted">
+        {label}
+      </span>
       <span className="text-base text-foreground">{value}</span>
     </div>
   );
 }
 
-export function IncidentDetail({ incidentId, className = "" }: IncidentDetailProps) {
-  const t = useTranslations("incidents");
+export function IncidentDetail({ incidentId, className = '' }: IncidentDetailProps) {
+  const t = useTranslations('incidents');
   const [incident, setIncident] = useState<IncidentResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function IncidentDetail({ incidentId, className = "" }: IncidentDetailPro
     setLoading(true);
     getIncident(code, incidentId)
       .then(setIncident)
-      .catch(() => setError("Failed to load incident"))
+      .catch(() => setError('Failed to load incident'))
       .finally(() => setLoading(false));
   }, [incidentId]);
 
@@ -60,7 +62,7 @@ export function IncidentDetail({ incidentId, className = "" }: IncidentDetailPro
   if (error || !incident) {
     return (
       <div className={`${className}`}>
-        <p className="text-base text-error">{error ?? "Incident not found"}</p>
+        <p className="text-base text-error">{error ?? 'Incident not found'}</p>
       </div>
     );
   }
@@ -77,24 +79,28 @@ export function IncidentDetail({ incidentId, className = "" }: IncidentDetailPro
           />
           <DetailRow
             label="Duration"
-            value={incident.duration_category ? t(`logger.duration.${incident.duration_category}`) : null}
+            value={
+              incident.duration_category ? t(`logger.duration.${incident.duration_category}`) : null
+            }
           />
-          <DetailRow
-            label="What was happening before"
-            value={incident.antecedent_description}
-          />
-          <DetailRow
-            label="What was tried"
-            value={incident.intervention_description}
-          />
+          <DetailRow label="What was happening before" value={incident.antecedent_description} />
+          <DetailRow label="What was tried" value={incident.intervention_description} />
           <DetailRow
             label="Outcome"
-            value={incident.intervention_outcome ? t(`logger.outcome.${incident.intervention_outcome}`) : null}
+            value={
+              incident.intervention_outcome
+                ? t(`logger.outcome.${incident.intervention_outcome}`)
+                : null
+            }
           />
           <DetailRow label="Location" value={incident.location} />
           <DetailRow
             label="Source"
-            value={incident.source === "auto_extracted" ? t("history.auto_extracted") : t("history.manual")}
+            value={
+              incident.source === 'auto_extracted'
+                ? t('history.auto_extracted')
+                : t('history.manual')
+            }
           />
           {incident.extraction_confidence !== null && (
             <DetailRow

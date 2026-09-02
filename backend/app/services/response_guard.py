@@ -25,7 +25,9 @@ SCRIPT_RULES: dict[str, ScriptRule] = {
     "ar": ScriptRule(re.compile(r"[\u0600-\u06FF]"), min_letters=100, min_ratio=0.65),
     "hi": ScriptRule(re.compile(r"[\u0900-\u097F]"), min_letters=100, min_ratio=0.65),
     "ja": ScriptRule(re.compile(r"[\u3040-\u30FF\u4E00-\u9FFF]"), min_letters=100, min_ratio=0.55),
-    "ko": ScriptRule(re.compile(r"[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]"), min_letters=100, min_ratio=0.65),
+    "ko": ScriptRule(
+        re.compile(r"[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]"), min_letters=100, min_ratio=0.65
+    ),
     "ta": ScriptRule(re.compile(r"[\u0B80-\u0BFF]"), min_letters=100, min_ratio=0.65),
     "zh": ScriptRule(re.compile(r"[\u4E00-\u9FFF]"), min_letters=100, min_ratio=0.65),
 }
@@ -41,7 +43,8 @@ KNOWN_BAD_PHRASES = (
 _DISRESPECTFUL_WORD_PATTERNS: list[re.Pattern[str]] = [
     re.compile(p, re.IGNORECASE)
     for p in [
-        r"\bcrazy\b", r"\bcraziness\b",
+        r"\bcrazy\b",
+        r"\bcraziness\b",
         r"\bsenil\w*\b",
         r"\bmake\s+(?:him|her|them)\s+obey\b",
         r"\battention\s*seek\w*\b",
@@ -55,7 +58,8 @@ _DISRESPECTFUL_WORD_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 _NEGATION_PREFIX = re.compile(
-    r"\b(?:don'?t|do\s+not|never|avoid|stop)\b", re.IGNORECASE,
+    r"\b(?:don'?t|do\s+not|never|avoid|stop)\b",
+    re.IGNORECASE,
 )
 _DIRECTIVE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(p, re.IGNORECASE)
@@ -69,44 +73,44 @@ _DIRECTIVE_PATTERNS: list[re.Pattern[str]] = [
 # Non-English disrespectful phrases — keyed by base locale
 LOCALIZED_DISRESPECTFUL_PHRASES: dict[str, tuple[str, ...]] = {
     "ta": (
-        "பைத்தியம்",        # crazy
-        "மூளை கெட்டவர்",    # brain-damaged (pejorative)
-        "பாரம்",            # burden
-        "கட்டுப்படுத்து",    # control (imperative)
-        "வாயை மூடு",        # shut up
-        "அடங்கு",           # obey/submit
+        "பைத்தியம்",  # crazy
+        "மூளை கெட்டவர்",  # brain-damaged (pejorative)
+        "பாரம்",  # burden
+        "கட்டுப்படுத்து",  # control (imperative)
+        "வாயை மூடு",  # shut up
+        "அடங்கு",  # obey/submit
     ),
     "hi": (
-        "पागल",             # crazy
-        "बोझ",              # burden
-        "बूढ़ा",            # old (pejorative)
-        "चुप करो",          # shut up
-        "काबू करो",         # control
-        "जबरदस्ती",         # force
+        "पागल",  # crazy
+        "बोझ",  # burden
+        "बूढ़ा",  # old (pejorative)
+        "चुप करो",  # shut up
+        "काबू करो",  # control
+        "जबरदस्ती",  # force
     ),
     "ar": (
-        "مجنون",            # crazy
-        "عبء",              # burden
-        "أسكته",            # shut him up
-        "سيطر عليه",        # control him
-        "أجبره",            # force him
+        "مجنون",  # crazy
+        "عبء",  # burden
+        "أسكته",  # shut him up
+        "سيطر عليه",  # control him
+        "أجبره",  # force him
     ),
     "zh": (
-        "疯子",             # crazy
-        "老糊涂",           # senile
-        "负担",             # burden
-        "控制",             # control
-        "强迫",             # force
+        "疯子",  # crazy
+        "老糊涂",  # senile
+        "负担",  # burden
+        "控制",  # control
+        "强迫",  # force
     ),
     "ja": (
-        "ボケ老人",         # senile old person
-        "負担",             # burden
-        "おかしい",         # crazy
+        "ボケ老人",  # senile old person
+        "負担",  # burden
+        "おかしい",  # crazy
     ),
     "ko": (
-        "미친",             # crazy
-        "짐",               # burden
-        "치매 노인",        # demented old person (pejorative)
+        "미친",  # crazy
+        "짐",  # burden
+        "치매 노인",  # demented old person (pejorative)
     ),
 }
 
@@ -233,7 +237,7 @@ def validate_response_respect(text: str, locale_code: str = "en") -> ValidationR
     for pattern in _DIRECTIVE_PATTERNS:
         match = pattern.search(cleaned)
         if match:
-            window = cleaned[max(0, match.start() - 60):match.start()]
+            window = cleaned[max(0, match.start() - 60) : match.start()]
             last_sentence = re.split(r"[.!?]", window)[-1]
             if not _NEGATION_PREFIX.search(last_sentence):
                 return ValidationResult(False, f"disrespectful_phrase:{match.group()}")

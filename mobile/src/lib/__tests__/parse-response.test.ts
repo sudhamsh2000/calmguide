@@ -23,12 +23,7 @@ describe('parseCoachResponse', () => {
 
     const sections = parseCoachResponse(raw);
 
-    expect(sections.map((s) => s.id)).toEqual([
-      'right-now',
-      'why',
-      'what-not-to-do',
-      'escalation',
-    ]);
+    expect(sections.map((s) => s.id)).toEqual(['right-now', 'why', 'what-not-to-do', 'escalation']);
     expect(sections[0].content).toBe('Speak slowly and stay calm.');
     expect(sections[2].content).toBe("Don't argue or correct them.");
     expect(sections[3].content).toBe('Call 911 if there is a fall or injury.');
@@ -53,12 +48,7 @@ describe('parseCoachResponse', () => {
     ].join('\n');
 
     const sections = parseCoachResponse(raw);
-    expect(sections.map((s) => s.id)).toEqual([
-      'right-now',
-      'why',
-      'what-not-to-do',
-      'escalation',
-    ]);
+    expect(sections.map((s) => s.id)).toEqual(['right-now', 'why', 'what-not-to-do', 'escalation']);
     expect(sections[0].content).toBe('Do this immediately.');
   });
 

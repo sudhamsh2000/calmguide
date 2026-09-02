@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   FACILITY_STORAGE_KEYS,
   clearFacilityCode,
@@ -8,30 +8,30 @@ import {
   setFacilityCode,
   setFacilityLoginMode,
   setFacilityName,
-} from "./facility-storage";
+} from './facility-storage';
 
-describe("facility-storage", () => {
+describe('facility-storage', () => {
   beforeEach(() => {
     window.localStorage.clear();
   });
 
-  it("stores and retrieves the facility login mode", () => {
-    setFacilityLoginMode("email");
+  it('stores and retrieves the facility login mode', () => {
+    setFacilityLoginMode('email');
 
-    expect(getFacilityLoginMode()).toBe("email");
-    expect(window.localStorage.getItem(FACILITY_STORAGE_KEYS.FACILITY_LOGIN_MODE)).toBe("email");
+    expect(getFacilityLoginMode()).toBe('email');
+    expect(window.localStorage.getItem(FACILITY_STORAGE_KEYS.FACILITY_LOGIN_MODE)).toBe('email');
   });
 
-  it("ignores invalid facility login modes", () => {
-    window.localStorage.setItem(FACILITY_STORAGE_KEYS.FACILITY_LOGIN_MODE, "pin");
+  it('ignores invalid facility login modes', () => {
+    window.localStorage.setItem(FACILITY_STORAGE_KEYS.FACILITY_LOGIN_MODE, 'pin');
 
     expect(getFacilityLoginMode()).toBeNull();
   });
 
-  it("clears stored facility identity and login mode together", () => {
-    setFacilityCode("ABCD1234");
-    setFacilityName("Harbor Memory Care");
-    setFacilityLoginMode("staff-select");
+  it('clears stored facility identity and login mode together', () => {
+    setFacilityCode('ABCD1234');
+    setFacilityName('Harbor Memory Care');
+    setFacilityLoginMode('staff-select');
 
     clearFacilityCode();
 

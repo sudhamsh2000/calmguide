@@ -20,9 +20,7 @@ _MAX_OUTPUT_TOKENS = 2048
 class OpenAIProvider(LLMProvider):
     def __init__(self, api_key: str, model: str = "gpt-4o-mini"):
         # Bound every request so a stalled provider can't hang the crisis path.
-        self._client = AsyncOpenAI(
-            api_key=api_key, timeout=get_settings().LLM_TIMEOUT_SECONDS
-        )
+        self._client = AsyncOpenAI(api_key=api_key, timeout=get_settings().LLM_TIMEOUT_SECONDS)
         self._model = model
 
     async def stream_completion(

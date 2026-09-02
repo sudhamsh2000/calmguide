@@ -1,9 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: [
-    './src/**/*.{ts,tsx}',
-  ],
+  content: ['./src/**/*.{ts,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {
@@ -63,25 +61,25 @@ const config: Config = {
         display: ['var(--font-display)', 'Nunito Sans', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        'coach': ['1.125rem', { lineHeight: '1.6' }],
+        coach: ['1.125rem', { lineHeight: '1.6' }],
       },
       minHeight: {
-        'tap': '48px',
+        tap: '48px',
       },
       minWidth: {
-        'tap': '48px',
+        tap: '48px',
       },
       borderColor: {
-        'theme': 'var(--color-border)',
+        theme: 'var(--color-border)',
         'theme-soft': 'var(--color-border-soft)',
         'theme-strong': 'var(--color-border-strong)',
       },
       maxWidth: {
-        'landing': '1200px',
+        landing: '1200px',
         // Desktop width for the caregiver app shell. Wide enough for the
         // two-column screens to breathe, deliberately short of the landing
         // page's 1200px so reading columns never get uncomfortably long.
-        'app': '1040px',
+        app: '1040px',
       },
       keyframes: {
         breathing: {

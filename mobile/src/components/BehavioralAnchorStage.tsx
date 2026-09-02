@@ -53,18 +53,24 @@ export function BehavioralAnchorStage({ selectedStage, onSelect }: BehavioralAnc
                 borderColor: isSelected ? colors.primary : colors.border,
               }}
             >
-              <View style={{
-                width: 20,
-                height: 20,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: isSelected ? colors.primary : colors.mutedForeground,
-                backgroundColor: isSelected ? colors.primary : 'transparent',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 2,
-              }}>
-                {isSelected && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#FFFFFF' }} />}
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  borderWidth: 2,
+                  borderColor: isSelected ? colors.primary : colors.mutedForeground,
+                  backgroundColor: isSelected ? colors.primary : 'transparent',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 2,
+                }}
+              >
+                {isSelected && (
+                  <View
+                    style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#FFFFFF' }}
+                  />
+                )}
               </View>
               <Text style={{ flex: 1, fontSize: 16, color: colors.foreground, lineHeight: 24 }}>
                 {t(`disease_stage.${key}`)}

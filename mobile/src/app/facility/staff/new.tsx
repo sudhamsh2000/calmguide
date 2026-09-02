@@ -53,7 +53,10 @@ export default function AddStaffScreen() {
       return;
     }
     if (isAdmin && password.length < 8) {
-      Alert.alert(t('login.password'), t('staff.password_min_length', 'Password must be at least 8 characters.'));
+      Alert.alert(
+        t('login.password'),
+        t('staff.password_min_length', 'Password must be at least 8 characters.'),
+      );
       return;
     }
 
@@ -71,7 +74,10 @@ export default function AddStaffScreen() {
       });
       router.back();
     } catch {
-      Alert.alert('Error', t('add_resident.error', 'Could not create staff member. Please try again.'));
+      Alert.alert(
+        'Error',
+        t('add_resident.error', 'Could not create staff member. Please try again.'),
+      );
     } finally {
       setSaving(false);
     }
@@ -93,12 +99,19 @@ export default function AddStaffScreen() {
       style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-        <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 24 }}>
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text
+          style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 24 }}
+        >
           {t('staff.add_title')}
         </Text>
 
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+        >
           {t('staff.name')}
         </Text>
         <TextInput
@@ -110,7 +123,9 @@ export default function AddStaffScreen() {
           accessibilityLabel={t('staff.name')}
         />
 
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+        >
           {t('staff.role')}
         </Text>
         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16 }}>
@@ -126,7 +141,9 @@ export default function AddStaffScreen() {
           ))}
         </View>
 
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+        >
           {t('staff.pin_label')}
         </Text>
         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16 }}>
@@ -140,15 +157,23 @@ export default function AddStaffScreen() {
             style={[inputStyle, { flex: 1 }]}
             accessibilityLabel={t('staff.pin_label')}
           />
-          <Button variant="secondary" size="sm" onPress={generatePin} style={{ alignSelf: 'center' }}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onPress={generatePin}
+            style={{ alignSelf: 'center' }}
+          >
             {t('staff.pin_generate')}
           </Button>
         </View>
 
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+        >
           {t('staff.email_label')}
           <Text style={{ fontSize: 12, fontWeight: '400', color: colors.mutedForeground }}>
-            {' '}({isAdmin ? t('staff.email_hint_admin') : t('staff.email_hint_cna')})
+            {' '}
+            ({isAdmin ? t('staff.email_hint_admin') : t('staff.email_hint_cna')})
           </Text>
         </Text>
         <TextInput
@@ -164,7 +189,9 @@ export default function AddStaffScreen() {
 
         {isAdmin && (
           <>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+            <Text
+              style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+            >
               {t('login.password')} *
             </Text>
             <TextInput
@@ -179,7 +206,9 @@ export default function AddStaffScreen() {
           </>
         )}
 
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+        >
           {t('staff.language_label')}
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
@@ -195,12 +224,7 @@ export default function AddStaffScreen() {
           ))}
         </View>
 
-        <Button
-          size="lg"
-          onPress={handleSave}
-          loading={saving}
-          disabled={!name.trim()}
-        >
+        <Button size="lg" onPress={handleSave} loading={saving} disabled={!name.trim()}>
           {t('staff.add_button')}
         </Button>
       </ScrollView>

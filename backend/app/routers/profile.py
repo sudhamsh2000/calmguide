@@ -3,7 +3,7 @@
 import json
 import secrets
 import string
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select
@@ -23,8 +23,6 @@ from app.models.profile_insights import ProfileInsights
 from app.models.response_feedback import ResponseFeedback
 from app.models.safety_event import SafetyEvent
 from app.models.staff_patient_assignment import StaffPatientAssignment
-from app.services.auth import hash_access_code
-from app.services.crypto import decrypt, encrypt
 from app.schemas.profile import (
     ErrorResponse,
     InviteCodeCheck,
@@ -34,6 +32,8 @@ from app.schemas.profile import (
     ProfileResponse,
     ProfileUpdate,
 )
+from app.services.auth import hash_access_code
+from app.services.crypto import decrypt, encrypt
 
 router = APIRouter(tags=["profiles"])
 
@@ -44,11 +44,10 @@ def _safe_decrypt_list(encrypted: str) -> list[str]:
     except (json.JSONDecodeError, Exception):
         return []
 
+
 # Characters for access codes — exclude ambiguous: 0, O, 1, I, L
 ACCESS_CODE_ALPHABET = string.ascii_uppercase + string.digits
-ACCESS_CODE_ALPHABET = "".join(
-    c for c in ACCESS_CODE_ALPHABET if c not in "0O1IL"
-)
+ACCESS_CODE_ALPHABET = "".join(c for c in ACCESS_CODE_ALPHABET if c not in "0O1IL")
 ACCESS_CODE_LENGTH = 8
 
 
@@ -58,9 +57,7 @@ def _generate_access_code() -> str:
 
 async def _find_profile_by_code(session: AsyncSession, access_code: str) -> Profile | None:
     code_hash = hash_access_code(access_code)
-    result = await session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     return result.scalar_one_or_none()
 
 
@@ -137,7 +134,10 @@ async def create_profile(
     else:
         raise HTTPException(
             status_code=500,
-            detail={"error": "Failed to generate unique access code", "code": "CODE_GENERATION_FAILED"},
+            detail={
+                "error": "Failed to generate unique access code",
+                "code": "CODE_GENERATION_FAILED",
+            },
         )
 
     profile = Profile(
@@ -220,13 +220,9 @@ async def delete_profile(
             detail={"error": "Profile not found", "code": "PROFILE_NOT_FOUND"},
         )
 
-    conversation_ids = (
-        select(Conversation.id).where(Conversation.profile_id == profile.id)
-    )
+    conversation_ids = select(Conversation.id).where(Conversation.profile_id == profile.id)
     await session.execute(
-        delete(ResponseFeedback).where(
-            ResponseFeedback.conversation_id.in_(conversation_ids)
-        )
+        delete(ResponseFeedback).where(ResponseFeedback.conversation_id.in_(conversation_ids))
     )
     for model in (
         Conversation,
@@ -265,14 +261,12 @@ async def update_profile(
     # Detect stage transition
     if payload.disease_stage != profile.disease_stage:
         profile.previous_stage = profile.disease_stage
-        profile.stage_changed_at = datetime.now(timezone.utc)
+        profile.stage_changed_at = datetime.now(UTC)
         profile.disease_stage = payload.disease_stage
 
         # Mark dossier stale so pre-transition incidents get re-weighted
         dossier_result = await session.execute(
-            select(BehavioralDossier).where(
-                BehavioralDossier.profile_id == profile.id
-            )
+            select(BehavioralDossier).where(BehavioralDossier.profile_id == profile.id)
         )
         dossier = dossier_result.scalar_one_or_none()
         if dossier:

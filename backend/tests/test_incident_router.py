@@ -4,7 +4,6 @@ import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 
-
 VALID_PROFILE = {
     "disease_stage": "middle",
     "behavioral_patterns": ["sundowning", "wandering"],
@@ -47,7 +46,9 @@ class TestCreateIncident:
         )
         assert resp.status_code == 404
 
-    async def test_invalid_category_returns_422(self, client: AsyncClient, seeded_profile_code: str):
+    async def test_invalid_category_returns_422(
+        self, client: AsyncClient, seeded_profile_code: str
+    ):
         resp = await client.post(
             f"/api/incidents/{seeded_profile_code}",
             json={
@@ -140,9 +141,7 @@ class TestGetIncident:
         assert data["intervention_description"] == "Offered tea, tried again after 10 min"
 
     async def test_not_found_returns_404(self, client: AsyncClient, seeded_profile_code: str):
-        resp = await client.get(
-            f"/api/incidents/{seeded_profile_code}/nonexistent-id"
-        )
+        resp = await client.get(f"/api/incidents/{seeded_profile_code}/nonexistent-id")
         assert resp.status_code == 404
 
 

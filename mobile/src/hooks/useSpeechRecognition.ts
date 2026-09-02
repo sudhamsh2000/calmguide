@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from 'react';
 
 let ExpoSpeechRecognitionModule: {
   requestPermissionsAsync: () => Promise<{ granted: boolean }>;
@@ -6,10 +6,11 @@ let ExpoSpeechRecognitionModule: {
   stop: () => void;
 } | null = null;
 
-let useSpeechRecognitionEvent: ((event: string, handler: (e: unknown) => void) => void) | null = null;
+let useSpeechRecognitionEvent: ((event: string, handler: (e: unknown) => void) => void) | null =
+  null;
 
 try {
-  const mod = require("expo-speech-recognition");
+  const mod = require('expo-speech-recognition');
   ExpoSpeechRecognitionModule = mod.ExpoSpeechRecognitionModule;
   useSpeechRecognitionEvent = mod.useSpeechRecognitionEvent;
 } catch {
@@ -41,7 +42,7 @@ export function useSpeechRecognition(
 
   const useEvent = useSpeechRecognitionEvent ?? noopEventHook;
 
-  useEvent("result", (event: unknown) => {
+  useEvent('result', (event: unknown) => {
     const e = event as { results?: { transcript?: string }[]; isFinal?: boolean };
     const transcript = e.results?.[0]?.transcript;
     if (transcript && e.isFinal) {
@@ -49,8 +50,8 @@ export function useSpeechRecognition(
     }
   });
 
-  useEvent("end", () => setIsListening(false));
-  useEvent("error", () => setIsListening(false));
+  useEvent('end', () => setIsListening(false));
+  useEvent('error', () => setIsListening(false));
 
   const start = useCallback(async () => {
     if (!ExpoSpeechRecognitionModule) return;
@@ -58,7 +59,7 @@ export function useSpeechRecognition(
     if (!granted) return;
 
     ExpoSpeechRecognitionModule.start({
-      lang: locale ?? "en-US",
+      lang: locale ?? 'en-US',
       interimResults: true,
       continuous: true,
     });

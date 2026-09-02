@@ -1,6 +1,7 @@
 """Public impact showcase endpoint — no authentication required."""
+
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select, text
@@ -20,20 +21,16 @@ _cache: dict = {"data": None, "expires_at": None}
 @router.get("/impact", response_model=ImpactResponse)
 async def get_impact(db: AsyncSession = Depends(get_session)):
     """Return aggregate impact metrics. Cached for 5 minutes."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if _cache["data"] and _cache["expires_at"] and now < _cache["expires_at"]:
         return _cache["data"]
 
     # Families supported — distinct profiles with at least one message
-    families_result = await db.execute(
-        select(func.count(func.distinct(Conversation.profile_id)))
-    )
+    families_result = await db.execute(select(func.count(func.distinct(Conversation.profile_id))))
     families_count = families_result.scalar() or 0
 
     # Total distinct coaching sessions
-    sessions_result = await db.execute(
-        select(func.count(func.distinct(Conversation.session_id)))
-    )
+    sessions_result = await db.execute(select(func.count(func.distinct(Conversation.session_id))))
     sessions_count = sessions_result.scalar() or 0
 
     # Languages served — distinct non-null locale codes

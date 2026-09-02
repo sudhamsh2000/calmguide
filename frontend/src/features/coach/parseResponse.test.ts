@@ -93,7 +93,8 @@ describe('parseCoachResponse', () => {
   });
 
   it('trims whitespace from section content', () => {
-    const text = '[[SECTION:right-now]]\n### இப்போது செய்ய வேண்டியது\n\n  Stay calm.  \n\n[[SECTION:why]]\n### இது ஏன் நடக்கிறது\n\nBecause reasons.\n';
+    const text =
+      '[[SECTION:right-now]]\n### இப்போது செய்ய வேண்டியது\n\n  Stay calm.  \n\n[[SECTION:why]]\n### இது ஏன் நடக்கிறது\n\nBecause reasons.\n';
     const sections = parseCoachResponse(text);
     expect(sections[0].content).toBe('Stay calm.');
     expect(sections[1].content).toBe('Because reasons.');

@@ -64,8 +64,12 @@ export function Button({
     variant === 'primary' || variant === 'danger'
       ? '#FFFFFF'
       : variant === 'secondary'
-        ? isDisabled ? colors.primary + 'AA' : colors.primary
-        : isDisabled ? colors.mutedForeground + 'CC' : colors.mutedForeground;
+        ? isDisabled
+          ? colors.primary + 'AA'
+          : colors.primary
+        : isDisabled
+          ? colors.mutedForeground + 'CC'
+          : colors.mutedForeground;
 
   const handlePress = () => {
     if (isDisabled) return;

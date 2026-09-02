@@ -3,11 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 export type ScenarioCategory =
-  | 'behavioral'
-  | 'daily_care'
-  | 'safety'
-  | 'communication'
-  | 'self_care';
+  'behavioral' | 'daily_care' | 'safety' | 'communication' | 'self_care';
 
 export interface CategoryBadgeProps {
   category: string;

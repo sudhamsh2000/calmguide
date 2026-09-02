@@ -16,7 +16,8 @@ export interface CoachResponseRendererProps {
 interface SectionStyle {
   containerClass: string;
   titleClass: string;
-  labelKey: 'sections.right_now' | 'sections.why' | 'sections.what_not_to_do' | 'sections.escalation';
+  labelKey:
+    'sections.right_now' | 'sections.why' | 'sections.what_not_to_do' | 'sections.escalation';
 }
 
 /* Each section carries its own semantic tint (globals.css) so the four-part
@@ -136,9 +137,7 @@ export const CoachResponseRenderer = memo(function CoachResponseRenderer({
 
   if (rawResponse?.trim()) {
     return (
-      <div
-        className={`card-shell rounded-2xl p-5 animate-fade-in-up space-y-2 ${className}`}
-      >
+      <div className={`card-shell rounded-2xl p-5 animate-fade-in-up space-y-2 ${className}`}>
         <SafeMarkdown>{rawResponse}</SafeMarkdown>
       </div>
     );

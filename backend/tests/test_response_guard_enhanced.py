@@ -16,39 +16,42 @@ import pytest
 
 from app.services.response_guard import (
     ValidationResult,
+    chunk_text_for_sse,
     validate_response_language,
     validate_response_quality,
     validate_response_respect,
-    chunk_text_for_sse,
 )
-
 
 # ---------------------------------------------------------------------------
 # Disrespectful word patterns — English morphological variants
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase,description", [
-    ("She's just crazy", "base word crazy"),
-    ("That's craziness", "morphological variant craziness"),
-    ("He is senile", "base word senile"),
-    ("She shows signs of senility", "variant senility"),
-    ("His senile behavior", "adjective senile"),
-    ("She's become demented", "demented — pejorative synonym"),
-    ("He's manipulating you", "manipulating"),
-    ("She is manipulative", "manipulative"),
-    ("He is such a burden", "such a burden — qualified by 'such a'"),
-    ("What a burden she is", "what a burden"),
-    ("Just a burden at this point", "just a burden"),
-    ("He's become a vegetable", "vegetable — dehumanizing"),
-    ("She's gone mental", "gone mental"),
-    ("She's gone in the head", "gone in the head"),
-    ("Force them to take it", "force them"),
-    ("Just control them", "control them"),
-    ("Make him obey", "make him obey"),
-    ("Shut her up already", "shut her up"),
-    ("She's just attention seeking", "attention seeking"),
-    ("He's a difficult patient", "difficult patient"),
-])
+
+@pytest.mark.parametrize(
+    "phrase,description",
+    [
+        ("She's just crazy", "base word crazy"),
+        ("That's craziness", "morphological variant craziness"),
+        ("He is senile", "base word senile"),
+        ("She shows signs of senility", "variant senility"),
+        ("His senile behavior", "adjective senile"),
+        ("She's become demented", "demented — pejorative synonym"),
+        ("He's manipulating you", "manipulating"),
+        ("She is manipulative", "manipulative"),
+        ("He is such a burden", "such a burden — qualified by 'such a'"),
+        ("What a burden she is", "what a burden"),
+        ("Just a burden at this point", "just a burden"),
+        ("He's become a vegetable", "vegetable — dehumanizing"),
+        ("She's gone mental", "gone mental"),
+        ("She's gone in the head", "gone in the head"),
+        ("Force them to take it", "force them"),
+        ("Just control them", "control them"),
+        ("Make him obey", "make him obey"),
+        ("Shut her up already", "shut her up"),
+        ("She's just attention seeking", "attention seeking"),
+        ("He's a difficult patient", "difficult patient"),
+    ],
+)
 def test_disrespectful_english_phrases_are_flagged(phrase, description):
     result = validate_response_respect(phrase)
     assert result.is_valid is False, (
@@ -60,44 +63,36 @@ def test_disrespectful_english_phrases_are_flagged(phrase, description):
 # Word-boundary matching — these should NOT be flagged
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("text,description", [
-    (
-        "Caregiver burden is a well-documented clinical condition.",
-        "'caregiver burden' as a compound noun (no leading qualifier)"
-    ),
-    (
-        "The burden of caregiving affects millions of families.",
-        "burden as subject of sentence, not applied to patient"
-    ),
-    (
-        "Researchers study caregiver burden extensively.",
-        "caregiver burden as a technical term"
-    ),
-    (
-        "Don't feel hopeless — there are resources available.",
-        "hopeless used in a supportive negation"
-    ),
-    (
-        "Please don't be crazy about this, take it one step at a time.",
-        "crazy used differently — wait, this should actually NOT be a FP...",
-    ),
-    (
-        "The azalea plant is blooming in the garden.",
-        "no offensive words at all"
-    ),
-    (
-        "She shows signs of burnout from caregiving.",
-        "burnout is a legitimate clinical term"
-    ),
-    (
-        "His behavioral patterns include repetition and confusion.",
-        "no disrespectful words"
-    ),
-    (
-        "Reduce the sensory burden by lowering lights.",
-        "burden applied to sensory load, not a person"
-    ),
-])
+
+@pytest.mark.parametrize(
+    "text,description",
+    [
+        (
+            "Caregiver burden is a well-documented clinical condition.",
+            "'caregiver burden' as a compound noun (no leading qualifier)",
+        ),
+        (
+            "The burden of caregiving affects millions of families.",
+            "burden as subject of sentence, not applied to patient",
+        ),
+        ("Researchers study caregiver burden extensively.", "caregiver burden as a technical term"),
+        (
+            "Don't feel hopeless — there are resources available.",
+            "hopeless used in a supportive negation",
+        ),
+        (
+            "Please don't be crazy about this, take it one step at a time.",
+            "crazy used differently — wait, this should actually NOT be a FP...",
+        ),
+        ("The azalea plant is blooming in the garden.", "no offensive words at all"),
+        ("She shows signs of burnout from caregiving.", "burnout is a legitimate clinical term"),
+        ("His behavioral patterns include repetition and confusion.", "no disrespectful words"),
+        (
+            "Reduce the sensory burden by lowering lights.",
+            "burden applied to sensory load, not a person",
+        ),
+    ],
+)
 def test_legitimate_clinical_language_is_not_flagged(text, description):
     # We only check the ones that should genuinely be safe
     # The "don't be crazy" phrase would correctly be flagged
@@ -126,26 +121,33 @@ def test_dont_feel_hopeless_not_flagged():
 # Negated directives — these should NOT be flagged
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("text", [
-    "Do not force them to take the medication.",
-    "Never force him into a chair.",
-    "Please don't control them — work with them instead.",
-    "Avoid trying to control her; redirect instead.",
-    "Don't force her to eat if she refuses.",
-    "Stop trying to force him to comply.",
-    "Don't shut them up — let them express themselves.",
-    "Never try to shut her up when she's upset.",
-])
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Do not force them to take the medication.",
+        "Never force him into a chair.",
+        "Please don't control them — work with them instead.",
+        "Avoid trying to control her; redirect instead.",
+        "Don't force her to eat if she refuses.",
+        "Stop trying to force him to comply.",
+        "Don't shut them up — let them express themselves.",
+        "Never try to shut her up when she's upset.",
+    ],
+)
 def test_negated_directives_are_not_flagged(text):
     result = validate_response_respect(text)
     assert result.is_valid is True, f"False positive: '{text}' should pass — directive is negated"
 
 
-@pytest.mark.parametrize("text", [
-    "Never do that! Force them to comply.",
-    "Can he avoid this? Force them to take it.",
-    "Be patient. Force him to sit down.",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Never do that! Force them to comply.",
+        "Can he avoid this? Force them to take it.",
+        "Be patient. Force him to sit down.",
+    ],
+)
 def test_directive_after_sentence_boundary_is_flagged(text):
     result = validate_response_respect(text)
     assert result.is_valid is False, f"'{text}' should be flagged — directive is in new sentence"
@@ -155,83 +157,95 @@ def test_directive_after_sentence_boundary_is_flagged(text):
 # Localized disrespectful phrases — Tamil (ta)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "அவர் பைத்தியம்",               # crazy
-    "அவர் பாரம் போல் இருக்கிறார்",  # like a burden
-    "அவரை கட்டுப்படுத்து",          # control them
-    "வாயை மூடு",                     # shut up
-    "அடங்கு என்று சொல்",            # tell them to submit
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "அவர் பைத்தியம்",  # crazy
+        "அவர் பாரம் போல் இருக்கிறார்",  # like a burden
+        "அவரை கட்டுப்படுத்து",  # control them
+        "வாயை மூடு",  # shut up
+        "அடங்கு என்று சொல்",  # tell them to submit
+    ],
+)
 def test_disrespectful_tamil_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="ta")
-    assert result.is_valid is False, (
-        f"Tamil phrase '{phrase}' should be flagged as disrespectful"
-    )
+    assert result.is_valid is False, f"Tamil phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
 # Localized disrespectful phrases — Hindi (hi)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "वह पागल हो गए हैं",      # they've gone crazy
-    "वह बोझ हैं",              # they are a burden
-    "चुप करो उन्हें",           # shut them up
-    "काबू करो उन्हें",          # control them
-    "जबरदस्ती करो",            # force them
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "वह पागल हो गए हैं",  # they've gone crazy
+        "वह बोझ हैं",  # they are a burden
+        "चुप करो उन्हें",  # shut them up
+        "काबू करो उन्हें",  # control them
+        "जबरदस्ती करो",  # force them
+    ],
+)
 def test_disrespectful_hindi_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="hi")
-    assert result.is_valid is False, (
-        f"Hindi phrase '{phrase}' should be flagged as disrespectful"
-    )
+    assert result.is_valid is False, f"Hindi phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
 # Localized disrespectful phrases — Arabic (ar)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "إنه مجنون",          # he's crazy
-    "هو عبء كبير",        # he's a big burden
-    "أسكته الآن",         # shut him up now
-    "سيطر عليه",          # control him
-    "أجبره على ذلك",      # force him
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "إنه مجنون",  # he's crazy
+        "هو عبء كبير",  # he's a big burden
+        "أسكته الآن",  # shut him up now
+        "سيطر عليه",  # control him
+        "أجبره على ذلك",  # force him
+    ],
+)
 def test_disrespectful_arabic_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="ar")
-    assert result.is_valid is False, (
-        f"Arabic phrase '{phrase}' should be flagged as disrespectful"
-    )
+    assert result.is_valid is False, f"Arabic phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
 # Localized disrespectful phrases — Chinese (zh)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "他是个疯子",         # he's a crazy person
-    "老糊涂了",           # senile
-    "是个负担",           # is a burden
-    "控制他",             # control him
-    "强迫他做",           # force him to do it
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "他是个疯子",  # he's a crazy person
+        "老糊涂了",  # senile
+        "是个负担",  # is a burden
+        "控制他",  # control him
+        "强迫他做",  # force him to do it
+    ],
+)
 def test_disrespectful_chinese_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="zh")
-    assert result.is_valid is False, (
-        f"Chinese phrase '{phrase}' should be flagged as disrespectful"
-    )
+    assert result.is_valid is False, f"Chinese phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
 # Localized disrespectful phrases — Japanese (ja)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "ボケ老人だから",     # because they're a senile old person
-    "負担になっている",   # they've become a burden
-    "おかしいんじゃないか", # aren't they crazy
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "ボケ老人だから",  # because they're a senile old person
+        "負担になっている",  # they've become a burden
+        "おかしいんじゃないか",  # aren't they crazy
+    ],
+)
 def test_disrespectful_japanese_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="ja")
     assert result.is_valid is False, (
@@ -243,16 +257,18 @@ def test_disrespectful_japanese_phrases_are_flagged(phrase):
 # Localized disrespectful phrases — Korean (ko)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("phrase", [
-    "미친 것 같아요",      # seems crazy
-    "짐이 되었어요",       # has become a burden
-    "치매 노인이니까",     # because they're a demented old person
-])
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "미친 것 같아요",  # seems crazy
+        "짐이 되었어요",  # has become a burden
+        "치매 노인이니까",  # because they're a demented old person
+    ],
+)
 def test_disrespectful_korean_phrases_are_flagged(phrase):
     result = validate_response_respect(phrase, locale_code="ko")
-    assert result.is_valid is False, (
-        f"Korean phrase '{phrase}' should be flagged as disrespectful"
-    )
+    assert result.is_valid is False, f"Korean phrase '{phrase}' should be flagged as disrespectful"
 
 
 # ---------------------------------------------------------------------------
@@ -289,6 +305,7 @@ cannot tell you that. This is not personal.
 - If the agitation continues beyond 30 minutes
 """
 
+
 def test_respectful_english_response_passes():
     result = validate_response_respect(GOOD_ENGLISH_RESPONSE)
     assert result.is_valid is True
@@ -297,6 +314,7 @@ def test_respectful_english_response_passes():
 # ---------------------------------------------------------------------------
 # validate_response_language — script ratio checks
 # ---------------------------------------------------------------------------
+
 
 def test_japanese_response_with_correct_script_passes():
     # A plausible short Japanese response (Hiragana/Kanji majority)
@@ -347,6 +365,7 @@ def test_response_too_short_fails_for_non_latin_locales():
 # Romanization detection
 # ---------------------------------------------------------------------------
 
+
 def test_romanized_japanese_response_fails():
     """Transliterated Japanese (romaji) must fail the validation.
 
@@ -384,6 +403,7 @@ def test_romanized_hindi_response_fails():
 # Known bad phrase detection
 # ---------------------------------------------------------------------------
 
+
 def test_known_boilerplate_english_phrase_fails():
     text = "I am designed specifically for dementia caregiving support and I am happy to help."
     result = validate_response_language(text, locale_code="en")
@@ -401,6 +421,7 @@ def test_known_bad_phrase_also_fails_non_english_locale():
 # ---------------------------------------------------------------------------
 # validate_response_quality pipeline
 # ---------------------------------------------------------------------------
+
 
 def test_quality_pipeline_language_failure_before_respect():
     """Language failure takes priority — short non-Latin text fails early."""
@@ -436,6 +457,7 @@ def test_quality_pipeline_latin_locales_skip_script_check():
 # Section marker stripping does not corrupt pattern matching
 # ---------------------------------------------------------------------------
 
+
 def test_section_markers_are_stripped_before_validation():
     """Machine markers [[SECTION:...]] must be stripped before checking disrespectful phrases."""
     text = "[[SECTION:right-now]]\n### Right Now\nMargaret needs support and patience."
@@ -452,6 +474,7 @@ def test_disrespectful_phrase_detected_even_with_section_markers():
 # ---------------------------------------------------------------------------
 # chunk_text_for_sse utility
 # ---------------------------------------------------------------------------
+
 
 def test_chunk_text_for_sse_empty_string_returns_empty_list():
     result = chunk_text_for_sse("")
@@ -476,6 +499,7 @@ def test_chunk_text_for_sse_reassembles_to_original():
 # ---------------------------------------------------------------------------
 # Reason field format
 # ---------------------------------------------------------------------------
+
 
 def test_disrespect_reason_contains_matched_phrase():
     result = validate_response_respect("He is acting crazy today.")

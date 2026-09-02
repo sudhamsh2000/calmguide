@@ -1,4 +1,5 @@
 """Pydantic v2 schemas for care pattern and cross-patient endpoints."""
+
 from pydantic import BaseModel
 
 

@@ -31,7 +31,7 @@ export function CheckInScreen() {
   const [isVoiceListening, setIsVoiceListening] = useState(false);
 
   const handleVoiceTranscript = useCallback((transcript: string) => {
-    setMessage((prev) => prev + (prev ? " " : "") + transcript);
+    setMessage((prev) => prev + (prev ? ' ' : '') + transcript);
   }, []);
 
   const handleListeningChange = useCallback((listening: boolean) => {
@@ -103,7 +103,10 @@ export function CheckInScreen() {
       <div className="flex items-center gap-3">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
         <div>
-          <h1 className="text-xl font-medium text-foreground leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1
+            className="text-xl font-medium text-foreground leading-tight"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
             {t('title')}
           </h1>
           <p className="text-sm text-foreground-muted mt-0.5">{t('subtitle')}</p>
@@ -126,16 +129,12 @@ export function CheckInScreen() {
               className={[
                 'field-shell w-full px-4 py-3 pb-10 text-base transition-all resize-none',
                 'min-h-[140px]',
-                isVoiceListening
-                  ? 'field-shell-error'
-                  : '',
+                isVoiceListening ? 'field-shell-error' : '',
               ].join(' ')}
             />
             {isVoiceListening && !message && (
               <div className="absolute top-3 start-4 end-4 pointer-events-none">
-                <p className="text-base text-error/60 animate-pulse">
-                  {tc('actions.speak_now')}
-                </p>
+                <p className="text-base text-error/60 animate-pulse">{tc('actions.speak_now')}</p>
               </div>
             )}
             <div className="absolute bottom-2 end-2 flex items-center gap-2">
@@ -191,7 +190,9 @@ export function CheckInScreen() {
           <div className="flex justify-end mb-2">
             <SpeakButton text={response} />
           </div>
-          <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">{response}</p>
+          <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">
+            {response}
+          </p>
         </div>
       )}
 

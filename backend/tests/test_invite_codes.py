@@ -13,7 +13,6 @@ from app import config
 from app.models.invite_code import InviteCode
 from app.services.auth import hash_access_code
 
-
 VALID_PROFILE = {
     "disease_stage": "middle",
     "behavioral_patterns": ["sundowning"],

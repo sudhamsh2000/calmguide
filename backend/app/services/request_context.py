@@ -7,9 +7,7 @@ a single caregiver's failing request can be traced across all log lines.
 import contextvars
 import logging
 
-request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
-    "request_id", default="-"
-)
+request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar("request_id", default="-")
 
 
 class RequestIdFilter(logging.Filter):

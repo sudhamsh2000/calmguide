@@ -5,7 +5,11 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, isRtl, type SupportedLocale } from '@/lib/locale';
 
-export function LocaleSwitcher({ triggerClassName = 'text-foreground-muted hover:text-foreground' }: { triggerClassName?: string }) {
+export function LocaleSwitcher({
+  triggerClassName = 'text-foreground-muted hover:text-foreground',
+}: {
+  triggerClassName?: string;
+}) {
   const currentLocale = useLocale() as SupportedLocale;
   const pathname = usePathname();
   const router = useRouter();
@@ -31,10 +35,7 @@ export function LocaleSwitcher({ triggerClassName = 'text-foreground-muted hover
 
       {open && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
             className={`absolute bottom-full mb-2 z-50 w-48 overflow-hidden rounded-xl border border-foreground/10 bg-surface shadow-lg ${
               rtl ? 'left-0' : 'right-0'

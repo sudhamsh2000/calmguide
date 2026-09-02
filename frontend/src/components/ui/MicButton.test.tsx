@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MicButton } from "./MicButton";
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MicButton } from './MicButton';
 
-vi.mock("next-intl", () => ({
-  useLocale: () => "en",
+vi.mock('next-intl', () => ({
+  useLocale: () => 'en',
 }));
 
 function createMockRecognition() {
@@ -12,7 +12,7 @@ function createMockRecognition() {
     stop: vi.fn(),
     continuous: false,
     interimResults: false,
-    lang: "",
+    lang: '',
     onresult: null,
     onerror: null,
     onend: null,
@@ -23,24 +23,24 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("MicButton", () => {
-  it("renders when SpeechRecognition is available", () => {
-    Object.defineProperty(window, "webkitSpeechRecognition", {
+describe('MicButton', () => {
+  it('renders when SpeechRecognition is available', () => {
+    Object.defineProperty(window, 'webkitSpeechRecognition', {
       value: createMockRecognition(),
       writable: true,
       configurable: true,
     });
     render(<MicButton onTranscript={() => {}} />);
-    expect(screen.getByRole("button", { name: /voice input/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /voice input/i })).toBeInTheDocument();
   });
 
-  it("does not render when SpeechRecognition is unavailable", () => {
-    Object.defineProperty(window, "webkitSpeechRecognition", {
+  it('does not render when SpeechRecognition is unavailable', () => {
+    Object.defineProperty(window, 'webkitSpeechRecognition', {
       value: undefined,
       writable: true,
       configurable: true,
     });
-    Object.defineProperty(window, "SpeechRecognition", {
+    Object.defineProperty(window, 'SpeechRecognition', {
       value: undefined,
       writable: true,
       configurable: true,

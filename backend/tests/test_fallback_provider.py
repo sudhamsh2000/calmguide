@@ -12,7 +12,9 @@ class _Ok(LLMProvider):
     def __init__(self, chunks):
         self.chunks = chunks
 
-    async def stream_completion(self, system_prompt, messages, model_override=None) -> AsyncGenerator[str, None]:
+    async def stream_completion(
+        self, system_prompt, messages, model_override=None
+    ) -> AsyncGenerator[str, None]:
         for c in self.chunks:
             yield c
 
@@ -21,7 +23,9 @@ class _Ok(LLMProvider):
 
 
 class _FailBeforeChunk(LLMProvider):
-    async def stream_completion(self, system_prompt, messages, model_override=None) -> AsyncGenerator[str, None]:
+    async def stream_completion(
+        self, system_prompt, messages, model_override=None
+    ) -> AsyncGenerator[str, None]:
         raise RuntimeError("503")
         yield ""  # pragma: no cover
 
@@ -30,7 +34,9 @@ class _FailBeforeChunk(LLMProvider):
 
 
 class _FailMidChunk(LLMProvider):
-    async def stream_completion(self, system_prompt, messages, model_override=None) -> AsyncGenerator[str, None]:
+    async def stream_completion(
+        self, system_prompt, messages, model_override=None
+    ) -> AsyncGenerator[str, None]:
         yield "partial "
         raise RuntimeError("reset")
 

@@ -21,14 +21,16 @@ export function PageBrand({ className = '' }: PageBrandProps) {
     const storedStaff = getStoredStaff();
     const facilityToken = getFacilityToken();
 
-    setHref(resolvePageBrandHref({
-      pathname: pathname ?? '/',
-      caregiverAccessCode: getAccessCode(),
-      caregiverPatientName: getPatientName(),
-      caregiverActiveProfile: getActiveProfile(),
-      facilityAuthenticated: Boolean(facilityToken && storedStaff),
-      facilityStaffRole: facilityToken && storedStaff ? storedStaff.role : null,
-    }));
+    setHref(
+      resolvePageBrandHref({
+        pathname: pathname ?? '/',
+        caregiverAccessCode: getAccessCode(),
+        caregiverPatientName: getPatientName(),
+        caregiverActiveProfile: getActiveProfile(),
+        facilityAuthenticated: Boolean(facilityToken && storedStaff),
+        facilityStaffRole: facilityToken && storedStaff ? storedStaff.role : null,
+      }),
+    );
   }, [pathname]);
 
   if (!mounted) {

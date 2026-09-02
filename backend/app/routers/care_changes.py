@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
-from app.models.care_change_event import CareChangeEvent
 from app.models.behavioral_dossier import BehavioralDossier
+from app.models.care_change_event import CareChangeEvent
 from app.models.profile import Profile
 from app.schemas.care_change import CareChangeCreate, CareChangeResponse
 from app.services.auth import hash_access_code
@@ -17,9 +17,7 @@ router = APIRouter(prefix="/care-changes", tags=["care-changes"])
 
 async def _get_profile(access_code: str, session: AsyncSession) -> Profile:
     code_hash = hash_access_code(access_code)
-    result = await session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
     if not profile:
         raise HTTPException(
@@ -47,9 +45,7 @@ async def create_care_change(
 
     # Mark dossier stale
     dossier_result = await session.execute(
-        select(BehavioralDossier).where(
-            BehavioralDossier.profile_id == profile.id
-        )
+        select(BehavioralDossier).where(BehavioralDossier.profile_id == profile.id)
     )
     dossier = dossier_result.scalar_one_or_none()
     if dossier:

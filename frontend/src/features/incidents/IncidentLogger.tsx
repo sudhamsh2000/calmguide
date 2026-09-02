@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { getAccessCode } from "@/lib/storage";
-import { createIncident, updateIncident } from "@/lib/api";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { getAccessCode } from '@/lib/storage';
+import { createIncident, updateIncident } from '@/lib/api';
 import type {
   BehaviorCategory,
   SeverityLevel,
@@ -14,7 +14,7 @@ import type {
   AntecedentCategory,
   InterventionOutcome,
   IncidentCreate,
-} from "@/lib/api";
+} from '@/lib/api';
 
 export interface IncidentLoggerProps {
   className?: string;
@@ -23,14 +23,14 @@ export interface IncidentLoggerProps {
 }
 
 const BEHAVIOR_CATEGORIES: BehaviorCategory[] = [
-  "aggression_anger",
-  "confusion_disorientation",
-  "wandering_exit_seeking",
-  "refusing_care",
-  "sleep_problems",
-  "hallucinations",
-  "repetitive_behavior",
-  "other",
+  'aggression_anger',
+  'confusion_disorientation',
+  'wandering_exit_seeking',
+  'refusing_care',
+  'sleep_problems',
+  'hallucinations',
+  'repetitive_behavior',
+  'other',
 ];
 
 /* Line icons in soft-tinted circles, matching the supplied Incident Log
@@ -108,21 +108,24 @@ const CATEGORY_ICONS: Record<BehaviorCategory, React.ReactNode> = {
  * tokenised: they encode *which behaviour*, not a semantic app state, and a
  * caregiver learns them by hue. */
 const CATEGORY_COLORS: Record<BehaviorCategory, string> = {
-  aggression_anger: "#B84C36",
-  confusion_disorientation: "#6F7FD8",
-  wandering_exit_seeking: "#2B7A78",
-  refusing_care: "#C1762F",
-  sleep_problems: "#5B6ABF",
-  hallucinations: "#7B5EA7",
-  repetitive_behavior: "#3AAFA9",
-  other: "#6B7280",
+  aggression_anger: '#B84C36',
+  confusion_disorientation: '#6F7FD8',
+  wandering_exit_seeking: '#2B7A78',
+  refusing_care: '#C1762F',
+  sleep_problems: '#5B6ABF',
+  hallucinations: '#7B5EA7',
+  repetitive_behavior: '#3AAFA9',
+  other: '#6B7280',
 };
 
 function CategoryIcon({ category }: { category: BehaviorCategory }) {
   return (
     <span
       className="flex h-11 w-11 items-center justify-center rounded-full"
-      style={{ backgroundColor: CATEGORY_COLORS[category] + "1F", color: CATEGORY_COLORS[category] }}
+      style={{
+        backgroundColor: CATEGORY_COLORS[category] + '1F',
+        color: CATEGORY_COLORS[category],
+      }}
       aria-hidden="true"
     >
       <svg
@@ -141,42 +144,42 @@ function CategoryIcon({ category }: { category: BehaviorCategory }) {
   );
 }
 
-const SEVERITY_LEVELS: SeverityLevel[] = ["mild", "moderate", "severe"];
-const DURATION_CATEGORIES: DurationCategory[] = ["seconds", "minutes", "about_an_hour", "longer"];
+const SEVERITY_LEVELS: SeverityLevel[] = ['mild', 'moderate', 'severe'];
+const DURATION_CATEGORIES: DurationCategory[] = ['seconds', 'minutes', 'about_an_hour', 'longer'];
 
 const ANTECEDENT_CATEGORIES: AntecedentCategory[] = [
-  "task_demand",
-  "transition",
-  "environmental",
-  "social",
-  "physical_state",
-  "unknown",
+  'task_demand',
+  'transition',
+  'environmental',
+  'social',
+  'physical_state',
+  'unknown',
 ];
 
 const INTERVENTION_OPTIONS = [
-  "music",
-  "redirect",
-  "quiet_space",
-  "warm_drink",
-  "wait_it_out",
-  "other",
+  'music',
+  'redirect',
+  'quiet_space',
+  'warm_drink',
+  'wait_it_out',
+  'other',
 ] as const;
 
 const OUTCOME_OPTIONS: InterventionOutcome[] = [
-  "resolved",
-  "partially_resolved",
-  "unresolved",
-  "escalated",
+  'resolved',
+  'partially_resolved',
+  'unresolved',
+  'escalated',
 ];
 
-type TimeChoice = "just_now" | "earlier_today" | "yesterday";
+type TimeChoice = 'just_now' | 'earlier_today' | 'yesterday';
 
 function resolveIncidentTime(choice: TimeChoice, hour?: number): string {
   const now = new Date();
-  if (choice === "just_now") {
+  if (choice === 'just_now') {
     return now.toISOString();
   }
-  if (choice === "earlier_today") {
+  if (choice === 'earlier_today') {
     const d = new Date(now);
     d.setHours(hour ?? 12, 0, 0, 0);
     return d.toISOString();
@@ -188,16 +191,16 @@ function resolveIncidentTime(choice: TimeChoice, hour?: number): string {
 }
 
 const INTERVENTION_TO_DESCRIPTION: Record<string, string> = {
-  music: "Played music",
-  redirect: "Redirected attention",
-  quiet_space: "Moved to quiet space",
-  warm_drink: "Offered warm drink",
-  wait_it_out: "Waited it out",
-  other: "Other intervention",
+  music: 'Played music',
+  redirect: 'Redirected attention',
+  quiet_space: 'Moved to quiet space',
+  warm_drink: 'Offered warm drink',
+  wait_it_out: 'Waited it out',
+  other: 'Other intervention',
 };
 
-export function IncidentLogger({ className = "", onComplete, profileId }: IncidentLoggerProps) {
-  const t = useTranslations("incidents");
+export function IncidentLogger({ className = '', onComplete, profileId }: IncidentLoggerProps) {
+  const t = useTranslations('incidents');
   const router = useRouter();
 
   const [level, setLevel] = useState(1);
@@ -220,18 +223,18 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
   const [outcome, setOutcome] = useState<InterventionOutcome | null>(null);
 
   // Level 4
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState('');
 
-  const accessCode = useMemo(() => profileId ? null : getAccessCode(), [profileId]);
+  const accessCode = useMemo(() => (profileId ? null : getAccessCode()), [profileId]);
   const savingRef = useRef(false);
 
   const buildIncidentData = useCallback((): IncidentCreate | null => {
     if (!category || !timeChoice) return null;
     return {
       behavior_category: category,
-      behavior_description: t(`logger.category.${category}`).replace(/\n/g, " "),
+      behavior_description: t(`logger.category.${category}`).replace(/\n/g, ' '),
       incident_time: resolveIncidentTime(timeChoice, timeHour),
-      source: "manual",
+      source: 'manual',
       severity: severity ?? undefined,
       duration_category: duration ?? undefined,
       antecedent_category: antecedent ?? undefined,
@@ -264,7 +267,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
       } else {
         let result;
         if (profileId) {
-          const { createIncidentByProfile } = await import("@/lib/facility-api");
+          const { createIncidentByProfile } = await import('@/lib/facility-api');
           result = await createIncidentByProfile(profileId, data);
         } else {
           result = await createIncident(accessCode!, data);
@@ -305,16 +308,27 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
       <div className={`flex flex-col gap-6 pt-4 ${className}`}>
         <div className="text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#E0F0E7]">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3A7D5C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#3A7D5C"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <p className="text-xl font-medium text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-            {t("logger.saved")}
+          <p
+            className="text-xl font-medium text-foreground"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            {t('logger.saved')}
           </p>
-          <p className="mt-2 text-base text-foreground-muted">
-            {t("logger.more_details_prompt")}
-          </p>
+          <p className="mt-2 text-base text-foreground-muted">{t('logger.more_details_prompt')}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -326,7 +340,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
               setLevel(2);
             }}
           >
-            {t("logger.yes_add_details")}
+            {t('logger.yes_add_details')}
           </Button>
           <Button
             variant="ghost"
@@ -334,10 +348,10 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
             className="flex-1 min-w-[140px]"
             onClick={() => {
               if (onComplete) onComplete();
-              else router.push("/home");
+              else router.push('/home');
             }}
           >
-            {t("logger.no_thanks")}
+            {t('logger.no_thanks')}
           </Button>
         </div>
       </div>
@@ -348,7 +362,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
     return (
       <div className={`flex flex-col gap-6 ${className}`}>
         <p className="text-base text-foreground-muted leading-relaxed">
-          {!category ? t("logger.what_happened") : t("logger.when")}
+          {!category ? t('logger.what_happened') : t('logger.when')}
         </p>
 
         {/* Step 1: Category */}
@@ -358,13 +372,13 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
               <button
                 key={cat}
                 type="button"
-                aria-label={t(`logger.category.${cat}`).replace(/\n/g, " ")}
+                aria-label={t(`logger.category.${cat}`).replace(/\n/g, ' ')}
                 onClick={() => setCategory(cat)}
                 className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border dark:border-[#31445f] bg-surface px-3 py-5 min-h-[100px] text-center transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
               >
                 <CategoryIcon category={cat} />
                 <span className="text-sm font-medium text-foreground leading-tight">
-                  {t(`logger.category.${cat}`).replace(/\n/g, " ")}
+                  {t(`logger.category.${cat}`).replace(/\n/g, ' ')}
                 </span>
               </button>
             ))}
@@ -374,7 +388,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         {/* Step 2: Time */}
         {category && !timeChoice && (
           <div className="grid grid-cols-1 gap-3">
-            {(["just_now", "earlier_today", "yesterday"] as TimeChoice[]).map((tc) => (
+            {(['just_now', 'earlier_today', 'yesterday'] as TimeChoice[]).map((tc) => (
               <button
                 key={tc}
                 type="button"
@@ -397,7 +411,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
     return (
       <div className={`flex flex-col gap-6 ${className}`}>
         <div className="flex flex-col gap-4">
-          <p className="text-base text-foreground-muted leading-relaxed">{t("logger.how_bad")}</p>
+          <p className="text-base text-foreground-muted leading-relaxed">{t('logger.how_bad')}</p>
           <div className="grid grid-cols-3 gap-3">
             {SEVERITY_LEVELS.map((s) => (
               <button
@@ -405,11 +419,11 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
                 type="button"
                 onClick={() => setSeverity(s)}
                 className={[
-                  "rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer",
+                  'rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer',
                   severity === s
-                    ? "border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]"
-                    : "border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]",
-                ].join(" ")}
+                    ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
+                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                ].join(' ')}
               >
                 {t(`logger.severity.${s}`)}
               </button>
@@ -418,7 +432,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         </div>
 
         <div className="flex flex-col gap-4">
-          <p className="text-base text-foreground-muted leading-relaxed">{t("logger.how_long")}</p>
+          <p className="text-base text-foreground-muted leading-relaxed">{t('logger.how_long')}</p>
           <div className="grid grid-cols-2 gap-3">
             {DURATION_CATEGORIES.map((d) => (
               <button
@@ -426,11 +440,11 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
                 type="button"
                 onClick={() => setDuration(d)}
                 className={[
-                  "rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer",
+                  'rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer',
                   duration === d
-                    ? "border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]"
-                    : "border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]",
-                ].join(" ")}
+                    ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
+                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                ].join(' ')}
               >
                 {t(`logger.duration.${d}`)}
               </button>
@@ -439,11 +453,21 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         </div>
 
         <div className="flex flex-wrap gap-3 mt-2">
-          <Button variant="primary" size="lg" className="flex-1 min-w-[140px]" onClick={() => setLevel(3)}>
-            {t("logger.save")}
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex-1 min-w-[140px]"
+            onClick={() => setLevel(3)}
+          >
+            {t('logger.save')}
           </Button>
-          <Button variant="ghost" size="lg" className="flex-1 min-w-[140px]" onClick={() => setLevel(3)}>
-            {t("logger.skip")}
+          <Button
+            variant="ghost"
+            size="lg"
+            className="flex-1 min-w-[140px]"
+            onClick={() => setLevel(3)}
+          >
+            {t('logger.skip')}
           </Button>
         </div>
       </div>
@@ -454,7 +478,9 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
     return (
       <div className={`flex flex-col gap-6 ${className}`}>
         <div className="flex flex-col gap-4">
-          <p className="text-base text-foreground-muted leading-relaxed">{t("logger.what_before")}</p>
+          <p className="text-base text-foreground-muted leading-relaxed">
+            {t('logger.what_before')}
+          </p>
           <div className="grid grid-cols-2 gap-3">
             {ANTECEDENT_CATEGORIES.map((a) => (
               <button
@@ -462,11 +488,11 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
                 type="button"
                 onClick={() => setAntecedent(a)}
                 className={[
-                  "rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer",
+                  'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   antecedent === a
-                    ? "border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]"
-                    : "border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]",
-                ].join(" ")}
+                    ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
+                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                ].join(' ')}
               >
                 {t(`logger.antecedent.${a}`)}
               </button>
@@ -475,7 +501,9 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         </div>
 
         <div className="flex flex-col gap-4">
-          <p className="text-base text-foreground-muted leading-relaxed">{t("logger.what_tried")}</p>
+          <p className="text-base text-foreground-muted leading-relaxed">
+            {t('logger.what_tried')}
+          </p>
           <div className="grid grid-cols-3 gap-3">
             {INTERVENTION_OPTIONS.map((i) => (
               <button
@@ -483,11 +511,11 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
                 type="button"
                 onClick={() => setIntervention(i)}
                 className={[
-                  "rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer",
+                  'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   intervention === i
-                    ? "border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]"
-                    : "border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]",
-                ].join(" ")}
+                    ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
+                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                ].join(' ')}
               >
                 {t(`logger.intervention.${i}`)}
               </button>
@@ -496,7 +524,9 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         </div>
 
         <div className="flex flex-col gap-4">
-          <p className="text-base text-foreground-muted leading-relaxed">{t("logger.did_it_help")}</p>
+          <p className="text-base text-foreground-muted leading-relaxed">
+            {t('logger.did_it_help')}
+          </p>
           <div className="grid grid-cols-2 gap-3">
             {OUTCOME_OPTIONS.map((o) => (
               <button
@@ -504,11 +534,11 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
                 type="button"
                 onClick={() => setOutcome(o)}
                 className={[
-                  "rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer",
+                  'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   outcome === o
-                    ? "border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]"
-                    : "border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]",
-                ].join(" ")}
+                    ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
+                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                ].join(' ')}
               >
                 {t(`logger.outcome.${o}`)}
               </button>
@@ -517,11 +547,21 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         </div>
 
         <div className="flex flex-wrap gap-3 mt-2">
-          <Button variant="primary" size="lg" className="flex-1 min-w-[140px]" onClick={() => setLevel(4)}>
-            {t("logger.save")}
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex-1 min-w-[140px]"
+            onClick={() => setLevel(4)}
+          >
+            {t('logger.save')}
           </Button>
-          <Button variant="ghost" size="lg" className="flex-1 min-w-[140px]" onClick={() => setLevel(4)}>
-            {t("logger.skip")}
+          <Button
+            variant="ghost"
+            size="lg"
+            className="flex-1 min-w-[140px]"
+            onClick={() => setLevel(4)}
+          >
+            {t('logger.skip')}
           </Button>
         </div>
       </div>
@@ -531,7 +571,7 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
   // Level 4 — free text
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
-      <p className="text-base text-foreground-muted leading-relaxed">{t("logger.anything_else")}</p>
+      <p className="text-base text-foreground-muted leading-relaxed">{t('logger.anything_else')}</p>
 
       <textarea
         value={notes}
@@ -548,10 +588,10 @@ export function IncidentLogger({ className = "", onComplete, profileId }: Incide
         onClick={async () => {
           await saveIncident();
           if (onComplete) onComplete();
-          else router.push("/home");
+          else router.push('/home');
         }}
       >
-        {t("logger.done")}
+        {t('logger.done')}
       </Button>
     </div>
   );

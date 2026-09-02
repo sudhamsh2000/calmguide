@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface UseSpeechRecognitionOptions {
   locale?: string;
@@ -9,9 +9,9 @@ interface UseSpeechRecognitionOptions {
 }
 
 const LOCALE_TO_BCP47: Record<string, string> = {
-  en: "en-US",
-  es: "es-ES",
-  hi: "hi-IN",
+  en: 'en-US',
+  es: 'es-ES',
+  hi: 'hi-IN',
 };
 
 interface UseSpeechRecognitionReturn {
@@ -22,10 +22,11 @@ interface UseSpeechRecognitionReturn {
 }
 
 function getSpeechRecognitionConstructor(): (new () => SpeechRecognition) | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   return (
     (window as unknown as { SpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition ??
-    (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition ??
+    (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognition })
+      .webkitSpeechRecognition ??
     null
   );
 }
@@ -62,8 +63,8 @@ export function useSpeechRecognition(
     if (locale) recognition.lang = LOCALE_TO_BCP47[locale] ?? locale;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalTranscript = "";
-      let interimTranscript = "";
+      let finalTranscript = '';
+      let interimTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];

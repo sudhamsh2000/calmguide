@@ -8,7 +8,14 @@ import { ThemedInput } from '@/components/ThemedInput';
 import { getScenario, interactWithScenario, type DiseaseStage } from '@/lib/api';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -107,7 +114,14 @@ function ScenarioScreenInner() {
 
   if (loadingScenario) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.background,
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -115,7 +129,15 @@ function ScenarioScreenInner() {
 
   if (!scenario) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.background,
+          padding: 24,
+        }}
+      >
         <Text style={{ color: colors.error, fontSize: 16, textAlign: 'center' }}>
           {error || t('error.not_found')}
         </Text>
@@ -126,8 +148,10 @@ function ScenarioScreenInner() {
   const feedbackSections = aiResponse ? parseFeedback(aiResponse) : [];
 
   // Use locale translations for title/description, fall back to API English
-  const localizedTitle = t(`scenarios.${scenario.id}.title`, { defaultValue: '' }) || scenario.title;
-  const localizedDescription = t(`scenarios.${scenario.id}.description`, { defaultValue: '' }) || scenario.description;
+  const localizedTitle =
+    t(`scenarios.${scenario.id}.title`, { defaultValue: '' }) || scenario.title;
+  const localizedDescription =
+    t(`scenarios.${scenario.id}.description`, { defaultValue: '' }) || scenario.description;
 
   return (
     <>
@@ -139,21 +163,43 @@ function ScenarioScreenInner() {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ padding: 20, gap: 20, paddingBottom: 40 + (Platform.OS === 'android' ? insets.bottom : 0) }}
+          contentContainerStyle={{
+            padding: 20,
+            gap: 20,
+            paddingBottom: 40 + (Platform.OS === 'android' ? insets.bottom : 0),
+          }}
         >
           {/* Scenario header */}
           <View style={{ gap: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <CategoryBadge category={scenario.category} />
               {scenario.disease_stage ? (
-                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, backgroundColor: colors.foreground + '0C' }}>
-                  <Text style={{ fontSize: 11, fontWeight: '500', color: colors.mutedForeground, textTransform: 'capitalize' }}>
-                    {t('scenario.stage_label', { stage: t(`scenario.stages.${scenario.disease_stage}`, scenario.disease_stage) })}
+                <View
+                  style={{
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 20,
+                    backgroundColor: colors.foreground + '0C',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      fontWeight: '500',
+                      color: colors.mutedForeground,
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {t('scenario.stage_label', {
+                      stage: t(`scenario.stages.${scenario.disease_stage}`, scenario.disease_stage),
+                    })}
                   </Text>
                 </View>
               ) : null}
             </View>
-            <Text style={{ fontSize: 24, fontWeight: '700', color: colors.foreground, lineHeight: 30 }}>
+            <Text
+              style={{ fontSize: 24, fontWeight: '700', color: colors.foreground, lineHeight: 30 }}
+            >
               {localizedTitle}
             </Text>
           </View>
@@ -170,7 +216,15 @@ function ScenarioScreenInner() {
               gap: 8,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: '700',
+                color: colors.primary,
+                textTransform: 'uppercase',
+                letterSpacing: 1,
+              }}
+            >
               {t('scenario.the_situation')}
             </Text>
             <Text style={{ fontSize: 15, color: colors.foreground, lineHeight: 23 }}>
@@ -194,7 +248,11 @@ function ScenarioScreenInner() {
                     inputStyle={{ minHeight: 130, textAlignVertical: 'top', lineHeight: 24 }}
                   />
                 </View>
-                <MicButton onTranscript={(text) => setUserResponse((prev) => prev ? prev + ' ' + text : text)} />
+                <MicButton
+                  onTranscript={(text) =>
+                    setUserResponse((prev) => (prev ? prev + ' ' + text : text))
+                  }
+                />
               </View>
               {error ? <Text style={{ color: colors.error, fontSize: 13 }}>{error}</Text> : null}
               <Button
@@ -206,7 +264,15 @@ function ScenarioScreenInner() {
               >
                 {phase === 'loading' ? t('scenario.getting_feedback') : t('scenario.get_feedback')}
               </Button>
-              <Text style={{ fontSize: 12, color: colors.mutedForeground, textAlign: 'center', opacity: 0.8, lineHeight: 18 }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: colors.mutedForeground,
+                  textAlign: 'center',
+                  opacity: 0.8,
+                  lineHeight: 18,
+                }}
+              >
                 {tc('privacy_hint')}
               </Text>
             </View>
@@ -224,18 +290,37 @@ function ScenarioScreenInner() {
                   {feedbackSections.map((section) => (
                     <View
                       key={section.heading}
-                      style={{ borderRadius: 16, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, padding: 16, gap: 8 }}
+                      style={{
+                        borderRadius: 16,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                        backgroundColor: colors.surface,
+                        padding: 16,
+                        gap: 8,
+                      }}
                     >
                       <Text style={{ fontSize: 13, fontWeight: '600', color: colors.primary }}>
                         {section.heading}
                       </Text>
-                      <MarkdownText baseSize={14} lineHeight={22}>{section.content}</MarkdownText>
+                      <MarkdownText baseSize={14} lineHeight={22}>
+                        {section.content}
+                      </MarkdownText>
                     </View>
                   ))}
                 </View>
               ) : (
-                <View style={{ borderRadius: 16, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, padding: 16 }}>
-                  <MarkdownText baseSize={15} lineHeight={24}>{aiResponse}</MarkdownText>
+                <View
+                  style={{
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    backgroundColor: colors.surface,
+                    padding: 16,
+                  }}
+                >
+                  <MarkdownText baseSize={15} lineHeight={24}>
+                    {aiResponse}
+                  </MarkdownText>
                 </View>
               )}
 

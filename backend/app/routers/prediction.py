@@ -1,4 +1,5 @@
 """Care pattern and cross-patient strategy endpoints."""
+
 import json
 import logging
 from datetime import date
@@ -12,10 +13,10 @@ from app.db import get_session
 from app.models.profile import Profile
 from app.models.profile_insights import ProfileInsights
 from app.schemas.prediction import (
-    CrossPatientResponse,
-    CrossPatientStrategyEntry,
     CarePatternReason,
     CarePatternResponse,
+    CrossPatientResponse,
+    CrossPatientStrategyEntry,
 )
 from app.schemas.profile import ErrorResponse
 from app.services.auth import hash_access_code
@@ -28,9 +29,7 @@ router = APIRouter(tags=["care-patterns"])
 
 async def _get_profile(access_code: str, db: AsyncSession) -> Profile:
     code_hash = hash_access_code(access_code)
-    result = await db.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await db.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
     if profile is None:
         raise HTTPException(

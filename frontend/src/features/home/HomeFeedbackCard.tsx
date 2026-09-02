@@ -29,9 +29,7 @@ export function HomeFeedbackCard({ pending, onDismiss, onSubmit }: HomeFeedbackC
     <div className="rounded-2xl border border-foreground/10 bg-surface p-4 space-y-3">
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">
-            {t('title')}
-          </h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
           <p className="text-xs text-foreground-muted mt-0.5 flex items-center gap-1">
             <span className="truncate max-w-[65%]">{pending.title.replace(/\.{3}$/, '')}</span>
             <span className="shrink-0">· {timeText}</span>

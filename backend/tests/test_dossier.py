@@ -1,18 +1,18 @@
+from datetime import UTC, datetime, timedelta, timezone
+
 import pytest
 import pytest_asyncio
-from datetime import datetime, timezone, timedelta
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.dossier import (
-    _apply_temporal_weight,
-    _apply_stage_transition_weight,
-    compute_incident_weight,
-    compute_dossier,
-)
 from app.models.incident import Incident
 from app.services.crypto import encrypt
-
+from app.services.dossier import (
+    _apply_stage_transition_weight,
+    _apply_temporal_weight,
+    compute_dossier,
+    compute_incident_weight,
+)
 
 VALID_PROFILE = {
     "disease_stage": "middle",
@@ -24,39 +24,39 @@ VALID_PROFILE = {
 
 class TestTemporalWeight:
     def test_recent_gets_full_weight(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(days=5)
         assert _apply_temporal_weight(incident_time, now) == 1.0
 
     def test_medium_gets_half_weight(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(days=90)
         assert _apply_temporal_weight(incident_time, now) == 0.5
 
     def test_old_gets_low_weight(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(days=250)
         assert _apply_temporal_weight(incident_time, now) == 0.2
 
     def test_archive_gets_zero_weight(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         incident_time = now - timedelta(days=400)
         assert _apply_temporal_weight(incident_time, now) == 0.0
 
 
 class TestStageTransitionWeight:
     def test_no_transition(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         assert _apply_stage_transition_weight(now, None) == 1.0
 
     def test_pre_transition_gets_reduced(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stage_changed = now - timedelta(days=5)
         incident_before = now - timedelta(days=10)
         assert _apply_stage_transition_weight(incident_before, stage_changed) == 0.3
 
     def test_post_transition_gets_full(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stage_changed = now - timedelta(days=10)
         incident_after = now - timedelta(days=5)
         assert _apply_stage_transition_weight(incident_after, stage_changed) == 1.0
@@ -75,7 +75,7 @@ async def test_compute_dossier_creates_record(client: AsyncClient, db_session: A
             json={
                 "behavior_category": "wandering_exit_seeking",
                 "behavior_description": f"Incident {i}",
-                "incident_time": datetime.now(timezone.utc).isoformat(),
+                "incident_time": datetime.now(UTC).isoformat(),
                 "severity": "moderate",
                 "intervention_description": "Played music",
                 "intervention_outcome": "resolved" if i < 2 else "escalated",

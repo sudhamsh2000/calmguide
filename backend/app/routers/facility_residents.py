@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import func, select
@@ -14,7 +14,7 @@ from app.models.staff import Staff
 from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.services.audit_service import log_audit
 from app.services.crypto import decrypt
-from app.services.dossier import get_dossier_if_fresh, compute_dossier
+from app.services.dossier import compute_dossier, get_dossier_if_fresh
 from app.services.rbac import require_role
 
 router = APIRouter(prefix="/facility", tags=["facility-residents"])
@@ -54,13 +54,11 @@ async def get_my_residents(
     if not profile_ids:
         return {"residents": []}
 
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
 
     # Bulk-load everything keyed by profile_id (one query each) instead of the
     # previous 5-queries-per-resident N+1, which scaled linearly with census.
-    profiles_result = await session.execute(
-        select(Profile).where(Profile.id.in_(profile_ids))
-    )
+    profiles_result = await session.execute(select(Profile).where(Profile.id.in_(profile_ids)))
     profiles_by_id = {p.id: p for p in profiles_result.scalars().all()}
 
     dossiers_result = await session.execute(
@@ -79,10 +77,14 @@ async def get_my_residents(
     recent_counts = {pid: count for pid, count in counts_result.all()}
 
     # Most recent incident per profile via a window function (one query).
-    row_number = func.row_number().over(
-        partition_by=Incident.profile_id,
-        order_by=Incident.created_at.desc(),
-    ).label("rn")
+    row_number = (
+        func.row_number()
+        .over(
+            partition_by=Incident.profile_id,
+            order_by=Incident.created_at.desc(),
+        )
+        .label("rn")
+    )
     last_subq = (
         select(
             Incident.profile_id.label("pid"),
@@ -126,10 +128,18 @@ async def get_my_residents(
         if d:
             contra_list = _parse_encrypted_json(d.contraindicated_json)
             if contra_list:
-                top_contra = contra_list[0].get("description", "") if isinstance(contra_list[0], dict) else str(contra_list[0])
+                top_contra = (
+                    contra_list[0].get("description", "")
+                    if isinstance(contra_list[0], dict)
+                    else str(contra_list[0])
+                )
             eff_list = _parse_encrypted_json(d.effective_json)
             if eff_list:
-                top_effective = eff_list[0].get("intervention", "") if isinstance(eff_list[0], dict) else str(eff_list[0])
+                top_effective = (
+                    eff_list[0].get("intervention", "")
+                    if isinstance(eff_list[0], dict)
+                    else str(eff_list[0])
+                )
 
         recent_count = recent_counts.get(pid, 0)
         risk = "low"
@@ -150,18 +160,20 @@ async def get_my_residents(
 
         await log_audit(staff, "READ", "patient_profile", pid, session=session)
 
-        residents.append({
-            "profile_id": pid,
-            "unit": unit_val,
-            "room": room_val,
-            "bed": bed_val,
-            "disease_stage": p.disease_stage,
-            "risk_level": risk,
-            "top_contraindicated": top_contra,
-            "top_effective": top_effective,
-            "last_incident_summary": last_summary,
-            "trend_direction": "stable",
-        })
+        residents.append(
+            {
+                "profile_id": pid,
+                "unit": unit_val,
+                "room": room_val,
+                "bed": bed_val,
+                "disease_stage": p.disease_stage,
+                "risk_level": risk,
+                "top_contraindicated": top_contra,
+                "top_effective": top_effective,
+                "last_incident_summary": last_summary,
+                "trend_direction": "stable",
+            }
+        )
 
     await session.commit()
     return {"residents": residents}
@@ -183,7 +195,9 @@ async def get_behavioral_card(
             )
         )
         if not assignment.scalar_one_or_none():
-            raise HTTPException(403, {"error": "Not assigned to this patient", "code": "NOT_ASSIGNED"})
+            raise HTTPException(
+                403, {"error": "Not assigned to this patient", "code": "NOT_ASSIGNED"}
+            )
 
     d = await get_dossier_if_fresh(profile_id, session)
     if not d:
@@ -210,21 +224,26 @@ async def get_behavioral_card(
     delirium_flags = _parse_encrypted_json(d.delirium_flags) if d else None
     pain_flags = _parse_encrypted_json(d.pain_flags) if d else None
 
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
     incidents_result = await session.execute(
-        select(Incident).where(
+        select(Incident)
+        .where(
             Incident.profile_id == profile_id,
             Incident.incident_time >= seven_days_ago,
-        ).order_by(Incident.incident_time.desc()).limit(10)
+        )
+        .order_by(Incident.incident_time.desc())
+        .limit(10)
     )
     recent_incidents = []
     for inc in incidents_result.scalars().all():
-        recent_incidents.append({
-            "date": inc.incident_time.isoformat(),
-            "category": inc.behavior_category,
-            "severity": inc.severity,
-            "outcome": inc.intervention_outcome,
-        })
+        recent_incidents.append(
+            {
+                "date": inc.incident_time.isoformat(),
+                "category": inc.behavior_category,
+                "severity": inc.severity,
+                "outcome": inc.intervention_outcome,
+            }
+        )
 
     await log_audit(staff, "READ", "patient_profile", profile_id, session=session)
     await session.commit()

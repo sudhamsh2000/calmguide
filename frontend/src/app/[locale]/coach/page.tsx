@@ -32,10 +32,7 @@ function GreetingCard() {
   return (
     <div className="mb-3 rounded-2xl bg-primary/5 border border-primary/20 p-3">
       <p className="text-base text-foreground leading-snug">
-        {t('greeting')}{' '}
-        <span className="text-foreground-muted">
-          {t('greeting_detail')}
-        </span>
+        {t('greeting')} <span className="text-foreground-muted">{t('greeting_detail')}</span>
       </p>
     </div>
   );
@@ -66,7 +63,11 @@ function CoachPageInner() {
   const isFacilityMode = !!profileId;
   const residentName = isFacilityMode ? formatResidentLocation(unit, room, bed) : undefined;
 
-  const { response, isStreaming, error, sendMessage, clearError } = useStreamingChat(initialSessionId, profileId ?? undefined, residentName);
+  const { response, isStreaming, error, sendMessage, clearError } = useStreamingChat(
+    initialSessionId,
+    profileId ?? undefined,
+    residentName,
+  );
   const [history, setHistory] = useState<ChatExchange[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [showInitial, setShowInitial] = useState(!initialSessionId);
@@ -75,7 +76,7 @@ function CoachPageInner() {
 
   const backHref = isFacilityMode
     ? `/facility/residents/${profileId}?${new URLSearchParams(
-        Object.entries({ unit, room, bed }).filter(([, v]) => v != null) as [string, string][]
+        Object.entries({ unit, room, bed }).filter(([, v]) => v != null) as [string, string][],
       ).toString()}`
     : '/home';
   const backLabel = isFacilityMode ? tc('nav.back') : tc('nav.back_to_home');
@@ -131,7 +132,7 @@ function CoachPageInner() {
       .finally(() => {
         setLoadingHistory(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Memoize parsing so the streamed response is only re-parsed when the text
@@ -203,7 +204,7 @@ function CoachPageInner() {
             <ResidentContextBanner unit={unit} room={room} bed={bed} riskLevel={risk} />
           )}
 
-          <div className={`mb-3 ${isFacilityMode ? "mt-4" : ""}`}>
+          <div className={`mb-3 ${isFacilityMode ? 'mt-4' : ''}`}>
             <SafetyDisclosure />
           </div>
 
@@ -255,10 +256,7 @@ function CoachPageInner() {
         {history.map((exchange, i) => (
           <div key={i}>
             <UserMessageBubble message={exchange.userMessage} />
-            <CoachResponseRenderer
-              sections={exchange.sections}
-              rawResponse={exchange.response}
-            />
+            <CoachResponseRenderer sections={exchange.sections} rawResponse={exchange.response} />
           </div>
         ))}
 

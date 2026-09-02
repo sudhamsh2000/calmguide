@@ -120,15 +120,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const colors = isDark ? darkColors : lightColors;
 
   const value = useMemo<ThemeContextValue>(
-    () => ({ colors, isDark, themePreference: preference, setThemePreference: handleSetPreference }),
+    () => ({
+      colors,
+      isDark,
+      themePreference: preference,
+      setThemePreference: handleSetPreference,
+    }),
     [colors, isDark, preference, handleSetPreference],
   );
 
-  return (
-    <ThemeContext value={value}>
-      {children}
-    </ThemeContext>
-  );
+  return <ThemeContext value={value}>{children}</ThemeContext>;
 }
 
 export function useTheme(): ThemeContextValue {

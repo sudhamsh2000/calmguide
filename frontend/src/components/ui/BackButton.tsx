@@ -21,7 +21,9 @@ export function BackButton({ href, label = 'Go back', className = '' }: BackButt
         'dark:hover:border-[#3a4f6d] dark:hover:bg-surface dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_0_0_1px_rgba(36,52,71,0.18)]',
         'focus-ring',
         className,
-      ].filter(Boolean).join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       <svg
         width="18"

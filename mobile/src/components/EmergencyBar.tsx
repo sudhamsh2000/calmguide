@@ -18,8 +18,7 @@ export function EmergencyBar() {
   const [expanded, setExpanded] = useState(false);
 
   const isTabRoute = segments.includes('(tabs)');
-  const hasStickyPrimaryAction =
-    pathname === '/login' || pathname === '/profile/setup';
+  const hasStickyPrimaryAction = pathname === '/login' || pathname === '/profile/setup';
   const bottomOffset = insets.bottom + (isTabRoute ? 68 : hasStickyPrimaryAction ? 92 : 14);
 
   function handleCall(number: string) {

@@ -13,9 +13,13 @@ def get_llm_provider(provider_name: str, api_key: str, model: str) -> LLMProvide
     """
     if provider_name == "openai":
         from app.services.openai_provider import OpenAIProvider
+
         return OpenAIProvider(api_key=api_key, model=model)
     elif provider_name == "anthropic":
         from app.services.anthropic_provider import AnthropicProvider
+
         return AnthropicProvider(api_key=api_key, model=model)
     else:
-        raise ValueError(f"Unknown LLM provider: {provider_name!r}. Must be 'openai' or 'anthropic'.")
+        raise ValueError(
+            f"Unknown LLM provider: {provider_name!r}. Must be 'openai' or 'anthropic'."
+        )

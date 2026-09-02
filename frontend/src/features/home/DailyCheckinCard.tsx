@@ -16,12 +16,22 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  const tagLabel = (key: string) => tc.has(key) ? tc(key) : key;
+  const tagLabel = (key: string) => (tc.has(key) ? tc(key) : key);
 
   if (submitted) {
     return (
       <div className="flex items-center gap-2 rounded-2xl border border-foreground/10 bg-surface px-4 py-3 text-sm text-primary animate-fade-in-up">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
           <path d="M20 6 9 17l-5-5" />
         </svg>
         {t('thanks')}
@@ -44,7 +54,9 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
   };
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    );
   };
 
   const TIME_SLOTS = ['overnight', 'morning', 'afternoon', 'evening'] as const;
@@ -101,7 +113,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
       <h3 className="text-base font-semibold text-foreground">{t('title')}</h3>
 
       <div className="grid grid-cols-3 gap-2.5" role="group" aria-label={t('title')}>
-        {SEVERITY_OPTIONS.map(opt => {
+        {SEVERITY_OPTIONS.map((opt) => {
           const isOn = severity === opt.id;
           return (
             <button
@@ -138,8 +150,12 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
         <>
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">{t('when')}</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label={t('when')}>
-              {TIME_SLOTS.map(slot => (
+            <div
+              className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+              role="group"
+              aria-label={t('when')}
+            >
+              {TIME_SLOTS.map((slot) => (
                 <button
                   key={slot}
                   type="button"
@@ -156,7 +172,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">{t('what_helped')}</p>
             <div className="flex flex-wrap gap-2" role="group" aria-label={t('what_helped')}>
-              {PREDEFINED_TAGS.map(tag => (
+              {PREDEFINED_TAGS.map((tag) => (
                 <button
                   key={tag}
                   type="button"

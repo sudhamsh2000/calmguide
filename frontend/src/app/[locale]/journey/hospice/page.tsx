@@ -4,7 +4,8 @@ import { DeflectionLayout } from '@/components/ui/DeflectionLayout';
 
 export const metadata: Metadata = {
   title: 'Hospice & End of Life | CalmGuide',
-  description: 'When dementia reaches its final stage, these trusted resources can guide you through.',
+  description:
+    'When dementia reaches its final stage, these trusted resources can guide you through.',
 };
 
 export default async function HospicePage() {

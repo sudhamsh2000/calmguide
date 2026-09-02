@@ -15,9 +15,7 @@ MVP_VALIDATED_CODES = {"en-US", "es-ES", "hi-IN"}
 
 
 def test_mvp_validated_languages_are_exactly_english_spanish_hindi():
-    validated = {
-        lang.code for lang in LANGUAGES if lang.tier is ValidationTier.MVP_VALIDATED
-    }
+    validated = {lang.code for lang in LANGUAGES if lang.tier is ValidationTier.MVP_VALIDATED}
     assert validated == MVP_VALIDATED_CODES
 
 

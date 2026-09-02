@@ -112,6 +112,7 @@ In `backend/app/routers/crisis.py`:
 
 ```python
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))  # repo root
 
 from rag.retrieve import get_rag_context
@@ -122,7 +123,7 @@ rag_context = await get_rag_context(request.message, k=3, min_score=0.20)
 prompt = template.render(
     profile=profile,
     message=request.message,
-    rag_context=rag_context,   # empty string = no injection
+    rag_context=rag_context,  # empty string = no injection
 )
 ```
 

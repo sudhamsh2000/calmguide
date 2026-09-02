@@ -129,7 +129,15 @@ function MultiSelectChips({
               accessibilityRole="checkbox"
               accessibilityState={{ checked: isSelected }}
             >
-              <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? color : colors.foreground, textAlign: 'center', flexShrink: 1 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: isSelected ? '700' : '500',
+                  color: isSelected ? color : colors.foreground,
+                  textAlign: 'center',
+                  flexShrink: 1,
+                }}
+              >
                 {item}
               </Text>
             </Pressable>
@@ -154,7 +162,9 @@ function MultiSelectChips({
             accessibilityRole="checkbox"
             accessibilityState={{ checked: true }}
           >
-            <Text style={{ fontSize: 14, fontWeight: '700', color, textAlign: 'center', flexShrink: 1 }}>
+            <Text
+              style={{ fontSize: 14, fontWeight: '700', color, textAlign: 'center', flexShrink: 1 }}
+            >
               {item}
             </Text>
           </Pressable>
@@ -204,23 +214,53 @@ function MultiSelectChips({
             }}
             accessibilityRole="button"
           >
-            <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{tCommon('add', { defaultValue: 'Add' })}</Text>
+            <Text
+              style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+            >
+              {tCommon('add', { defaultValue: 'Add' })}
+            </Text>
           </Pressable>
           <Pressable
-            onPress={() => { setShowCustomInput(false); setCustomValue(''); }}
-            style={{ paddingHorizontal: 10, paddingVertical: 10, minHeight: 44, minWidth: 72, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => {
+              setShowCustomInput(false);
+              setCustomValue('');
+            }}
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              minHeight: 44,
+              minWidth: 72,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
             accessibilityRole="button"
           >
-            <Text style={{ fontSize: 14, color: colors.mutedForeground }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{tCommon('cancel', { defaultValue: 'Cancel' })}</Text>
+            <Text
+              style={{ fontSize: 14, color: colors.mutedForeground }}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+            >
+              {tCommon('cancel', { defaultValue: 'Cancel' })}
+            </Text>
           </Pressable>
         </View>
       ) : (
         <Pressable
           onPress={handleShowInput}
-          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, alignSelf: 'flex-start', paddingVertical: 4 })}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.6 : 1,
+            alignSelf: 'flex-start',
+            paddingVertical: 4,
+          })}
           accessibilityRole="button"
         >
-          <Text style={{ fontSize: 15, color, fontWeight: '500' }}>+ {tCommon('add_custom', { defaultValue: 'Add custom option' })}</Text>
+          <Text style={{ fontSize: 15, color, fontWeight: '500' }}>
+            + {tCommon('add_custom', { defaultValue: 'Add custom option' })}
+          </Text>
         </Pressable>
       )}
     </View>
@@ -299,7 +339,12 @@ export default function ProfileSetupScreen() {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={{ backgroundColor: colors.background }}
-          contentContainerStyle={{ padding: 24, gap: 28, alignItems: 'center', paddingBottom: 60 + (Platform.OS === 'android' ? insets.bottom : 0) }}
+          contentContainerStyle={{
+            padding: 24,
+            gap: 28,
+            alignItems: 'center',
+            paddingBottom: 60 + (Platform.OS === 'android' ? insets.bottom : 0),
+          }}
         >
           <View
             style={{
@@ -326,41 +371,75 @@ export default function ProfileSetupScreen() {
               }}
             />
           </View>
-        <View style={{ alignItems: 'center', gap: 10 }}>
-          <Text style={{ fontSize: 28, fontWeight: '800', color: colors.foreground, textAlign: 'center' }}>
-            {t('success.profile_created')}
-          </Text>
-          <Text style={{ fontSize: 16, color: colors.mutedForeground, textAlign: 'center', lineHeight: 24 }}>
-            {t('success.save_code_message')}
-          </Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: colors.primary + '14',
-            borderRadius: 20,
-            borderCurve: 'continuous',
-            padding: 24,
-            alignItems: 'center',
-            gap: 12,
-            alignSelf: 'stretch',
-            borderWidth: 2,
-            borderColor: colors.primary,
-          }}
-        >
-          <Text style={{ fontSize: 14, fontWeight: '700', color: colors.mutedForeground, textTransform: 'uppercase', letterSpacing: 1 }}>
-            {t('success.access_code_label')}
-          </Text>
-          <Text selectable style={{ fontSize: 36, fontWeight: '900', color: colors.primary, letterSpacing: 6 }}>
-            {successCode}
-          </Text>
-          <Text style={{ fontSize: 13, color: colors.mutedForeground, textAlign: 'center' }}>
-            {t('success.screenshot_hint')}
-          </Text>
-        </View>
-          <Button variant="secondary" size="lg" onPress={handleShareCode} style={{ alignSelf: 'stretch' }}>
+          <View style={{ alignItems: 'center', gap: 10 }}>
+            <Text
+              style={{
+                fontSize: 28,
+                fontWeight: '800',
+                color: colors.foreground,
+                textAlign: 'center',
+              }}
+            >
+              {t('success.profile_created')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                color: colors.mutedForeground,
+                textAlign: 'center',
+                lineHeight: 24,
+              }}
+            >
+              {t('success.save_code_message')}
+            </Text>
+          </View>
+          <View
+            style={{
+              backgroundColor: colors.primary + '14',
+              borderRadius: 20,
+              borderCurve: 'continuous',
+              padding: 24,
+              alignItems: 'center',
+              gap: 12,
+              alignSelf: 'stretch',
+              borderWidth: 2,
+              borderColor: colors.primary,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '700',
+                color: colors.mutedForeground,
+                textTransform: 'uppercase',
+                letterSpacing: 1,
+              }}
+            >
+              {t('success.access_code_label')}
+            </Text>
+            <Text
+              selectable
+              style={{ fontSize: 36, fontWeight: '900', color: colors.primary, letterSpacing: 6 }}
+            >
+              {successCode}
+            </Text>
+            <Text style={{ fontSize: 13, color: colors.mutedForeground, textAlign: 'center' }}>
+              {t('success.screenshot_hint')}
+            </Text>
+          </View>
+          <Button
+            variant="secondary"
+            size="lg"
+            onPress={handleShareCode}
+            style={{ alignSelf: 'stretch' }}
+          >
             {t('success.share_code', { defaultValue: 'Share Access Code' })}
           </Button>
-          <Button size="lg" onPress={() => router.replace('/(tabs)/home')} style={{ alignSelf: 'stretch' }}>
+          <Button
+            size="lg"
+            onPress={() => router.replace('/(tabs)/home')}
+            style={{ alignSelf: 'stretch' }}
+          >
             {t('success.start_button')}
           </Button>
         </ScrollView>
@@ -370,253 +449,271 @@ export default function ProfileSetupScreen() {
 
   const progressPercent = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
 
-    return (
+  return (
     <>
-      <Stack.Screen options={{ title: step === 1 ? t('setup_title') : t('setup.step_of', { step, total: TOTAL_STEPS, defaultValue: `Step ${step} of ${TOTAL_STEPS}` }) }} />
+      <Stack.Screen
+        options={{
+          title:
+            step === 1
+              ? t('setup_title')
+              : t('setup.step_of', {
+                  step,
+                  total: TOTAL_STEPS,
+                  defaultValue: `Step ${step} of ${TOTAL_STEPS}`,
+                }),
+        }}
+      />
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: colors.background }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ padding: 24, paddingBottom: 180 }}
-        >
-          <View style={{ gap: 24 }}>
-          {/* Progress bar */}
-          <View style={{ gap: 8 }}>
-            <View
-              style={{
-                height: 6,
-                backgroundColor: colors.border,
-                borderRadius: 3,
-                overflow: 'hidden',
-                alignItems: 'flex-start',
-              }}
-            >
-              <View
-                style={{
-                  height: '100%',
-                  width: `${progressPercent}%`,
-                  backgroundColor: colors.primary,
-                  borderRadius: 3,
-                }}
-              />
-            </View>
-            <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
-              {t('setup.step_of', { step, total: TOTAL_STEPS, defaultValue: `Step ${step} of ${TOTAL_STEPS}` })}
-            </Text>
-          </View>
-
-          {/* Step 1: Patient name */}
-          {step === 1 && (
-            <View style={{ gap: 16 }}>
+          <ScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ padding: 24, paddingBottom: 180 }}
+          >
+            <View style={{ gap: 24 }}>
+              {/* Progress bar */}
               <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
-                  {t('setup.heading')}
-                </Text>
-                <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
-                  {t('setup.subtitle')}
-                </Text>
-              </View>
-              <ThemedInput
-                label={t('setup.name_label')}
-                placeholder={t('setup.name_placeholder')}
-                value={patientNameValue}
-                onChangeText={setPatientNameValue}
-                autoFocus
-                returnKeyType="next"
-                onSubmitEditing={nextStep}
-              />
-              <Card variant="default" padding={14}>
-                <Text style={{ fontSize: 14, color: colors.mutedForeground, lineHeight: 20 }}>
-                  {t('setup.name_privacy')}
-                </Text>
-              </Card>
-            </View>
-          )}
-
-          {/* Step 2: Disease stage */}
-          {step === 2 && (
-            <View style={{ gap: 16 }}>
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
-                  {t('setup.stage_heading')}
-                </Text>
-                <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
-                  {t('setup.stage_subtitle')}
-                </Text>
-              </View>
-              <View style={{ gap: 12 }}>
-                {STAGE_KEYS.map(({ value, color, bgColor }) => {
-                  const isSelected = diseaseStage === value;
-                  return (
-                    <Pressable
-                      key={value}
-                      onPress={() => setDiseaseStage(value)}
-                      style={{
-                        backgroundColor: isSelected ? bgColor : colors.surface,
-                        borderRadius: 16,
-                        borderCurve: 'continuous',
-                        padding: 16,
-                        borderWidth: 2,
-                        borderColor: isSelected ? color : colors.border,
-                        gap: 6,
-                      }}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected: isSelected }}
-                    >
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 17, fontWeight: '700', color: isSelected ? color : colors.foreground }}>
-                          {t(`disease_stage.${value}_title`)}
-                        </Text>
-                        {isSelected && (
-                          <View
-                            style={{
-                              width: 10,
-                              height: 10,
-                              borderRadius: 5,
-                              backgroundColor: color,
-                            }}
-                          />
-                        )}
-                      </View>
-                      <Text style={{ fontSize: 14, color: colors.mutedForeground, lineHeight: 20 }}>
-                        {t(`disease_stage.${value}_description`)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-          )}
-
-          {/* Step 3: Behavioral patterns */}
-          {step === 3 && (
-            <View style={{ gap: 16 }}>
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
-                  {t('steps.behavioral.title')}
-                </Text>
-                <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
-                  {t('steps.behavioral.description')}
-                </Text>
-              </View>
-              <MultiSelectChips
-                options={BEHAVIORAL_PATTERNS}
-                selected={behavioralPatterns}
-                onChange={setBehavioralPatterns}
-                color={colors.primary}
-              />
-              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
-                {behavioralPatterns.length} selected
-              </Text>
-            </View>
-          )}
-
-          {/* Step 4: Calming strategies */}
-          {step === 4 && (
-            <View style={{ gap: 16 }}>
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
-                  {t('steps.calming.title')}
-                </Text>
-                <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
-                  {t('steps.calming.description')}
-                </Text>
-              </View>
-              <MultiSelectChips
-                options={CALMING_STRATEGIES}
-                selected={calmingStrategies}
-                onChange={setCalmingStrategies}
-                color={colors.primary}
-              />
-              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
-                {calmingStrategies.length} selected
-              </Text>
-            </View>
-          )}
-
-          {/* Step 5: Safety concerns */}
-          {step === 5 && (
-            <View style={{ gap: 16 }}>
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
-                  {t('steps.safety.title')}
-                </Text>
-                <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
-                  {t('steps.safety.description')}
-                </Text>
-              </View>
-              <MultiSelectChips
-                options={SAFETY_CONCERNS}
-                selected={safetyConcerns}
-                onChange={setSafetyConcerns}
-                color={colors.primary}
-              />
-              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
-                {safetyConcerns.length} selected
-              </Text>
-              {error ? (
                 <View
                   style={{
-                    backgroundColor: colors.error + '18',
-                    borderRadius: 10,
-                    padding: 14,
-                    borderStartWidth: 3,
-                    borderStartColor: colors.error,
+                    height: 6,
+                    backgroundColor: colors.border,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    alignItems: 'flex-start',
                   }}
                 >
-                  <Text style={{ color: colors.error, fontSize: 14 }}>{error}</Text>
+                  <View
+                    style={{
+                      height: '100%',
+                      width: `${progressPercent}%`,
+                      backgroundColor: colors.primary,
+                      borderRadius: 3,
+                    }}
+                  />
                 </View>
-              ) : null}
-            </View>
-          )}
+                <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                  {t('setup.step_of', {
+                    step,
+                    total: TOTAL_STEPS,
+                    defaultValue: `Step ${step} of ${TOTAL_STEPS}`,
+                  })}
+                </Text>
+              </View>
 
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: colors.border,
-            backgroundColor: colors.background + 'F2',
-            paddingHorizontal: 24,
-            paddingTop: 14,
-            paddingBottom: Math.max(insets.bottom, 12),
-            flexDirection: 'row',
-            gap: 12,
-          }}
-        >
-          {step > 1 ? (
-            <View style={{ flex: 1 }}>
-              <Button variant="secondary" size="lg" onPress={prevStep}>
-                {t('actions.back')}
-              </Button>
+              {/* Step 1: Patient name */}
+              {step === 1 && (
+                <View style={{ gap: 16 }}>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
+                      {t('setup.heading')}
+                    </Text>
+                    <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+                      {t('setup.subtitle')}
+                    </Text>
+                  </View>
+                  <ThemedInput
+                    label={t('setup.name_label')}
+                    placeholder={t('setup.name_placeholder')}
+                    value={patientNameValue}
+                    onChangeText={setPatientNameValue}
+                    autoFocus
+                    returnKeyType="next"
+                    onSubmitEditing={nextStep}
+                  />
+                  <Card variant="default" padding={14}>
+                    <Text style={{ fontSize: 14, color: colors.mutedForeground, lineHeight: 20 }}>
+                      {t('setup.name_privacy')}
+                    </Text>
+                  </Card>
+                </View>
+              )}
+
+              {/* Step 2: Disease stage */}
+              {step === 2 && (
+                <View style={{ gap: 16 }}>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
+                      {t('setup.stage_heading')}
+                    </Text>
+                    <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+                      {t('setup.stage_subtitle')}
+                    </Text>
+                  </View>
+                  <View style={{ gap: 12 }}>
+                    {STAGE_KEYS.map(({ value, color, bgColor }) => {
+                      const isSelected = diseaseStage === value;
+                      return (
+                        <Pressable
+                          key={value}
+                          onPress={() => setDiseaseStage(value)}
+                          style={{
+                            backgroundColor: isSelected ? bgColor : colors.surface,
+                            borderRadius: 16,
+                            borderCurve: 'continuous',
+                            padding: 16,
+                            borderWidth: 2,
+                            borderColor: isSelected ? color : colors.border,
+                            gap: 6,
+                          }}
+                          accessibilityRole="radio"
+                          accessibilityState={{ selected: isSelected }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 17,
+                                fontWeight: '700',
+                                color: isSelected ? color : colors.foreground,
+                              }}
+                            >
+                              {t(`disease_stage.${value}_title`)}
+                            </Text>
+                            {isSelected && (
+                              <View
+                                style={{
+                                  width: 10,
+                                  height: 10,
+                                  borderRadius: 5,
+                                  backgroundColor: color,
+                                }}
+                              />
+                            )}
+                          </View>
+                          <Text
+                            style={{ fontSize: 14, color: colors.mutedForeground, lineHeight: 20 }}
+                          >
+                            {t(`disease_stage.${value}_description`)}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
+              {/* Step 3: Behavioral patterns */}
+              {step === 3 && (
+                <View style={{ gap: 16 }}>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
+                      {t('steps.behavioral.title')}
+                    </Text>
+                    <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+                      {t('steps.behavioral.description')}
+                    </Text>
+                  </View>
+                  <MultiSelectChips
+                    options={BEHAVIORAL_PATTERNS}
+                    selected={behavioralPatterns}
+                    onChange={setBehavioralPatterns}
+                    color={colors.primary}
+                  />
+                  <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                    {behavioralPatterns.length} selected
+                  </Text>
+                </View>
+              )}
+
+              {/* Step 4: Calming strategies */}
+              {step === 4 && (
+                <View style={{ gap: 16 }}>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
+                      {t('steps.calming.title')}
+                    </Text>
+                    <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+                      {t('steps.calming.description')}
+                    </Text>
+                  </View>
+                  <MultiSelectChips
+                    options={CALMING_STRATEGIES}
+                    selected={calmingStrategies}
+                    onChange={setCalmingStrategies}
+                    color={colors.primary}
+                  />
+                  <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                    {calmingStrategies.length} selected
+                  </Text>
+                </View>
+              )}
+
+              {/* Step 5: Safety concerns */}
+              {step === 5 && (
+                <View style={{ gap: 16 }}>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 26, fontWeight: '800', color: colors.foreground }}>
+                      {t('steps.safety.title')}
+                    </Text>
+                    <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+                      {t('steps.safety.description')}
+                    </Text>
+                  </View>
+                  <MultiSelectChips
+                    options={SAFETY_CONCERNS}
+                    selected={safetyConcerns}
+                    onChange={setSafetyConcerns}
+                    color={colors.primary}
+                  />
+                  <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                    {safetyConcerns.length} selected
+                  </Text>
+                  {error ? (
+                    <View
+                      style={{
+                        backgroundColor: colors.error + '18',
+                        borderRadius: 10,
+                        padding: 14,
+                        borderStartWidth: 3,
+                        borderStartColor: colors.error,
+                      }}
+                    >
+                      <Text style={{ color: colors.error, fontSize: 14 }}>{error}</Text>
+                    </View>
+                  ) : null}
+                </View>
+              )}
             </View>
-          ) : null}
-          <View style={{ flex: 1 }}>
-            {step < TOTAL_STEPS ? (
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={!canProceed()}
-                onPress={nextStep}
-              >
-                {t('actions.next')}
-              </Button>
-            ) : (
-              <Button
-                variant="primary"
-                size="lg"
-                loading={loading}
-                onPress={handleCreate}
-              >
-                {t('actions.create')}
-              </Button>
-            )}
+          </ScrollView>
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: colors.border,
+              backgroundColor: colors.background + 'F2',
+              paddingHorizontal: 24,
+              paddingTop: 14,
+              paddingBottom: Math.max(insets.bottom, 12),
+              flexDirection: 'row',
+              gap: 12,
+            }}
+          >
+            {step > 1 ? (
+              <View style={{ flex: 1 }}>
+                <Button variant="secondary" size="lg" onPress={prevStep}>
+                  {t('actions.back')}
+                </Button>
+              </View>
+            ) : null}
+            <View style={{ flex: 1 }}>
+              {step < TOTAL_STEPS ? (
+                <Button variant="primary" size="lg" disabled={!canProceed()} onPress={nextStep}>
+                  {t('actions.next')}
+                </Button>
+              ) : (
+                <Button variant="primary" size="lg" loading={loading} onPress={handleCreate}>
+                  {t('actions.create')}
+                </Button>
+              )}
+            </View>
           </View>
-        </View>
         </SafeAreaView>
       </KeyboardAvoidingView>
     </>

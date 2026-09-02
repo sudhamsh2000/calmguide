@@ -1,11 +1,11 @@
+from datetime import UTC, datetime, timezone
+
 import pytest
 import pytest_asyncio
-from datetime import datetime, timezone
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.incident_retriever import detect_behavior_categories, get_relevant_incidents
-
 
 VALID_PROFILE = {
     "disease_stage": "middle",
@@ -46,9 +46,7 @@ class TestDetectBehaviorCategories:
 
 
 @pytest.mark.asyncio
-async def test_get_relevant_incidents_by_category(
-    client: AsyncClient, db_session: AsyncSession
-):
+async def test_get_relevant_incidents_by_category(client: AsyncClient, db_session: AsyncSession):
     resp = await client.post("/api/profiles", json=VALID_PROFILE)
     code = resp.json()["access_code"]
     profile_id = resp.json()["id"]
@@ -58,7 +56,7 @@ async def test_get_relevant_incidents_by_category(
         json={
             "behavior_category": "wandering_exit_seeking",
             "behavior_description": "Tried to leave at 2am",
-            "incident_time": datetime.now(timezone.utc).isoformat(),
+            "incident_time": datetime.now(UTC).isoformat(),
         },
     )
     await client.post(
@@ -66,13 +64,11 @@ async def test_get_relevant_incidents_by_category(
         json={
             "behavior_category": "aggression_anger",
             "behavior_description": "Hit caregiver",
-            "incident_time": datetime.now(timezone.utc).isoformat(),
+            "incident_time": datetime.now(UTC).isoformat(),
         },
     )
 
-    incidents = await get_relevant_incidents(
-        profile_id, "Mom is trying to leave again", db_session
-    )
+    incidents = await get_relevant_incidents(profile_id, "Mom is trying to leave again", db_session)
     assert len(incidents) >= 1
     categories = [i.behavior_category for i in incidents]
     assert "wandering_exit_seeking" in categories

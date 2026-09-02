@@ -27,7 +27,9 @@ export function resolveApiBase(): string {
       resolved = configured.replace(/\/$/, '');
     }
     if (!__DEV__ && !resolved.startsWith('https://')) {
-      throw new Error('Production builds must use HTTPS. Set EXPO_PUBLIC_API_URL to an https:// URL.');
+      throw new Error(
+        'Production builds must use HTTPS. Set EXPO_PUBLIC_API_URL to an https:// URL.',
+      );
     }
     return resolved;
   }
@@ -159,12 +161,11 @@ export interface AssignmentResponse {
 // -- Auth (no JWT needed) --
 
 export async function getActiveStaff(facilityCode: string): Promise<StaffListItem[]> {
-  const res = await fetch(
-    `${API_BASE}/api/facilities/${facilityCode}/staff/active`,
-    { headers: localeHeaders() },
-  );
+  const res = await fetch(`${API_BASE}/api/facilities/${facilityCode}/staff/active`, {
+    headers: localeHeaders(),
+  });
   if (!res.ok) throw new Error(`Failed to fetch staff: ${res.status}`);
-  const data = await res.json() as { staff: StaffListItem[] };
+  const data = (await res.json()) as { staff: StaffListItem[] };
   return data.staff;
 }
 
@@ -179,7 +180,7 @@ export async function pinLogin(
     body: JSON.stringify({ facility_code: facilityCode, staff_id: staffId, pin }),
   });
   if (res.status === 401) {
-    const body = await res.json() as { error: string; code: string };
+    const body = (await res.json()) as { error: string; code: string };
     throw new PinError(body.code);
   }
   if (res.status === 423) {
@@ -189,17 +190,14 @@ export async function pinLogin(
   return res.json() as Promise<AuthResponse>;
 }
 
-export async function emailLogin(
-  email: string,
-  password: string,
-): Promise<AuthResponse> {
+export async function emailLogin(email: string, password: string): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/api/facility/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...localeHeaders() },
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => ({})) as { code?: string };
+    const body = (await res.json().catch(() => ({}))) as { code?: string };
     if (body.code === 'ACCOUNT_LOCKED') throw new PinError('ACCOUNT_LOCKED');
     throw new Error(`Login failed: ${res.status}`);
   }
@@ -218,7 +216,7 @@ export class PinError extends Error {
 export async function refreshToken(): Promise<{ token: string; expires_at: string }> {
   const res = await authFetch('/api/facility/auth/refresh', { method: 'POST' });
   if (!res.ok) throw new Error(`Refresh failed: ${res.status}`);
-  const data = await res.json() as { token: string; expires_at: string };
+  const data = (await res.json()) as { token: string; expires_at: string };
   await setToken(data.token, data.expires_at);
   return data;
 }
@@ -226,7 +224,9 @@ export async function refreshToken(): Promise<{ token: string; expires_at: strin
 export async function logout(): Promise<void> {
   try {
     await authFetch('/api/facility/auth/logout', { method: 'POST' });
-  } catch { /* best effort */ }
+  } catch {
+    /* best effort */
+  }
 }
 
 // -- Residents (JWT required) --
@@ -234,7 +234,7 @@ export async function logout(): Promise<void> {
 export async function getMyResidents(): Promise<ResidentCard[]> {
   const res = await authFetch('/api/facility/my-residents');
   if (!res.ok) throw new Error(`Failed to fetch residents: ${res.status}`);
-  const data = await res.json() as { residents: ResidentCard[] };
+  const data = (await res.json()) as { residents: ResidentCard[] };
   return data.residents;
 }
 
@@ -346,14 +346,11 @@ export async function getAuditLogs(params?: {
 export async function getStaffList(facilityCode: string): Promise<StaffDetail[]> {
   const res = await authFetch(`/api/facilities/${facilityCode}/staff`);
   if (!res.ok) throw new Error(`Failed to fetch staff: ${res.status}`);
-  const data = await res.json() as { staff: StaffDetail[] };
+  const data = (await res.json()) as { staff: StaffDetail[] };
   return data.staff;
 }
 
-export async function createStaff(
-  facilityCode: string,
-  data: StaffCreate,
-): Promise<StaffDetail> {
+export async function createStaff(facilityCode: string, data: StaffCreate): Promise<StaffDetail> {
   const res = await authFetch(`/api/facilities/${facilityCode}/staff`, {
     method: 'POST',
     body: JSON.stringify(data),
@@ -400,13 +397,10 @@ export async function linkPatient(
   room?: string,
   bed?: string,
 ): Promise<unknown> {
-  const res = await authFetch(
-    `/api/facilities/${encodeURIComponent(facilityCode)}/patients`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ access_code: accessCode, unit, room, bed }),
-    },
-  );
+  const res = await authFetch(`/api/facilities/${encodeURIComponent(facilityCode)}/patients`, {
+    method: 'POST',
+    body: JSON.stringify({ access_code: accessCode, unit, room, bed }),
+  });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Failed to link patient: ${text}`);
@@ -425,9 +419,7 @@ export async function getFacilityPatients(facilityCode: string): Promise<{ patie
 export async function verifyFacility(
   facilityCode: string,
 ): Promise<{ id: string; name: string; is_active: boolean }> {
-  const res = await fetch(
-    `${API_BASE}/api/facilities/${encodeURIComponent(facilityCode)}/verify`,
-  );
+  const res = await fetch(`${API_BASE}/api/facilities/${encodeURIComponent(facilityCode)}/verify`);
   if (!res.ok) throw new Error(`Facility not found: ${res.status}`);
   return res.json() as Promise<{ id: string; name: string; is_active: boolean }>;
 }
@@ -483,14 +475,11 @@ export async function getAssignments(
   const params = staffId ? `?staff_id=${staffId}` : '';
   const res = await authFetch(`/api/facilities/${facilityCode}/assignments${params}`);
   if (!res.ok) return [];
-  const data = await res.json() as { assignments: AssignmentResponse[] };
+  const data = (await res.json()) as { assignments: AssignmentResponse[] };
   return data.assignments;
 }
 
-export async function removeAssignment(
-  facilityCode: string,
-  assignmentId: string,
-): Promise<void> {
+export async function removeAssignment(facilityCode: string, assignmentId: string): Promise<void> {
   const res = await authFetch(`/api/facilities/${facilityCode}/assignments/${assignmentId}`, {
     method: 'DELETE',
   });

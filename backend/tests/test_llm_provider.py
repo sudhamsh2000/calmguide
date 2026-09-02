@@ -1,11 +1,11 @@
 """Tests for the LLM provider abstraction layer."""
 
-import pytest
 from unittest.mock import patch
 
-from app.services.llm_provider import LLMProvider
-from app.services.llm import get_llm_provider
+import pytest
 
+from app.services.llm import get_llm_provider
+from app.services.llm_provider import LLMProvider
 
 # ---------------------------------------------------------------------------
 # Abstract base class contract
@@ -48,12 +48,16 @@ def test_llm_provider_requires_completion():
 def test_factory_returns_openai_provider():
     provider = get_llm_provider(provider_name="openai", api_key="test-key", model="gpt-4o-mini")
     from app.services.openai_provider import OpenAIProvider
+
     assert isinstance(provider, OpenAIProvider)
 
 
 def test_factory_returns_anthropic_provider():
-    provider = get_llm_provider(provider_name="anthropic", api_key="test-key", model="claude-sonnet-4-20250514")
+    provider = get_llm_provider(
+        provider_name="anthropic", api_key="test-key", model="claude-sonnet-4-20250514"
+    )
     from app.services.anthropic_provider import AnthropicProvider
+
     assert isinstance(provider, AnthropicProvider)
 
 

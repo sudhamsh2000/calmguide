@@ -8,7 +8,7 @@ get_relevant_incidents (keyword-matched incident recall) and compute_dossier
 (weighted contraindicated/effective/trend synthesis).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -37,7 +37,7 @@ async def _create_profile_with_incident(
         json={
             "behavior_category": behavior_category,
             "behavior_description": description,
-            "incident_time": datetime.now(timezone.utc).isoformat(),
+            "incident_time": datetime.now(UTC).isoformat(),
             "intervention_description": description,
             "intervention_outcome": outcome,
         },
@@ -62,12 +62,8 @@ async def test_relevant_incidents_do_not_cross_profiles(
         outcome="resolved",
     )
 
-    incidents_a = await get_relevant_incidents(
-        profile_a, "trying to leave again", db_session
-    )
-    incidents_b = await get_relevant_incidents(
-        profile_b, "trying to leave again", db_session
-    )
+    incidents_a = await get_relevant_incidents(profile_a, "trying to leave again", db_session)
+    incidents_b = await get_relevant_incidents(profile_b, "trying to leave again", db_session)
 
     assert all(i.profile_id == profile_a for i in incidents_a)
     assert all(i.profile_id == profile_b for i in incidents_b)
@@ -94,8 +90,9 @@ async def test_dossier_contraindicated_and_effective_do_not_cross_profiles(
     dossier_a = await compute_dossier(profile_a, db_session)
     dossier_b = await compute_dossier(profile_b, db_session)
 
-    from app.services.crypto import decrypt
     import json
+
+    from app.services.crypto import decrypt
 
     contraindicated_a = json.loads(decrypt(dossier_a.contraindicated_json))
     effective_a = json.loads(decrypt(dossier_a.effective_json))

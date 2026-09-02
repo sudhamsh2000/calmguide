@@ -1,7 +1,7 @@
 """ProfileInsights model — derived behavioral patterns per profile (encrypted)."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -27,6 +27,6 @@ class ProfileInsights(Base):
     computed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
     insights_json: Mapped[str] = mapped_column(Text, nullable=False)  # encrypted JSON

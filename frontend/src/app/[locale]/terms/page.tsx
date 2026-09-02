@@ -23,7 +23,15 @@ const sections = [
   { id: 'contact', title: 'Contact Us' },
 ];
 
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section id={id} className="scroll-mt-6 py-6 border-b border-theme">
       <h2 className="text-xl font-bold text-foreground mb-3">{title}</h2>
@@ -35,8 +43,9 @@ function Section({ id, title, children }: { id: string; title: string; children:
 export default function TermsPage() {
   return (
     <LegalLayout title="Terms of Service" lastUpdated="April 30, 2026" sections={sections}>
-
-      <p className="text-xs text-foreground-muted/60 italic mb-2">This document is only available in English.</p>
+      <p className="text-xs text-foreground-muted/60 italic mb-2">
+        This document is only available in English.
+      </p>
 
       <Section id="acceptance" title="1. Acceptance of Terms">
         <p>
@@ -52,41 +61,63 @@ export default function TermsPage() {
           care facility staff (B2B). The service provides:
         </p>
         <ul className="list-disc ps-5 space-y-1">
-          <li><strong className="text-foreground">Moment Coach</strong> — immediate, structured guidance when a behavioral situation is happening</li>
-          <li><strong className="text-foreground">Learn Mode</strong> — scenario-based practice for common dementia caregiving challenges</li>
-          <li><strong className="text-foreground">Emotional Check-In</strong> — empathetic support for caregiver wellbeing</li>
-          <li><strong className="text-foreground">Incident Logging</strong> — structured recording of behavioral incidents with pattern detection</li>
-          <li><strong className="text-foreground">Daily Behavioral Log</strong> — daily tracking that feeds predictive pattern alerts</li>
-          <li><strong className="text-foreground">Behavioral Insights</strong> — personalized pattern analysis, cycle detection, and care-level predictions</li>
+          <li>
+            <strong className="text-foreground">Moment Coach</strong> — immediate, structured
+            guidance when a behavioral situation is happening
+          </li>
+          <li>
+            <strong className="text-foreground">Learn Mode</strong> — scenario-based practice for
+            common dementia caregiving challenges
+          </li>
+          <li>
+            <strong className="text-foreground">Emotional Check-In</strong> — empathetic support for
+            caregiver wellbeing
+          </li>
+          <li>
+            <strong className="text-foreground">Incident Logging</strong> — structured recording of
+            behavioral incidents with pattern detection
+          </li>
+          <li>
+            <strong className="text-foreground">Daily Behavioral Log</strong> — daily tracking that
+            feeds predictive pattern alerts
+          </li>
+          <li>
+            <strong className="text-foreground">Behavioral Insights</strong> — personalized pattern
+            analysis, cycle detection, and care-level predictions
+          </li>
         </ul>
         <p>
           For professional care facilities, CalmGuide also provides staff management, resident
           behavioral profiles, dashboard analytics, audit logging, and PDF reporting.
         </p>
         <p>
-          CalmGuide is a free service for family caregivers. No account creation, subscription,
-          or payment is required. Facility access requires a facility code provided by the
-          care organization.
+          CalmGuide is a free service for family caregivers. No account creation, subscription, or
+          payment is required. Facility access requires a facility code provided by the care
+          organization.
         </p>
       </Section>
 
       <Section id="not-medical" title="3. Not a Medical Service">
         <p className="font-semibold text-foreground">
-          CalmGuide is not a medical service and does not provide medical advice, diagnosis, or treatment.
+          CalmGuide is not a medical service and does not provide medical advice, diagnosis, or
+          treatment.
         </p>
         <p>
           The guidance provided is informational and educational only. It is not a substitute for
           professional medical care, licensed clinical advice, or emergency services.
         </p>
         <p>
-          <strong className="text-foreground">If you or your loved one is in immediate danger, call 911 or your local emergency number.</strong>{' '}
+          <strong className="text-foreground">
+            If you or your loved one is in immediate danger, call 911 or your local emergency
+            number.
+          </strong>{' '}
           Do not rely on CalmGuide in life-threatening situations.
         </p>
         <p>
           CalmGuide includes an automated safety system that detects descriptions of medical
           emergencies and self-harm. When triggered, the system bypasses AI guidance entirely and
-          provides emergency contact information appropriate to your language and region.
-          This system is not a substitute for calling emergency services.
+          provides emergency contact information appropriate to your language and region. This
+          system is not a substitute for calling emergency services.
         </p>
         <p>
           Always consult a qualified healthcare provider regarding the medical care of a person with
@@ -105,11 +136,27 @@ export default function TermsPage() {
         <p>You understand and accept that:</p>
         <ul className="list-disc ps-5 space-y-1">
           <li>AI guidance is a supplement to, not a replacement for, professional judgment</li>
-          <li>Responses are generated based on the patient profile, the situation you describe, past incident history, and retrieved caregiving guidance</li>
+          <li>
+            Responses are generated based on the patient profile, the situation you describe, past
+            incident history, and retrieved caregiving guidance
+          </li>
           <li>The accuracy of guidance depends on the accuracy of the information you provide</li>
-          <li>Your queries and patient profile data are sent to third-party AI services for processing (see our <Link href="/privacy#ai-processing" className="text-primary hover:text-primary-light transition-colors">Privacy Policy</Link> for details)</li>
+          <li>
+            Your queries and patient profile data are sent to third-party AI services for processing
+            (see our{' '}
+            <Link
+              href="/privacy#ai-processing"
+              className="text-primary hover:text-primary-light transition-colors"
+            >
+              Privacy Policy
+            </Link>{' '}
+            for details)
+          </li>
           <li>We do not guarantee any particular outcome from following AI guidance</li>
-          <li>All AI responses pass through automated quality and safety checks, including language validation and a respect filter, but these checks are not infallible</li>
+          <li>
+            All AI responses pass through automated quality and safety checks, including language
+            validation and a respect filter, but these checks are not infallible
+          </li>
         </ul>
       </Section>
 
@@ -119,9 +166,9 @@ export default function TermsPage() {
           generated when you complete the patient profile setup and is stored in your browser.
         </p>
         <p>
-          Your access code links your browser to the clinical profile stored on our servers.
-          You are responsible for keeping your access code safe. Anyone with your access code can
-          access and modify the patient profile associated with it.
+          Your access code links your browser to the clinical profile stored on our servers. You are
+          responsible for keeping your access code safe. Anyone with your access code can access and
+          modify the patient profile associated with it.
         </p>
         <p>
           If you lose your access code, the associated profile cannot be recovered. We do not store
@@ -129,23 +176,30 @@ export default function TermsPage() {
         </p>
         <p>
           For professional care facilities, staff members authenticate via a facility code plus a
-          personal PIN or email/password. Facility accounts are managed by the facility administrator
-          and are subject to automatic lockout after repeated failed login attempts.
+          personal PIN or email/password. Facility accounts are managed by the facility
+          administrator and are subject to automatic lockout after repeated failed login attempts.
         </p>
       </Section>
 
       <Section id="entering-information" title="6. Entering Information">
         <p>
-          We encourage you to describe your loved one in <strong className="text-foreground">clinical and behavioral terms</strong> only — not personal ones. The profile fields are designed to capture what helps the AI give better guidance, not to store identifying details.
+          We encourage you to describe your loved one in{' '}
+          <strong className="text-foreground">clinical and behavioral terms</strong> only — not
+          personal ones. The profile fields are designed to capture what helps the AI give better
+          guidance, not to store identifying details.
         </p>
-        <p><strong className="text-foreground">We recommend you enter:</strong></p>
+        <p>
+          <strong className="text-foreground">We recommend you enter:</strong>
+        </p>
         <ul className="list-disc ps-5 space-y-1">
           <li>Disease stage (e.g. &ldquo;moderate Alzheimer&rsquo;s&rdquo;)</li>
           <li>Behavioral patterns (e.g. &ldquo;sundowning after 5pm, refuses bathing&rdquo;)</li>
           <li>What helps (e.g. &ldquo;classical music, familiar photos calm her&rdquo;)</li>
           <li>Safety notes (e.g. &ldquo;uses a walker, fall risk&rdquo;)</li>
         </ul>
-        <p><strong className="text-foreground">We recommend you do not enter:</strong></p>
+        <p>
+          <strong className="text-foreground">We recommend you do not enter:</strong>
+        </p>
         <ul className="list-disc ps-5 space-y-1">
           <li>The patient&apos;s full name, date of birth, or address</li>
           <li>Medical record numbers, insurance details, or doctor names</li>
@@ -153,9 +207,11 @@ export default function TermsPage() {
           <li>Any information you would not want stored on a third-party server</li>
         </ul>
         <p>
-          The patient&apos;s name field in the app is stored <strong className="text-foreground">in your browser only</strong> and is never saved on our servers. It is sent to the AI provider as part of each Moment Coach
-          session to personalize guidance, but it is not retained after the session ends.
-          Any text you enter into profile description fields is stored server-side with encryption. We cannot guarantee
+          The patient&apos;s name field in the app is stored{' '}
+          <strong className="text-foreground">in your browser only</strong> and is never saved on
+          our servers. It is sent to the AI provider as part of each Moment Coach session to
+          personalize guidance, but it is not retained after the session ends. Any text you enter
+          into profile description fields is stored server-side with encryption. We cannot guarantee
           confidentiality of PII you choose to include there.
         </p>
       </Section>
@@ -180,9 +236,9 @@ export default function TermsPage() {
           linked only to your access code — not to any personal identifier.
         </p>
         <p>
-          Conversation history, feedback ratings, daily check-in logs, incident records, and
-          derived behavioral insights are also stored with encryption. This data is used to
-          personalize future guidance and detect behavioral patterns.
+          Conversation history, feedback ratings, daily check-in logs, incident records, and derived
+          behavioral insights are also stored with encryption. This data is used to personalize
+          future guidance and detect behavioral patterns.
         </p>
         <p>
           Your patient&apos;s name is stored only in your browser&apos;s local storage. It is sent
@@ -190,8 +246,11 @@ export default function TermsPage() {
           written to our database.
         </p>
         <p>
-          See our <Link href="/privacy" className="text-primary hover:text-primary-light transition-colors">Privacy Policy</Link> for
-          full details on how we handle your information.
+          See our{' '}
+          <Link href="/privacy" className="text-primary hover:text-primary-light transition-colors">
+            Privacy Policy
+          </Link>{' '}
+          for full details on how we handle your information.
         </p>
       </Section>
 
@@ -202,9 +261,14 @@ export default function TermsPage() {
         </p>
         <p>
           You grant us a limited license to process the information you provide solely for the
-          purpose of delivering the service, including deriving anonymized aggregate insights
-          that may benefit other caregivers (see our{' '}
-          <Link href="/privacy#cross-patient" className="text-primary hover:text-primary-light transition-colors">Privacy Policy</Link>{' '}
+          purpose of delivering the service, including deriving anonymized aggregate insights that
+          may benefit other caregivers (see our{' '}
+          <Link
+            href="/privacy#cross-patient"
+            className="text-primary hover:text-primary-light transition-colors"
+          >
+            Privacy Policy
+          </Link>{' '}
           for how cross-patient learning works).
         </p>
       </Section>
@@ -246,10 +310,11 @@ export default function TermsPage() {
       <section id="contact" className="scroll-mt-6 pt-6">
         <h2 className="text-xl font-bold text-foreground mb-3">13. Contact Us</h2>
         <div className="space-y-3 text-sm text-foreground-muted leading-relaxed">
-          <p>For questions about these terms, please reach out through our official contact channels.</p>
+          <p>
+            For questions about these terms, please reach out through our official contact channels.
+          </p>
         </div>
       </section>
-
     </LegalLayout>
   );
 }

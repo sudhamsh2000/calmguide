@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/Input";
+import { useTranslations } from 'next-intl';
+import { Input } from '@/components/ui/Input';
 
 export interface StepInviteCodeProps {
   inviteCode: string;
@@ -14,27 +14,27 @@ export function StepInviteCode({
   inviteCode,
   onChange,
   error,
-  className = "",
+  className = '',
 }: StepInviteCodeProps) {
-  const t = useTranslations("profile");
+  const t = useTranslations('profile');
 
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       <div>
         <h2
           className="text-2xl font-bold tracking-tight text-ink"
-          style={{ fontFamily: "var(--font-display)" }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
-          {t("invite.heading")}
+          {t('invite.heading')}
         </h2>
         <p className="mt-3 text-base text-foreground-muted leading-relaxed">
-          {t("invite.subtitle")}
+          {t('invite.subtitle')}
         </p>
       </div>
 
       <Input
-        label={t("invite.code_label")}
-        placeholder={t("invite.code_placeholder")}
+        label={t('invite.code_label')}
+        placeholder={t('invite.code_placeholder')}
         value={inviteCode}
         onChange={(e) => onChange(e.target.value.toUpperCase())}
         autoComplete="off"
@@ -43,9 +43,7 @@ export function StepInviteCode({
       />
 
       <div className="card-shell p-4">
-        <p className="text-sm text-foreground-muted leading-relaxed">
-          {t("invite.hint")}
-        </p>
+        <p className="text-sm text-foreground-muted leading-relaxed">{t('invite.hint')}</p>
       </div>
     </div>
   );

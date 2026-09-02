@@ -41,24 +41,13 @@ export function EmptyState({
   className = '',
 }: EmptyStateProps) {
   return (
-    <div
-      className={`flex flex-col items-center text-center px-6 py-10 ${className}`}
-    >
-      <div className="mb-4">
-        {icon ?? <DefaultEmptyIcon />}
-      </div>
+    <div className={`flex flex-col items-center text-center px-6 py-10 ${className}`}>
+      <div className="mb-4">{icon ?? <DefaultEmptyIcon />}</div>
 
-      <p className="text-base text-foreground-muted leading-relaxed max-w-xs">
-        {message}
-      </p>
+      <p className="text-base text-foreground-muted leading-relaxed max-w-xs">{message}</p>
 
       {actionLabel && onAction && (
-        <Button
-          variant="secondary"
-          size="md"
-          onClick={onAction}
-          className="mt-5"
-        >
+        <Button variant="secondary" size="md" onClick={onAction} className="mt-5">
           {actionLabel}
         </Button>
       )}

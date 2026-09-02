@@ -9,7 +9,7 @@ categorical/boolean data (matched concept labels, flag names, confidence
 scores) — never the caregiver's original message.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, String, func
@@ -24,9 +24,7 @@ _JSON = JSONB().with_variant(JSON(), "sqlite")
 class SafetyEvent(Base):
     __tablename__ = "safety_events"
 
-    id: Mapped[str] = mapped_column(
-        String(36), primary_key=True, default=lambda: str(uuid4())
-    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
 
     # e.g. "safety_gate_triggered", "classifier_flagged", "acute_change_screen",
     # "emergency_action_selected", "rag_retrieval"
@@ -43,9 +41,7 @@ class SafetyEvent(Base):
         String(36), ForeignKey("profiles.id"), nullable=True, index=True
     )
     session_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
-    staff_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("staff.id"), nullable=True
-    )
+    staff_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("staff.id"), nullable=True)
     facility_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("facilities.id"), nullable=True
     )
@@ -61,7 +57,7 @@ class SafetyEvent(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         server_default=func.now(),
     )
 

@@ -24,7 +24,10 @@ function tokenize(text: string): Token[] {
     const line = lines[i].trim();
 
     // Skip empty lines between blocks
-    if (line === '') { i++; continue; }
+    if (line === '') {
+      i++;
+      continue;
+    }
 
     // Unordered list item
     if (/^[-*•]\s+/.test(line)) {
@@ -57,8 +60,16 @@ function tokenize(text: string): Token[] {
 }
 
 // Renders inline markdown: **bold**, *italic*, `code`
-function InlineText({ text, color, fontSize, lineHeight }: {
-  text: string; color: string; fontSize: number; lineHeight: number;
+function InlineText({
+  text,
+  color,
+  fontSize,
+  lineHeight,
+}: {
+  text: string;
+  color: string;
+  fontSize: number;
+  lineHeight: number;
 }) {
   // Split on bold (**...**), italic (*...*), code (`...`)
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
@@ -75,14 +86,31 @@ function InlineText({ text, color, fontSize, lineHeight }: {
     <Text style={{ color, fontSize, lineHeight }} selectable>
       {parts.map((part, i) => {
         if (/^\*\*[^*]+\*\*$/.test(part)) {
-          return <Text key={i} style={{ fontWeight: '700', color }}>{part.slice(2, -2)}</Text>;
+          return (
+            <Text key={i} style={{ fontWeight: '700', color }}>
+              {part.slice(2, -2)}
+            </Text>
+          );
         }
         if (/^\*[^*]+\*$/.test(part)) {
-          return <Text key={i} style={{ fontStyle: 'italic', color }}>{part.slice(1, -1)}</Text>;
+          return (
+            <Text key={i} style={{ fontStyle: 'italic', color }}>
+              {part.slice(1, -1)}
+            </Text>
+          );
         }
         if (/^`[^`]+`$/.test(part)) {
           return (
-            <Text key={i} style={{ fontFamily: 'monospace', fontSize: fontSize - 1, color, backgroundColor: color + '15', borderRadius: 3 }}>
+            <Text
+              key={i}
+              style={{
+                fontFamily: 'monospace',
+                fontSize: fontSize - 1,
+                color,
+                backgroundColor: color + '15',
+                borderRadius: 3,
+              }}
+            >
               {part.slice(1, -1)}
             </Text>
           );
@@ -105,9 +133,16 @@ export function SimpleMarkdown({ children, fontSize = 15, lineHeight = 23 }: Pro
         if (token.type === 'bullet') {
           return (
             <View key={i} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-              <Text style={{ color: colors.mutedForeground, fontSize, lineHeight, marginTop: 1 }}>•</Text>
+              <Text style={{ color: colors.mutedForeground, fontSize, lineHeight, marginTop: 1 }}>
+                •
+              </Text>
               <View style={{ flex: 1 }}>
-                <InlineText text={token.content} color={colors.foreground} fontSize={fontSize} lineHeight={lineHeight} />
+                <InlineText
+                  text={token.content}
+                  color={colors.foreground}
+                  fontSize={fontSize}
+                  lineHeight={lineHeight}
+                />
               </View>
             </View>
           );
@@ -116,18 +151,37 @@ export function SimpleMarkdown({ children, fontSize = 15, lineHeight = 23 }: Pro
         if (token.type === 'ordered') {
           return (
             <View key={i} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-              <Text style={{ color: colors.mutedForeground, fontSize, lineHeight, minWidth: 18, marginTop: 1 }}>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontSize,
+                  lineHeight,
+                  minWidth: 18,
+                  marginTop: 1,
+                }}
+              >
                 {token.index}.
               </Text>
               <View style={{ flex: 1 }}>
-                <InlineText text={token.content} color={colors.foreground} fontSize={fontSize} lineHeight={lineHeight} />
+                <InlineText
+                  text={token.content}
+                  color={colors.foreground}
+                  fontSize={fontSize}
+                  lineHeight={lineHeight}
+                />
               </View>
             </View>
           );
         }
 
         return (
-          <InlineText key={i} text={token.content} color={colors.foreground} fontSize={fontSize} lineHeight={lineHeight} />
+          <InlineText
+            key={i}
+            text={token.content}
+            color={colors.foreground}
+            fontSize={fontSize}
+            lineHeight={lineHeight}
+          />
         );
       })}
     </View>

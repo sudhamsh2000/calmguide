@@ -1,4 +1,5 @@
 """Pydantic schema for the public impact endpoint."""
+
 from pydantic import BaseModel
 
 

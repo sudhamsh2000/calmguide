@@ -69,7 +69,11 @@ describe('Card', () => {
   });
 
   it('forwards additional HTML attributes', () => {
-    render(<Card data-testid="my-card" role="article">Content</Card>);
+    render(
+      <Card data-testid="my-card" role="article">
+        Content
+      </Card>,
+    );
     expect(screen.getByTestId('my-card')).toBeInTheDocument();
     expect(screen.getByRole('article')).toBeInTheDocument();
   });

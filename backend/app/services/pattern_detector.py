@@ -1,5 +1,6 @@
 """Episode cycle detection and care-level scoring for behavioral pattern alerts."""
-from datetime import date, datetime, timedelta, timezone
+
+from datetime import UTC, date, datetime, timedelta
 from statistics import mean, stdev
 
 
@@ -80,9 +81,14 @@ def compute_risk_score(cycle: dict, trend: str, peak_time: str) -> int:
 
     trend_bonus = {"increasing": 20, "stable": 5, "decreasing": 0}.get(trend, 5)
 
-    now_hour = datetime.now(timezone.utc).hour
+    now_hour = datetime.now(UTC).hour
     time_bonus = 0
-    peak_hours = {"overnight": (22, 6), "morning": (6, 12), "afternoon": (12, 18), "evening": (18, 22)}
+    peak_hours = {
+        "overnight": (22, 6),
+        "morning": (6, 12),
+        "afternoon": (12, 18),
+        "evening": (18, 22),
+    }
     if peak_time in peak_hours:
         start, end = peak_hours[peak_time]
         if start <= now_hour or now_hour < end:

@@ -1,6 +1,6 @@
 """Facility PDF report generation."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,12 +8,12 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.incident import Incident
-from app.models.facility_patient_link import FacilityPatientLink
-from app.models.staff import Staff
-from app.models.facility import Facility
-from app.services.rbac import require_role
 from app.db import get_session
+from app.models.facility import Facility
+from app.models.facility_patient_link import FacilityPatientLink
+from app.models.incident import Incident
+from app.models.staff import Staff
+from app.services.rbac import require_role
 
 router = APIRouter(prefix="/facility/report", tags=["facility-report"])
 
@@ -34,9 +34,9 @@ def _build_pdf(
     try:
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import inch
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
     except ModuleNotFoundError as exc:
         raise RuntimeError("PDF export dependency is not installed") from exc
 
@@ -84,19 +84,29 @@ def _build_pdf(
     elements.append(Paragraph("Summary", heading_style))
     kpi_data = [
         ["Total Incidents", "Severe", "Mild", "Staff Active", "Residents"],
-        [str(total_incidents), str(severe_count), str(mild_count), f"{staff_active}/{staff_total}", str(resident_count)],
+        [
+            str(total_incidents),
+            str(severe_count),
+            str(mild_count),
+            f"{staff_active}/{staff_total}",
+            str(resident_count),
+        ],
     ]
     kpi_table = Table(kpi_data, colWidths=[content_width / 5] * 5)
-    kpi_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2B7A78")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTSIZE", (0, 0), (-1, -1), 10),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-    ]))
+    kpi_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2B7A78")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 8),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ]
+        )
+    )
     elements.append(kpi_table)
     elements.append(Spacer(1, 16))
 
@@ -108,14 +118,18 @@ def _build_pdf(
             label = cat.replace("_", " ").title()
             cat_data.append([label, str(count)])
         cat_table = Table(cat_data, colWidths=[content_width * 0.72, content_width * 0.28])
-        cat_table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F5F5F5")),
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 10),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ]))
+        cat_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F5F5F5")),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 10),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                    ("TOPPADDING", (0, 0), (-1, -1), 6),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ]
+            )
+        )
         elements.append(cat_table)
         elements.append(Spacer(1, 16))
 
@@ -132,23 +146,36 @@ def _build_pdf(
             time_data,
             colWidths=[content_width * 0.46, content_width * 0.27, content_width * 0.27],
         )
-        time_table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F5F5F5")),
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 10),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ]))
+        time_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F5F5F5")),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 10),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                    ("TOPPADDING", (0, 0), (-1, -1), 6),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ]
+            )
+        )
         elements.append(time_table)
 
     # Footer
     elements.append(Spacer(1, 30))
-    elements.append(Paragraph(
-        "This report is generated by CalmGuide and contains aggregated facility data. "
-        "All patient information is de-identified. For internal use only.",
-        ParagraphStyle("Footer", parent=body_style, fontSize=8, leading=11, textColor=colors.grey, alignment=0),
-    ))
+    elements.append(
+        Paragraph(
+            "This report is generated by CalmGuide and contains aggregated facility data. "
+            "All patient information is de-identified. For internal use only.",
+            ParagraphStyle(
+                "Footer",
+                parent=body_style,
+                fontSize=8,
+                leading=11,
+                textColor=colors.grey,
+                alignment=0,
+            ),
+        )
+    )
 
     doc.build(elements)
     return buf.getvalue()
@@ -163,7 +190,7 @@ async def export_pdf(
     facility = await session.get(Facility, staff.facility_id)
     facility_name = facility.name if facility else "Facility"
 
-    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
 
     # Get facility's profile IDs
     links = await session.execute(
@@ -212,13 +239,15 @@ async def export_pdf(
 
     # Staff stats
     staff_total_q = await session.execute(
-        select(func.count()).select_from(Staff)
+        select(func.count())
+        .select_from(Staff)
         .where(Staff.facility_id == staff.facility_id, Staff.is_active.is_(True))
     )
     staff_total = staff_total_q.scalar() or 0
 
     staff_active_q = await session.execute(
-        select(func.count()).select_from(Staff)
+        select(func.count())
+        .select_from(Staff)
         .where(
             Staff.facility_id == staff.facility_id,
             Staff.is_active.is_(True),
@@ -227,7 +256,7 @@ async def export_pdf(
     )
     staff_active = staff_active_q.scalar() or 0
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     generated_at = now.strftime("%B %d, %Y at %I:%M %p UTC")
 
     try:

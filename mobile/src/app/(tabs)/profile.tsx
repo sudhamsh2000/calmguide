@@ -1,12 +1,27 @@
 import { Button } from '@/components/Button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/components/ThemeContext';
-import { LOCALE_LABELS, SUPPORTED_LOCALES, applyLocaleChange, resolveSupportedLocale, type SupportedLocale } from '@/lib/i18n';
+import {
+  LOCALE_LABELS,
+  SUPPORTED_LOCALES,
+  applyLocaleChange,
+  resolveSupportedLocale,
+  type SupportedLocale,
+} from '@/lib/i18n';
 import { getProfile, type ProfileResponse } from '@/lib/api';
 import { clearAll, getAccessCode, getPatientName } from '@/lib/storage';
 import { router, Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, DevSettings, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  DevSettings,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +41,16 @@ const avatarText: Record<DiseaseStage, string> = {
 function SectionLabel({ title }: { title: string }) {
   const { colors } = useTheme();
   return (
-    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.primary + 'BB', textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 8 }}>
+    <Text
+      style={{
+        fontSize: 13,
+        fontWeight: '600',
+        color: colors.primary + 'BB',
+        textTransform: 'uppercase',
+        letterSpacing: 1.4,
+        marginBottom: 8,
+      }}
+    >
       {title}
     </Text>
   );
@@ -38,8 +62,23 @@ function ChipGroup({ items, color }: { items: string[]; color?: string }) {
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
       {items.map((item) => (
-        <View key={item} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: chipColor + '1A' }}>
-          <Text style={{ fontSize: 13, fontWeight: '500', color: chipColor, textTransform: 'capitalize' }}>
+        <View
+          key={item}
+          style={{
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 20,
+            backgroundColor: chipColor + '1A',
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: '500',
+              color: chipColor,
+              textTransform: 'capitalize',
+            }}
+          >
             {item.replace(/_/g, ' ')}
           </Text>
         </View>
@@ -89,11 +128,7 @@ export default function ProfileScreen() {
           return;
         }
 
-        Alert.alert(
-          tc('restart.title'),
-          tc('restart.message'),
-          [{ text: tc('restart.ok') }],
-        );
+        Alert.alert(tc('restart.title'), tc('restart.message'), [{ text: tc('restart.ok') }]);
       }
     } finally {
       setChangingLanguage(false);
@@ -103,36 +138,56 @@ export default function ProfileScreen() {
   const load = useCallback(async () => {
     const code = await getAccessCode();
     const name = await getPatientName();
-    if (!code) { router.replace('/'); return; }
+    if (!code) {
+      router.replace('/');
+      return;
+    }
     setAccessCodeState(code);
     setPatientNameState(name ?? '');
     try {
       const p = await getProfile(code);
       setProfile(p);
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   function handleSignOut() {
     Alert.alert(
       t('sign_out.title', 'Sign Out'),
-      t('sign_out.message', 'This will clear your access code and patient name from this device. Your clinical profile will remain on the server.'),
+      t(
+        'sign_out.message',
+        'This will clear your access code and patient name from this device. Your clinical profile will remain on the server.',
+      ),
       [
         { text: t('sign_out.cancel', 'Cancel'), style: 'cancel' },
         {
           text: t('sign_out.confirm', 'Sign Out'),
           style: 'destructive',
-          onPress: async () => { await clearAll(); router.replace('/'); },
+          onPress: async () => {
+            await clearAll();
+            router.replace('/');
+          },
         },
-      ]
+      ],
     );
   }
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.background,
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -142,9 +197,8 @@ export default function ProfileScreen() {
   const initial = patientName.charAt(0).toUpperCase();
 
   // Format code: "KM7X · 4PQ2"
-  const formattedCode = accessCode.length === 8
-    ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}`
-    : accessCode;
+  const formattedCode =
+    accessCode.length === 8 ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}` : accessCode;
 
   return (
     <>
@@ -152,7 +206,10 @@ export default function ProfileScreen() {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={{ backgroundColor: colors.background }}
-        contentContainerStyle={{ paddingBottom: 48, paddingTop: Platform.OS === 'android' ? insets.top : 0 }}
+        contentContainerStyle={{
+          paddingBottom: 48,
+          paddingTop: Platform.OS === 'android' ? insets.top : 0,
+        }}
       >
         {/* Name card */}
         <View style={{ marginHorizontal: 20, marginTop: 16 }}>
@@ -186,15 +243,18 @@ export default function ProfileScreen() {
               </Text>
             </View>
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ fontSize: 17, fontWeight: '600', color: colors.foreground }}>{patientName}</Text>
-              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>{t('view.name_hint', 'Name stored on your device only')}</Text>
+              <Text style={{ fontSize: 17, fontWeight: '600', color: colors.foreground }}>
+                {patientName}
+              </Text>
+              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                {t('view.name_hint', 'Name stored on your device only')}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Sections */}
         <View style={{ marginHorizontal: 20, marginTop: 24, gap: 0 }}>
-
           {/* Disease Stage */}
           <View style={{ paddingBottom: 20 }}>
             <SectionLabel title={t('view.dementia_stage', 'Dementia Stage')} />
@@ -213,7 +273,9 @@ export default function ProfileScreen() {
                 color={colors.primary}
               />
             ) : (
-              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('view.none_recorded', 'None recorded')}</Text>
+              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+                {t('view.none_recorded', 'None recorded')}
+              </Text>
             )}
           </View>
           <Divider />
@@ -251,27 +313,59 @@ export default function ProfileScreen() {
               marginBottom: 20,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '600', color: colors.mutedForeground, textTransform: 'uppercase', letterSpacing: 1.4 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: '600',
+                color: colors.mutedForeground,
+                textTransform: 'uppercase',
+                letterSpacing: 1.4,
+              }}
+            >
               {t('view.access_code', 'Your Access Code')}
             </Text>
             <Text
               selectable={showCode}
-              style={{ fontSize: 26, fontWeight: '700', color: colors.primary, letterSpacing: 3, fontVariant: ['tabular-nums'] }}
+              style={{
+                fontSize: 26,
+                fontWeight: '700',
+                color: colors.primary,
+                letterSpacing: 3,
+                fontVariant: ['tabular-nums'],
+              }}
             >
               {showCode ? formattedCode : '••••••••'}
             </Text>
             <Pressable
               onPress={() => setShowCode((v) => !v)}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, paddingVertical: 10, paddingHorizontal: 12 })}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.6 : 1,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+              })}
               accessibilityRole="button"
-              accessibilityLabel={showCode ? t('view.hide_code', 'Hide access code') : t('view.show_code', 'Show access code')}
+              accessibilityLabel={
+                showCode
+                  ? t('view.hide_code', 'Hide access code')
+                  : t('view.show_code', 'Show access code')
+              }
             >
               <Text style={{ fontSize: 14, fontWeight: '600', color: colors.primary }}>
                 {showCode ? t('view.hide_code', 'Hide') : t('view.show_code', 'Show')}
               </Text>
             </Pressable>
-            <Text style={{ fontSize: 13, color: colors.mutedForeground, textAlign: 'center', lineHeight: 20 }}>
-              {t('view.access_code_hint', 'Save this code to access your profile from another device')}
+            <Text
+              style={{
+                fontSize: 13,
+                color: colors.mutedForeground,
+                textAlign: 'center',
+                lineHeight: 20,
+              }}
+            >
+              {t(
+                'view.access_code_hint',
+                'Save this code to access your profile from another device',
+              )}
             </Text>
           </View>
 
@@ -360,7 +454,9 @@ export default function ProfileScreen() {
                 return (
                   <Pressable
                     key={locale}
-                    onPress={() => { void handleLanguageChange(locale); }}
+                    onPress={() => {
+                      void handleLanguageChange(locale);
+                    }}
                     style={({ pressed }) => ({
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -374,7 +470,13 @@ export default function ProfileScreen() {
                     accessibilityRole="menuitem"
                     accessibilityState={{ selected: isSelected }}
                   >
-                    <Text style={{ fontSize: 15, color: isSelected ? colors.primary : colors.foreground, fontWeight: isSelected ? '600' : '500' }}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: isSelected ? colors.primary : colors.foreground,
+                        fontWeight: isSelected ? '600' : '500',
+                      }}
+                    >
                       {LOCALE_LABELS[locale]}
                     </Text>
                     {isSelected ? (
@@ -393,13 +495,23 @@ export default function ProfileScreen() {
           </Button>
 
           {/* Legal links */}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 8 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 10,
+              marginTop: 8,
+            }}
+          >
             <Pressable onPress={() => router.push('/terms')} accessibilityRole="link">
               <Text style={{ fontSize: 13, color: colors.mutedForeground }}>{tc('nav.terms')}</Text>
             </Pressable>
             <Text style={{ fontSize: 13, color: colors.mutedForeground, opacity: 0.4 }}>·</Text>
             <Pressable onPress={() => router.push('/privacy')} accessibilityRole="link">
-              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>{tc('nav.privacy')}</Text>
+              <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                {tc('nav.privacy')}
+              </Text>
             </Pressable>
           </View>
         </View>

@@ -52,7 +52,7 @@ export function BreathingIndicator({ size = 48 }: BreathingIndicatorProps) {
             useNativeDriver: true,
           }),
         ]),
-      ])
+      ]),
     );
     pulse.start();
     return () => pulse.stop();

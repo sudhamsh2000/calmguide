@@ -7,22 +7,27 @@ over false positives to avoid corrupting clinical narratives).
 
 import re
 
-
 _NAME_PATTERN = re.compile(
     r"\b(?:Dr\.?\s+|Mr\.?\s+|Mrs\.?\s+|Ms\.?\s+)?[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})?\b"
 )
 
-_LOCATION_PATTERN = re.compile(
-    r"\b(?:from|in|at|to)\s+([A-Z][a-z]{2,}(?:\s+[A-Z][a-z]+)*)\b"
-)
+_LOCATION_PATTERN = re.compile(r"\b(?:from|in|at|to)\s+([A-Z][a-z]{2,}(?:\s+[A-Z][a-z]+)*)\b")
 
-_DOCTOR_PATTERN = re.compile(
-    r"\bDr\.?\s+[A-Z][a-z]+\b"
-)
+_DOCTOR_PATTERN = re.compile(r"\bDr\.?\s+[A-Z][a-z]+\b")
 
 GENERIC_DEMENTIA_NAMES = {
-    "mom", "dad", "mother", "father", "grandma", "grandpa",
-    "grandmother", "grandfather", "nana", "papa", "husband", "wife",
+    "mom",
+    "dad",
+    "mother",
+    "father",
+    "grandma",
+    "grandpa",
+    "grandmother",
+    "grandfather",
+    "nana",
+    "papa",
+    "husband",
+    "wife",
 }
 
 
@@ -51,9 +56,10 @@ def scrub_third_party_pii(text: str, patient_name: str) -> str:
             continue
         if name_lower.startswith("dr") or name_lower.startswith("["):
             continue
-        is_sentence_start = (
-            match.start() == 0
-            or result[match.start() - 2 : match.start()] in (". ", "! ", "? ")
+        is_sentence_start = match.start() == 0 or result[match.start() - 2 : match.start()] in (
+            ". ",
+            "! ",
+            "? ",
         )
         if not is_sentence_start:
             result = result.replace(name, "[family member]")

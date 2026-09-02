@@ -68,7 +68,9 @@ describe('streamCoachChat request body (XCON-1)', () => {
   it('includes a non-empty patient_name on the access_code branch', () => {
     streamCoachChat(
       { access_code: 'ABCD1234', patient_name: 'Mom', message: 'She is upset' },
-      () => {}, () => {}, () => {},
+      () => {},
+      () => {},
+      () => {},
     );
 
     expect(sentRequests).toHaveLength(1);
@@ -83,7 +85,9 @@ describe('streamCoachChat request body (XCON-1)', () => {
   it('includes patient_name and the staff JWT on the facility profile_id branch', async () => {
     streamCoachChat(
       { profile_id: 'profile-uuid', patient_name: 'Resident', message: 'Wandering' },
-      () => {}, () => {}, () => {},
+      () => {},
+      () => {},
+      () => {},
     );
     // The token is resolved asynchronously before the request is sent.
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -101,7 +105,9 @@ describe('streamCheckIn request body (XCON-1)', () => {
   it('includes a non-empty patient_name', () => {
     streamCheckIn(
       { access_code: 'ABCD1234', patient_name: 'Dad', message: 'Hard morning' },
-      () => {}, () => {}, () => {},
+      () => {},
+      () => {},
+      () => {},
     );
 
     const { url, body } = sentRequests[0];

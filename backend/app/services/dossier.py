@@ -8,7 +8,7 @@ delirium/pain flags, and a 7-day timeline.
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,9 +31,9 @@ MAX_INCIDENT_AGE_DAYS = 365
 def _apply_temporal_weight(incident_time: datetime, now: datetime) -> float:
     # Normalize both to UTC-aware for safe subtraction (SQLite strips tzinfo)
     if incident_time.tzinfo is None:
-        incident_time = incident_time.replace(tzinfo=timezone.utc)
+        incident_time = incident_time.replace(tzinfo=UTC)
     if now.tzinfo is None:
-        now = now.replace(tzinfo=timezone.utc)
+        now = now.replace(tzinfo=UTC)
     age_days = (now - incident_time).days
     if age_days <= 30:
         return 1.0
@@ -45,7 +45,7 @@ def _apply_temporal_weight(incident_time: datetime, now: datetime) -> float:
 
 
 def _ensure_utc(dt: datetime) -> datetime:
-    return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+    return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
 def _apply_stage_transition_weight(
@@ -91,9 +91,7 @@ def compute_incident_weight(
 
 async def mark_dossier_stale(profile_id: str, session: AsyncSession) -> None:
     result = await session.execute(
-        select(BehavioralDossier).where(
-            BehavioralDossier.profile_id == profile_id
-        )
+        select(BehavioralDossier).where(BehavioralDossier.profile_id == profile_id)
     )
     dossier = result.scalar_one_or_none()
     if dossier:
@@ -102,9 +100,7 @@ async def mark_dossier_stale(profile_id: str, session: AsyncSession) -> None:
         session.add(BehavioralDossier(profile_id=profile_id, is_stale=True))
 
 
-async def get_dossier_if_fresh(
-    profile_id: str, session: AsyncSession
-) -> BehavioralDossier | None:
+async def get_dossier_if_fresh(profile_id: str, session: AsyncSession) -> BehavioralDossier | None:
     result = await session.execute(
         select(BehavioralDossier).where(
             BehavioralDossier.profile_id == profile_id,
@@ -119,12 +115,10 @@ async def compute_dossier(
     session: AsyncSession,
     llm_provider=None,
 ) -> BehavioralDossier:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     result = await session.execute(
-        select(BehavioralDossier).where(
-            BehavioralDossier.profile_id == profile_id
-        )
+        select(BehavioralDossier).where(BehavioralDossier.profile_id == profile_id)
     )
     dossier = result.scalar_one_or_none()
 
@@ -132,9 +126,7 @@ async def compute_dossier(
         if (now - dossier.computed_at).total_seconds() < 3600:
             return dossier
 
-    profile_result = await session.execute(
-        select(Profile).where(Profile.id == profile_id)
-    )
+    profile_result = await session.execute(select(Profile).where(Profile.id == profile_id))
     profile = profile_result.scalar_one()
 
     care_changes_result = await session.execute(
@@ -160,9 +152,7 @@ async def compute_dossier(
 
     weighted_incidents = []
     for incident in all_incidents:
-        weight = compute_incident_weight(
-            incident, now, profile.stage_changed_at, care_changes
-        )
+        weight = compute_incident_weight(incident, now, profile.stage_changed_at, care_changes)
         if weight > 0:
             weighted_incidents.append((incident, weight))
 
@@ -183,36 +173,42 @@ async def compute_dossier(
             frequency_by_category[cat]["previous"] += 1
 
         if incident.intervention_outcome == "escalated":
-            contraindicated.append({
-                "description": (
-                    decrypt(incident.intervention_description)
-                    if incident.intervention_description
-                    else "Unknown intervention"
-                ),
-                "incident_date": itime.isoformat(),
-                "behavior": incident.behavior_category,
-                "weight": weight,
-            })
+            contraindicated.append(
+                {
+                    "description": (
+                        decrypt(incident.intervention_description)
+                        if incident.intervention_description
+                        else "Unknown intervention"
+                    ),
+                    "incident_date": itime.isoformat(),
+                    "behavior": incident.behavior_category,
+                    "weight": weight,
+                }
+            )
         elif incident.intervention_outcome == "resolved":
-            effective.append({
-                "intervention": (
-                    decrypt(incident.intervention_description)
-                    if incident.intervention_description
-                    else "Unknown"
-                ),
-                "behavior": incident.behavior_category,
-                "caregiver_role": incident.caregiver_role,
-                "date": itime.isoformat(),
-                "weight": weight,
-            })
+            effective.append(
+                {
+                    "intervention": (
+                        decrypt(incident.intervention_description)
+                        if incident.intervention_description
+                        else "Unknown"
+                    ),
+                    "behavior": incident.behavior_category,
+                    "caregiver_role": incident.caregiver_role,
+                    "date": itime.isoformat(),
+                    "weight": weight,
+                }
+            )
 
         if itime >= seven_days_ago:
-            seven_day.append({
-                "date": itime.isoformat(),
-                "behavior_category": incident.behavior_category,
-                "severity": incident.severity,
-                "outcome": incident.intervention_outcome,
-            })
+            seven_day.append(
+                {
+                    "date": itime.isoformat(),
+                    "behavior_category": incident.behavior_category,
+                    "severity": incident.severity,
+                    "outcome": incident.intervention_outcome,
+                }
+            )
 
     # Heaviest first: the prompt shows a bounded slice of each list, and the
     # weight already encodes recency, recall confidence and extraction
@@ -247,18 +243,20 @@ async def compute_dossier(
 
     pain_behaviors = {"aggression_anger", "refusing_care", "repetitive_behavior"}
     recent_pain_related = sum(
-        1 for i, w in weighted_incidents
-        if i.behavior_category in pain_behaviors
-        and _ensure_utc(i.incident_time) >= seven_days_ago
+        1
+        for i, w in weighted_incidents
+        if i.behavior_category in pain_behaviors and _ensure_utc(i.incident_time) >= seven_days_ago
     )
     pain_flags = {
         "suspected": recent_pain_related >= 2,
-        "indicators": list({
-            i.behavior_category
-            for i, w in weighted_incidents
-            if i.behavior_category in pain_behaviors
-            and _ensure_utc(i.incident_time) >= seven_days_ago
-        }),
+        "indicators": list(
+            {
+                i.behavior_category
+                for i, w in weighted_incidents
+                if i.behavior_category in pain_behaviors
+                and _ensure_utc(i.incident_time) >= seven_days_ago
+            }
+        ),
     }
 
     if not dossier:

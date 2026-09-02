@@ -42,7 +42,9 @@ async def test_log_safety_event_writes_row(_wire_session_factory, db_session):
 
 
 @pytest.mark.asyncio
-async def test_log_safety_event_allows_nullable_staff_and_facility(_wire_session_factory, db_session):
+async def test_log_safety_event_allows_nullable_staff_and_facility(
+    _wire_session_factory, db_session
+):
     """B2C safety events have no staff/facility — must not fail to insert."""
     await log_safety_event(
         event_type="acute_change_screen",

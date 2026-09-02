@@ -40,7 +40,9 @@ export default function AllResidentsScreen() {
     try {
       const list = await getMyResidents();
       setResidents(list);
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, []);
 
   useEffect(() => {
@@ -77,64 +79,96 @@ export default function AllResidentsScreen() {
   const moderateCount = sorted.filter((r) => r.risk_level === 'moderate').length;
   const lowCount = sorted.filter((r) => r.risk_level === 'low').length;
 
-  const riskColor = useCallback((level: string) => {
-    if (level === 'high') return colors.error;
-    if (level === 'moderate') return '#F97316';
-    return '#22C55E';
-  }, [colors.error]);
+  const riskColor = useCallback(
+    (level: string) => {
+      if (level === 'high') return colors.error;
+      if (level === 'moderate') return '#F97316';
+      return '#22C55E';
+    },
+    [colors.error],
+  );
 
   const keyExtractor = useCallback((item: ResidentCard) => item.profile_id, []);
 
-  const renderItem = useCallback(({ item: r }: { item: ResidentCard }) => (
-    <Pressable
-      onPress={() => router.push(`/facility/residents/${r.profile_id}?unit=${r.unit ?? ''}&room=${r.room ?? ''}&bed=${r.bed ?? ''}&risk=${r.risk_level}`)}
-      style={({ pressed }) => ({
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 8,
-        borderWidth: 1,
-        borderColor: colors.border,
-        opacity: pressed ? 0.7 : 1,
-      })}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
-          {r.room ? `${t('residents_all.room')} ${r.room}` : r.profile_id.slice(0, 8).toUpperCase()}
-        </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <View style={{
-            paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6,
-            backgroundColor: `${riskColor(r.risk_level)}18`,
-          }}>
-            <Text style={{ fontSize: 11, fontWeight: '700', color: riskColor(r.risk_level) }}>
-              {t(`residents.risk_${r.risk_level}`)}
+  const renderItem = useCallback(
+    ({ item: r }: { item: ResidentCard }) => (
+      <Pressable
+        onPress={() =>
+          router.push(
+            `/facility/residents/${r.profile_id}?unit=${r.unit ?? ''}&room=${r.room ?? ''}&bed=${r.bed ?? ''}&risk=${r.risk_level}`,
+          )
+        }
+        style={({ pressed }) => ({
+          backgroundColor: colors.surface,
+          borderRadius: 12,
+          padding: 14,
+          marginBottom: 8,
+          borderWidth: 1,
+          borderColor: colors.border,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 6,
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
+            {r.room
+              ? `${t('residents_all.room')} ${r.room}`
+              : r.profile_id.slice(0, 8).toUpperCase()}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View
+              style={{
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                borderRadius: 6,
+                backgroundColor: `${riskColor(r.risk_level)}18`,
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: riskColor(r.risk_level) }}>
+                {t(`residents.risk_${r.risk_level}`)}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+              {TREND_SYMBOLS[r.trend_direction] ?? '→'}
             </Text>
           </View>
-          <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
-            {TREND_SYMBOLS[r.trend_direction] ?? '→'}
-          </Text>
         </View>
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
-          {r.disease_stage ? r.disease_stage.charAt(0).toUpperCase() + r.disease_stage.slice(1) : '—'}
-        </Text>
-        {r.last_incident_summary && (
-          <Text style={{ fontSize: 12, color: colors.mutedForeground }} numberOfLines={1}>
-            {r.last_incident_summary}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+            {r.disease_stage
+              ? r.disease_stage.charAt(0).toUpperCase() + r.disease_stage.slice(1)
+              : '—'}
           </Text>
-        )}
-      </View>
-    </Pressable>
-  ), [colors, router, t, riskColor]);
+          {r.last_incident_summary && (
+            <Text style={{ fontSize: 12, color: colors.mutedForeground }} numberOfLines={1}>
+              {r.last_incident_summary}
+            </Text>
+          )}
+        </View>
+      </Pressable>
+    ),
+    [colors, router, t, riskColor],
+  );
 
   // Header content scrolls with the list. Kept in ListHeaderComponent (not a
   // sibling) so it scrolls away; the search TextInput stays mounted because the
   // FlatList itself never remounts.
   const listHeader = (
     <>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
         <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground }}>
           {t('residents_all.title')}
         </Text>
@@ -192,7 +226,14 @@ export default function AllResidentsScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -207,7 +248,13 @@ export default function AllResidentsScreen() {
         ListHeaderComponent={listHeader}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         keyboardShouldPersistTaps="handled"
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+          />
+        }
         removeClippedSubviews
         initialNumToRender={12}
         windowSize={11}

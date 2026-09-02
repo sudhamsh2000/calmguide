@@ -1,12 +1,22 @@
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from app.services.incident_extractor import extract_incident_from_conversation
 
 SAMPLE_CONVERSATION = [
-    {"role": "user", "content": "Mom keeps trying to leave through the front door. It's 2am and she's very confused."},
-    {"role": "assistant", "content": "I understand this is frightening. Right now, stand between her and the door..."},
-    {"role": "user", "content": "I tried playing her favorite Frank Sinatra and she calmed down after about 10 minutes."},
+    {
+        "role": "user",
+        "content": "Mom keeps trying to leave through the front door. It's 2am and she's very confused.",
+    },
+    {
+        "role": "assistant",
+        "content": "I understand this is frightening. Right now, stand between her and the door...",
+    },
+    {
+        "role": "user",
+        "content": "I tried playing her favorite Frank Sinatra and she calmed down after about 10 minutes.",
+    },
     {"role": "assistant", "content": "That's wonderful that the music worked..."},
 ]
 

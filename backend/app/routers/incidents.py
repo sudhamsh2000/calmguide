@@ -1,18 +1,16 @@
 """Incident CRUD, patterns, digest, and verification endpoints."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.staff import Staff
-from app.services.rbac import require_role, staff_can_access_profile
-
 from app.db import get_session
-from app.models.incident import Incident
 from app.models.behavioral_dossier import BehavioralDossier
+from app.models.incident import Incident
 from app.models.profile import Profile
+from app.models.staff import Staff
 from app.schemas.incident import (
     IncidentCreate,
     IncidentListResponse,
@@ -22,15 +20,14 @@ from app.schemas.incident import (
 )
 from app.services.auth import hash_access_code
 from app.services.crypto import decrypt, encrypt
+from app.services.rbac import require_role, staff_can_access_profile
 
 router = APIRouter(prefix="/incidents", tags=["incidents"])
 
 
 async def _get_profile(access_code: str, session: AsyncSession) -> Profile:
     code_hash = hash_access_code(access_code)
-    result = await session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
     if not profile:
         raise HTTPException(
@@ -75,9 +72,7 @@ def _incident_to_response(incident: Incident) -> IncidentResponse:
         severity=incident.severity,
         duration_category=incident.duration_category,
         antecedent_description=(
-            decrypt(incident.antecedent_description)
-            if incident.antecedent_description
-            else None
+            decrypt(incident.antecedent_description) if incident.antecedent_description else None
         ),
         antecedent_category=incident.antecedent_category,
         behavior_description=decrypt(incident.behavior_description),
@@ -99,9 +94,7 @@ def _incident_to_response(incident: Incident) -> IncidentResponse:
 
 async def _mark_dossier_stale(profile_id: str, session: AsyncSession) -> None:
     result = await session.execute(
-        select(BehavioralDossier).where(
-            BehavioralDossier.profile_id == profile_id
-        )
+        select(BehavioralDossier).where(BehavioralDossier.profile_id == profile_id)
     )
     dossier = result.scalar_one_or_none()
     if dossier:
@@ -117,8 +110,8 @@ async def get_patterns(
 ):
     profile = await _get_profile(access_code, session)
 
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
-    fourteen_days_ago = datetime.now(timezone.utc) - timedelta(days=14)
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
+    fourteen_days_ago = datetime.now(UTC) - timedelta(days=14)
 
     result = await session.execute(
         select(Incident)
@@ -159,10 +152,12 @@ async def get_patterns(
             effective[desc] = effective.get(desc, 0) + 1
 
         if inc.intervention_outcome == "escalated" and inc.intervention_description:
-            contra.append({
-                "description": decrypt(inc.intervention_description),
-                "behavior": inc.behavior_category,
-            })
+            contra.append(
+                {
+                    "description": decrypt(inc.intervention_description),
+                    "behavior": inc.behavior_category,
+                }
+            )
 
     all_cats = set(freq_current) | set(freq_previous)
     frequency_trends = {}
@@ -218,7 +213,7 @@ async def get_verification_pending(
 ):
     profile = await _get_profile(access_code, session)
 
-    twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+    twenty_four_hours_ago = datetime.now(UTC) - timedelta(hours=24)
 
     result = await session.execute(
         select(Incident)
@@ -236,8 +231,12 @@ async def get_verification_pending(
         return Response(status_code=204)
 
     desc = decrypt(incident.behavior_description)
-    antecedent = decrypt(incident.antecedent_description) if incident.antecedent_description else None
-    intervention = decrypt(incident.intervention_description) if incident.intervention_description else None
+    antecedent = (
+        decrypt(incident.antecedent_description) if incident.antecedent_description else None
+    )
+    intervention = (
+        decrypt(incident.intervention_description) if incident.intervention_description else None
+    )
 
     parts = []
     if antecedent:
@@ -261,9 +260,7 @@ async def create_incident_by_profile(
     session: AsyncSession = Depends(get_session),
 ):
     """Create incident using profile_id directly (facility/B2B mode)."""
-    result = await session.execute(
-        select(Profile).where(Profile.id == profile_id)
-    )
+    result = await session.execute(select(Profile).where(Profile.id == profile_id))
     profile = result.scalar_one_or_none()
     if not profile:
         raise HTTPException(
@@ -278,7 +275,7 @@ async def create_incident_by_profile(
             detail={"error": "Not authorized for this patient", "code": "PROFILE_FORBIDDEN"},
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     incident = Incident(
         profile_id=profile.id,
         source=payload.source,
@@ -288,16 +285,12 @@ async def create_incident_by_profile(
         severity=payload.severity,
         duration_category=payload.duration_category,
         antecedent_description=(
-            encrypt(payload.antecedent_description)
-            if payload.antecedent_description
-            else None
+            encrypt(payload.antecedent_description) if payload.antecedent_description else None
         ),
         antecedent_category=payload.antecedent_category,
         behavior_description=encrypt(payload.behavior_description),
         intervention_description=(
-            encrypt(payload.intervention_description)
-            if payload.intervention_description
-            else None
+            encrypt(payload.intervention_description) if payload.intervention_description else None
         ),
         intervention_outcome=payload.intervention_outcome,
         location=payload.location,
@@ -321,7 +314,7 @@ async def create_incident(
     session: AsyncSession = Depends(get_session),
 ):
     profile = await _get_profile(access_code, session)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     incident = Incident(
         profile_id=profile.id,
@@ -332,16 +325,12 @@ async def create_incident(
         severity=payload.severity,
         duration_category=payload.duration_category,
         antecedent_description=(
-            encrypt(payload.antecedent_description)
-            if payload.antecedent_description
-            else None
+            encrypt(payload.antecedent_description) if payload.antecedent_description else None
         ),
         antecedent_category=payload.antecedent_category,
         behavior_description=encrypt(payload.behavior_description),
         intervention_description=(
-            encrypt(payload.intervention_description)
-            if payload.intervention_description
-            else None
+            encrypt(payload.intervention_description) if payload.intervention_description else None
         ),
         intervention_outcome=payload.intervention_outcome,
         location=payload.location,
@@ -372,9 +361,7 @@ async def list_incidents(
     profile = await _get_profile(access_code, session)
 
     query = select(Incident).where(Incident.profile_id == profile.id)
-    count_query = select(func.count(Incident.id)).where(
-        Incident.profile_id == profile.id
-    )
+    count_query = select(func.count(Incident.id)).where(Incident.profile_id == profile.id)
 
     if category:
         query = query.where(Incident.behavior_category == category)
@@ -456,7 +443,7 @@ async def update_incident(
             setattr(incident, field, value)
 
     incident.verified_by_caregiver = True
-    incident.verified_at = datetime.now(timezone.utc)
+    incident.verified_at = datetime.now(UTC)
 
     await _mark_dossier_stale(profile.id, session)
     await session.commit()
@@ -500,7 +487,7 @@ async def verify_incident(
         await _mark_dossier_stale(profile.id, session)
 
     incident.verified_by_caregiver = True
-    incident.verified_at = datetime.now(timezone.utc)
+    incident.verified_at = datetime.now(UTC)
 
     await session.commit()
     await session.refresh(incident)

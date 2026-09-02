@@ -67,13 +67,15 @@ describe('createProfile', () => {
   it('throws ApiError on non-2xx response', async () => {
     mockFetch.mockResolvedValueOnce(mockJsonResponse({ detail: 'Bad Request' }, 400));
 
-    await expect(createProfile({
-      disease_stage: 'early',
-      behavioral_patterns: [],
-      calming_strategies: [],
-      safety_concerns: [],
-      invite_code: 'TESTCODE',
-    })).rejects.toThrow(ApiError);
+    await expect(
+      createProfile({
+        disease_stage: 'early',
+        behavioral_patterns: [],
+        calming_strategies: [],
+        safety_concerns: [],
+        invite_code: 'TESTCODE',
+      }),
+    ).rejects.toThrow(ApiError);
   });
 });
 
@@ -102,10 +104,15 @@ describe('getProfile', () => {
   });
 
   it('encodes special characters in access code', async () => {
-    mockFetch.mockResolvedValueOnce(mockJsonResponse({
-      id: '1', disease_stage: 'early', behavioral_patterns: [],
-      calming_strategies: [], safety_concerns: [],
-    }));
+    mockFetch.mockResolvedValueOnce(
+      mockJsonResponse({
+        id: '1',
+        disease_stage: 'early',
+        behavioral_patterns: [],
+        calming_strategies: [],
+        safety_concerns: [],
+      }),
+    );
 
     await getProfile('A+B/C');
 
@@ -124,10 +131,15 @@ describe('updateProfile', () => {
       calming_strategies: ['music'],
       safety_concerns: ['fall risk'],
     };
-    mockFetch.mockResolvedValueOnce(mockJsonResponse({
-      id: '1', disease_stage: 'late',
-      behavioral_patterns: ['wandering'], calming_strategies: ['music'], safety_concerns: ['fall risk'],
-    }));
+    mockFetch.mockResolvedValueOnce(
+      mockJsonResponse({
+        id: '1',
+        disease_stage: 'late',
+        behavioral_patterns: ['wandering'],
+        calming_strategies: ['music'],
+        safety_concerns: ['fall risk'],
+      }),
+    );
 
     const result = await updateProfile('ABC12345', updateData);
 
@@ -201,7 +213,13 @@ describe('coachChat', () => {
 describe('getScenarios', () => {
   it('fetches scenario list', async () => {
     const scenarios = [
-      { id: '1', title: 'Sundowning', description: 'Evening agitation', disease_stage: 'middle', category: 'behavioral' },
+      {
+        id: '1',
+        title: 'Sundowning',
+        description: 'Evening agitation',
+        disease_stage: 'middle',
+        category: 'behavioral',
+      },
     ];
     mockFetch.mockResolvedValueOnce(mockJsonResponse(scenarios));
 

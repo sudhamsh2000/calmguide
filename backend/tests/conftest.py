@@ -13,10 +13,10 @@ from app.db import get_session
 from app.models.base import Base
 from app.services.llm_provider import LLMProvider
 
-
 # ---------------------------------------------------------------------------
 # Event loop
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -30,9 +30,11 @@ def event_loop():
 # Settings override — use SQLite for tests (no Postgres required)
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def test_settings() -> Settings:
     import base64
+
     return Settings(
         DATABASE_URL="sqlite+aiosqlite:///./test.db",
         LLM_PROVIDER="openai",
@@ -60,10 +62,12 @@ def test_settings() -> Settings:
 # Database fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def override_get_settings(test_settings, monkeypatch):
     """Ensure crypto.py gets the test encryption key via the real get_settings() cache."""
     from app import config
+
     monkeypatch.setenv(
         "CONVERSATION_ENCRYPTION_KEY",
         test_settings.CONVERSATION_ENCRYPTION_KEY,
@@ -103,6 +107,7 @@ async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
 # ---------------------------------------------------------------------------
 # Mock LLM provider — never calls real APIs in tests
 # ---------------------------------------------------------------------------
+
 
 class MockLLMProvider(LLMProvider):
     """Deterministic mock that yields predefined chunks."""
@@ -149,11 +154,12 @@ def mock_llm() -> MockLLMProvider:
 # FastAPI test client
 # ---------------------------------------------------------------------------
 
+
 @pytest_asyncio.fixture
 async def app(db_engine, mock_llm):
     """Create a FastAPI app wired to test DB and mock LLM."""
-    from app.main import create_app
     import app.db as db_module
+    from app.main import create_app
 
     application = create_app()
 

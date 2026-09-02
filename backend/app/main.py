@@ -11,9 +11,7 @@ def _configure_logging() -> None:
     """Include the request id in every log line for cross-line correlation."""
     handler = logging.StreamHandler()
     handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s %(levelname)s [%(request_id)s] %(name)s: %(message)s"
-        )
+        logging.Formatter("%(asctime)s %(levelname)s [%(request_id)s] %(name)s: %(message)s")
     )
     handler.addFilter(RequestIdFilter())
     logging.basicConfig(level=logging.INFO, handlers=[handler], force=True)
@@ -26,7 +24,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
-from app.db import get_engine, dispose_engine
+from app.db import dispose_engine, get_engine
 from app.services.llm import get_llm_provider
 
 
@@ -37,6 +35,7 @@ async def lifespan(app: FastAPI):
 
     # Validate encryption key before accepting any traffic
     from app.services.crypto import validate_encryption_key
+
     validate_encryption_key()
 
     # Validate JWT secret key. A present-but-weak secret is a misconfiguration
@@ -44,6 +43,7 @@ async def lifespan(app: FastAPI):
     # disables facility auth (B2C still works); jwt_service fails closed, so we
     # warn loudly rather than blocking startup.
     from app.services.jwt_service import MIN_JWT_SECRET_LENGTH
+
     if not settings.JWT_SECRET_KEY:
         logging.getLogger(__name__).warning(
             "JWT_SECRET_KEY is not set — B2B facility auth is DISABLED (token "
@@ -85,6 +85,7 @@ async def lifespan(app: FastAPI):
 
     if other_key:
         from app.services.fallback_provider import FallbackLLMProvider
+
         secondary_provider = get_llm_provider(
             provider_name=other_name, api_key=other_key, model=other_model
         )
@@ -100,10 +101,12 @@ async def lifespan(app: FastAPI):
     try:
         import sys
         from pathlib import Path
+
         _repo_root = str(Path(__file__).resolve().parents[2])
         if _repo_root not in sys.path:
             sys.path.insert(0, _repo_root)
         from rag.vectorstores import get_vector_store
+
         store = get_vector_store()
         await store.setup()
         logging.getLogger(__name__).info("RAG vector store ready")
@@ -119,6 +122,7 @@ async def lifespan(app: FastAPI):
     async def _nightly_insights():
         """Recompute insights for all profiles that have conversations."""
         import logging as _logging
+
         _log = _logging.getLogger("calmguide.nightly_insights")
 
         # The scheduler lives in-process, so every replica fires this job at
@@ -148,16 +152,15 @@ async def lifespan(app: FastAPI):
                 lock_conn = None
 
         try:
-            from sqlalchemy import select, distinct
+            from sqlalchemy import distinct, select
+
             from app.db import get_session_factory
             from app.models.conversation import Conversation
             from app.services.insights import compute_profile_insights, upsert_profile_insights
 
             factory = get_session_factory()
             async with factory() as session:
-                result = await session.execute(
-                    select(distinct(Conversation.profile_id))
-                )
+                result = await session.execute(select(distinct(Conversation.profile_id)))
                 profile_ids = [row[0] for row in result.all()]
 
             _log.info("Nightly insights: processing %d profiles", len(profile_ids))
@@ -172,8 +175,8 @@ async def lifespan(app: FastAPI):
 
             # Stale dossier recomputation
             try:
-                from app.services.dossier import compute_dossier
                 from app.models.behavioral_dossier import BehavioralDossier
+                from app.services.dossier import compute_dossier
 
                 async with factory() as dossier_session:
                     stale_result = await dossier_session.execute(
@@ -188,7 +191,9 @@ async def lifespan(app: FastAPI):
                         async with factory() as d_session:
                             await compute_dossier(stale_pid, d_session)
                     except Exception as d_exc:
-                        _log.warning("Nightly dossier recompute failed for %s: %s", stale_pid, d_exc)
+                        _log.warning(
+                            "Nightly dossier recompute failed for %s: %s", stale_pid, d_exc
+                        )
 
                 _log.info("Nightly dossier: recomputed %d stale dossiers", len(stale_profile_ids))
             except Exception as dossier_exc:
@@ -197,6 +202,7 @@ async def lifespan(app: FastAPI):
             # Cross-patient strategy aggregation
             try:
                 from app.services.cross_patient import compute_cross_patient_strategies
+
                 async with factory() as cp_session:
                     result = await compute_cross_patient_strategies(cp_session)
                     _log.info("Cross-patient: computed %d strategy entries", len(result))
@@ -220,6 +226,7 @@ async def lifespan(app: FastAPI):
     # Memory writes for a session that just ended run detached from the
     # response; give them a moment to land rather than dropping them on deploy.
     from app.routers.coach import drain_background_tasks
+
     await drain_background_tasks()
 
     await dispose_engine()
@@ -256,7 +263,8 @@ def create_app() -> FastAPI:
             async def _send(message):
                 if message["type"] == "http.response.start" and message.get("status") == 204:
                     headers = [
-                        (k, v) for k, v in message.get("headers", [])
+                        (k, v)
+                        for k, v in message.get("headers", [])
                         if (k if isinstance(k, bytes) else k.encode()).lower() != b"content-length"
                     ]
                     message = {**message, "headers": headers}
@@ -303,28 +311,28 @@ def create_app() -> FastAPI:
     )
 
     # Register routers
-    from app.routers.health import router as health_router
-    from app.routers.profile import router as profile_router
-    from app.routers.coach import router as coach_router
-    from app.routers.learn import router as learn_router
-    from app.routers.checkin import router as checkin_router
-    from app.routers.impact import router as impact_router
-    from app.routers.insights import router as insights_router
-    from app.routers.feedback import router as feedback_router
-    from app.routers.checkin_daily import router as checkin_daily_router
-    from app.routers.prediction import router as care_patterns_router
-    from app.routers.speech import router as speech_router
-    from app.routers.incidents import router as incidents_router
     from app.routers.care_changes import router as care_changes_router
+    from app.routers.checkin import router as checkin_router
+    from app.routers.checkin_daily import router as checkin_daily_router
+    from app.routers.coach import router as coach_router
     from app.routers.facility import router as facility_router
-    from app.routers.facility_staff import router as facility_staff_router
+    from app.routers.facility_audit import router as facility_audit_router
     from app.routers.facility_auth import router as facility_auth_router
-    from app.routers.facility_residents import router as facility_residents_router
     from app.routers.facility_dashboard import router as facility_dashboard_router
     from app.routers.facility_executive import router as facility_executive_router
-    from app.routers.facility_audit import router as facility_audit_router
     from app.routers.facility_report import router as facility_report_router
+    from app.routers.facility_residents import router as facility_residents_router
+    from app.routers.facility_staff import router as facility_staff_router
+    from app.routers.feedback import router as feedback_router
+    from app.routers.health import router as health_router
+    from app.routers.impact import router as impact_router
+    from app.routers.incidents import router as incidents_router
+    from app.routers.insights import router as insights_router
     from app.routers.languages import router as languages_router
+    from app.routers.learn import router as learn_router
+    from app.routers.prediction import router as care_patterns_router
+    from app.routers.profile import router as profile_router
+    from app.routers.speech import router as speech_router
 
     app.include_router(health_router)
     app.include_router(profile_router, prefix="/api")

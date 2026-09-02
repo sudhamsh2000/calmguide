@@ -14,15 +14,14 @@ async function fetchImpact(): Promise<ImpactResponse | null> {
 function Stat({ value, label, sub }: { value: string | number; label: string; sub?: string }) {
   return (
     <div className="card-shell flex flex-col items-center gap-1.5 px-5 py-6">
-      <span className="text-4xl font-bold tracking-tight text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
+      <span
+        className="text-4xl font-bold tracking-tight text-foreground"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
         {value}
       </span>
-      <span className="text-center text-sm font-medium text-foreground">
-        {label}
-      </span>
-      {sub && (
-        <span className="text-center text-xs text-foreground-muted">{sub}</span>
-      )}
+      <span className="text-center text-sm font-medium text-foreground">{label}</span>
+      {sub && <span className="text-center text-xs text-foreground-muted">{sub}</span>}
     </div>
   );
 }
@@ -39,12 +38,13 @@ export default async function ImpactPage() {
       <div className="mb-4">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
       </div>
-      <h1 className="text-[26px] font-medium text-foreground leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+      <h1
+        className="text-[26px] font-medium text-foreground leading-tight"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
         {t('title')}
       </h1>
-      <p className="mt-2 text-sm text-foreground-muted">
-        {t('subtitle')}
-      </p>
+      <p className="mt-2 text-sm text-foreground-muted">{t('subtitle')}</p>
 
       {data ? (
         <>
@@ -72,17 +72,16 @@ export default async function ImpactPage() {
           </div>
 
           <div className="mt-3 rounded-2xl bg-gradient-to-br from-primary to-[#1F5454] px-5 py-5 text-center">
-            <span className="text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            <span
+              className="text-3xl font-bold text-white"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               {data.sessions_this_week.toLocaleString()}
             </span>
-            <p className="mt-1 text-sm text-white/70">
-              {t('sessions_this_week')}
-            </p>
+            <p className="mt-1 text-sm text-white/70">{t('sessions_this_week')}</p>
           </div>
 
-          <p className="mt-6 text-center text-xs text-foreground-muted italic">
-            {t('closing')}
-          </p>
+          <p className="mt-6 text-center text-xs text-foreground-muted italic">{t('closing')}</p>
         </>
       ) : (
         <p className="mt-8 text-foreground-muted">{t('unavailable')}</p>

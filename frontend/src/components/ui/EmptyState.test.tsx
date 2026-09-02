@@ -15,24 +15,13 @@ describe('EmptyState', () => {
   });
 
   it('renders a custom icon when provided', () => {
-    render(
-      <EmptyState
-        message="Empty"
-        icon={<span data-testid="custom-icon">Icon</span>}
-      />,
-    );
+    render(<EmptyState message="Empty" icon={<span data-testid="custom-icon">Icon</span>} />);
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 
   it('renders action button when actionLabel and onAction are provided', () => {
     const handleAction = vi.fn();
-    render(
-      <EmptyState
-        message="No items"
-        actionLabel="Add Item"
-        onAction={handleAction}
-      />,
-    );
+    render(<EmptyState message="No items" actionLabel="Add Item" onAction={handleAction} />);
     expect(screen.getByRole('button', { name: 'Add Item' })).toBeInTheDocument();
   });
 
@@ -49,13 +38,7 @@ describe('EmptyState', () => {
   it('calls onAction when action button is clicked', async () => {
     const user = userEvent.setup();
     const handleAction = vi.fn();
-    render(
-      <EmptyState
-        message="No items"
-        actionLabel="Create New"
-        onAction={handleAction}
-      />,
-    );
+    render(<EmptyState message="No items" actionLabel="Create New" onAction={handleAction} />);
 
     await user.click(screen.getByRole('button', { name: 'Create New' }));
     expect(handleAction).toHaveBeenCalledOnce();

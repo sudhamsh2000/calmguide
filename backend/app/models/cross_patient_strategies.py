@@ -1,9 +1,9 @@
 """CrossPatientStrategies model — anonymized aggregate strategy effectiveness."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Integer, String, UniqueConstraint, func
+from sqlalchemy import DateTime, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -24,9 +24,7 @@ class CrossPatientStrategies(Base):
     computed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
 
-    __table_args__ = (
-        UniqueConstraint("cohort_key", "strategy_tag", name="uq_cohort_strategy"),
-    )
+    __table_args__ = (UniqueConstraint("cohort_key", "strategy_tag", name="uq_cohort_strategy"),)

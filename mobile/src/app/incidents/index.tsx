@@ -20,7 +20,12 @@ const CATEGORY_ICONS: Record<BehaviorCategory, string> = {
 
 function formatDate(isoDate: string): string {
   const d = new Date(isoDate);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  return d.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 }
 
 export default function IncidentHistoryScreen() {
@@ -37,38 +42,47 @@ export default function IncidentHistoryScreen() {
       try {
         const result = await getIncidents(code, { limit: 50 });
         setIncidents(result.incidents);
-      } catch { /* silent */ }
+      } catch {
+        /* silent */
+      }
       setLoading(false);
     })();
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: IncidentResponse }) => (
-    <Pressable
-      onPress={() => router.push(`/incidents/${item.id}` as Href)}
-      style={{
-        backgroundColor: colors.surface,
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        flexDirection: 'row',
-        gap: 12,
-        alignItems: 'flex-start',
-      }}
-    >
-      <Text style={{ fontSize: 20, marginTop: 2 }}>{CATEGORY_ICONS[item.behavior_category] ?? '\u{2753}'}</Text>
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{formatDate(item.incident_time)}</Text>
-        <Text style={{ fontSize: 16, color: colors.foreground, marginTop: 4 }} numberOfLines={2}>
-          {item.behavior_description}
+  const renderItem = useCallback(
+    ({ item }: { item: IncidentResponse }) => (
+      <Pressable
+        onPress={() => router.push(`/incidents/${item.id}` as Href)}
+        style={{
+          backgroundColor: colors.surface,
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 12,
+          flexDirection: 'row',
+          gap: 12,
+          alignItems: 'flex-start',
+        }}
+      >
+        <Text style={{ fontSize: 20, marginTop: 2 }}>
+          {CATEGORY_ICONS[item.behavior_category] ?? '\u{2753}'}
         </Text>
-        {item.intervention_outcome && (
-          <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
-            {t(`history.${item.intervention_outcome}`)}
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+            {formatDate(item.incident_time)}
           </Text>
-        )}
-      </View>
-    </Pressable>
-  ), [colors, router, t]);
+          <Text style={{ fontSize: 16, color: colors.foreground, marginTop: 4 }} numberOfLines={2}>
+            {item.behavior_description}
+          </Text>
+          {item.intervention_outcome && (
+            <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
+              {t(`history.${item.intervention_outcome}`)}
+            </Text>
+          )}
+        </View>
+      </Pressable>
+    ),
+    [colors, router, t],
+  );
 
   return (
     <>
@@ -82,8 +96,12 @@ export default function IncidentHistoryScreen() {
         ListEmptyComponent={
           !loading ? (
             <View style={{ alignItems: 'center', paddingVertical: 48 }}>
-              <Text style={{ fontSize: 18, color: colors.mutedForeground }}>{t('history.no_incidents')}</Text>
-              <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>{t('history.no_incidents_subtitle')}</Text>
+              <Text style={{ fontSize: 18, color: colors.mutedForeground }}>
+                {t('history.no_incidents')}
+              </Text>
+              <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 4 }}>
+                {t('history.no_incidents_subtitle')}
+              </Text>
             </View>
           ) : null
         }

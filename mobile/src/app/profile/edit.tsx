@@ -81,9 +81,7 @@ function MultiSelectChips({
   const { colors } = useTheme();
 
   function toggle(item: string) {
-    onChange(
-      selected.includes(item) ? selected.filter((s) => s !== item) : [...selected, item]
-    );
+    onChange(selected.includes(item) ? selected.filter((s) => s !== item) : [...selected, item]);
   }
 
   return (
@@ -139,7 +137,10 @@ export default function EditProfileScreen() {
   useEffect(() => {
     (async () => {
       const code = await getAccessCode();
-      if (!code) { router.replace('/'); return; }
+      if (!code) {
+        router.replace('/');
+        return;
+      }
       try {
         const profile = await getProfile(code);
         setDiseaseStage(profile.disease_stage);
@@ -175,7 +176,14 @@ export default function EditProfileScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.background,
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -191,7 +199,11 @@ export default function EditProfileScreen() {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ padding: 24, gap: 28, paddingBottom: 60 + (Platform.OS === 'android' ? insets.bottom : 0) }}
+          contentContainerStyle={{
+            padding: 24,
+            gap: 28,
+            paddingBottom: 60 + (Platform.OS === 'android' ? insets.bottom : 0),
+          }}
         >
           {/* Disease stage */}
           <View style={{ gap: 14 }}>
@@ -218,7 +230,14 @@ export default function EditProfileScreen() {
                     accessibilityRole="radio"
                     accessibilityState={{ selected: isSelected }}
                   >
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: isSelected ? color : colors.foreground, textAlign: 'center' }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: '700',
+                        color: isSelected ? color : colors.foreground,
+                        textAlign: 'center',
+                      }}
+                    >
                       {label}
                     </Text>
                   </Pressable>

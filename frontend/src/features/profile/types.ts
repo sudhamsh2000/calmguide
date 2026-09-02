@@ -48,14 +48,17 @@ export const SAFETY_CONCERNS = [
 export const DISEASE_STAGE_INFO: Record<DiseaseStage, { title: string; description: string }> = {
   early: {
     title: 'Early Stage',
-    description: 'Mild memory lapses, difficulty finding words, some confusion with complex tasks. Can still manage most daily activities independently.',
+    description:
+      'Mild memory lapses, difficulty finding words, some confusion with complex tasks. Can still manage most daily activities independently.',
   },
   middle: {
     title: 'Middle Stage',
-    description: 'Increasing confusion, difficulty recognizing people, behavioral changes, needs help with daily activities like dressing and bathing.',
+    description:
+      'Increasing confusion, difficulty recognizing people, behavioral changes, needs help with daily activities like dressing and bathing.',
   },
   late: {
     title: 'Late Stage',
-    description: 'Severe memory loss, limited communication, needs full-time assistance with all daily activities, may not recognize family members.',
+    description:
+      'Severe memory loss, limited communication, needs full-time assistance with all daily activities, may not recognize family members.',
   },
 };

@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/components/ThemeContext';
@@ -70,22 +64,25 @@ export default function ResidentsScreen() {
 
   const keyExtractor = useCallback((item: ResidentCardData) => item.profile_id, []);
 
-  const renderItem = useCallback(({ item: r }: { item: ResidentCardData }) => (
-    <View style={{ marginBottom: 12 }}>
-      <ResidentCard
-        resident={r}
-        onPress={() => {
-          recordActivity();
-          const params = new URLSearchParams();
-          if (r.unit) params.set('unit', r.unit);
-          if (r.room) params.set('room', r.room);
-          if (r.bed) params.set('bed', r.bed);
-          params.set('risk', r.risk_level);
-          router.push(`/facility/residents/${r.profile_id}?${params.toString()}`);
-        }}
-      />
-    </View>
-  ), [recordActivity, router]);
+  const renderItem = useCallback(
+    ({ item: r }: { item: ResidentCardData }) => (
+      <View style={{ marginBottom: 12 }}>
+        <ResidentCard
+          resident={r}
+          onPress={() => {
+            recordActivity();
+            const params = new URLSearchParams();
+            if (r.unit) params.set('unit', r.unit);
+            if (r.room) params.set('room', r.room);
+            if (r.bed) params.set('bed', r.bed);
+            params.set('risk', r.risk_level);
+            router.push(`/facility/residents/${r.profile_id}?${params.toString()}`);
+          }}
+        />
+      </View>
+    ),
+    [recordActivity, router],
+  );
 
   const listHeader = (
     <>
@@ -111,9 +108,7 @@ export default function ResidentsScreen() {
             borderColor: colors.error,
           }}
         >
-          <Text style={{ color: colors.error, fontSize: 14, textAlign: 'center' }}>
-            {error}
-          </Text>
+          <Text style={{ color: colors.error, fontSize: 14, textAlign: 'center' }}>{error}</Text>
           <Button variant="secondary" onPress={handleRefresh} style={{ marginTop: 12 }}>
             Retry
           </Button>
@@ -124,10 +119,20 @@ export default function ResidentsScreen() {
 
   const listEmpty = !error ? (
     <View style={{ alignItems: 'center', paddingVertical: 48 }}>
-      <Text style={{ fontSize: 18, fontWeight: '600', color: colors.foreground, marginBottom: 8, textAlign: 'center' }}>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: '600',
+          color: colors.foreground,
+          marginBottom: 8,
+          textAlign: 'center',
+        }}
+      >
         {t('residents.no_residents')}
       </Text>
-      <Text style={{ fontSize: 14, color: colors.mutedForeground, textAlign: 'center', maxWidth: 300 }}>
+      <Text
+        style={{ fontSize: 14, color: colors.mutedForeground, textAlign: 'center', maxWidth: 300 }}
+      >
         {t('residents.no_residents_subtitle')}
       </Text>
     </View>
@@ -135,7 +140,14 @@ export default function ResidentsScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );

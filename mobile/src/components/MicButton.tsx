@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { AccessibilityInfo, Pressable, StyleSheet } from "react-native";
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@/components/ThemeContext";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import Svg, { Path, Line } from "react-native-svg";
+import { useEffect } from 'react';
+import { AccessibilityInfo, Pressable, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/components/ThemeContext';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import Svg, { Path, Line } from 'react-native-svg';
 
 interface MicButtonProps {
   onTranscript: (text: string) => void;
@@ -12,7 +12,12 @@ interface MicButtonProps {
   transparent?: boolean;
 }
 
-export function MicButton({ onTranscript, onListeningChange, disabled = false, transparent = false }: MicButtonProps) {
+export function MicButton({
+  onTranscript,
+  onListeningChange,
+  disabled = false,
+  transparent = false,
+}: MicButtonProps) {
   const { colors } = useTheme();
   const { t, i18n } = useTranslation('common');
   const { start, stop, isListening, isSupported } = useSpeechRecognition({
@@ -40,13 +45,19 @@ export function MicButton({ onTranscript, onListeningChange, disabled = false, t
     <Pressable
       onPress={handlePress}
       disabled={disabled}
-      accessibilityLabel={isListening ? t('accessibility.stop_voice') : t('accessibility.voice_input')}
+      accessibilityLabel={
+        isListening ? t('accessibility.stop_voice') : t('accessibility.voice_input')
+      }
       accessibilityRole="button"
       accessibilityState={{ selected: isListening }}
       style={[
         styles.button,
         {
-          backgroundColor: isListening ? colors.error + "14" : transparent ? "transparent" : colors.foreground + "10",
+          backgroundColor: isListening
+            ? colors.error + '14'
+            : transparent
+              ? 'transparent'
+              : colors.foreground + '10',
           opacity: disabled ? 0.5 : 1,
         },
       ]}
@@ -75,7 +86,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -5,7 +5,7 @@ import json
 import logging
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -19,43 +19,43 @@ from app.db import get_session
 from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.staff import Staff
-from app.services.availability import record_llm_failure, record_llm_success
-from app.services.response_timing import record_llm_timing, record_rag_timing
-from app.services.rate_limit import rate_limit
-from app.services.rbac import get_current_staff, staff_can_access_profile
 from app.schemas.coach import (
     AcuteChangeScreenRequest,
     AcuteChangeScreenResponse,
+    CoachRequest,
     ConversationListResponse,
     ConversationMessage,
     ConversationMessagesResponse,
     ConversationSummary,
-    CoachRequest,
 )
 from app.schemas.profile import ErrorResponse
+from app.services.acute_change_screen import (
+    AcuteChangeScreenInput,
+    evaluate_acute_change_screen,
+)
+from app.services.auth import hash_access_code
+from app.services.availability import record_llm_failure, record_llm_success
+from app.services.crypto import decrypt, encrypt
 from app.services.prompt import (
     get_request_locale_header,
     render_coach_prompt,
     resolve_language,
-    resolve_locale_code,
     resolve_language_constraint,
+    resolve_locale_code,
     resolve_model_for_locale,
 )
-from app.services.retrieval_query import build_english_rag_query
-from app.services.auth import hash_access_code
-from app.services.crypto import decrypt, encrypt
+from app.services.rate_limit import rate_limit
+from app.services.rbac import get_current_staff, staff_can_access_profile
 from app.services.response_guard import (
     get_localized_fallback,
     guard_response_text,
     validate_response_quality,
 )
-from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
+from app.services.response_timing import record_llm_timing, record_rag_timing
+from app.services.retrieval_query import build_english_rag_query
 from app.services.safety_classifier import classify_message
+from app.services.safety_gate import SafetyGateType, build_gate_response_text, check_safety_gate
 from app.services.safety_log import log_safety_event
-from app.services.acute_change_screen import (
-    AcuteChangeScreenInput,
-    evaluate_acute_change_screen,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,7 @@ async def _fetch_rag_context(message: str) -> str:
     start = time.monotonic()
     try:
         from rag.retrieve import get_rag_context  # noqa: PLC0415
+
         context = await get_rag_context(message, k=3, min_score=0.20)
         duration_ms = (time.monotonic() - start) * 1000
         record_rag_timing(duration_ms)
@@ -76,7 +77,9 @@ async def _fetch_rag_context(message: str) -> str:
             chunk_count = len(context.split("\n\n---\n\n"))
             logger.info(
                 "RAG: injected %d chunk(s) (%d chars) duration_ms=%.0f",
-                chunk_count, len(context), duration_ms,
+                chunk_count,
+                len(context),
+                duration_ms,
             )
         else:
             logger.info("RAG: no chunks above min_score threshold duration_ms=%.0f", duration_ms)
@@ -84,6 +87,7 @@ async def _fetch_rag_context(message: str) -> str:
     except Exception as exc:
         logger.warning("RAG: unavailable — %s", exc)
         return ""
+
 
 router = APIRouter(tags=["coach"])
 
@@ -125,7 +129,8 @@ async def drain_background_tasks(timeout: float = 10.0) -> None:
     if still_running:
         logger.warning(
             "%d background task(s) did not finish within %.0fs",
-            len(still_running), timeout,
+            len(still_running),
+            timeout,
         )
 
 
@@ -170,8 +175,9 @@ async def _persist_and_learn(
         await save_session.commit()
 
     try:
-        from app.services.tag_generator import generate_suggested_tags
         from sqlalchemy import update
+
+        from app.services.tag_generator import generate_suggested_tags
 
         tags = await generate_suggested_tags(assistant_text, llm)
         async with factory() as tag_session:
@@ -244,7 +250,7 @@ async def _extract_incident(
     if not extraction or not extraction.get("behavior_category"):
         return
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     async with factory() as extract_session:
         incident = Incident(
             profile_id=profile_id,
@@ -281,17 +287,13 @@ async def _extract_incident(
         extract_session.add(incident)
 
         dossier_result = await extract_session.execute(
-            select(BehavioralDossier).where(
-                BehavioralDossier.profile_id == profile_id
-            )
+            select(BehavioralDossier).where(BehavioralDossier.profile_id == profile_id)
         )
         dossier = dossier_result.scalar_one_or_none()
         if dossier:
             dossier.is_stale = True
         else:
-            extract_session.add(
-                BehavioralDossier(profile_id=profile_id, is_stale=True)
-            )
+            extract_session.add(BehavioralDossier(profile_id=profile_id, is_stale=True))
 
         await extract_session.commit()
         logger.info("Extracted incident %s for session %s", incident.id, session_id)
@@ -336,9 +338,7 @@ async def list_conversations(
 ):
     """Return recent conversation sessions for a profile, grouped by session_id."""
     code_hash = hash_access_code(access_code)
-    result = await session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
 
     if profile is None:
@@ -414,9 +414,7 @@ async def get_session_messages(
 ):
     """Return all messages in a specific conversation session."""
     code_hash = hash_access_code(access_code)
-    result = await db.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await db.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
 
     if profile is None:
@@ -475,9 +473,7 @@ async def coach_chat(
                 status_code=401,
                 detail={"error": "Authentication required", "code": "AUTH_REQUIRED"},
             )
-        result = await session.execute(
-            select(Profile).where(Profile.id == payload.profile_id)
-        )
+        result = await session.execute(select(Profile).where(Profile.id == payload.profile_id))
         profile = result.scalar_one_or_none()
         if profile is None:
             raise HTTPException(
@@ -494,9 +490,7 @@ async def coach_chat(
     elif payload.access_code:
         # B2C mode — existing behavior
         code_hash = hash_access_code(payload.access_code)
-        result = await session.execute(
-            select(Profile).where(Profile.access_code_hash == code_hash)
-        )
+        result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
         profile = result.scalar_one_or_none()
         if profile is None:
             raise HTTPException(
@@ -506,7 +500,10 @@ async def coach_chat(
     else:
         raise HTTPException(
             status_code=400,
-            detail={"error": "Either profile_id or access_code is required", "code": "MISSING_IDENTIFIER"},
+            detail={
+                "error": "Either profile_id or access_code is required",
+                "code": "MISSING_IDENTIFIER",
+            },
         )
 
     # Session management
@@ -571,7 +568,7 @@ async def coach_chat(
                     CareChangeEvent.is_active == True,
                 )
             )
-            today = datetime.now(timezone.utc).date()
+            today = datetime.now(UTC).date()
             cutoff = pre_change_cutoff(care_changes_result.scalars().all(), today)
             if cutoff:
                 ctx["care_change"] = {"days_ago": (today - cutoff).days}
@@ -580,20 +577,23 @@ async def coach_chat(
 
         # Cross-patient strategies for prompt injection
         try:
-            from app.services.cross_patient import get_cohort_strategies
             from app.models.profile_insights import ProfileInsights
+            from app.services.cross_patient import get_cohort_strategies
+
             insights_result = await session.execute(
                 select(ProfileInsights).where(ProfileInsights.profile_id == profile.id)
             )
             insights_row = insights_result.scalar_one_or_none()
             if insights_row:
                 import json as _json
+
                 insights_data = _json.loads(decrypt(insights_row.insights_json))
                 peak = insights_data.get("peak_time", "evening")
                 cohort_key = f"{profile.disease_stage}:{peak}"
                 strategies = await get_cohort_strategies(cohort_key, session)
                 if strategies:
                     import random
+
                     shuffled = strategies[:3]
                     random.shuffle(shuffled)  # Randomize to prevent feedback loops
                     ctx["cross_patient_strategies"] = [
@@ -629,16 +629,20 @@ async def coach_chat(
                 if dossier.pain_flags:
                     ctx["pain_flags"] = _safe_decrypt_json(dossier.pain_flags, default={})
                 if dossier.frequency_trends:
-                    ctx["frequency_trends"] = _safe_decrypt_json(dossier.frequency_trends, default={})
+                    ctx["frequency_trends"] = _safe_decrypt_json(
+                        dossier.frequency_trends, default={}
+                    )
         except Exception as doss_exc:
             logger.warning("Dossier fetch failed for %s: %s", profile.id, doss_exc)
 
         # Relevant past incidents
         try:
-            from app.services.incident_retriever import get_relevant_incidents, format_incident_for_prompt
-            relevant = await get_relevant_incidents(
-                profile.id, retrieval_query, session
+            from app.services.incident_retriever import (
+                format_incident_for_prompt,
+                get_relevant_incidents,
             )
+
+            relevant = await get_relevant_incidents(profile.id, retrieval_query, session)
             ctx["relevant_incident_dicts"] = [format_incident_for_prompt(i) for i in relevant]
         except Exception as ret_exc:
             logger.warning("Incident retrieval failed for %s: %s", profile.id, ret_exc)
@@ -718,22 +722,26 @@ async def coach_chat(
 
             factory = get_session_factory()
             async with factory() as save_session:
-                save_session.add(Conversation(
-                    session_id=session_id,
-                    profile_id=safety_profile_id,
-                    role="user",
-                    content=encrypt(payload.message),
-                    locale_code=locale_code,
-                    is_safety_gate=True,
-                ))
-                save_session.add(Conversation(
-                    session_id=session_id,
-                    profile_id=safety_profile_id,
-                    role="assistant",
-                    content=encrypt(safety.response_text),
-                    locale_code=locale_code,
-                    is_safety_gate=True,
-                ))
+                save_session.add(
+                    Conversation(
+                        session_id=session_id,
+                        profile_id=safety_profile_id,
+                        role="user",
+                        content=encrypt(payload.message),
+                        locale_code=locale_code,
+                        is_safety_gate=True,
+                    )
+                )
+                save_session.add(
+                    Conversation(
+                        session_id=session_id,
+                        profile_id=safety_profile_id,
+                        role="assistant",
+                        content=encrypt(safety.response_text),
+                        locale_code=locale_code,
+                        is_safety_gate=True,
+                    )
+                )
                 await save_session.commit()
 
         async def _log_safety_gate_event() -> None:
@@ -761,7 +769,9 @@ async def coach_chat(
 
         logger.info(
             "Safety gate triggered (%s, source=%s) for session %s",
-            safety.gate_type, safety_source, session_id,
+            safety.gate_type,
+            safety_source,
+            session_id,
         )
         return StreamingResponse(
             safety_stream(),
@@ -810,8 +820,7 @@ async def coach_chat(
                 patient_name=payload.patient_name,
                 locale_code=locale_code,
                 assistant_text=assistant_text,
-                extraction_messages=messages
-                + [{"role": "assistant", "content": assistant_text}],
+                extraction_messages=messages + [{"role": "assistant", "content": assistant_text}],
                 user_message=payload.message,
                 llm=llm,
             ),
@@ -832,18 +841,26 @@ async def coach_chat(
             stream_start = time.monotonic()
             first_chunk_at: float | None = None
             try:
-                async for chunk in llm.stream_completion(system_prompt, messages, model_override=model_override):
+                async for chunk in llm.stream_completion(
+                    system_prompt, messages, model_override=model_override
+                ):
                     if first_chunk_at is None:
                         first_chunk_at = time.monotonic()
                     full_response.append(chunk)
                     yield f"data: {json.dumps({'text': chunk})}\n\n"
                 record_llm_success()
                 total_ms = (time.monotonic() - stream_start) * 1000
-                ttfc_ms = (first_chunk_at - stream_start) * 1000 if first_chunk_at is not None else total_ms
+                ttfc_ms = (
+                    (first_chunk_at - stream_start) * 1000
+                    if first_chunk_at is not None
+                    else total_ms
+                )
                 record_llm_timing(ttfc_ms, total_ms)
                 logger.info(
                     "Coach LLM stream timing session=%s ttfc_ms=%.0f total_ms=%.0f",
-                    session_id, ttfc_ms, total_ms,
+                    session_id,
+                    ttfc_ms,
+                    total_ms,
                 )
             except Exception as exc:
                 logger.error("LLM stream failed for session %s: %s", session_id, exc)
@@ -860,7 +877,9 @@ async def coach_chat(
                 assistant_text = "".join(full_response)
                 validation = validate_response_quality(assistant_text, locale_code)
                 if not validation.is_valid:
-                    logger.warning("Coach response failed validation (%s), repairing", validation.reason)
+                    logger.warning(
+                        "Coach response failed validation (%s), repairing", validation.reason
+                    )
                     try:
                         repaired_text = await guard_response_text(
                             llm,
@@ -926,9 +945,7 @@ async def acute_change_screen(
                 status_code=401,
                 detail={"error": "Authentication required", "code": "AUTH_REQUIRED"},
             )
-        result = await session.execute(
-            select(Profile).where(Profile.id == payload.profile_id)
-        )
+        result = await session.execute(select(Profile).where(Profile.id == payload.profile_id))
         profile = result.scalar_one_or_none()
         if profile is None:
             raise HTTPException(
@@ -944,9 +961,7 @@ async def acute_change_screen(
         audit_facility_id = staff.facility_id
     elif payload.access_code:
         code_hash = hash_access_code(payload.access_code)
-        result = await session.execute(
-            select(Profile).where(Profile.access_code_hash == code_hash)
-        )
+        result = await session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
         profile = result.scalar_one_or_none()
         if profile is None:
             raise HTTPException(
@@ -956,7 +971,10 @@ async def acute_change_screen(
     else:
         raise HTTPException(
             status_code=400,
-            detail={"error": "Either profile_id or access_code is required", "code": "MISSING_IDENTIFIER"},
+            detail={
+                "error": "Either profile_id or access_code is required",
+                "code": "MISSING_IDENTIFIER",
+            },
         )
 
     answers = AcuteChangeScreenInput(

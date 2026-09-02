@@ -1,11 +1,12 @@
 """Cross-patient strategy aggregation — anonymized effectiveness data."""
+
 import json
 import logging
 import uuid
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.conversation import Conversation
@@ -33,15 +34,14 @@ async def compute_cross_patient_strategies(db: AsyncSession) -> list[dict]:
     # conversation history, so the nightly job's cost grew quadratically with
     # the user base.
     timestamps_result = await db.execute(
-        select(Conversation.profile_id, Conversation.created_at)
-        .where(Conversation.role == "user")
+        select(Conversation.profile_id, Conversation.created_at).where(Conversation.role == "user")
     )
 
     hour_buckets: dict[str, dict[str, int]] = defaultdict(
         lambda: {"overnight": 0, "morning": 0, "afternoon": 0, "evening": 0}
     )
     for profile_id, created_at in timestamps_result.all():
-        ts = created_at.replace(tzinfo=timezone.utc) if created_at.tzinfo is None else created_at
+        ts = created_at.replace(tzinfo=UTC) if created_at.tzinfo is None else created_at
         hour = ts.hour
         if hour < 6:
             bucket = "overnight"
@@ -86,7 +86,7 @@ async def compute_cross_patient_strategies(db: AsyncSession) -> list[dict]:
                 cohort_strategies[cohort_key][tag].add(profile_id)
 
     # Write to table
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     await db.execute(delete(CrossPatientStrategies))
 
     results = []
@@ -99,14 +99,16 @@ async def compute_cross_patient_strategies(db: AsyncSession) -> list[dict]:
                 "helped_count": len(profile_ids),
                 "total_profiles": total,
             }
-            db.add(CrossPatientStrategies(
-                id=str(uuid.uuid4()),
-                cohort_key=cohort_key,
-                strategy_tag=tag,
-                helped_count=len(profile_ids),
-                total_profiles=total,
-                computed_at=now,
-            ))
+            db.add(
+                CrossPatientStrategies(
+                    id=str(uuid.uuid4()),
+                    cohort_key=cohort_key,
+                    strategy_tag=tag,
+                    helped_count=len(profile_ids),
+                    total_profiles=total,
+                    computed_at=now,
+                )
+            )
             results.append(entry)
 
     await db.commit()
@@ -124,13 +126,17 @@ async def get_cohort_strategies(cohort_key: str, db: AsyncSession) -> list[dict]
     for row in result.scalars().all():
         if row.total_profiles < MIN_COHORT_SIZE:
             continue
-        strategies.append({
-            "tag": row.strategy_tag,
-            "helped": row.helped_count,
-            # Exact cohort size, not something to be reconstructed from `rate`:
-            # callers show "helped N of M families" to the model, and inverting
-            # a rounded rate produced a wrong M.
-            "total": row.total_profiles,
-            "rate": round(row.helped_count / row.total_profiles, 2) if row.total_profiles > 0 else 0,
-        })
+        strategies.append(
+            {
+                "tag": row.strategy_tag,
+                "helped": row.helped_count,
+                # Exact cohort size, not something to be reconstructed from `rate`:
+                # callers show "helped N of M families" to the model, and inverting
+                # a rounded rate produced a wrong M.
+                "total": row.total_profiles,
+                "rate": round(row.helped_count / row.total_profiles, 2)
+                if row.total_profiles > 0
+                else 0,
+            }
+        )
     return strategies[:5]

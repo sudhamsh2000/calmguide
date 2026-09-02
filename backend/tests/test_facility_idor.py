@@ -62,17 +62,22 @@ async def resident_a(db_session, facility_a):
     )
     db_session.add(profile)
     await db_session.flush()
-    db_session.add(FacilityPatientLink(facility_id=facility_a.id, profile_id=profile.id, is_active=True))
+    db_session.add(
+        FacilityPatientLink(facility_id=facility_a.id, profile_id=profile.id, is_active=True)
+    )
     await db_session.commit()
     await db_session.refresh(profile)
     return profile
 
 
 def _auth(staff):
-    return {"Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"}
+    return {
+        "Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"
+    }
 
 
 # --- BAUTH-3: cross-facility read/write via the URL code ------------------
+
 
 async def test_get_facility_cross_facility_forbidden(client, facility_a, admin_b):
     resp = await client.get("/api/facilities/FACAAAA1", headers=_auth(admin_b))
@@ -96,13 +101,20 @@ async def test_create_resident_cross_facility_forbidden(client, facility_a, admi
 
 # --- BAPI-4: deleting another facility's assignment ----------------------
 
-async def test_remove_assignment_cross_facility_scoped_out(client, db_session, facility_a, admin_b, resident_a):
+
+async def test_remove_assignment_cross_facility_scoped_out(
+    client, db_session, facility_a, admin_b, resident_a
+):
     """admin_b uses their OWN facility code (passes ownership) but targets an
     assignment id that belongs to facility A — must be 404, not deleted."""
-    staff_a = Staff(facility_id=facility_a.id, name="Carol", email="c@a.example", role="staff", is_active=True)
+    staff_a = Staff(
+        facility_id=facility_a.id, name="Carol", email="c@a.example", role="staff", is_active=True
+    )
     db_session.add(staff_a)
     await db_session.flush()
-    assignment = StaffPatientAssignment(staff_id=staff_a.id, profile_id=resident_a.id, facility_id=facility_a.id)
+    assignment = StaffPatientAssignment(
+        staff_id=staff_a.id, profile_id=resident_a.id, facility_id=facility_a.id
+    )
     db_session.add(assignment)
     await db_session.commit()
     await db_session.refresh(assignment)
@@ -119,7 +131,10 @@ async def test_remove_assignment_cross_facility_scoped_out(client, db_session, f
 
 # --- BAPI-8: writing an incident into another facility's patient ---------
 
-async def test_create_incident_by_profile_cross_facility_forbidden(client, facility_a, admin_b, resident_a):
+
+async def test_create_incident_by_profile_cross_facility_forbidden(
+    client, facility_a, admin_b, resident_a
+):
     resp = await client.post(
         f"/api/incidents/by-profile/{resident_a.id}",
         json={

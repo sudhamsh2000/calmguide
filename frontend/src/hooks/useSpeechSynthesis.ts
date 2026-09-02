@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from 'react';
 
-import { getSpeechStatus, synthesizeSpeech } from "@/lib/api";
+import { getSpeechStatus, synthesizeSpeech } from '@/lib/api';
 
 interface UseSpeechSynthesisOptions {
   locale?: string;
@@ -51,18 +51,33 @@ const SPEECH_PITCH = 1.05;
  */
 const PREFERRED_VOICE_NAMES = [
   // macOS / iOS Safari classic high-quality voices, per language
-  "Ava", "Samantha", "Allison", "Susan", "Zoe", "Nicky", // en
+  'Ava',
+  'Samantha',
+  'Allison',
+  'Susan',
+  'Zoe',
+  'Nicky', // en
   // Newer cross-language voice set — currently only tried for es (Mónica
   // wasn't warm enough); see note above before widening this to other
   // locales without it being requested.
-  "Reed", "Shelley", "Flo",
-  "Mónica", "Paulina", // es fallback
+  'Reed',
+  'Shelley',
+  'Flo',
+  'Mónica',
+  'Paulina', // es fallback
   // Chrome/Edge network-backed voices, notably better than local ones
-  "Google US English", "Google UK English Female", "Google español",
-  "Microsoft Aria", "Microsoft Jenny", "Microsoft Sonia",
+  'Google US English',
+  'Google UK English Female',
+  'Google español',
+  'Microsoft Aria',
+  'Microsoft Jenny',
+  'Microsoft Sonia',
 ];
 
-function pickVoice(voices: SpeechSynthesisVoice[], locale: string): SpeechSynthesisVoice | undefined {
+function pickVoice(
+  voices: SpeechSynthesisVoice[],
+  locale: string,
+): SpeechSynthesisVoice | undefined {
   const localeMatches = voices.filter((v) => v.lang.toLowerCase().startsWith(locale.toLowerCase()));
   if (localeMatches.length === 0) return undefined;
 
@@ -98,7 +113,7 @@ export function useSpeechSynthesis(
   const requestIdRef = useRef(0);
 
   useEffect(() => {
-    const supported = typeof window !== "undefined" && !!window.speechSynthesis;
+    const supported = typeof window !== 'undefined' && !!window.speechSynthesis;
     setIsSupported(supported);
     if (!supported) return;
 
@@ -126,7 +141,7 @@ export function useSpeechSynthesis(
     const current = neuralRef.current;
     if (!current) return;
     current.audio.pause();
-    current.audio.src = "";
+    current.audio.src = '';
     URL.revokeObjectURL(current.url);
     neuralRef.current = null;
   }, []);
@@ -157,9 +172,18 @@ export function useSpeechSynthesis(
         utterance.lang = locale;
       }
 
-      utterance.onstart = () => { setIsSpeaking(true); setIsPaused(false); };
-      utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); };
-      utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); };
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        setIsPaused(false);
+      };
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+      };
       utterance.onpause = () => setIsPaused(true);
       utterance.onresume = () => setIsPaused(false);
 

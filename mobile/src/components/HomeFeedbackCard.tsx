@@ -37,20 +37,28 @@ export function HomeFeedbackCard({ pending, onDismiss, onSubmit }: HomeFeedbackC
       }}
     >
       {/* Header */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <View
+        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}
+      >
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
             {t('feedback.title')}
           </Text>
-          <Text style={{ fontSize: 12, color: colors.mutedForeground, marginTop: 2 }} numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            style={{ fontSize: 12, color: colors.mutedForeground, marginTop: 2 }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {pending.title.replace(/\.{3}$/, '')} · {timeLabel(pending.created_at)}
           </Text>
         </View>
         <Pressable
           onPress={onDismiss}
           style={{
-            width: 44, height: 44,
-            alignItems: 'center', justifyContent: 'center',
+            width: 44,
+            height: 44,
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
           accessibilityRole="button"
           accessibilityLabel={tc('accessibility.dismiss_feedback')}

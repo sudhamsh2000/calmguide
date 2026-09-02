@@ -2,9 +2,20 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-const EMERGENCY_NUMBERS: Record<string, { emergency: string; helpline: string; helplineName: string }> = {
-  en: { emergency: '911', helpline: '1-800-272-3900', helplineName: "Alzheimer's Association 24/7 Helpline" },
-  es: { emergency: '911', helpline: '1-800-272-3900', helplineName: 'Línea de Ayuda de Alzheimer 24/7' },
+const EMERGENCY_NUMBERS: Record<
+  string,
+  { emergency: string; helpline: string; helplineName: string }
+> = {
+  en: {
+    emergency: '911',
+    helpline: '1-800-272-3900',
+    helplineName: "Alzheimer's Association 24/7 Helpline",
+  },
+  es: {
+    emergency: '911',
+    helpline: '1-800-272-3900',
+    helplineName: 'Línea de Ayuda de Alzheimer 24/7',
+  },
   hi: { emergency: '112', helpline: '1800-11-0031', helplineName: 'ARDSI हेल्पलाइन' },
 };
 
@@ -39,8 +50,14 @@ export function SafetyDisclosure() {
         <p>
           <span className="font-semibold">{t('safety_disclosure.safety_talking_to_ai')}</span>{' '}
           {t('safety_disclosure.safety_emergency_instruction', { number: numbers.emergency })}{' '}
-          <a href={`tel:${numbers.helpline.replace(/[^+\d]/g, '')}`} className="underline font-semibold">
-            {t('safety_disclosure.safety_helpline', { phone: numbers.helpline, name: numbers.helplineName })}
+          <a
+            href={`tel:${numbers.helpline.replace(/[^+\d]/g, '')}`}
+            className="underline font-semibold"
+          >
+            {t('safety_disclosure.safety_helpline', {
+              phone: numbers.helpline,
+              name: numbers.helplineName,
+            })}
           </a>
         </p>
       </div>

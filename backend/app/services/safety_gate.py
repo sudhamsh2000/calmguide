@@ -144,17 +144,47 @@ _ELDER_ABUSE_NEGLECT_PATTERNS: list[re.Pattern[str]] = [
 
 
 LOCALE_EMERGENCY_NUMBERS: dict[str, dict[str, str]] = {
-    "en": {"emergency": "911", "crisis": "988", "alzheimers": "1-800-272-3900", "crisis_text": "text HOME to 741741"},
-    "es": {"emergency": "112 or 911", "crisis": "024 (Spain) / 800-290-0024 (Mexico)", "alzheimers": None, "crisis_text": None},
+    "en": {
+        "emergency": "911",
+        "crisis": "988",
+        "alzheimers": "1-800-272-3900",
+        "crisis_text": "text HOME to 741741",
+    },
+    "es": {
+        "emergency": "112 or 911",
+        "crisis": "024 (Spain) / 800-290-0024 (Mexico)",
+        "alzheimers": None,
+        "crisis_text": None,
+    },
     "fr": {"emergency": "15 or 112", "crisis": "3114", "alzheimers": None, "crisis_text": None},
     "de": {"emergency": "112", "crisis": "0800-111-0-111", "alzheimers": None, "crisis_text": None},
-    "pt-br": {"emergency": "192 (SAMU)", "crisis": "188 (CVV)", "alzheimers": None, "crisis_text": None},
+    "pt-br": {
+        "emergency": "192 (SAMU)",
+        "crisis": "188 (CVV)",
+        "alzheimers": None,
+        "crisis_text": None,
+    },
     "ja": {"emergency": "119", "crisis": "0120-279-338", "alzheimers": None, "crisis_text": None},
     "ko": {"emergency": "119", "crisis": "1393", "alzheimers": None, "crisis_text": None},
     "zh": {"emergency": "120", "crisis": "12320-5", "alzheimers": None, "crisis_text": None},
-    "hi": {"emergency": "112", "crisis": "9152987821 (iCall)", "alzheimers": None, "crisis_text": None},
-    "ta": {"emergency": "112", "crisis": "9152987821 (iCall)", "alzheimers": None, "crisis_text": None},
-    "ar": {"emergency": "911 (Saudi) / 999 (UAE) / 123 (Egypt) / 112", "crisis": None, "alzheimers": None, "crisis_text": None},
+    "hi": {
+        "emergency": "112",
+        "crisis": "9152987821 (iCall)",
+        "alzheimers": None,
+        "crisis_text": None,
+    },
+    "ta": {
+        "emergency": "112",
+        "crisis": "9152987821 (iCall)",
+        "alzheimers": None,
+        "crisis_text": None,
+    },
+    "ar": {
+        "emergency": "911 (Saudi) / 999 (UAE) / 123 (Egypt) / 112",
+        "crisis": None,
+        "alzheimers": None,
+        "crisis_text": None,
+    },
 }
 
 
@@ -170,7 +200,9 @@ def _build_911_response(locale_code: str) -> str:
     emergency = nums["emergency"]
     alzheimers_line = ""
     if nums.get("alzheimers"):
-        alzheimers_line = f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}**"
+        alzheimers_line = (
+            f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}**"
+        )
 
     return f"""## This sounds like a medical emergency.
 
@@ -195,7 +227,9 @@ def _build_988_response(locale_code: str) -> str:
 
     crisis_line = f"**Crisis Helpline** — Call **{crisis}** (24/7, free, confidential)"
     if locale_code.lower().split("-", 1)[0] == "en":
-        crisis_line = f"**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+        crisis_line = (
+            "**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+        )
 
     alzheimers_line = ""
     if nums.get("alzheimers"):
@@ -235,7 +269,9 @@ def _build_caregiver_harm_risk_response(locale_code: str) -> str:
     emergency = nums["emergency"]
     crisis_line = f"**Crisis Helpline** — Call **{crisis}** (24/7, free, confidential)"
     if locale_code.lower().split("-", 1)[0] == "en":
-        crisis_line = "**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+        crisis_line = (
+            "**988 Suicide & Crisis Lifeline** — Call or text **988** (24/7, free, confidential)"
+        )
     alzheimers_line = ""
     if nums.get("alzheimers"):
         alzheimers_line = f"\n> **Alzheimer's Association 24/7 Helpline** — **{nums['alzheimers']}** (respite and caregiver-crisis support)"

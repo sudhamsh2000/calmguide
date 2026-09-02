@@ -32,7 +32,9 @@ function resolveApiBase(): string {
   if (configured) {
     const resolved = normalizeApiBase(configured);
     if (!__DEV__ && !resolved.startsWith('https://')) {
-      throw new Error('Production builds must use HTTPS. Set EXPO_PUBLIC_API_URL to an https:// URL.');
+      throw new Error(
+        'Production builds must use HTTPS. Set EXPO_PUBLIC_API_URL to an https:// URL.',
+      );
     }
     return resolved;
   }
@@ -42,9 +44,7 @@ function resolveApiBase(): string {
   const expoHost = getExpoHost();
   if (expoHost) return `http://${expoHost}:8000`;
 
-  return Platform.OS === 'android'
-    ? 'http://10.0.2.2:8000'
-    : 'http://localhost:8000';
+  return Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 }
 
 const API_BASE = resolveApiBase();
@@ -95,11 +95,7 @@ async function fetchWithTimeout(
 
 export type DiseaseStage = 'early' | 'middle' | 'late';
 export type ScenarioCategory =
-  | 'behavioral'
-  | 'daily_care'
-  | 'safety'
-  | 'communication'
-  | 'self_care';
+  'behavioral' | 'daily_care' | 'safety' | 'communication' | 'self_care';
 
 export interface CreateProfileData {
   disease_stage: DiseaseStage;
@@ -167,9 +163,7 @@ export interface ScenarioInteractParams {
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
 
-export async function createProfile(
-  data: CreateProfileData
-): Promise<CreateProfileResponse> {
+export async function createProfile(data: CreateProfileData): Promise<CreateProfileResponse> {
   const res = await fetchWithTimeout(`${API_BASE}/api/profiles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getLocaleHeaders() },
@@ -194,7 +188,7 @@ export async function getProfile(accessCode: string): Promise<ProfileResponse> {
 
 export async function updateProfile(
   accessCode: string,
-  data: Partial<CreateProfileData>
+  data: Partial<CreateProfileData>,
 ): Promise<ProfileResponse> {
   const res = await fetchWithTimeout(`${API_BASE}/api/profiles/${accessCode}`, {
     method: 'PUT',
@@ -210,14 +204,12 @@ export async function updateProfile(
 
 // ─── Conversations ────────────────────────────────────────────────────────────
 
-export async function getConversations(
-  accessCode: string
-): Promise<ConversationSummary[]> {
+export async function getConversations(accessCode: string): Promise<ConversationSummary[]> {
   const res = await fetchWithTimeout(`${API_BASE}/api/conversations/${accessCode}`, {
     headers: getLocaleHeaders(),
   });
   if (!res.ok) return [];
-  const data = await res.json() as { conversations: ConversationSummary[] };
+  const data = (await res.json()) as { conversations: ConversationSummary[] };
   return data.conversations;
 }
 
@@ -236,7 +228,7 @@ export async function getConversationMessages(
     { headers: getLocaleHeaders() },
   );
   if (!res.ok) return [];
-  const data = await res.json() as { session_id: string; messages: ConversationMessage[] };
+  const data = (await res.json()) as { session_id: string; messages: ConversationMessage[] };
   return data.messages;
 }
 
@@ -244,7 +236,7 @@ export async function getConversationMessages(
 
 export async function getScenarios(
   diseaseStage?: DiseaseStage,
-  category?: ScenarioCategory
+  category?: ScenarioCategory,
 ): Promise<Scenario[]> {
   const params = new URLSearchParams();
   if (diseaseStage) params.set('disease_stage', diseaseStage);
@@ -266,7 +258,7 @@ export async function getScenario(id: string): Promise<Scenario> {
 }
 
 export async function interactWithScenario(
-  data: ScenarioInteractParams
+  data: ScenarioInteractParams,
 ): Promise<{ response: string }> {
   const res = await fetchWithTimeout(`${API_BASE}/api/learn/interact`, {
     method: 'POST',
@@ -353,24 +345,45 @@ export async function getImpact(): Promise<ImpactResponse> {
 // ─── Feedback ────────────────────────────────────────────────────────────────
 
 export const PREDEFINED_TAGS = [
-  'calm_approach', 'music', 'redirection', 'physical_space',
-  'familiar_objects', 'routine', 'lighting', 'simple_words',
-  'physical_touch', 'called_for_help', 'waited_it_out', 'left_the_room',
+  'calm_approach',
+  'music',
+  'redirection',
+  'physical_space',
+  'familiar_objects',
+  'routine',
+  'lighting',
+  'simple_words',
+  'physical_touch',
+  'called_for_help',
+  'waited_it_out',
+  'left_the_room',
 ] as const;
 
 export const NEGATIVE_REASON_TAGS = [
-  'too_generic', 'wrong_situation', 'didnt_understand',
-  'felt_unsafe', 'already_tried',
+  'too_generic',
+  'wrong_situation',
+  'didnt_understand',
+  'felt_unsafe',
+  'already_tried',
 ] as const;
 
 export const TAG_LABELS: Record<string, string> = {
-  calm_approach: 'Calm approach', music: 'Music', redirection: 'Redirection',
-  physical_space: 'Physical space', familiar_objects: 'Familiar objects',
-  routine: 'Routine', lighting: 'Lighting', simple_words: 'Simple words',
-  physical_touch: 'Physical touch', called_for_help: 'Called for help',
-  waited_it_out: 'Waited it out', left_the_room: 'Left the room',
-  too_generic: 'Too generic', wrong_situation: 'Wrong situation',
-  didnt_understand: "Didn't understand", felt_unsafe: 'Felt unsafe',
+  calm_approach: 'Calm approach',
+  music: 'Music',
+  redirection: 'Redirection',
+  physical_space: 'Physical space',
+  familiar_objects: 'Familiar objects',
+  routine: 'Routine',
+  lighting: 'Lighting',
+  simple_words: 'Simple words',
+  physical_touch: 'Physical touch',
+  called_for_help: 'Called for help',
+  waited_it_out: 'Waited it out',
+  left_the_room: 'Left the room',
+  too_generic: 'Too generic',
+  wrong_situation: 'Wrong situation',
+  didnt_understand: "Didn't understand",
+  felt_unsafe: 'Felt unsafe',
   already_tried: 'Already tried this',
 };
 
@@ -441,7 +454,7 @@ export async function getSessionFeedback(
     { headers: getLocaleHeaders() },
   );
   if (!res.ok) return [];
-  const data = await res.json() as { feedback: FeedbackEntry[] };
+  const data = (await res.json()) as { feedback: FeedbackEntry[] };
   return data.feedback;
 }
 
@@ -481,13 +494,10 @@ export async function submitDailyCheckin(
   return res.json() as Promise<{ id: string }>;
 }
 
-export async function getDailyCheckinStatus(
-  accessCode: string,
-): Promise<DailyCheckinStatus> {
-  const res = await fetchWithTimeout(
-    `${API_BASE}/api/checkin/daily/${accessCode}/today`,
-    { headers: getLocaleHeaders() },
-  );
+export async function getDailyCheckinStatus(accessCode: string): Promise<DailyCheckinStatus> {
+  const res = await fetchWithTimeout(`${API_BASE}/api/checkin/daily/${accessCode}/today`, {
+    headers: getLocaleHeaders(),
+  });
   if (!res.ok) return { checked_in: false, entries: [] };
   return res.json() as Promise<DailyCheckinStatus>;
 }
@@ -511,13 +521,10 @@ export interface CarePatternData {
   } | null;
 }
 
-export async function getCarePatterns(
-  accessCode: string,
-): Promise<CarePatternData | null> {
-  const res = await fetchWithTimeout(
-    `${API_BASE}/api/care-patterns/${accessCode}`,
-    { headers: getLocaleHeaders() },
-  );
+export async function getCarePatterns(accessCode: string): Promise<CarePatternData | null> {
+  const res = await fetchWithTimeout(`${API_BASE}/api/care-patterns/${accessCode}`, {
+    headers: getLocaleHeaders(),
+  });
   if (res.status === 204 || res.status === 404) return null;
   if (!res.ok) return null;
   return res.json() as Promise<CarePatternData>;
@@ -540,25 +547,11 @@ export type SeverityLevel = 'mild' | 'moderate' | 'severe';
 export type DurationCategory = 'seconds' | 'minutes' | 'about_an_hour' | 'longer';
 
 export type AntecedentCategory =
-  | 'task_demand'
-  | 'transition'
-  | 'environmental'
-  | 'social'
-  | 'physical_state'
-  | 'unknown';
+  'task_demand' | 'transition' | 'environmental' | 'social' | 'physical_state' | 'unknown';
 
-export type InterventionOutcome =
-  | 'resolved'
-  | 'partially_resolved'
-  | 'unresolved'
-  | 'escalated';
+export type InterventionOutcome = 'resolved' | 'partially_resolved' | 'unresolved' | 'escalated';
 
-export type CaregiverRole =
-  | 'spouse'
-  | 'adult_child'
-  | 'paid_aide'
-  | 'other_family'
-  | 'other';
+export type CaregiverRole = 'spouse' | 'adult_child' | 'paid_aide' | 'other_family' | 'other';
 
 export interface IncidentCreate {
   behavior_category: BehaviorCategory;
@@ -706,10 +699,9 @@ export async function getIncident(
   accessCode: string,
   incidentId: string,
 ): Promise<IncidentResponse> {
-  const res = await fetchWithTimeout(
-    `${API_BASE}/api/incidents/${accessCode}/${incidentId}`,
-    { headers: getLocaleHeaders() },
-  );
+  const res = await fetchWithTimeout(`${API_BASE}/api/incidents/${accessCode}/${incidentId}`, {
+    headers: getLocaleHeaders(),
+  });
   if (!res.ok) throw new Error(`Incident not found: ${res.status}`);
   return res.json() as Promise<IncidentResponse>;
 }
@@ -719,14 +711,11 @@ export async function updateIncident(
   incidentId: string,
   data: IncidentUpdate,
 ): Promise<IncidentResponse> {
-  const res = await fetchWithTimeout(
-    `${API_BASE}/api/incidents/${accessCode}/${incidentId}`,
-    {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...getLocaleHeaders() },
-      body: JSON.stringify(data),
-    },
-  );
+  const res = await fetchWithTimeout(`${API_BASE}/api/incidents/${accessCode}/${incidentId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getLocaleHeaders() },
+    body: JSON.stringify(data),
+  });
   if (!res.ok) throw new Error(`Failed to update incident: ${res.status}`);
   return res.json() as Promise<IncidentResponse>;
 }
@@ -748,13 +737,10 @@ export async function verifyIncident(
   return res.json() as Promise<IncidentResponse>;
 }
 
-export async function getPatterns(
-  accessCode: string,
-): Promise<PatternResponse | null> {
-  const res = await fetchWithTimeout(
-    `${API_BASE}/api/incidents/${accessCode}/patterns`,
-    { headers: getLocaleHeaders() },
-  );
+export async function getPatterns(accessCode: string): Promise<PatternResponse | null> {
+  const res = await fetchWithTimeout(`${API_BASE}/api/incidents/${accessCode}/patterns`, {
+    headers: getLocaleHeaders(),
+  });
   if (res.status === 404) return null;
   if (!res.ok) return null;
   return res.json() as Promise<PatternResponse>;
@@ -828,7 +814,9 @@ function processSSEBuffer(
         } else if (parsed.text) {
           onChunk(parsed.text);
         }
-      } catch { /* not JSON */ }
+      } catch {
+        /* not JSON */
+      }
     }
   }
   return { remaining, done: false };
@@ -883,7 +871,10 @@ function streamSSE(
     // Process any remaining buffered text
     const newText = xhr.responseText.slice(processedLength);
     if (newText) processSSEBuffer(newText, onChunk, onReplace);
-    if (!finished) { finished = true; onDone(); }
+    if (!finished) {
+      finished = true;
+      onDone();
+    }
   };
 
   xhr.onerror = () => {
@@ -897,7 +888,9 @@ function streamSSE(
     }
   };
 
-  xhr.onabort = () => { finished = true; };
+  xhr.onabort = () => {
+    finished = true;
+  };
 
   // Check HTTP status once headers arrive
   xhr.onreadystatechange = () => {
@@ -909,7 +902,10 @@ function streamSSE(
   };
 
   xhr.send(JSON.stringify(body));
-  return () => { finished = true; xhr.abort(); };
+  return () => {
+    finished = true;
+    xhr.abort();
+  };
 }
 
 export function streamCoachChat(

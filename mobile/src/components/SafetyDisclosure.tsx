@@ -3,11 +3,26 @@ import { Linking, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeContext';
 
-const EMERGENCY_NUMBERS: Record<string, { emergency: string; helpline: string; helplineName: string }> = {
-  en: { emergency: '911', helpline: '1-800-272-3900', helplineName: "Alzheimer's Association 24/7 Helpline" },
-  es: { emergency: '911', helpline: '1-800-272-3900', helplineName: 'Línea de Ayuda de Alzheimer 24/7' },
+const EMERGENCY_NUMBERS: Record<
+  string,
+  { emergency: string; helpline: string; helplineName: string }
+> = {
+  en: {
+    emergency: '911',
+    helpline: '1-800-272-3900',
+    helplineName: "Alzheimer's Association 24/7 Helpline",
+  },
+  es: {
+    emergency: '911',
+    helpline: '1-800-272-3900',
+    helplineName: 'Línea de Ayuda de Alzheimer 24/7',
+  },
   fr: { emergency: '15', helpline: '01 42 04 28 50', helplineName: 'France Alzheimer' },
-  de: { emergency: '112', helpline: '030 259 37 95 14', helplineName: 'Deutsche Alzheimer Gesellschaft' },
+  de: {
+    emergency: '112',
+    helpline: '030 259 37 95 14',
+    helplineName: 'Deutsche Alzheimer Gesellschaft',
+  },
   'pt-BR': { emergency: '192', helpline: '0800-272-3900', helplineName: 'ABRAz' },
   ja: { emergency: '119', helpline: '0120-279-338', helplineName: '認知症の人と家族の会' },
   ko: { emergency: '119', helpline: '1899-9988', helplineName: '치매상담콜센터' },
@@ -46,12 +61,16 @@ export function SafetyDisclosure() {
           paddingVertical: 8,
         }}
       >
-        <Text aria-hidden style={{ fontSize: 13 }}>ⓘ</Text>
+        <Text aria-hidden style={{ fontSize: 13 }}>
+          ⓘ
+        </Text>
         <Text style={{ flex: 1, fontSize: 14, color: colors.foreground, lineHeight: 18 }}>
           <Text style={{ fontWeight: '700' }}>{t('safety_disclosure.safety_headline')}</Text>{' '}
           {t('safety_disclosure.safety_call_emergency', { number: numbers.emergency })}
         </Text>
-        <Text style={{ fontSize: 14, color: colors.mutedForeground, textDecorationLine: 'underline' }}>
+        <Text
+          style={{ fontSize: 14, color: colors.mutedForeground, textDecorationLine: 'underline' }}
+        >
           {expanded ? t('safety_disclosure.safety_hide') : t('safety_disclosure.safety_info')}
         </Text>
       </Pressable>
@@ -68,15 +87,20 @@ export function SafetyDisclosure() {
             {t('honesty_disclaimer')}
           </Text>
           <Text style={{ fontSize: 14, color: colors.foreground, lineHeight: 18 }}>
-            <Text style={{ fontWeight: '700' }}>{t('safety_disclosure.safety_talking_to_ai')}</Text>
-            {' '}{t('safety_disclosure.safety_emergency_instruction', { number: numbers.emergency })}{' '}
+            <Text style={{ fontWeight: '700' }}>{t('safety_disclosure.safety_talking_to_ai')}</Text>{' '}
+            {t('safety_disclosure.safety_emergency_instruction', { number: numbers.emergency })}{' '}
             <Text
-              onPress={() => Linking.openURL(`tel:${numbers.helpline.replace(/[^+\d]/g, '')}`).catch(() => {})}
+              onPress={() =>
+                Linking.openURL(`tel:${numbers.helpline.replace(/[^+\d]/g, '')}`).catch(() => {})
+              }
               accessibilityRole="link"
               accessibilityLabel={`Call ${numbers.helplineName} at ${numbers.helpline}`}
               style={{ fontWeight: '700', color: colors.primary, textDecorationLine: 'underline' }}
             >
-              {t('safety_disclosure.safety_helpline', { phone: numbers.helpline, name: numbers.helplineName })}
+              {t('safety_disclosure.safety_helpline', {
+                phone: numbers.helpline,
+                name: numbers.helplineName,
+              })}
             </Text>
           </Text>
         </View>

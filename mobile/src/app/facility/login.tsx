@@ -66,40 +66,47 @@ export default function FacilityLoginScreen() {
         loadStaff(code);
       }
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const loadStaff = useCallback(async (code: string) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
-    setLoading(true);
-    setError(null);
-    try {
-      const { resolveApiBase } = await import('@/lib/facility-api');
-      const apiBase = resolveApiBase();
-      const [verifyRes, list] = await Promise.all([
-        fetch(`${apiBase}/api/facilities/${encodeURIComponent(code)}/verify`).then(r => r.ok ? r.json() : null),
-        getActiveStaff(code),
-      ]);
-      if (verifyRes?.name) {
-        setFacilityNameLocal(verifyRes.name);
-        await setFacilityName(verifyRes.name);
-      }
-      if (list.length === 0) {
-        setError(t('login.no_staff'));
+  const loadStaff = useCallback(
+    async (code: string) => {
+      if (loadingRef.current) return;
+      loadingRef.current = true;
+      setLoading(true);
+      setError(null);
+      try {
+        const { resolveApiBase } = await import('@/lib/facility-api');
+        const apiBase = resolveApiBase();
+        const [verifyRes, list] = await Promise.all([
+          fetch(`${apiBase}/api/facilities/${encodeURIComponent(code)}/verify`).then((r) =>
+            r.ok ? r.json() : null,
+          ),
+          getActiveStaff(code),
+        ]);
+        if (verifyRes?.name) {
+          setFacilityNameLocal(verifyRes.name);
+          await setFacilityName(verifyRes.name);
+        }
+        if (list.length === 0) {
+          setError(t('login.no_staff'));
+          setPhase('code');
+        } else {
+          setStaffList(list);
+          setPhase('select');
+        }
+      } catch {
+        setError(t('login.connection_error'));
         setPhase('code');
-      } else {
-        setStaffList(list);
-        setPhase('select');
+      } finally {
+        setLoading(false);
+        loadingRef.current = false;
       }
-    } catch {
-      setError(t('login.connection_error'));
-      setPhase('code');
-    } finally {
-      setLoading(false);
-      loadingRef.current = false;
-    }
-  }, [t]);
+    },
+    [t],
+  );
 
   const handleCodeSubmit = useCallback(async () => {
     const code = facilityCode.trim().toUpperCase();
@@ -216,7 +223,14 @@ export default function FacilityLoginScreen() {
         {phase === 'code' && (
           <View style={{ width: '100%', maxWidth: 400, alignItems: 'center' }}>
             {facilityName ? (
-              <Text style={{ fontSize: 14, color: colors.mutedForeground, marginBottom: 16, textAlign: 'center' }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: colors.mutedForeground,
+                  marginBottom: 16,
+                  textAlign: 'center',
+                }}
+              >
                 {facilityName}
               </Text>
             ) : null}
@@ -285,7 +299,11 @@ export default function FacilityLoginScreen() {
 
             <Pressable
               onPress={() => setPhase('email')}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, marginTop: 16, paddingVertical: 8 })}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.6 : 1,
+                marginTop: 16,
+                paddingVertical: 8,
+              })}
             >
               <Text style={{ fontSize: 14, color: colors.primary, textAlign: 'center' }}>
                 {t('login.admin_email_link')}
@@ -330,11 +348,7 @@ export default function FacilityLoginScreen() {
               />
             )}
 
-            <Button
-              variant="ghost"
-              onPress={handleBack}
-              style={{ marginTop: 24 }}
-            >
+            <Button variant="ghost" onPress={handleBack} style={{ marginTop: 24 }}>
               {t('login.change_facility')}
             </Button>
           </View>
@@ -386,18 +400,10 @@ export default function FacilityLoginScreen() {
             />
 
             {loading && (
-              <ActivityIndicator
-                size="small"
-                color={colors.primary}
-                style={{ marginTop: 12 }}
-              />
+              <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 12 }} />
             )}
 
-            <Button
-              variant="ghost"
-              onPress={handleBack}
-              style={{ marginTop: 16 }}
-            >
+            <Button variant="ghost" onPress={handleBack} style={{ marginTop: 16 }}>
               {t('login.not_you', { name: firstName })}
             </Button>
           </View>
@@ -410,12 +416,22 @@ export default function FacilityLoginScreen() {
             </Text>
 
             <View>
-              <Text style={{ fontSize: 14, fontWeight: '500', color: colors.foreground, marginBottom: 6 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '500',
+                  color: colors.foreground,
+                  marginBottom: 6,
+                }}
+              >
                 {t('login.email')}
               </Text>
               <TextInput
                 value={email}
-                onChangeText={(v) => { setEmail(v); setEmailError(null); }}
+                onChangeText={(v) => {
+                  setEmail(v);
+                  setEmailError(null);
+                }}
                 placeholder={t('login.email_placeholder')}
                 placeholderTextColor={colors.mutedForeground}
                 keyboardType="email-address"
@@ -435,12 +451,22 @@ export default function FacilityLoginScreen() {
             </View>
 
             <View>
-              <Text style={{ fontSize: 14, fontWeight: '500', color: colors.foreground, marginBottom: 6 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '500',
+                  color: colors.foreground,
+                  marginBottom: 6,
+                }}
+              >
                 {t('login.password')}
               </Text>
               <TextInput
                 value={password}
-                onChangeText={(v) => { setPassword(v); setEmailError(null); }}
+                onChangeText={(v) => {
+                  setPassword(v);
+                  setEmailError(null);
+                }}
                 placeholderTextColor={colors.mutedForeground}
                 secureTextEntry
                 autoComplete="current-password"

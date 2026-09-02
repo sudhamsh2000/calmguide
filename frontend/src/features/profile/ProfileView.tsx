@@ -41,7 +41,10 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
     late: t('view.late_stage'),
   };
 
-  const translateProfileOption = (group: 'behavioral' | 'calming' | 'safety', value: string): string => {
+  const translateProfileOption = (
+    group: 'behavioral' | 'calming' | 'safety',
+    value: string,
+  ): string => {
     const key = `options.${group}.${value}`;
     return t.has(key) ? t(key) : value;
   };
@@ -79,9 +82,8 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   const avatarStyle = avatarColors[diseaseStage] ?? 'bg-foreground/10 text-foreground';
   const initial = patientName.charAt(0).toUpperCase();
 
-  const formattedCode = accessCode.length === 8
-    ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}`
-    : accessCode;
+  const formattedCode =
+    accessCode.length === 8 ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}` : accessCode;
 
   const handleLanguageChange = (newLocale: SupportedLocale) => {
     setLangOpen(false);
@@ -104,7 +106,10 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       {/* Header */}
       <div className="flex items-center gap-3 py-3">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
-        <h1 className="text-xl font-medium text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1
+          className="text-xl font-medium text-foreground"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
           {t('view.title')}
         </h1>
       </div>
@@ -155,8 +160,8 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       </div>
 
       {/* Calming Strategies — the reference's "What Works Best" card. Rendered
-        * as teal chips rather than a comma-joined sentence so each strategy is
-        * individually scannable, matching how the reference presents them. */}
+       * as teal chips rather than a comma-joined sentence so each strategy is
+       * individually scannable, matching how the reference presents them. */}
       <div className="card-shell mt-4 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
           {t('view.calming_strategies')}
@@ -178,7 +183,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       </div>
 
       {/* Safety Concerns — the reference's "What to Avoid" card, in the app's
-        * safety-coral family so it reads as caution without alarming. */}
+       * safety-coral family so it reads as caution without alarming. */}
       <div className="card-shell mt-4 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
           {t('view.safety_concerns')}
@@ -289,7 +294,9 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
 
                   if (e.key === 'ArrowUp') {
                     e.preventDefault();
-                    focusLanguageOption((index - 1 + SUPPORTED_LOCALES.length) % SUPPORTED_LOCALES.length);
+                    focusLanguageOption(
+                      (index - 1 + SUPPORTED_LOCALES.length) % SUPPORTED_LOCALES.length,
+                    );
                     return;
                   }
 
@@ -320,16 +327,22 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
 
       {/* Sign Out */}
       {/* Sign out also returns to the landing page — WelcomeGate redirects any
-        * stored session away from it, so this is the only route back. */}
+       * stored session away from it, so this is the only route back. */}
       <SignOutButton className="mt-5 w-full" />
 
       {/* Legal Links */}
       <div className="mt-6 flex items-center justify-center gap-4 pb-4">
-        <Link href="/terms" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+        <Link
+          href="/terms"
+          className="text-sm text-foreground-muted hover:text-primary transition-colors"
+        >
           {tc('nav.terms')}
         </Link>
         <span className="text-foreground-muted">·</span>
-        <Link href="/privacy" className="text-sm text-foreground-muted hover:text-primary transition-colors">
+        <Link
+          href="/privacy"
+          className="text-sm text-foreground-muted hover:text-primary transition-colors"
+        >
           {tc('nav.privacy')}
         </Link>
       </div>

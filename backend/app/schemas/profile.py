@@ -2,8 +2,7 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
-
+from pydantic import BaseModel, Field
 
 DISEASE_STAGES = Literal["early", "middle", "late", "unknown"]
 
@@ -39,6 +38,7 @@ class ProfileResponse(BaseModel):
 
 class ProfileCreateResponse(ProfileResponse):
     """Returned only on creation — includes the plaintext access code."""
+
     access_code: str
 
 

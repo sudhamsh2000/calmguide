@@ -1,4 +1,5 @@
 """Generate suggested feedback tags from a coach response."""
+
 import json
 import logging
 
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 _TAG_EXTRACTION_PROMPT = (
     "Extract 1-2 specific caregiving strategy keywords from this coach response's "
     "'RIGHT NOW' section. Return ONLY a JSON array of short keyword strings. "
-    "Example: [\"play favorite music\", \"show photo album\"]. "
+    'Example: ["play favorite music", "show photo album"]. '
     "If no specific strategies beyond general advice, return []."
 )
 
@@ -28,7 +29,9 @@ async def generate_suggested_tags(response_text: str, llm: LLMProvider) -> list[
         )
         parsed = json.loads(raw.strip())
         if isinstance(parsed, list):
-            custom_tags = [str(t).strip().lower() for t in parsed if isinstance(t, str) and t.strip()]
+            custom_tags = [
+                str(t).strip().lower() for t in parsed if isinstance(t, str) and t.strip()
+            ]
     except Exception as exc:
         logger.warning("Tag extraction failed, using predefined only: %s", exc)
 

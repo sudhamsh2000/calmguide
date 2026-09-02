@@ -53,7 +53,9 @@ function CheckInScreenInner() {
   useEffect(() => {
     getAccessCode().then((c) => setAccessCodeState(c ?? ''));
     getPatientName().then((n) => setPatientNameState(n ?? 'Patient'));
-    return () => { abortRef.current?.(); };
+    return () => {
+      abortRef.current?.();
+    };
   }, []);
 
   const handleShare = useCallback(() => {
@@ -63,7 +65,11 @@ function CheckInScreenInner() {
     setError('');
 
     abortRef.current = streamCheckIn(
-      { access_code: accessCode, patient_name: patientName.trim() || 'Patient', message: message.trim() },
+      {
+        access_code: accessCode,
+        patient_name: patientName.trim() || 'Patient',
+        message: message.trim(),
+      },
       (chunk) => {
         setResponse((prev) => prev + chunk);
         scrollRef.current?.scrollToEnd({ animated: true });
@@ -75,8 +81,10 @@ function CheckInScreenInner() {
       },
       () => {
         setPhase('done');
-        setError(isOnlineRef.current === false ? tc('network.offline_detail') : tc('error.connection'));
-      }
+        setError(
+          isOnlineRef.current === false ? tc('network.offline_detail') : tc('error.connection'),
+        );
+      },
     );
   }, [message, accessCode, patientName, tc]);
 
@@ -107,16 +115,20 @@ function CheckInScreenInner() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
           style={{ flex: 1 }}
-          contentContainerStyle={{ padding: 20, gap: 20, paddingBottom: 40 + (Platform.OS === 'android' ? insets.bottom : 0) }}
+          contentContainerStyle={{
+            padding: 20,
+            gap: 20,
+            paddingBottom: 40 + (Platform.OS === 'android' ? insets.bottom : 0),
+          }}
         >
           {/* Header */}
           <View style={{ gap: 2 }}>
-            <Text style={{ fontSize: 20, fontWeight: '500', color: colors.foreground, lineHeight: 26 }}>
+            <Text
+              style={{ fontSize: 20, fontWeight: '500', color: colors.foreground, lineHeight: 26 }}
+            >
               {t('title')}
             </Text>
-            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
-              {t('subtitle')}
-            </Text>
+            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('subtitle')}</Text>
           </View>
 
           <OfflineBanner />
@@ -140,7 +152,9 @@ function CheckInScreenInner() {
                     textAlignVertical: 'top',
                     lineHeight: 24,
                   }}
-                  placeholder={isListening && !message ? tc('actions.speak_now') : t('input_placeholder')}
+                  placeholder={
+                    isListening && !message ? tc('actions.speak_now') : t('input_placeholder')
+                  }
                   placeholderTextColor={colors.mutedForeground + '88'}
                   value={message}
                   onChangeText={setMessage}
@@ -149,7 +163,7 @@ function CheckInScreenInner() {
                   accessibilityLabel={t('input_aria_label')}
                 />
                 <MicButton
-                  onTranscript={(text) => setMessage((prev) => prev ? prev + ' ' + text : text)}
+                  onTranscript={(text) => setMessage((prev) => (prev ? prev + ' ' + text : text))}
                   onListeningChange={setIsListening}
                 />
               </View>
@@ -183,11 +197,11 @@ function CheckInScreenInner() {
 
           {/* Streaming / loading */}
           {phase === 'streaming' && !response && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 }}
+            >
               <BreathingIndicator size={20} />
-              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
-                {t('loading')}
-              </Text>
+              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('loading')}</Text>
             </View>
           )}
 
@@ -236,12 +250,26 @@ function CheckInScreenInner() {
             >
               <Text style={{ color: colors.error, fontSize: 14 }}>{error}</Text>
               <Pressable
-                onPress={() => { setError(''); setPhase('input'); }}
+                onPress={() => {
+                  setError('');
+                  setPhase('input');
+                }}
                 accessibilityRole="button"
                 accessibilityLabel={t('start_over')}
-                style={{ marginTop: 12, paddingVertical: 12, paddingHorizontal: 24, backgroundColor: colors.primary, borderRadius: 12, minHeight: 44 }}
+                style={{
+                  marginTop: 12,
+                  paddingVertical: 12,
+                  paddingHorizontal: 24,
+                  backgroundColor: colors.primary,
+                  borderRadius: 12,
+                  minHeight: 44,
+                }}
               >
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', textAlign: 'center' }}>{t('start_over')}</Text>
+                <Text
+                  style={{ color: '#fff', fontSize: 16, fontWeight: '600', textAlign: 'center' }}
+                >
+                  {t('start_over')}
+                </Text>
               </Pressable>
             </View>
           ) : null}

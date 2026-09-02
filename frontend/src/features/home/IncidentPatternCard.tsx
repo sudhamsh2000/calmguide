@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { Card } from "@/components/ui/Card";
-import type { PatternResponse } from "@/lib/api";
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { Card } from '@/components/ui/Card';
+import type { PatternResponse } from '@/lib/api';
 
 export interface IncidentPatternCardProps {
   patterns: PatternResponse;
   className?: string;
 }
 
-export function IncidentPatternCard({ patterns, className = "" }: IncidentPatternCardProps) {
-  const t = useTranslations("incidents");
+export function IncidentPatternCard({ patterns, className = '' }: IncidentPatternCardProps) {
+  const t = useTranslations('incidents');
 
   const trends = patterns.frequency_trends as Record<
     string,
@@ -33,27 +33,26 @@ export function IncidentPatternCard({ patterns, className = "" }: IncidentPatter
 
   return (
     <Card variant="default" padding="md" className={className}>
-      <p className="text-sm font-semibold text-foreground mb-3">
-        {t("patterns.title")}
-      </p>
+      <p className="text-sm font-semibold text-foreground mb-3">{t('patterns.title')}</p>
 
       <div className="flex flex-col gap-2">
         <p className="text-base text-foreground">
-          <span className="capitalize">{category.replace(/_/g, " ")}</span>
-          {": "}
+          <span className="capitalize">{category.replace(/_/g, ' ')}</span>
+          {': '}
           <span className="font-semibold">
-            {data.current_weekly ?? 0}x {t("patterns.this_week")}
+            {data.current_weekly ?? 0}x {t('patterns.this_week')}
           </span>
         </p>
-        {data.direction === "increasing" && data.previous_weekly !== undefined && (
+        {data.direction === 'increasing' && data.previous_weekly !== undefined && (
           <p className="text-sm text-foreground-muted">
-            {"↑ "}{t("patterns.up_from", { count: data.previous_weekly })}
+            {'↑ '}
+            {t('patterns.up_from', { count: data.previous_weekly })}
           </p>
         )}
         {topIntervention?.intervention && (
           <p className="text-sm text-foreground-muted">
-            {t("patterns.whats_helping")}: {topIntervention.intervention}
-            {topIntervention.count ? ` (${topIntervention.count}x)` : ""}
+            {t('patterns.whats_helping')}: {topIntervention.intervention}
+            {topIntervention.count ? ` (${topIntervention.count}x)` : ''}
           </p>
         )}
       </div>
@@ -62,7 +61,7 @@ export function IncidentPatternCard({ patterns, className = "" }: IncidentPatter
         href="/incidents"
         className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
       >
-        {t("patterns.see_details")}
+        {t('patterns.see_details')}
       </Link>
     </Card>
   );

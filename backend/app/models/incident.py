@@ -4,7 +4,7 @@ Narrative fields (antecedent_description, behavior_description,
 intervention_description, metadata) are AES-256-GCM encrypted before storage.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, String, func
@@ -16,20 +16,14 @@ from .base import Base
 class Incident(Base):
     __tablename__ = "incidents"
 
-    id: Mapped[str] = mapped_column(
-        String(36), primary_key=True, default=lambda: str(uuid4())
-    )
-    profile_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("profiles.id"), nullable=False
-    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False)
     conversation_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("conversations.id"), nullable=True
     )
 
     source: Mapped[str] = mapped_column(String(20), nullable=False)
-    incident_time: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    incident_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     time_slot: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     behavior_category: Mapped[str] = mapped_column(String(30), nullable=False)
@@ -55,25 +49,19 @@ class Incident(Base):
     verified_by_caregiver: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, insert_default=False
     )
-    verified_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    staff_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("staff.id"), nullable=True
-    )
+    staff_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("staff.id"), nullable=True)
     facility_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("facilities.id"), nullable=True
     )
 
-    extra_metadata: Mapped[str | None] = mapped_column(
-        "metadata", String, nullable=True
-    )
+    extra_metadata: Mapped[str | None] = mapped_column("metadata", String, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         server_default=func.now(),
     )
 

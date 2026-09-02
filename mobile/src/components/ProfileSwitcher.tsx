@@ -52,16 +52,30 @@ export function ProfileSwitcher({ onSwitch }: ProfileSwitcherProps) {
         accessibilityLabel={`Active profile: ${active?.patient_name ?? 'Unknown'}`}
         accessibilityState={{ expanded: open }}
       >
-        <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: `${colors.primary}20`, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: `${colors.primary}20`,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Text style={{ fontSize: 14, fontWeight: '700', color: colors.primary }}>
             {active?.patient_name?.[0]?.toUpperCase() ?? '?'}
           </Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }} numberOfLines={1}>
+          <Text
+            style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}
+            numberOfLines={1}
+          >
             {active?.patient_name ?? 'Unknown'}
           </Text>
-          <Text style={{ fontSize: 12, color: colors.mutedForeground, textTransform: 'capitalize' }}>
+          <Text
+            style={{ fontSize: 12, color: colors.mutedForeground, textTransform: 'capitalize' }}
+          >
             {active?.disease_stage ?? ''} stage
           </Text>
         </View>
@@ -69,22 +83,24 @@ export function ProfileSwitcher({ onSwitch }: ProfileSwitcherProps) {
       </Pressable>
 
       {open && (
-        <View style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          backgroundColor: colors.surface,
-          borderRadius: 12,
-          borderWidth: 1,
-          borderColor: colors.border,
-          marginTop: 4,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
-          elevation: 5,
-        }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: colors.surface,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: colors.border,
+            marginTop: 4,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 5,
+          }}
+        >
           {profiles.map((profile, index) => (
             <Pressable
               key={profile.access_code}
@@ -109,21 +125,41 @@ export function ProfileSwitcher({ onSwitch }: ProfileSwitcherProps) {
               accessibilityRole="menuitem"
               accessibilityState={{ selected: index === activeIndex }}
             >
-              <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: `${colors.primary}20`, alignItems: 'center', justifyContent: 'center' }}>
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: `${colors.primary}20`,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <Text style={{ fontSize: 14, fontWeight: '700', color: colors.primary }}>
                   {profile.patient_name?.[0]?.toUpperCase() ?? '?'}
                 </Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }} numberOfLines={1}>
+                <Text
+                  style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}
+                  numberOfLines={1}
+                >
                   {profile.patient_name}
                 </Text>
-                <Text style={{ fontSize: 12, color: colors.mutedForeground, textTransform: 'capitalize' }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: colors.mutedForeground,
+                    textTransform: 'capitalize',
+                  }}
+                >
                   {profile.disease_stage} stage
                 </Text>
               </View>
               {index === activeIndex && (
-                <Text style={{ fontSize: 14, color: colors.primary, fontWeight: '700' }}>{'✓'}</Text>
+                <Text style={{ fontSize: 14, color: colors.primary, fontWeight: '700' }}>
+                  {'✓'}
+                </Text>
               )}
             </Pressable>
           ))}

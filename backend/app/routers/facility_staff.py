@@ -1,3 +1,5 @@
+from datetime import UTC
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,8 +17,8 @@ from app.schemas.staff import (
     StaffResponse,
     StaffUpdate,
 )
-from app.services.auth import hash_access_code
 from app.services.audit_service import log_audit
+from app.services.auth import hash_access_code
 from app.services.facility_auth import hash_password, hash_pin
 from app.services.rbac import require_role
 
@@ -39,7 +41,9 @@ async def _get_facility(
     # Multi-tenancy boundary: an authenticated caller may only act on their own
     # facility, regardless of the code in the URL (prevents cross-facility IDOR).
     if staff is not None and facility.id != staff.facility_id:
-        raise HTTPException(403, {"error": "Access denied for this facility", "code": "WRONG_FACILITY"})
+        raise HTTPException(
+            403, {"error": "Access denied for this facility", "code": "WRONG_FACILITY"}
+        )
     return facility
 
 
@@ -77,7 +81,9 @@ async def create_staff(
     facility = await _get_facility(facility_code, session, admin)
 
     if payload.role in ("admin", "owner") and not payload.email:
-        raise HTTPException(400, {"error": "Email required for admin/owner roles", "code": "EMAIL_REQUIRED"})
+        raise HTTPException(
+            400, {"error": "Email required for admin/owner roles", "code": "EMAIL_REQUIRED"}
+        )
 
     staff = Staff(
         facility_id=facility.id,
@@ -106,10 +112,12 @@ async def list_staff(
 ):
     facility = await _get_facility(facility_code, session, admin)
     result = await session.execute(
-        select(Staff).where(
+        select(Staff)
+        .where(
             Staff.facility_id == facility.id,
             Staff.is_active == True,
-        ).order_by(Staff.name)
+        )
+        .order_by(Staff.name)
     )
     staff_list = []
     for s in result.scalars().all():
@@ -126,16 +134,15 @@ async def list_active_staff(
 ):
     facility = await _get_facility(facility_code, session)
     result = await session.execute(
-        select(Staff).where(
+        select(Staff)
+        .where(
             Staff.facility_id == facility.id,
             Staff.is_active == True,
-        ).order_by(Staff.name)
+        )
+        .order_by(Staff.name)
     )
     return {
-        "staff": [
-            StaffListItem(id=s.id, name=s.name, role=s.role)
-            for s in result.scalars().all()
-        ]
+        "staff": [StaffListItem(id=s.id, name=s.name, role=s.role) for s in result.scalars().all()]
     }
 
 
@@ -200,8 +207,9 @@ async def deactivate_staff(
             StaffPatientAssignment.ended_at == None,
         )
     )
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
+    from datetime import datetime
+
+    now = datetime.now(UTC)
     for assignment in assignments_result.scalars().all():
         assignment.ended_at = now
 
@@ -228,7 +236,9 @@ async def create_assignment(
         )
     )
     if not staff_check.scalar_one_or_none():
-        raise HTTPException(404, {"error": "Staff not found in this facility", "code": "STAFF_NOT_FOUND"})
+        raise HTTPException(
+            404, {"error": "Staff not found in this facility", "code": "STAFF_NOT_FOUND"}
+        )
 
     # Validate patient is linked to this facility
     link_check = await session.execute(
@@ -239,7 +249,9 @@ async def create_assignment(
         )
     )
     if not link_check.scalar_one_or_none():
-        raise HTTPException(404, {"error": "Patient not linked to this facility", "code": "PATIENT_NOT_LINKED"})
+        raise HTTPException(
+            404, {"error": "Patient not linked to this facility", "code": "PATIENT_NOT_LINKED"}
+        )
 
     existing = await session.execute(
         select(StaffPatientAssignment).where(
@@ -293,8 +305,9 @@ async def remove_assignment(
     if not assignment:
         raise HTTPException(404, {"error": "Assignment not found", "code": "ASSIGNMENT_NOT_FOUND"})
 
-    from datetime import datetime, timezone
-    assignment.ended_at = datetime.now(timezone.utc)
+    from datetime import datetime
+
+    assignment.ended_at = datetime.now(UTC)
 
     await log_audit(admin, "DELETE", "assignment", assignment_id, session=session)
     await session.commit()

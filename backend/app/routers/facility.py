@@ -1,11 +1,13 @@
+import json
 import secrets
+import secrets as _secrets
+import string as _string
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-
-from app.config import get_settings
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.db import get_session
 from app.models.facility import Facility
 from app.models.facility_patient_link import FacilityPatientLink
@@ -13,20 +15,17 @@ from app.models.profile import Profile
 from app.models.staff import Staff
 from app.schemas.facility import FacilityCreate, FacilityResponse, FacilityUpdate
 from app.schemas.staff import PatientLinkRequest, ResidentCreateRequest
-from app.services.auth import hash_access_code
 from app.services.audit_service import log_audit
+from app.services.auth import hash_access_code
 from app.services.crypto import encrypt
 from app.services.rbac import require_role
-
-import json
-import secrets as _secrets
-import string as _string
 
 _CODE_ALPHA = "".join(c for c in _string.ascii_uppercase + _string.digits if c not in "0O1IL")
 
 
 def _generate_access_code() -> str:
     return "".join(_secrets.choice(_CODE_ALPHA) for _ in range(8))
+
 
 router = APIRouter(prefix="/facilities", tags=["facilities"])
 
@@ -37,21 +36,19 @@ def _generate_facility_code() -> str:
     return "".join(secrets.choice(ACCESS_CODE_ALPHABET) for _ in range(8))
 
 
-async def _get_owned_facility(
-    facility_code: str, staff: Staff, session: AsyncSession
-) -> Facility:
+async def _get_owned_facility(facility_code: str, staff: Staff, session: AsyncSession) -> Facility:
     """Resolve a facility from its code and enforce that the authenticated
     caller belongs to it — the multi-tenancy boundary (prevents cross-facility
     IDOR where staff act on another facility by changing the URL code)."""
     code_hash = hash_access_code(facility_code)
-    result = await session.execute(
-        select(Facility).where(Facility.facility_code_hash == code_hash)
-    )
+    result = await session.execute(select(Facility).where(Facility.facility_code_hash == code_hash))
     facility = result.scalar_one_or_none()
     if not facility:
         raise HTTPException(404, {"error": "Facility not found", "code": "FACILITY_NOT_FOUND"})
     if facility.id != staff.facility_id:
-        raise HTTPException(403, {"error": "Access denied for this facility", "code": "WRONG_FACILITY"})
+        raise HTTPException(
+            403, {"error": "Access denied for this facility", "code": "WRONG_FACILITY"}
+        )
     return facility
 
 
@@ -77,7 +74,9 @@ async def create_facility(
         if not existing.scalar_one_or_none():
             break
     else:
-        raise HTTPException(500, {"error": "Could not generate unique code", "code": "CODE_GENERATION_FAILED"})
+        raise HTTPException(
+            500, {"error": "Could not generate unique code", "code": "CODE_GENERATION_FAILED"}
+        )
 
     facility = Facility(
         name=payload.name,
@@ -216,7 +215,9 @@ async def link_patient(
     )
     profile = profile_result.scalar_one_or_none()
     if not profile:
-        raise HTTPException(404, {"error": "Patient profile not found", "code": "PROFILE_NOT_FOUND"})
+        raise HTTPException(
+            404, {"error": "Patient profile not found", "code": "PROFILE_NOT_FOUND"}
+        )
 
     existing = await session.execute(
         select(FacilityPatientLink).where(
@@ -263,7 +264,9 @@ async def create_resident(
         if dup.scalar_one_or_none() is None:
             break
     else:
-        raise HTTPException(500, {"error": "Failed to generate unique code", "code": "CODE_GENERATION_FAILED"})
+        raise HTTPException(
+            500, {"error": "Failed to generate unique code", "code": "CODE_GENERATION_FAILED"}
+        )
 
     profile = Profile(
         access_code_hash=ac_hash,
@@ -307,21 +310,23 @@ async def list_patients(
     facility = await _get_owned_facility(facility_code, staff, session)
 
     links_result = await session.execute(
-        select(FacilityPatientLink, Profile).join(
-            Profile, FacilityPatientLink.profile_id == Profile.id
-        ).where(
+        select(FacilityPatientLink, Profile)
+        .join(Profile, FacilityPatientLink.profile_id == Profile.id)
+        .where(
             FacilityPatientLink.facility_id == facility.id,
             FacilityPatientLink.is_active == True,
         )
     )
     patients = []
     for link, profile in links_result.all():
-        patients.append({
-            "profile_id": profile.id,
-            "disease_stage": profile.disease_stage,
-            "unit": link.unit,
-            "room": link.room,
-            "bed": link.bed,
-        })
+        patients.append(
+            {
+                "profile_id": profile.id,
+                "disease_stage": profile.disease_stage,
+                "unit": link.unit,
+                "room": link.room,
+                "bed": link.bed,
+            }
+        )
 
     return {"patients": patients}

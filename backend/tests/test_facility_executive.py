@@ -9,7 +9,7 @@ decisions, same precedent as the FAC-6 prn_medications fix.
 """
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest_asyncio
 
@@ -24,7 +24,9 @@ from app.services.jwt_service import create_token
 
 
 def _auth(staff):
-    return {"Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"}
+    return {
+        "Authorization": f"Bearer {create_token(staff_id=staff.id, facility_id=staff.facility_id, role=staff.role)}"
+    }
 
 
 def _incident(profile_id, incident_time):
@@ -49,8 +51,10 @@ async def executive_setup(db_session):
     await db_session.flush()
 
     profile = Profile(
-        access_code_hash=hash_access_code("RESIEXE1"), disease_stage="middle",
-        behavioral_patterns=encrypt(json.dumps([])), calming_strategies=encrypt(json.dumps([])),
+        access_code_hash=hash_access_code("RESIEXE1"),
+        disease_stage="middle",
+        behavioral_patterns=encrypt(json.dumps([])),
+        calming_strategies=encrypt(json.dumps([])),
         safety_concerns=encrypt(json.dumps([])),
     )
     db_session.add(profile)
@@ -58,7 +62,7 @@ async def executive_setup(db_session):
 
     db_session.add(FacilityPatientLink(facility_id=fac.id, profile_id=profile.id, is_active=True))
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     # previous 30d window (30-60 days ago): 10 incidents
     # current 30d window (0-30 days ago): 5 incidents -> a real 50% reduction
     incidents = [_incident(profile.id, now - timedelta(days=45)) for _ in range(10)]

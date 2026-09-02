@@ -21,7 +21,11 @@ describe('Button', () => {
   it('does not call onClick when disabled', async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
-    render(<Button disabled onClick={handleClick}>Click</Button>);
+    render(
+      <Button disabled onClick={handleClick}>
+        Click
+      </Button>,
+    );
 
     await user.click(screen.getByRole('button'));
     expect(handleClick).not.toHaveBeenCalled();
@@ -30,7 +34,11 @@ describe('Button', () => {
   it('does not call onClick when loading', async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
-    render(<Button loading onClick={handleClick}>Click</Button>);
+    render(
+      <Button loading onClick={handleClick}>
+        Click
+      </Button>,
+    );
 
     await user.click(screen.getByRole('button'));
     expect(handleClick).not.toHaveBeenCalled();
@@ -99,7 +107,11 @@ describe('Button', () => {
   });
 
   it('forwards additional HTML attributes', () => {
-    render(<Button type="submit" aria-label="Submit form">Submit</Button>);
+    render(
+      <Button type="submit" aria-label="Submit form">
+        Submit
+      </Button>,
+    );
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('type', 'submit');
     expect(button).toHaveAttribute('aria-label', 'Submit form');

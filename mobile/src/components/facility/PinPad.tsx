@@ -1,13 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Platform,
-  Pressable,
-  Text,
-  View,
-  type ViewStyle,
-} from 'react-native';
+import { Animated, Platform, Pressable, Text, View, type ViewStyle } from 'react-native';
 import { useTheme } from '../ThemeContext';
 import { Button } from '../Button';
 
@@ -98,7 +91,14 @@ export function PinPad({
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.error, textAlign: 'center' }}>
           Account temporarily locked
         </Text>
-        <Text style={{ fontSize: 14, color: colors.mutedForeground, textAlign: 'center', maxWidth: 280 }}>
+        <Text
+          style={{
+            fontSize: 14,
+            color: colors.mutedForeground,
+            textAlign: 'center',
+            maxWidth: 280,
+          }}
+        >
           Contact your charge nurse to reset
         </Text>
         {onBackToSelect && (
@@ -112,7 +112,11 @@ export function PinPad({
 
   return (
     <View style={{ alignItems: 'center', paddingVertical: 16 }}>
-      <Animated.View style={[dotRow, { transform: [{ translateX: shakeAnim }] }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Animated.View
+        style={[dotRow, { transform: [{ translateX: shakeAnim }] }]}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         {Array.from({ length: maxLength }).map((_, i) => (
           <View
             key={i}

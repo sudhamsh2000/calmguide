@@ -8,10 +8,7 @@ export interface BreathingIndicatorProps {
   className?: string;
 }
 
-export function BreathingIndicator({
-  message,
-  className = '',
-}: BreathingIndicatorProps) {
+export function BreathingIndicator({ message, className = '' }: BreathingIndicatorProps) {
   const t = useTranslations('coach');
   const resolvedMessage = message ?? t('finding_guidance');
   return (
@@ -20,10 +17,7 @@ export function BreathingIndicator({
       aria-live="polite"
       className={`flex flex-col items-center gap-4 ${className}`}
     >
-      <div
-        className="animate-breathing h-16 w-16 rounded-full bg-primary/30"
-        aria-hidden="true"
-      />
+      <div className="animate-breathing h-16 w-16 rounded-full bg-primary/30" aria-hidden="true" />
       <p className="text-base text-foreground-muted font-sans">{resolvedMessage}</p>
     </div>
   );

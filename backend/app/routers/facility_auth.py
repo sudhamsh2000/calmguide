@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
@@ -8,8 +8,8 @@ from app.db import get_session
 from app.models.facility import Facility
 from app.models.staff import Staff
 from app.schemas.staff import AuthResponse, EmailLoginRequest, PinLoginRequest, StaffResponse
-from app.services.auth import hash_access_code
 from app.services.audit_service import log_audit
+from app.services.auth import hash_access_code
 from app.services.facility_auth import verify_password, verify_pin
 from app.services.jwt_service import create_token
 from app.services.rbac import require_role
@@ -67,9 +67,11 @@ async def pin_login(
     if not staff:
         raise HTTPException(404, {"error": "Staff not found", "code": "STAFF_NOT_FOUND"})
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if staff.locked_until and staff.locked_until > now:
-        raise HTTPException(423, {"error": "Account locked. Try again later.", "code": "ACCOUNT_LOCKED"})
+        raise HTTPException(
+            423, {"error": "Account locked. Try again later.", "code": "ACCOUNT_LOCKED"}
+        )
 
     if not staff.pin_hash or not verify_pin(payload.pin, staff.pin_hash):
         staff.failed_login_count += 1
@@ -86,8 +88,11 @@ async def pin_login(
     await session.commit()
 
     token = create_token(
-        staff_id=staff.id, facility_id=facility.id, role=staff.role,
-        expiry_seconds=PIN_TOKEN_EXPIRY_SECONDS, auth_method="pin",
+        staff_id=staff.id,
+        facility_id=facility.id,
+        role=staff.role,
+        expiry_seconds=PIN_TOKEN_EXPIRY_SECONDS,
+        auth_method="pin",
     )
     exp = now + timedelta(seconds=PIN_TOKEN_EXPIRY_SECONDS)
 
@@ -113,7 +118,7 @@ async def email_login(
     if not staff or not staff.password_hash:
         raise HTTPException(401, {"error": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if staff.locked_until and staff.locked_until > now:
         raise HTTPException(423, {"error": "Account locked", "code": "ACCOUNT_LOCKED"})
 
@@ -132,10 +137,13 @@ async def email_login(
     await session.commit()
 
     token = create_token(
-        staff_id=staff.id, facility_id=staff.facility_id, role=staff.role,
+        staff_id=staff.id,
+        facility_id=staff.facility_id,
+        role=staff.role,
         auth_method="password",
     )
     from app.config import get_settings
+
     exp = now + timedelta(seconds=get_settings().JWT_EXPIRY_SECONDS)
 
     return AuthResponse(
@@ -158,13 +166,19 @@ async def refresh_token(
     expiry_seconds = PIN_TOKEN_EXPIRY_SECONDS if auth_method == "pin" else None
 
     token = create_token(
-        staff_id=staff.id, facility_id=staff.facility_id, role=staff.role,
-        expiry_seconds=expiry_seconds, auth_method=auth_method,
+        staff_id=staff.id,
+        facility_id=staff.facility_id,
+        role=staff.role,
+        expiry_seconds=expiry_seconds,
+        auth_method=auth_method,
     )
 
     from app.config import get_settings
-    exp_seconds = expiry_seconds if expiry_seconds is not None else get_settings().JWT_EXPIRY_SECONDS
-    exp = datetime.now(timezone.utc) + timedelta(seconds=exp_seconds)
+
+    exp_seconds = (
+        expiry_seconds if expiry_seconds is not None else get_settings().JWT_EXPIRY_SECONDS
+    )
+    exp = datetime.now(UTC) + timedelta(seconds=exp_seconds)
     return {
         "token": token,
         "staff": _staff_response(staff),

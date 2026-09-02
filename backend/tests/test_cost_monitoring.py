@@ -3,9 +3,9 @@
 from app.services.prompt import render_coach_prompt
 from tests.evaluation.labeled_conversations import LABELED_CONVERSATIONS
 from tests.evaluation.run_extraction_eval import (
+    F1_TARGETS,
     compute_field_accuracy,
     run_evaluation_report,
-    F1_TARGETS,
 )
 
 

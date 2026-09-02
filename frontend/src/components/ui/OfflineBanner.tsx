@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useTranslations } from 'next-intl';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 /**
  * Persistent banner shown while the browser is known to be offline (P2-12
@@ -16,7 +16,7 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
  */
 export function OfflineBanner() {
   const { isOnline } = useNetworkStatus();
-  const t = useTranslations("common");
+  const t = useTranslations('common');
 
   if (isOnline !== false) return null;
 
@@ -26,8 +26,10 @@ export function OfflineBanner() {
       aria-live="polite"
       className="rounded-2xl border-s-4 border-s-foreground-muted bg-foreground-muted/10 px-4 py-3.5 flex flex-col gap-1"
     >
-      <p className="text-sm font-bold text-foreground">{t("network.offline_banner")}</p>
-      <p className="text-[13px] text-foreground-muted leading-snug">{t("network.offline_detail")}</p>
+      <p className="text-sm font-bold text-foreground">{t('network.offline_banner')}</p>
+      <p className="text-[13px] text-foreground-muted leading-snug">
+        {t('network.offline_detail')}
+      </p>
     </div>
   );
 }

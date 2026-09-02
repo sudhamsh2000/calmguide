@@ -1,4 +1,5 @@
 """Pydantic v2 schemas for daily behavioral check-in."""
+
 from pydantic import BaseModel, Field
 
 SEVERITY_OPTIONS = ["calm", "mild", "tough"]

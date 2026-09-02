@@ -246,9 +246,7 @@ class TestPriorityOrder:
         assert result.gate_type == SafetyGateType.LIFE_THREAT
 
     def test_no_trigger_on_normal_message(self):
-        result = check_safety_gate(
-            "Mom keeps asking where dad is. He passed away 3 years ago."
-        )
+        result = check_safety_gate("Mom keeps asking where dad is. He passed away 3 years ago.")
         assert not result.triggered
         assert result.gate_type is None
         assert result.response_text == ""

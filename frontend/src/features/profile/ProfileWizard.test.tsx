@@ -90,7 +90,9 @@ describe('ProfileWizard', () => {
     await user.click(screen.getByRole('button', { name: 'Next' }));
 
     await waitFor(() => {
-      expect(screen.getByText("That invite code isn't valid. Double check it and try again.")).toBeInTheDocument();
+      expect(
+        screen.getByText("That invite code isn't valid. Double check it and try again."),
+      ).toBeInTheDocument();
     });
     expect(screen.getByText('Step 1 of 6')).toBeInTheDocument();
   });

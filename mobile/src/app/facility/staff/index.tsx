@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/components/ThemeContext';
@@ -29,7 +22,9 @@ export default function StaffListScreen() {
     try {
       const list = await getStaffList(code);
       setStaff(list);
-    } catch { /* handled by empty state */ }
+    } catch {
+      /* handled by empty state */
+    }
   }, []);
 
   useEffect(() => {
@@ -45,7 +40,14 @@ export default function StaffListScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -56,10 +58,21 @@ export default function StaffListScreen() {
       <ScrollView
         contentContainerStyle={{ padding: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+          />
         }
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}
+        >
           <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground }}>
             {t('staff.title')}
           </Text>
@@ -74,10 +87,20 @@ export default function StaffListScreen() {
 
         {staff.length === 0 && (
           <View style={{ alignItems: 'center', paddingVertical: 48 }}>
-            <Text style={{ fontSize: 18, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}>
+            <Text
+              style={{ fontSize: 18, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}
+            >
               {t('empty.staff_title')}
             </Text>
-            <Text style={{ fontSize: 14, color: colors.mutedForeground, textAlign: 'center', maxWidth: 300, marginBottom: 24 }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.mutedForeground,
+                textAlign: 'center',
+                maxWidth: 300,
+                marginBottom: 24,
+              }}
+            >
               {t('empty.staff_description')}
             </Text>
             <Button onPress={() => router.push('/facility/staff/new')}>
@@ -108,11 +131,21 @@ export default function StaffListScreen() {
                 {s.name}
               </Text>
               <Text style={{ fontSize: 13, color: colors.mutedForeground, marginTop: 2 }}>
-                {s.role === 'staff' ? t('staff.role_staff') : s.role === 'admin' ? t('staff.role_admin') : s.role}
-                {' · '}{s.assigned_patients_count} {t('staff.residents_col').toLowerCase()}
+                {s.role === 'staff'
+                  ? t('staff.role_staff')
+                  : s.role === 'admin'
+                    ? t('staff.role_admin')
+                    : s.role}
+                {' · '}
+                {s.assigned_patients_count} {t('staff.residents_col').toLowerCase()}
               </Text>
             </View>
-            <Text style={{ fontSize: 12, color: s.last_login_at ? colors.success : colors.mutedForeground }}>
+            <Text
+              style={{
+                fontSize: 12,
+                color: s.last_login_at ? colors.success : colors.mutedForeground,
+              }}
+            >
               {s.last_login_at ? formatRelative(s.last_login_at) : t('staff.inactive')}
             </Text>
           </Pressable>

@@ -40,7 +40,9 @@ export function LandingNav() {
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-colors ${
-        scrolled ? 'bg-surface/90 backdrop-blur-md shadow-sm border-b border-theme' : 'bg-transparent'
+        scrolled
+          ? 'bg-surface/90 backdrop-blur-md shadow-sm border-b border-theme'
+          : 'bg-transparent'
       }`}
     >
       <a
@@ -93,11 +95,31 @@ export function LandingNav() {
           className="focus-ring inline-flex min-h-tap min-w-tap items-center justify-center rounded-xl text-foreground lg:hidden"
         >
           {mobileOpen ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M3 6h18M3 12h18M3 18h18" />
             </svg>
           )}
@@ -105,7 +127,10 @@ export function LandingNav() {
       </div>
 
       {mobileOpen && (
-        <div id="landing-mobile-nav" className="border-t border-theme bg-surface px-5 py-4 lg:hidden">
+        <div
+          id="landing-mobile-nav"
+          className="border-t border-theme bg-surface px-5 py-4 lg:hidden"
+        >
           <nav className="flex flex-col" aria-label="Main">
             {NAV_LINKS.map((link) => (
               <a

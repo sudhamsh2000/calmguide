@@ -7,14 +7,7 @@ import { ACCESS_CODE_LENGTH, sanitizeAccessCode, validateLoginInput } from '@/li
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CODE_LENGTH = ACCESS_CODE_LENGTH;
@@ -32,9 +25,11 @@ export default function LoginScreen() {
     setError('');
     const result = validateLoginInput(accessCode, patientName);
     if (!result.valid) {
-      setError(result.error === 'incomplete_code'
-        ? t('login.error_incomplete_code')
-        : t('login.error_missing_name'));
+      setError(
+        result.error === 'incomplete_code'
+          ? t('login.error_incomplete_code')
+          : t('login.error_missing_name'),
+      );
       return;
     }
     const code = result.code;
@@ -125,7 +120,9 @@ export default function LoginScreen() {
           ) : null}
 
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 4 }}>
-            <Text style={{ fontSize: 13, color: colors.mutedForeground }}>{t('login.no_code')}</Text>
+            <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+              {t('login.no_code')}
+            </Text>
             <Pressable
               onPress={() => router.push('/profile/setup')}
               accessibilityRole="link"

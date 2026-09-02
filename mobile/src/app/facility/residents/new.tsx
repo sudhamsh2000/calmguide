@@ -94,7 +94,9 @@ function TagInput({
             >
               <Text style={{ fontSize: 13, color: colors.foreground }}>{item}</Text>
               <Pressable onPress={() => onChange(items.filter((_, idx) => idx !== i))}>
-                <Text style={{ fontSize: 16, color: colors.mutedForeground, fontWeight: '700' }}>×</Text>
+                <Text style={{ fontSize: 16, color: colors.mutedForeground, fontWeight: '700' }}>
+                  ×
+                </Text>
               </Pressable>
             </View>
           ))}
@@ -120,7 +122,9 @@ export default function AddResidentScreen() {
   const [staffList, setStaffList] = useState<StaffDetail[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ accessCode: string; assignedCount: number } | null>(null);
+  const [success, setSuccess] = useState<{ accessCode: string; assignedCount: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     getFacilityCode().then(async (code) => {
@@ -128,14 +132,14 @@ export default function AddResidentScreen() {
       try {
         const list = await getStaffList(code);
         setStaffList(list.filter((s) => s.is_active && s.role === 'staff'));
-      } catch { /* silent */ }
+      } catch {
+        /* silent */
+      }
     });
   }, []);
 
   const toggleStaff = (id: string) => {
-    setSelectedStaff((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
-    );
+    setSelectedStaff((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
   };
 
   const handleSubmit = useCallback(async () => {
@@ -159,7 +163,9 @@ export default function AddResidentScreen() {
         try {
           await createAssignment(code, { staff_id: staffId, profile_id: result.profile_id });
           assignedCount++;
-        } catch { /* continue */ }
+        } catch {
+          /* continue */
+        }
       }
 
       setSuccess({ accessCode: result.access_code, assignedCount });
@@ -203,26 +209,69 @@ export default function AddResidentScreen() {
 
   if (success) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <View style={{
-          width: 64, height: 64, borderRadius: 32, backgroundColor: '#E0F0E7',
-          alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-        }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 24,
+        }}
+      >
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 32,
+            backgroundColor: '#E0F0E7',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 16,
+          }}
+        >
           <Text style={{ fontSize: 28, color: '#3A7D5C' }}>✓</Text>
         </View>
-        <Text style={{ fontSize: 20, fontWeight: '700', color: colors.foreground, marginBottom: 16 }}>
+        <Text
+          style={{ fontSize: 20, fontWeight: '700', color: colors.foreground, marginBottom: 16 }}
+        >
           {t('add_resident.success_title')}
         </Text>
-        <View style={{
-          borderWidth: 2, borderColor: `${colors.primary}50`, backgroundColor: `${colors.primary}08`,
-          borderRadius: 16, paddingHorizontal: 24, paddingVertical: 16, marginBottom: 12, alignItems: 'center',
-        }}>
-          <Text style={{ fontSize: 12, color: colors.mutedForeground, marginBottom: 4 }}>Access Code</Text>
-          <Text style={{ fontSize: 24, fontWeight: '700', fontFamily: 'monospace', letterSpacing: 4, color: colors.primary }}>
+        <View
+          style={{
+            borderWidth: 2,
+            borderColor: `${colors.primary}50`,
+            backgroundColor: `${colors.primary}08`,
+            borderRadius: 16,
+            paddingHorizontal: 24,
+            paddingVertical: 16,
+            marginBottom: 12,
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 12, color: colors.mutedForeground, marginBottom: 4 }}>
+            Access Code
+          </Text>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: '700',
+              fontFamily: 'monospace',
+              letterSpacing: 4,
+              color: colors.primary,
+            }}
+          >
             {success.accessCode}
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: colors.mutedForeground, textAlign: 'center', marginBottom: 12, maxWidth: 280 }}>
+        <Text
+          style={{
+            fontSize: 13,
+            color: colors.mutedForeground,
+            textAlign: 'center',
+            marginBottom: 12,
+            maxWidth: 280,
+          }}
+        >
           {t('add_resident.success_message', { code: success.accessCode })}
         </Text>
         {success.assignedCount > 0 && (
@@ -231,7 +280,9 @@ export default function AddResidentScreen() {
           </Text>
         )}
         <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 320 }}>
-          <Button style={{ flex: 1 }} onPress={resetForm}>{t('add_resident.add_another')}</Button>
+          <Button style={{ flex: 1 }} onPress={resetForm}>
+            {t('add_resident.add_another')}
+          </Button>
           <Button style={{ flex: 1 }} variant="secondary" onPress={() => router.back()}>
             {t('add_resident.view_residents')}
           </Button>
@@ -245,13 +296,20 @@ export default function AddResidentScreen() {
       style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-        <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 24 }}>
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text
+          style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 24 }}
+        >
           {t('add_resident.title')}
         </Text>
 
         {/* Disease Stage */}
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}
+        >
           {t('add_resident.disease_stage')} *
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
@@ -268,28 +326,56 @@ export default function AddResidentScreen() {
         </View>
 
         {/* Location */}
-        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 8 }}
+        >
           {t('add_resident.location')}
         </Text>
         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>{t('add_resident.unit')}</Text>
-            <TextInput value={unit} onChangeText={setUnit} placeholder={t('add_resident.unit_placeholder')} placeholderTextColor={colors.mutedForeground} style={inputStyle} />
+            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>
+              {t('add_resident.unit')}
+            </Text>
+            <TextInput
+              value={unit}
+              onChangeText={setUnit}
+              placeholder={t('add_resident.unit_placeholder')}
+              placeholderTextColor={colors.mutedForeground}
+              style={inputStyle}
+            />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>{t('add_resident.room')}</Text>
-            <TextInput value={room} onChangeText={setRoom} placeholder={t('add_resident.room_placeholder')} placeholderTextColor={colors.mutedForeground} style={inputStyle} />
+            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>
+              {t('add_resident.room')}
+            </Text>
+            <TextInput
+              value={room}
+              onChangeText={setRoom}
+              placeholder={t('add_resident.room_placeholder')}
+              placeholderTextColor={colors.mutedForeground}
+              style={inputStyle}
+            />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>{t('add_resident.bed')}</Text>
-            <TextInput value={bed} onChangeText={setBed} placeholder={t('add_resident.bed_placeholder')} placeholderTextColor={colors.mutedForeground} style={inputStyle} />
+            <Text style={{ fontSize: 11, color: colors.mutedForeground, marginBottom: 4 }}>
+              {t('add_resident.bed')}
+            </Text>
+            <TextInput
+              value={bed}
+              onChangeText={setBed}
+              placeholder={t('add_resident.bed_placeholder')}
+              placeholderTextColor={colors.mutedForeground}
+              style={inputStyle}
+            />
           </View>
         </View>
 
         {/* Staff Assignment */}
         {staffList.length > 0 && (
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 4 }}>
+            <Text
+              style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 4 }}
+            >
               {t('add_resident.assign_staff')}
             </Text>
             <Text style={{ fontSize: 12, color: colors.mutedForeground, marginBottom: 10 }}>
@@ -314,16 +400,26 @@ export default function AddResidentScreen() {
                     marginBottom: 8,
                   }}
                 >
-                  <View style={{
-                    width: 22, height: 22, borderRadius: 4,
-                    borderWidth: 2, borderColor: checked ? colors.primary : colors.border,
-                    backgroundColor: checked ? colors.primary : 'transparent',
-                    alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {checked && <Text style={{ color: '#FFF', fontSize: 13, fontWeight: '700' }}>✓</Text>}
+                  <View
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 4,
+                      borderWidth: 2,
+                      borderColor: checked ? colors.primary : colors.border,
+                      backgroundColor: checked ? colors.primary : 'transparent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {checked && (
+                      <Text style={{ color: '#FFF', fontSize: 13, fontWeight: '700' }}>✓</Text>
+                    )}
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>{staff.name}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
+                      {staff.name}
+                    </Text>
                     <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
                       {staff.assigned_patients_count} {t('add_resident.assign_current')}
                     </Text>
@@ -335,33 +431,68 @@ export default function AddResidentScreen() {
         )}
 
         {/* Behavioral Profile */}
-        <View style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, marginBottom: 20 }}>
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: colors.border,
+            paddingTop: 16,
+            marginBottom: 20,
+          }}
+        >
           <Text style={{ fontSize: 12, color: colors.mutedForeground, marginBottom: 16 }}>
             {t('add_resident.optional_section')}
           </Text>
 
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+          <Text
+            style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+          >
             {t('add_resident.behavioral_patterns')}
           </Text>
-          <TagInput items={patterns} onChange={setPatterns} placeholder={t('add_resident.behavioral_placeholder')} hint={t('add_resident.hint_comma')} colors={colors} />
+          <TagInput
+            items={patterns}
+            onChange={setPatterns}
+            placeholder={t('add_resident.behavioral_placeholder')}
+            hint={t('add_resident.hint_comma')}
+            colors={colors}
+          />
 
           <View style={{ height: 16 }} />
 
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+          <Text
+            style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+          >
             {t('add_resident.calming_strategies')}
           </Text>
-          <TagInput items={strategies} onChange={setStrategies} placeholder={t('add_resident.calming_placeholder')} hint={t('add_resident.hint_comma')} colors={colors} />
+          <TagInput
+            items={strategies}
+            onChange={setStrategies}
+            placeholder={t('add_resident.calming_placeholder')}
+            hint={t('add_resident.hint_comma')}
+            colors={colors}
+          />
 
           <View style={{ height: 16 }} />
 
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}>
+          <Text
+            style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, marginBottom: 6 }}
+          >
             {t('add_resident.safety_concerns')}
           </Text>
-          <TagInput items={concerns} onChange={setConcerns} placeholder={t('add_resident.safety_placeholder')} hint={t('add_resident.hint_comma')} colors={colors} />
+          <TagInput
+            items={concerns}
+            onChange={setConcerns}
+            placeholder={t('add_resident.safety_placeholder')}
+            hint={t('add_resident.hint_comma')}
+            colors={colors}
+          />
         </View>
 
         {error && (
-          <Text style={{ fontSize: 13, color: colors.error, textAlign: 'center', marginBottom: 12 }}>{error}</Text>
+          <Text
+            style={{ fontSize: 13, color: colors.error, textAlign: 'center', marginBottom: 12 }}
+          >
+            {error}
+          </Text>
         )}
 
         <Button size="lg" onPress={handleSubmit} loading={submitting}>

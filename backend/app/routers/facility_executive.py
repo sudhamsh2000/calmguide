@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
@@ -21,21 +21,23 @@ async def executive_overview(
     session: AsyncSession = Depends(get_session),
 ):
     facility_id = staff.facility_id
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
-    facility_result = await session.execute(
-        select(Facility).where(Facility.id == facility_id)
-    )
+    facility_result = await session.execute(select(Facility).where(Facility.id == facility_id))
     facility = facility_result.scalar_one_or_none()
     created_at = facility.created_at if facility else None
     if created_at and created_at.tzinfo is None:
-        created_at = created_at.replace(tzinfo=timezone.utc)
+        created_at = created_at.replace(tzinfo=UTC)
     days_active = (now - created_at).days if created_at else 0
 
-    linked_profiles = select(FacilityPatientLink.profile_id).where(
-        FacilityPatientLink.facility_id == facility_id,
-        FacilityPatientLink.is_active == True,
-    ).scalar_subquery()
+    linked_profiles = (
+        select(FacilityPatientLink.profile_id)
+        .where(
+            FacilityPatientLink.facility_id == facility_id,
+            FacilityPatientLink.is_active == True,
+        )
+        .scalar_subquery()
+    )
 
     thirty_days_ago = now - timedelta(days=30)
     sixty_days_ago = now - timedelta(days=60)

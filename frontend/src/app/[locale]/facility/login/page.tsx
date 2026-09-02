@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { StaffSelector } from "@/components/facility/StaffSelector";
-import { PinPad } from "@/components/facility/PinPad";
-import { BackButton } from "@/components/ui/BackButton";
-import { useFacility } from "@/context/FacilityContext";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { StaffSelector } from '@/components/facility/StaffSelector';
+import { PinPad } from '@/components/facility/PinPad';
+import { BackButton } from '@/components/ui/BackButton';
+import { useFacility } from '@/context/FacilityContext';
 import {
   getActiveStaff,
   verifyFacilityCode,
   pinLogin,
   emailLogin,
   FacilityApiError,
-} from "@/lib/facility-api";
-import type { StaffListItem } from "@/lib/facility-api";
+} from '@/lib/facility-api';
+import type { StaffListItem } from '@/lib/facility-api';
 import {
   clearFacilityCode,
   getFacilityCode,
@@ -23,27 +23,27 @@ import {
   setFacilityCode,
   setFacilityLoginMode,
   setFacilityName as storeFacilityName,
-} from "@/lib/facility-storage";
+} from '@/lib/facility-storage';
 
-type LoginMode = "staff-select" | "pin" | "email" | "facility-code";
-type RestorableLoginMode = Exclude<LoginMode, "pin">;
+type LoginMode = 'staff-select' | 'pin' | 'email' | 'facility-code';
+type RestorableLoginMode = Exclude<LoginMode, 'pin'>;
 
 export default function FacilityLoginPage() {
-  const t = useTranslations("facility");
+  const t = useTranslations('facility');
   const router = useRouter();
   const { state, dispatch } = useFacility();
   const bootstrappedRef = useRef(false);
 
-  const [mode, setMode] = useState<LoginMode>("facility-code");
+  const [mode, setMode] = useState<LoginMode>('facility-code');
   const [isBootstrapping, setIsBootstrapping] = useState(true);
-  const [facilityCode, setFacilityCodeLocal] = useState("");
-  const [facilityName, setFacilityName] = useState("");
+  const [facilityCode, setFacilityCodeLocal] = useState('');
+  const [facilityName, setFacilityName] = useState('');
   const [staffList, setStaffList] = useState<StaffListItem[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<StaffListItem | null>(null);
   const [staffLoading, setStaffLoading] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [pinLocked, setPinLocked] = useState(false);
@@ -53,37 +53,42 @@ export default function FacilityLoginPage() {
     setMode(nextMode);
   }, []);
 
-  const loadFacilityStaff = useCallback(async (code: string, options?: { optimisticStaffSelect?: boolean }) => {
-    const optimisticStaffSelect = options?.optimisticStaffSelect ?? false;
-    setStaffLoading(true);
-    setCodeError(null);
-    try {
-      const [facilityData, staffData] = await Promise.all([
-        verifyFacilityCode(code),
-        getActiveStaff(code),
-      ]);
-      setFacilityName(facilityData.name);
-      setStaffList(staffData.staff);
-      setFacilityCode(code);
-      storeFacilityName(facilityData.name);
-      dispatch({
-        type: "SET_FACILITY",
-        payload: { facilityCode: code, facilityName: facilityData.name },
-      });
-      setRestorableMode("staff-select");
-    } catch (err) {
-      if (optimisticStaffSelect) {
-        setRestorableMode("facility-code");
+  const loadFacilityStaff = useCallback(
+    async (code: string, options?: { optimisticStaffSelect?: boolean }) => {
+      const optimisticStaffSelect = options?.optimisticStaffSelect ?? false;
+      setStaffLoading(true);
+      setCodeError(null);
+      try {
+        const [facilityData, staffData] = await Promise.all([
+          verifyFacilityCode(code),
+          getActiveStaff(code),
+        ]);
+        setFacilityName(facilityData.name);
+        setStaffList(staffData.staff);
+        setFacilityCode(code);
+        storeFacilityName(facilityData.name);
+        dispatch({
+          type: 'SET_FACILITY',
+          payload: { facilityCode: code, facilityName: facilityData.name },
+        });
+        setRestorableMode('staff-select');
+      } catch (err) {
+        if (optimisticStaffSelect) {
+          setRestorableMode('facility-code');
+        }
+        if (err instanceof FacilityApiError && err.status === 404) {
+          setCodeError(
+            'Facility code not recognized. Double-check the code on your welcome sheet.',
+          );
+        } else {
+          setCodeError('Could not reach the server. Check your connection and try again.');
+        }
+      } finally {
+        setStaffLoading(false);
       }
-      if (err instanceof FacilityApiError && err.status === 404) {
-        setCodeError("Facility code not recognized. Double-check the code on your welcome sheet.");
-      } else {
-        setCodeError("Could not reach the server. Check your connection and try again.");
-      }
-    } finally {
-      setStaffLoading(false);
-    }
-  }, [dispatch]);
+    },
+    [dispatch],
+  );
 
   // Check if facility code already stored
   useEffect(() => {
@@ -91,21 +96,21 @@ export default function FacilityLoginPage() {
     bootstrappedRef.current = true;
 
     const storedCode = state.facilityCode ?? getFacilityCode();
-    const storedName = state.facilityName ?? getFacilityName() ?? "";
+    const storedName = state.facilityName ?? getFacilityName() ?? '';
     const storedMode = getFacilityLoginMode();
 
-    if (storedMode === "email") {
-      setFacilityCodeLocal(storedCode ?? "");
+    if (storedMode === 'email') {
+      setFacilityCodeLocal(storedCode ?? '');
       if (storedName) {
         setFacilityName(storedName);
       }
-      setRestorableMode("email");
+      setRestorableMode('email');
       setIsBootstrapping(false);
       return;
     }
 
     if (!storedCode) {
-      setRestorableMode("facility-code");
+      setRestorableMode('facility-code');
       setIsBootstrapping(false);
       return;
     }
@@ -114,7 +119,7 @@ export default function FacilityLoginPage() {
     if (storedName) {
       setFacilityName(storedName);
     }
-    setRestorableMode("staff-select");
+    setRestorableMode('staff-select');
     setStaffLoading(true);
     setIsBootstrapping(false);
     void loadFacilityStaff(storedCode, { optimisticStaffSelect: true });
@@ -124,12 +129,12 @@ export default function FacilityLoginPage() {
   useEffect(() => {
     if (state.authenticated && state.staff) {
       const role = state.staff.role;
-      if (role === "staff") {
-        router.push("/facility/residents");
-      } else if (role === "admin") {
-        router.push("/facility/dashboard");
+      if (role === 'staff') {
+        router.push('/facility/residents');
+      } else if (role === 'admin') {
+        router.push('/facility/dashboard');
       } else {
-        router.push("/facility/executive");
+        router.push('/facility/executive');
       }
     }
   }, [state.authenticated, state.staff, router]);
@@ -139,7 +144,7 @@ export default function FacilityLoginPage() {
       e.preventDefault();
       const code = facilityCode.trim().toUpperCase();
       if (code.length !== 8) {
-        setCodeError("Facility code must be 8 characters.");
+        setCodeError('Facility code must be 8 characters.');
         return;
       }
       loadFacilityStaff(code);
@@ -151,18 +156,18 @@ export default function FacilityLoginPage() {
     setSelectedStaff(staff);
     setPinError(null);
     setPinLocked(false);
-    setMode("pin");
+    setMode('pin');
   }, []);
 
   const handlePinComplete = useCallback(
     async (pin: string) => {
       if (!selectedStaff) return;
-      dispatch({ type: "LOGIN_START" });
+      dispatch({ type: 'LOGIN_START' });
       setPinError(null);
       try {
         const data = await pinLogin(facilityCode, selectedStaff.id, pin);
         dispatch({
-          type: "LOGIN_SUCCESS",
+          type: 'LOGIN_SUCCESS',
           payload: {
             staff: data.staff,
             facilityCode,
@@ -172,16 +177,18 @@ export default function FacilityLoginPage() {
       } catch (err) {
         if (err instanceof FacilityApiError) {
           const body = err.body as Record<string, string> | undefined;
-          if (body?.code === "ACCOUNT_LOCKED") {
+          if (body?.code === 'ACCOUNT_LOCKED') {
             setPinLocked(true);
-            setPinError("PIN locked after too many attempts. Contact your charge nurse to reset, or wait 30 minutes.");
+            setPinError(
+              'PIN locked after too many attempts. Contact your charge nurse to reset, or wait 30 minutes.',
+            );
           } else {
-            setPinError(t("login.incorrect_pin"));
+            setPinError(t('login.incorrect_pin'));
           }
         } else {
-          setPinError(t("login.incorrect_pin"));
+          setPinError(t('login.incorrect_pin'));
         }
-        dispatch({ type: "LOGIN_ERROR", payload: "PIN login failed" });
+        dispatch({ type: 'LOGIN_ERROR', payload: 'PIN login failed' });
       }
     },
     [selectedStaff, facilityCode, facilityName, dispatch, t],
@@ -190,31 +197,31 @@ export default function FacilityLoginPage() {
   const handleEmailLogin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      dispatch({ type: "LOGIN_START" });
+      dispatch({ type: 'LOGIN_START' });
       setEmailError(null);
       try {
         const data = await emailLogin(email, password);
-        setFacilityCode(facilityCode || "admin");
+        setFacilityCode(facilityCode || 'admin');
         dispatch({
-          type: "LOGIN_SUCCESS",
+          type: 'LOGIN_SUCCESS',
           payload: {
             staff: data.staff,
-            facilityCode: facilityCode || "admin",
-            facilityName: facilityName || "Facility",
+            facilityCode: facilityCode || 'admin',
+            facilityName: facilityName || 'Facility',
           },
         });
       } catch (err) {
         if (err instanceof FacilityApiError) {
           const body = err.body as Record<string, string> | undefined;
-          if (body?.code === "ACCOUNT_LOCKED") {
-            setEmailError(t("login.account_locked"));
+          if (body?.code === 'ACCOUNT_LOCKED') {
+            setEmailError(t('login.account_locked'));
           } else {
-            setEmailError("Invalid email or password.");
+            setEmailError('Invalid email or password.');
           }
         } else {
-          setEmailError("Could not reach the server. Check your connection and try again.");
+          setEmailError('Could not reach the server. Check your connection and try again.');
         }
-        dispatch({ type: "LOGIN_ERROR", payload: "Email login failed" });
+        dispatch({ type: 'LOGIN_ERROR', payload: 'Email login failed' });
       }
     },
     [email, password, facilityCode, facilityName, dispatch, t],
@@ -224,7 +231,7 @@ export default function FacilityLoginPage() {
     setSelectedStaff(null);
     setPinError(null);
     setPinLocked(false);
-    setRestorableMode("staff-select");
+    setRestorableMode('staff-select');
   }, [setRestorableMode]);
 
   const handleShowEmailLogin = useCallback(() => {
@@ -233,21 +240,21 @@ export default function FacilityLoginPage() {
     setPinLocked(false);
     setCodeError(null);
     setEmailError(null);
-    setRestorableMode("email");
+    setRestorableMode('email');
   }, [setRestorableMode]);
 
   const handleChangeFacility = useCallback(() => {
     clearFacilityCode();
-    dispatch({ type: "CLEAR_FACILITY" });
+    dispatch({ type: 'CLEAR_FACILITY' });
     setSelectedStaff(null);
     setStaffList([]);
-    setFacilityCodeLocal("");
-    setFacilityName("");
+    setFacilityCodeLocal('');
+    setFacilityName('');
     setCodeError(null);
     setEmailError(null);
     setPinError(null);
     setPinLocked(false);
-    setRestorableMode("facility-code");
+    setRestorableMode('facility-code');
   }, [dispatch, setRestorableMode]);
 
   const handleBackToStaffLogin = useCallback(() => {
@@ -257,11 +264,11 @@ export default function FacilityLoginPage() {
     setPinLocked(false);
 
     if (!facilityCode) {
-      setRestorableMode("facility-code");
+      setRestorableMode('facility-code');
       return;
     }
 
-    setRestorableMode("staff-select");
+    setRestorableMode('staff-select');
     if (staffList.length === 0 && !staffLoading) {
       void loadFacilityStaff(facilityCode, { optimisticStaffSelect: true });
     }
@@ -279,7 +286,10 @@ export default function FacilityLoginPage() {
     <main className="flex flex-col items-center h-full overflow-y-auto px-4 pt-4 pb-24 sm:px-5 sm:pt-8 sm:pb-8">
       <div className="mb-4 flex w-full items-center gap-3">
         <BackButton href="/" label="Back to welcome" />
-        <h1 className="text-xl font-medium text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+        <h1
+          className="text-xl font-medium text-foreground"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
           Facility Login
         </h1>
       </div>
@@ -292,10 +302,13 @@ export default function FacilityLoginPage() {
       )}
 
       {/* Facility code entry */}
-      {mode === "facility-code" && (
+      {mode === 'facility-code' && (
         <form onSubmit={handleCodeSubmit} className="w-full max-w-sm flex flex-col gap-4">
           <div>
-            <label htmlFor="facility-code" className="block text-sm font-medium text-foreground mb-1.5">
+            <label
+              htmlFor="facility-code"
+              className="block text-sm font-medium text-foreground mb-1.5"
+            >
               Facility Code
             </label>
             <input
@@ -314,14 +327,16 @@ export default function FacilityLoginPage() {
             />
           </div>
           {codeError && (
-            <p className="text-sm text-error" role="alert">{codeError}</p>
+            <p className="text-sm text-error" role="alert">
+              {codeError}
+            </p>
           )}
           <button
             type="submit"
             disabled={facilityCode.length !== 8 || staffLoading}
             className="h-12 rounded-xl bg-primary text-white font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
           >
-            {staffLoading ? "Connecting..." : "Continue"}
+            {staffLoading ? 'Connecting...' : 'Continue'}
           </button>
           <button
             type="button"
@@ -334,10 +349,10 @@ export default function FacilityLoginPage() {
       )}
 
       {/* Staff selection grid — only show staff role (CNAs), not admin/owner */}
-      {mode === "staff-select" && (
+      {mode === 'staff-select' && (
         <div className="w-full">
           <StaffSelector
-            staff={staffList.filter((s) => s.role === "staff")}
+            staff={staffList.filter((s) => s.role === 'staff')}
             selectedId={null}
             onSelect={handleStaffSelect}
             loading={staffLoading}
@@ -363,11 +378,9 @@ export default function FacilityLoginPage() {
       )}
 
       {/* PIN entry */}
-      {mode === "pin" && selectedStaff && (
+      {mode === 'pin' && selectedStaff && (
         <div className="w-full max-w-sm flex flex-col items-center gap-2">
-          <h2 className="text-xl font-bold text-foreground">
-            Hello, {selectedStaff.name}
-          </h2>
+          <h2 className="text-xl font-bold text-foreground">Hello, {selectedStaff.name}</h2>
           <p className="text-sm text-foreground-muted">Enter your PIN</p>
           <div className="mt-4 w-full">
             <PinPad
@@ -383,19 +396,20 @@ export default function FacilityLoginPage() {
             onClick={handleBackToStaffSelect}
             className="mt-4 text-sm text-foreground-muted hover:text-foreground hover:underline"
           >
-            Not {selectedStaff.name.split(" ")[0]}? Switch
+            Not {selectedStaff.name.split(' ')[0]}? Switch
           </button>
         </div>
       )}
 
       {/* Email / password login */}
-      {mode === "email" && (
+      {mode === 'email' && (
         <form onSubmit={handleEmailLogin} className="w-full max-w-sm flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-foreground text-start">
-            Admin Login
-          </h2>
+          <h2 className="text-xl font-semibold text-foreground text-start">Admin Login</h2>
           <div>
-            <label htmlFor="admin-email" className="block text-sm font-medium text-foreground mb-1.5">
+            <label
+              htmlFor="admin-email"
+              className="block text-sm font-medium text-foreground mb-1.5"
+            >
               Email
             </label>
             <input
@@ -410,7 +424,10 @@ export default function FacilityLoginPage() {
             />
           </div>
           <div>
-            <label htmlFor="admin-password" className="block text-sm font-medium text-foreground mb-1.5">
+            <label
+              htmlFor="admin-password"
+              className="block text-sm font-medium text-foreground mb-1.5"
+            >
               Password
             </label>
             <input
@@ -423,14 +440,16 @@ export default function FacilityLoginPage() {
             />
           </div>
           {emailError && (
-            <p className="text-sm text-error" role="alert">{emailError}</p>
+            <p className="text-sm text-error" role="alert">
+              {emailError}
+            </p>
           )}
           <button
             type="submit"
             disabled={!email || !password || state.loading}
             className="h-12 rounded-xl bg-primary text-white font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
           >
-            {state.loading ? "Signing in..." : "Sign In"}
+            {state.loading ? 'Signing in...' : 'Sign In'}
           </button>
           <button
             type="button"

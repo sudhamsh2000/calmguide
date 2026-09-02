@@ -90,9 +90,7 @@ async def test_long_text_is_truncated_not_rejected(client, tts_enabled, monkeypa
 
     monkeypatch.setattr("app.routers.speech.synthesize_speech", _capture)
 
-    response = await client.post(
-        "/api/speech", json={"text": "a" * (speech.MAX_TTS_CHARS + 2000)}
-    )
+    response = await client.post("/api/speech", json={"text": "a" * (speech.MAX_TTS_CHARS + 2000)})
     assert response.status_code == 200
     # The router forwards the full text; the service is what truncates.
     assert len(seen["text"]) == speech.MAX_TTS_CHARS + 2000

@@ -4,7 +4,8 @@ import { DeflectionLayout } from '@/components/ui/DeflectionLayout';
 
 export const metadata: Metadata = {
   title: 'After a Diagnosis | CalmGuide',
-  description: 'A new dementia diagnosis is overwhelming. These resources can help you take the first steps.',
+  description:
+    'A new dementia diagnosis is overwhelming. These resources can help you take the first steps.',
 };
 
 export default async function DiagnosisPage() {

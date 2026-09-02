@@ -2,7 +2,8 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-export type ScenarioCategory = 'behavioral' | 'daily_care' | 'safety' | 'communication' | 'self_care';
+export type ScenarioCategory =
+  'behavioral' | 'daily_care' | 'safety' | 'communication' | 'self_care';
 
 interface CategoryConfig {
   color: string;
@@ -24,9 +25,7 @@ function isKnown(cat: string): cat is ScenarioCategory {
 export function CategoryBadge({ category }: { category: string }) {
   const { t } = useTranslation('learn');
 
-  const config = isKnown(category)
-    ? categoryConfig[category]
-    : { color: '#636E72', bg: '#F0F0F0' };
+  const config = isKnown(category) ? categoryConfig[category] : { color: '#636E72', bg: '#F0F0F0' };
 
   const label = isKnown(category)
     ? t(`list.filter_${category}`, category.replace(/_/g, ' '))

@@ -186,11 +186,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         setSuccessCode(response.access_code);
       }
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : t('errors.generic'),
-      );
+      setError(err instanceof Error ? err.message : t('errors.generic'));
       setSubmitting(false);
     }
   }
@@ -199,8 +195,10 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
     return (
       <div className={`flex flex-col items-center gap-6 text-center ${className}`}>
         {/* Checkmark circle */}
-        <div className="w-20 h-20 rounded-full bg-success flex items-center justify-center shadow-lg mt-2"
-          style={{ boxShadow: '0 4px 24px rgba(0,184,148,0.35)' }}>
+        <div
+          className="w-20 h-20 rounded-full bg-success flex items-center justify-center shadow-lg mt-2"
+          style={{ boxShadow: '0 4px 24px rgba(0,184,148,0.35)' }}
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -216,15 +214,19 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-extrabold text-foreground">{t('success.profile_created')}</h1>
+          <h1 className="text-3xl font-extrabold text-foreground">
+            {t('success.profile_created')}
+          </h1>
           <p className="text-base text-foreground-muted leading-relaxed max-w-sm">
             {t('success.save_code_message')}
           </p>
         </div>
 
         {/* Access code display */}
-        <div className="card-shell-selected w-full p-6 flex flex-col items-center gap-3"
-          style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 8%, transparent)' }}>
+        <div
+          className="card-shell-selected w-full p-6 flex flex-col items-center gap-3"
+          style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 8%, transparent)' }}
+        >
           <p className="text-xs font-bold text-foreground-muted uppercase tracking-widest">
             {t('success.access_code_label')}
           </p>
@@ -249,17 +251,10 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
           >
             {codeCopied ? `✓ ${tc('actions.copied')}` : tc('actions.copy')}
           </button>
-          <p className="text-sm text-foreground-muted">
-            {t('success.screenshot_hint')}
-          </p>
+          <p className="text-sm text-foreground-muted">{t('success.screenshot_hint')}</p>
         </div>
 
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={() => router.push('/home')}
-          className="w-full"
-        >
+        <Button variant="primary" size="lg" onClick={() => router.push('/home')} className="w-full">
           {t('success.start_button')}
         </Button>
       </div>
@@ -296,9 +291,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
       {step === 2 + stepOffset && (
         <StepDiseaseStage
           selectedStage={formData.diseaseStage}
-          onSelect={(stage: DiseaseStage) =>
-            setFormData({ ...formData, diseaseStage: stage })
-          }
+          onSelect={(stage: DiseaseStage) => setFormData({ ...formData, diseaseStage: stage })}
         />
       )}
 
@@ -309,9 +302,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
           options={BEHAVIORAL_PATTERNS}
           selected={formData.behavioralPatterns}
           group="behavioral"
-          onChange={(patterns) =>
-            setFormData({ ...formData, behavioralPatterns: patterns })
-          }
+          onChange={(patterns) => setFormData({ ...formData, behavioralPatterns: patterns })}
         />
       )}
 
@@ -322,9 +313,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
           options={CALMING_STRATEGIES}
           selected={formData.calmingStrategies}
           group="calming"
-          onChange={(strategies) =>
-            setFormData({ ...formData, calmingStrategies: strategies })
-          }
+          onChange={(strategies) => setFormData({ ...formData, calmingStrategies: strategies })}
         />
       )}
 
@@ -335,9 +324,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
           options={SAFETY_CONCERNS}
           selected={formData.safetyConcerns}
           group="safety"
-          onChange={(concerns) =>
-            setFormData({ ...formData, safetyConcerns: concerns })
-          }
+          onChange={(concerns) => setFormData({ ...formData, safetyConcerns: concerns })}
         />
       )}
 

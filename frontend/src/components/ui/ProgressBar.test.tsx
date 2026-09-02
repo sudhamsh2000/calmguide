@@ -30,9 +30,7 @@ describe('ProgressBar', () => {
   });
 
   it('accepts a custom className', () => {
-    const { container } = render(
-      <ProgressBar currentStep={1} totalSteps={3} className="mt-4" />,
-    );
+    const { container } = render(<ProgressBar currentStep={1} totalSteps={3} className="mt-4" />);
     expect(container.firstChild).toHaveClass('mt-4');
   });
 

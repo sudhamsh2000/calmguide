@@ -40,12 +40,14 @@ export default function FacilityTabLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarStyle: isAdmin ? {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          height: tabBarHeight,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 4,
-        } : { display: 'none' },
+        tabBarStyle: isAdmin
+          ? {
+              backgroundColor: colors.surface,
+              borderTopColor: colors.border,
+              height: tabBarHeight,
+              paddingBottom: insets.bottom > 0 ? insets.bottom : 4,
+            }
+          : { display: 'none' },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',

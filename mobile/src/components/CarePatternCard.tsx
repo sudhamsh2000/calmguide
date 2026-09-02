@@ -40,9 +40,7 @@ export function CarePatternCard({ carePattern }: CarePatternCardProps) {
         </Text>
       </View>
 
-      <Text style={{ fontSize: 13, lineHeight: 19, color: '#78350F' }}>
-        {reasonText}
-      </Text>
+      <Text style={{ fontSize: 13, lineHeight: 19, color: '#78350F' }}>{reasonText}</Text>
 
       {carePattern.top_strategies.length > 0 ? (
         <View style={{ gap: 6 }}>
@@ -62,9 +60,7 @@ export function CarePatternCard({ carePattern }: CarePatternCardProps) {
                   paddingVertical: 4,
                 }}
               >
-                <Text style={{ fontSize: 12, color: '#92400E' }}>
-                  {TAG_LABELS[tag] ?? tag}
-                </Text>
+                <Text style={{ fontSize: 12, color: '#92400E' }}>{TAG_LABELS[tag] ?? tag}</Text>
               </View>
             ))}
           </View>

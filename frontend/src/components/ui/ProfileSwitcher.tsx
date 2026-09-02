@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   getProfiles,
   getActiveProfileIndex,
   switchProfile,
   type StoredProfile,
-} from "@/lib/storage";
+} from '@/lib/storage';
 
 export interface ProfileSwitcherProps {
   onSwitch: () => void;
   className?: string;
 }
 
-export function ProfileSwitcher({ onSwitch, className = "" }: ProfileSwitcherProps) {
+export function ProfileSwitcher({ onSwitch, className = '' }: ProfileSwitcherProps) {
   const [open, setOpen] = useState(false);
   const profiles = getProfiles();
   const activeIndex = getActiveProfileIndex();
@@ -30,17 +30,17 @@ export function ProfileSwitcher({ onSwitch, className = "" }: ProfileSwitcherPro
         className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 min-h-[44px] transition-colors hover:border-primary/40 focus-ring"
         aria-expanded={open}
         aria-haspopup="listbox"
-        style={{ textAlign: "start" }}
+        style={{ textAlign: 'start' }}
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-          {active?.patient_name?.[0]?.toUpperCase() ?? "?"}
+          {active?.patient_name?.[0]?.toUpperCase() ?? '?'}
         </span>
         <span className="flex-1 min-w-0">
           <span className="block text-sm font-medium text-foreground truncate">
-            {active?.patient_name ?? "Unknown"}
+            {active?.patient_name ?? 'Unknown'}
           </span>
           <span className="block text-xs text-foreground-muted capitalize">
-            {active?.disease_stage ?? ""} stage
+            {active?.disease_stage ?? ''} stage
           </span>
         </span>
         <svg
@@ -50,7 +50,7 @@ export function ProfileSwitcher({ onSwitch, className = "" }: ProfileSwitcherPro
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          className={`text-foreground-muted transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-foreground-muted transition-transform ${open ? 'rotate-180' : ''}`}
           aria-hidden="true"
         >
           <polyline points="6 9 12 15 18 9" />
@@ -74,14 +74,12 @@ export function ProfileSwitcher({ onSwitch, className = "" }: ProfileSwitcherPro
                 onSwitch();
               }}
               className={`flex w-full cursor-pointer items-center gap-2 px-3 py-3 min-h-[44px] transition-colors first:rounded-t-xl last:rounded-b-xl ${
-                index === activeIndex
-                  ? "bg-primary/5"
-                  : "hover:bg-foreground/5"
+                index === activeIndex ? 'bg-primary/5' : 'hover:bg-foreground/5'
               }`}
-              style={{ textAlign: "start" }}
+              style={{ textAlign: 'start' }}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {profile.patient_name?.[0]?.toUpperCase() ?? "?"}
+                {profile.patient_name?.[0]?.toUpperCase() ?? '?'}
               </span>
               <span className="flex-1 min-w-0">
                 <span className="block text-sm font-medium text-foreground truncate">
@@ -92,7 +90,16 @@ export function ProfileSwitcher({ onSwitch, className = "" }: ProfileSwitcherPro
                 </span>
               </span>
               {index === activeIndex && (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-primary"
+                  aria-hidden="true"
+                >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}

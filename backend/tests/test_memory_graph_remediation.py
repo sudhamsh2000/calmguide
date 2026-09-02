@@ -6,7 +6,7 @@ crisis path, and the caches/evictions that keep repeated work cheap.
 """
 
 import json
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 
 import pytest
 import pytest_asyncio
@@ -63,17 +63,19 @@ async def profile_with_pre_change_episodes(db_session: AsyncSession):
     db_session.add(profile)
     await db_session.flush()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for index in range(6):
         stamp = (now - timedelta(days=20 - index * 3)).replace(hour=2, minute=0)
-        db_session.add(Conversation(
-            profile_id=profile.id,
-            session_id=f"pre-{index}",
-            role="user",
-            content=encrypt("wandering again"),
-            created_at=stamp,
-            locale_code="en",
-        ))
+        db_session.add(
+            Conversation(
+                profile_id=profile.id,
+                session_id=f"pre-{index}",
+                role="user",
+                content=encrypt("wandering again"),
+                created_at=stamp,
+                locale_code="en",
+            )
+        )
 
     await db_session.commit()
     return profile.id
@@ -88,13 +90,15 @@ async def test_insights_ignore_episodes_from_before_an_open_care_change(
     before = await compute_profile_insights(profile_with_pre_change_episodes, db_session)
     assert before["episode_cycle"]["detected"] is True
 
-    db_session.add(CareChangeEvent(
-        profile_id=profile_with_pre_change_episodes,
-        change_date=(datetime.now(timezone.utc) - timedelta(days=3)).date(),
-        description=encrypt("started donepezil"),
-        observation_window_days=28,
-        is_active=True,
-    ))
+    db_session.add(
+        CareChangeEvent(
+            profile_id=profile_with_pre_change_episodes,
+            change_date=(datetime.now(UTC) - timedelta(days=3)).date(),
+            description=encrypt("started donepezil"),
+            observation_window_days=28,
+            is_active=True,
+        )
+    )
     await db_session.commit()
 
     after = await compute_profile_insights(profile_with_pre_change_episodes, db_session)
@@ -109,24 +113,24 @@ async def test_insights_report_lifetime_session_count_outside_the_window(
     """Analysis is windowed; the session count the caregiver sees is not."""
     from app.services.insights import ANALYSIS_WINDOW_DAYS, compute_profile_insights
 
-    old_stamp = datetime.now(timezone.utc) - timedelta(days=ANALYSIS_WINDOW_DAYS + 30)
-    db_session.add(Conversation(
-        profile_id=profile_with_pre_change_episodes,
-        session_id="ancient-session",
-        role="user",
-        content=encrypt("an old crisis"),
-        created_at=old_stamp,
-        locale_code="en",
-    ))
+    old_stamp = datetime.now(UTC) - timedelta(days=ANALYSIS_WINDOW_DAYS + 30)
+    db_session.add(
+        Conversation(
+            profile_id=profile_with_pre_change_episodes,
+            session_id="ancient-session",
+            role="user",
+            content=encrypt("an old crisis"),
+            created_at=old_stamp,
+            locale_code="en",
+        )
+    )
     await db_session.commit()
 
     result = await compute_profile_insights(profile_with_pre_change_episodes, db_session)
 
     assert result["crisis_frequency"]["total_sessions"] == 7
     # ...but the old session contributes no episode to cycle detection.
-    assert all(
-        trigger != "ancient" for trigger in result["top_triggers"]
-    )
+    assert all(trigger != "ancient" for trigger in result["top_triggers"])
 
 
 @pytest.mark.asyncio
@@ -135,13 +139,15 @@ async def test_cohort_strategies_expose_the_exact_denominator(db_session: AsyncS
     from app.models.cross_patient_strategies import CrossPatientStrategies
     from app.services.cross_patient import get_cohort_strategies
 
-    db_session.add(CrossPatientStrategies(
-        cohort_key="middle:overnight",
-        strategy_tag="music",
-        helped_count=1,
-        total_profiles=6,
-        computed_at=datetime.now(timezone.utc),
-    ))
+    db_session.add(
+        CrossPatientStrategies(
+            cohort_key="middle:overnight",
+            strategy_tag="music",
+            helped_count=1,
+            total_profiles=6,
+            computed_at=datetime.now(UTC),
+        )
+    )
     await db_session.commit()
 
     strategies = await get_cohort_strategies("middle:overnight", db_session)
@@ -153,14 +159,12 @@ async def test_cohort_strategies_expose_the_exact_denominator(db_session: AsyncS
 
 
 @pytest.mark.asyncio
-async def test_cross_patient_aggregation_keeps_cohort_membership(
-    db_session: AsyncSession
-):
+async def test_cross_patient_aggregation_keeps_cohort_membership(db_session: AsyncSession):
     """The set-based rewrite must produce the same counts as the old loop."""
     from app.models.response_feedback import ResponseFeedback
     from app.services.cross_patient import compute_cross_patient_strategies
 
-    now = datetime.now(timezone.utc).replace(hour=2, minute=0)
+    now = datetime.now(UTC).replace(hour=2, minute=0)
     for index in range(2):
         profile = Profile(
             access_code_hash=hash_access_code(f"COHORT{index}"),
@@ -191,13 +195,15 @@ async def test_cross_patient_aggregation_keeps_cohort_membership(
         db_session.add_all([user_msg, assistant_msg])
         await db_session.flush()
 
-        db_session.add(ResponseFeedback(
-            conversation_id=assistant_msg.id,
-            helpful=True,
-            tags=encrypt(json.dumps(["music"])),
-            negative_reasons=None,
-            source="home",
-        ))
+        db_session.add(
+            ResponseFeedback(
+                conversation_id=assistant_msg.id,
+                helpful=True,
+                tags=encrypt(json.dumps(["music"])),
+                negative_reasons=None,
+                source="home",
+            )
+        )
     await db_session.commit()
 
     results = await compute_cross_patient_strategies(db_session)
@@ -243,7 +249,7 @@ class TestDossierBounds:
             _apply_temporal_weight,
         )
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         just_inside = now - timedelta(days=MAX_INCIDENT_AGE_DAYS - 1)
         just_outside = now - timedelta(days=MAX_INCIDENT_AGE_DAYS + 1)
 

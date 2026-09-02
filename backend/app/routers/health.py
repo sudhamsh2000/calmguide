@@ -57,7 +57,9 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
         response.status_code = 503
 
     llm_status = get_llm_status()
-    overall = "unhealthy" if not db_healthy else ("degraded" if llm_status == "degraded" else "healthy")
+    overall = (
+        "unhealthy" if not db_healthy else ("degraded" if llm_status == "degraded" else "healthy")
+    )
 
     return {
         "status": overall,

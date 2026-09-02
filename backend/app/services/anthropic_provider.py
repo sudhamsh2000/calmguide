@@ -12,9 +12,7 @@ def _cacheable_system(system_prompt: str) -> list[dict]:
     """Wrap the system prompt in a cache_control block so Anthropic reuses the
     cached prefix across turns (lower latency + cost). No-op when the prefix
     doesn't repeat — purely additive."""
-    return [
-        {"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}
-    ]
+    return [{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}]
 
 
 class AnthropicProvider(LLMProvider):

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useReducer,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useReducer, type ReactNode } from 'react';
 import type { ProfileResponse } from '@/lib/api';
 
 // --- State ---

@@ -77,8 +77,20 @@ const ANTECEDENT_CATEGORIES: AntecedentCategory[] = [
   'unknown',
 ];
 
-const INTERVENTION_OPTIONS = ['music', 'redirect', 'quiet_space', 'warm_drink', 'wait_it_out', 'other'] as const;
-const OUTCOME_OPTIONS: InterventionOutcome[] = ['resolved', 'partially_resolved', 'unresolved', 'escalated'];
+const INTERVENTION_OPTIONS = [
+  'music',
+  'redirect',
+  'quiet_space',
+  'warm_drink',
+  'wait_it_out',
+  'other',
+] as const;
+const OUTCOME_OPTIONS: InterventionOutcome[] = [
+  'resolved',
+  'partially_resolved',
+  'unresolved',
+  'escalated',
+];
 
 type TimeChoice = 'just_now' | 'earlier_today' | 'yesterday';
 
@@ -142,7 +154,9 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
       duration_category: duration ?? undefined,
       antecedent_category: antecedent ?? undefined,
       antecedent_description: antecedent ? t(`logger.antecedent.${antecedent}`) : undefined,
-      intervention_description: intervention ? (INTERVENTION_TO_DESCRIPTION[intervention] ?? intervention) : undefined,
+      intervention_description: intervention
+        ? (INTERVENTION_TO_DESCRIPTION[intervention] ?? intervention)
+        : undefined,
       intervention_outcome: outcome ?? undefined,
     };
   }, [category, timeChoice, severity, duration, antecedent, intervention, outcome, t]);
@@ -179,7 +193,7 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
       Alert.alert(
         'Could not save',
         'Your entry is still here. Check your connection and try the next step again.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
     } finally {
       savingRef.current = false;
@@ -237,22 +251,47 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
 
   if (savedId && showMorePrompt && level === 1) {
     return (
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, gap: 20 }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+      >
         <View style={{ alignItems: 'center', gap: 12, marginTop: 20 }}>
-          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#E0F0E7', alignItems: 'center', justifyContent: 'center' }}>
+          <View
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 28,
+              backgroundColor: '#E0F0E7',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <Text style={{ fontSize: 28, color: '#3A7D5C' }}>{'✓'}</Text>
           </View>
-          <Text style={{ fontSize: 22, fontWeight: '600', color: colors.foreground }}>{t('logger.saved')}</Text>
-          <Text style={{ fontSize: 16, color: colors.mutedForeground, textAlign: 'center' }}>{t('logger.more_details_prompt')}</Text>
+          <Text style={{ fontSize: 22, fontWeight: '600', color: colors.foreground }}>
+            {t('logger.saved')}
+          </Text>
+          <Text style={{ fontSize: 16, color: colors.mutedForeground, textAlign: 'center' }}>
+            {t('logger.more_details_prompt')}
+          </Text>
         </View>
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1 }}>
-            <Button variant="primary" size="lg" onPress={() => { setShowMorePrompt(false); setLevel(2); }}>
+            <Button
+              variant="primary"
+              size="lg"
+              onPress={() => {
+                setShowMorePrompt(false);
+                setLevel(2);
+              }}
+            >
               {t('logger.yes_add_details')}
             </Button>
           </View>
           <View style={{ flex: 1 }}>
-            <Button variant="ghost" size="lg" onPress={goHome}>{t('logger.no_thanks')}</Button>
+            <Button variant="ghost" size="lg" onPress={goHome}>
+              {t('logger.no_thanks')}
+            </Button>
           </View>
         </View>
       </ScrollView>
@@ -261,16 +300,28 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
 
   if (level === 1) {
     return (
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, gap: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>{t('logger.title')}</Text>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+      >
+        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>
+          {t('logger.title')}
+        </Text>
         {!category && (
           <>
-            <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.what_happened')}</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+            <Text style={{ fontSize: 18, color: colors.foreground }}>
+              {t('logger.what_happened')}
+            </Text>
+            <View
+              style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}
+            >
               {BEHAVIOR_CATEGORIES.map((cat) => (
                 <Pressable
                   key={cat}
-                  onPress={() => { haptic(); setCategory(cat); }}
+                  onPress={() => {
+                    haptic();
+                    setCategory(cat);
+                  }}
                   style={({ pressed }) => ({
                     width: '46%',
                     borderWidth: 2,
@@ -288,23 +339,35 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
                   accessibilityState={{ selected: category === cat }}
                   accessibilityLabel={t(`logger.category.${cat}`).replace(/\n/g, ' ')}
                 >
-                  <View style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: CATEGORY_COLORS[cat] + '15',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: '700',
-                      color: CATEGORY_COLORS[cat],
-                    }}>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: CATEGORY_COLORS[cat] + '15',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '700',
+                        color: CATEGORY_COLORS[cat],
+                      }}
+                    >
                       {CATEGORY_LABELS[cat]}
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, textAlign: 'center', lineHeight: 18 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '600',
+                      color: colors.foreground,
+                      textAlign: 'center',
+                      lineHeight: 18,
+                    }}
+                  >
                     {t(`logger.category.${cat}`).replace(/\n/g, ' ')}
                   </Text>
                 </Pressable>
@@ -318,12 +381,26 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
             {(['just_now', 'earlier_today', 'yesterday'] as TimeChoice[]).map((tc) => (
               <Pressable
                 key={tc}
-                onPress={() => { haptic(); setTimeChoice(tc); setShowMorePrompt(true); }}
-                style={{ borderWidth: 2, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 16, minHeight: 48 }}
+                onPress={() => {
+                  haptic();
+                  setTimeChoice(tc);
+                  setShowMorePrompt(true);
+                }}
+                style={{
+                  borderWidth: 2,
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface,
+                  borderRadius: 12,
+                  paddingHorizontal: 16,
+                  paddingVertical: 16,
+                  minHeight: 48,
+                }}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: timeChoice === tc }}
               >
-                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>{t(`logger.${tc}`)}</Text>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
+                  {t(`logger.${tc}`)}
+                </Text>
               </Pressable>
             ))}
           </>
@@ -334,12 +411,26 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
 
   if (level === 2) {
     return (
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, gap: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>{t('logger.title')}</Text>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+      >
+        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>
+          {t('logger.title')}
+        </Text>
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.how_bad')}</Text>
         <View style={{ flexDirection: 'row', gap: 12 }}>
           {SEVERITY_LEVELS.map((s) => (
-            <Pressable key={s} onPress={() => { haptic(); setSeverity(s); }} style={[chipStyle(severity === s), { flex: 1 }]} accessibilityRole="radio" accessibilityState={{ selected: severity === s }}>
+            <Pressable
+              key={s}
+              onPress={() => {
+                haptic();
+                setSeverity(s);
+              }}
+              style={[chipStyle(severity === s), { flex: 1 }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: severity === s }}
+            >
               <Text style={chipText(severity === s)}>{t(`logger.severity.${s}`)}</Text>
             </Pressable>
           ))}
@@ -347,14 +438,31 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.how_long')}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {DURATION_CATEGORIES.map((d) => (
-            <Pressable key={d} onPress={() => { haptic(); setDuration(d); }} style={[chipStyle(duration === d), { width: '47%' }]} accessibilityRole="radio" accessibilityState={{ selected: duration === d }}>
+            <Pressable
+              key={d}
+              onPress={() => {
+                haptic();
+                setDuration(d);
+              }}
+              style={[chipStyle(duration === d), { width: '47%' }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: duration === d }}
+            >
               <Text style={chipText(duration === d)}>{t(`logger.duration.${d}`)}</Text>
             </Pressable>
           ))}
         </View>
         <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
-          <View style={{ flex: 1 }}><Button variant="primary" size="lg" onPress={() => setLevel(3)}>{t('logger.save')}</Button></View>
-          <View style={{ flex: 1 }}><Button variant="ghost" size="lg" onPress={() => setLevel(3)}>{t('logger.skip')}</Button></View>
+          <View style={{ flex: 1 }}>
+            <Button variant="primary" size="lg" onPress={() => setLevel(3)}>
+              {t('logger.save')}
+            </Button>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button variant="ghost" size="lg" onPress={() => setLevel(3)}>
+              {t('logger.skip')}
+            </Button>
+          </View>
         </View>
       </ScrollView>
     );
@@ -362,12 +470,26 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
 
   if (level === 3) {
     return (
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, gap: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>{t('logger.title')}</Text>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+      >
+        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>
+          {t('logger.title')}
+        </Text>
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.what_before')}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {ANTECEDENT_CATEGORIES.map((a) => (
-            <Pressable key={a} onPress={() => { haptic(); setAntecedent(a); }} style={[chipStyle(antecedent === a), { width: '47%' }]} accessibilityRole="radio" accessibilityState={{ selected: antecedent === a }}>
+            <Pressable
+              key={a}
+              onPress={() => {
+                haptic();
+                setAntecedent(a);
+              }}
+              style={[chipStyle(antecedent === a), { width: '47%' }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: antecedent === a }}
+            >
               <Text style={chipText(antecedent === a)}>{t(`logger.antecedent.${a}`)}</Text>
             </Pressable>
           ))}
@@ -375,7 +497,16 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.what_tried')}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {INTERVENTION_OPTIONS.map((i) => (
-            <Pressable key={i} onPress={() => { haptic(); setIntervention(i); }} style={[chipStyle(intervention === i), { width: '30%' }]} accessibilityRole="radio" accessibilityState={{ selected: intervention === i }}>
+            <Pressable
+              key={i}
+              onPress={() => {
+                haptic();
+                setIntervention(i);
+              }}
+              style={[chipStyle(intervention === i), { width: '30%' }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: intervention === i }}
+            >
               <Text style={chipText(intervention === i)}>{t(`logger.intervention.${i}`)}</Text>
             </Pressable>
           ))}
@@ -383,23 +514,48 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.did_it_help')}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {OUTCOME_OPTIONS.map((o) => (
-            <Pressable key={o} onPress={() => { haptic(); setOutcome(o); }} style={[chipStyle(outcome === o), { width: '47%' }]} accessibilityRole="radio" accessibilityState={{ selected: outcome === o }}>
+            <Pressable
+              key={o}
+              onPress={() => {
+                haptic();
+                setOutcome(o);
+              }}
+              style={[chipStyle(outcome === o), { width: '47%' }]}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: outcome === o }}
+            >
               <Text style={chipText(outcome === o)}>{t(`logger.outcome.${o}`)}</Text>
             </Pressable>
           ))}
         </View>
         <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
-          <View style={{ flex: 1 }}><Button variant="primary" size="lg" onPress={() => setLevel(4)}>{t('logger.save')}</Button></View>
-          <View style={{ flex: 1 }}><Button variant="ghost" size="lg" onPress={() => setLevel(4)}>{t('logger.skip')}</Button></View>
+          <View style={{ flex: 1 }}>
+            <Button variant="primary" size="lg" onPress={() => setLevel(4)}>
+              {t('logger.save')}
+            </Button>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button variant="ghost" size="lg" onPress={() => setLevel(4)}>
+              {t('logger.skip')}
+            </Button>
+          </View>
         </View>
       </ScrollView>
     );
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20, gap: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>{t('logger.title')}</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 20, gap: 20 }}
+      >
+        <Text style={{ fontSize: 24, fontWeight: '600', color: colors.foreground }}>
+          {t('logger.title')}
+        </Text>
         <Text style={{ fontSize: 18, color: colors.foreground }}>{t('logger.anything_else')}</Text>
         <TextInput
           value={notes}

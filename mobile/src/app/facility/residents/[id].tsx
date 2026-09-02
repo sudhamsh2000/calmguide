@@ -33,9 +33,19 @@ export default function ResidentDetailScreen() {
       setError(null);
     } catch (err) {
       if (err instanceof Error && err.message === 'NOT_ASSIGNED') {
-        setError(t('residents.not_assigned', "You're not assigned to this resident. Check with your charge nurse."));
+        setError(
+          t(
+            'residents.not_assigned',
+            "You're not assigned to this resident. Check with your charge nurse.",
+          ),
+        );
       } else {
-        setError(t('residents.card_error', 'Behavioral profile unavailable. Try again or check another resident.'));
+        setError(
+          t(
+            'residents.card_error',
+            'Behavioral profile unavailable. Try again or check another resident.',
+          ),
+        );
       }
     } finally {
       setLoading(false);
@@ -48,7 +58,14 @@ export default function ResidentDetailScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -56,7 +73,15 @@ export default function ResidentDetailScreen() {
 
   if (error) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 24,
+        }}
+      >
         <Text style={{ color: colors.error, fontSize: 16, textAlign: 'center', marginBottom: 16 }}>
           {error}
         </Text>
@@ -74,7 +99,10 @@ export default function ResidentDetailScreen() {
   return (
     <>
       <Stack.Screen options={{ title: location, headerBackTitle: '' }} />
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+      >
         {/* What NOT to Do — always first, per spec */}
         <SectionCard
           title={t('residents.what_not_to_do')}
@@ -102,7 +130,9 @@ export default function ResidentDetailScreen() {
               borderColor: colors.border,
             }}
           >
-            <Text style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 8 }}>
+            <Text
+              style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 8 }}
+            >
               {t('residents.escalation_pattern')}
             </Text>
             <Text style={{ fontSize: 15, color: colors.foreground, lineHeight: 22 }}>
@@ -123,7 +153,14 @@ export default function ResidentDetailScreen() {
               borderColor: colors.border,
             }}
           >
-            <Text style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 12 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '700',
+                color: colors.foreground,
+                marginBottom: 12,
+              }}
+            >
               {t('residents.recent_incidents')}
             </Text>
             {card.recent_incidents.map((inc, idx) => (
@@ -135,7 +172,9 @@ export default function ResidentDetailScreen() {
                   borderTopColor: colors.border,
                 }}
               >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+                <View
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}
+                >
                   <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
                     {ti(`logger.category.${inc.category}`).replace(/\n/g, ' ')}
                   </Text>
@@ -214,14 +253,22 @@ function SectionCard({
 }: {
   title: string;
   items: Array<Record<string, unknown>>;
-  colors: { surface: string; border: string; foreground: string; error: string; success: string; mutedForeground: string };
+  colors: {
+    surface: string;
+    border: string;
+    foreground: string;
+    error: string;
+    success: string;
+    mutedForeground: string;
+  };
   variant: 'danger' | 'success';
 }) {
   const accentColor = variant === 'danger' ? colors.error : colors.success;
   const prefix = '';
-  const emptyText = variant === 'danger'
-    ? 'No contraindicated interventions recorded yet.'
-    : 'No effective interventions recorded yet.';
+  const emptyText =
+    variant === 'danger'
+      ? 'No contraindicated interventions recorded yet.'
+      : 'No effective interventions recorded yet.';
 
   return (
     <View
@@ -250,7 +297,8 @@ function SectionCard({
             <View key={idx} style={{ flexDirection: 'row', gap: 8, paddingVertical: 4 }}>
               <Text style={{ fontSize: 15, color: accentColor, lineHeight: 22 }}>•</Text>
               <Text style={{ fontSize: 15, color: colors.foreground, lineHeight: 22, flex: 1 }}>
-                {desc}{detail ? ` ${detail}` : ''}
+                {desc}
+                {detail ? ` ${detail}` : ''}
               </Text>
             </View>
           );
@@ -267,7 +315,12 @@ function SectionCard({
 function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return d.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   } catch {
     return iso;
   }

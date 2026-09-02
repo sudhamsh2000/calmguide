@@ -34,7 +34,9 @@ export default function FacilitySettingsScreen() {
         try {
           const info = await getFacility(code);
           setFacility(info);
-        } catch { /* silent */ }
+        } catch {
+          /* silent */
+        }
       }
     });
   }, []);
@@ -50,18 +52,44 @@ export default function FacilitySettingsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 20 }}>
+        <Text
+          style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 20 }}
+        >
           {t('settings.title')}
         </Text>
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border, marginBottom: 20 }}>
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: colors.border,
+            marginBottom: 20,
+          }}
+        >
           <View style={rowStyle}>
-            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('settings.facility_name')}</Text>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>{facilityName}</Text>
+            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+              {t('settings.facility_name')}
+            </Text>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
+              {facilityName}
+            </Text>
           </View>
           <View style={rowStyle}>
-            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>{t('settings.facility_code')}</Text>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, fontFamily: 'monospace' }}>{facilityCode}</Text>
+            <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+              {t('settings.facility_code')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: '600',
+                color: colors.foreground,
+                fontFamily: 'monospace',
+              }}
+            >
+              {facilityCode}
+            </Text>
           </View>
           <Text style={{ fontSize: 12, color: colors.mutedForeground, marginTop: 8 }}>
             {t('settings.facility_code_hint')}
@@ -69,20 +97,49 @@ export default function FacilitySettingsScreen() {
         </View>
 
         {facility && (
-          <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border, marginBottom: 20, flexDirection: 'row', gap: 24 }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 16,
+              padding: 16,
+              borderWidth: 1,
+              borderColor: colors.border,
+              marginBottom: 20,
+              flexDirection: 'row',
+              gap: 24,
+            }}
+          >
             <View>
-              <Text style={{ fontSize: 20, fontWeight: '700', color: colors.foreground }}>{facility.patient_count}</Text>
-              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>{t('settings.linked_patients')}</Text>
+              <Text style={{ fontSize: 20, fontWeight: '700', color: colors.foreground }}>
+                {facility.patient_count}
+              </Text>
+              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+                {t('settings.linked_patients')}
+              </Text>
             </View>
             <View>
-              <Text style={{ fontSize: 20, fontWeight: '700', color: colors.foreground }}>{facility.staff_count}</Text>
-              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>{t('settings.active_staff')}</Text>
+              <Text style={{ fontSize: 20, fontWeight: '700', color: colors.foreground }}>
+                {facility.staff_count}
+              </Text>
+              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+                {t('settings.active_staff')}
+              </Text>
             </View>
           </View>
         )}
 
-        <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border }}>
-          <Text style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 12 }}>
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            borderRadius: 16,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <Text
+            style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 12 }}
+          >
             {t('settings.alert_thresholds')}
           </Text>
           <Text style={{ fontSize: 13, color: colors.mutedForeground, marginBottom: 8 }}>
@@ -94,7 +151,10 @@ export default function FacilitySettingsScreen() {
             t('settings.alert_inactive', { days: 3 }),
             t('settings.alert_family'),
           ].map((label) => (
-            <View key={label} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 8 }}>
+            <View
+              key={label}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 8 }}
+            >
               <View
                 style={{
                   width: 20,

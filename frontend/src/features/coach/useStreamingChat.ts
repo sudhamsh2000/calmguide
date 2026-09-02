@@ -30,7 +30,11 @@ export interface UseStreamingChatReturn extends StreamingChatState {
  *
  * @param initialSessionId - Optional session ID to resume an existing conversation.
  */
-export function useStreamingChat(initialSessionId?: string, profileId?: string, patientNameOverride?: string): UseStreamingChatReturn {
+export function useStreamingChat(
+  initialSessionId?: string,
+  profileId?: string,
+  patientNameOverride?: string,
+): UseStreamingChatReturn {
   const t = useTranslations('coach');
   const tc = useTranslations('common');
   const [response, setResponse] = useState('');
@@ -58,7 +62,8 @@ export function useStreamingChat(initialSessionId?: string, profileId?: string, 
 
   const sendMessage = useCallback((message: string) => {
     const accessCode = profileId ? null : getAccessCode();
-    const patientName = patientNameOverride ?? getPatientName() ?? (profileId ? 'the resident' : 'your loved one');
+    const patientName =
+      patientNameOverride ?? getPatientName() ?? (profileId ? 'the resident' : 'your loved one');
 
     if (!accessCode && !profileId) {
       setError(tRef.current('error.no_access_code'));
@@ -114,7 +119,11 @@ export function useStreamingChat(initialSessionId?: string, profileId?: string, 
             }
 
             try {
-              const parsed = JSON.parse(data) as { session_id?: string; text?: string; replace?: string };
+              const parsed = JSON.parse(data) as {
+                session_id?: string;
+                text?: string;
+                replace?: string;
+              };
 
               if (parsed.session_id) {
                 sessionIdRef.current = parsed.session_id;

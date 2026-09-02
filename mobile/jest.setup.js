@@ -33,7 +33,7 @@ jest.mock('@react-native-async-storage/async-storage', () => {
 // mock (defaults to "connected") so useNetworkStatus and anything importing
 // it load cleanly. Individual tests override return values as needed.
 jest.mock('@react-native-community/netinfo', () =>
-  require('@react-native-community/netinfo/jest/netinfo-mock')
+  require('@react-native-community/netinfo/jest/netinfo-mock'),
 );
 
 // Quiet down Expo's winter/runtime warnings that aren't relevant in unit tests.

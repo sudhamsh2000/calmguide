@@ -23,7 +23,9 @@ export function PatientCard({
   className = '',
 }: PatientCardProps) {
   const t = useTranslations('profile');
-  const stageLabel = t.has(`view.${diseaseStage}_stage`) ? t(`view.${diseaseStage}_stage`) : diseaseStage;
+  const stageLabel = t.has(`view.${diseaseStage}_stage`)
+    ? t(`view.${diseaseStage}_stage`)
+    : diseaseStage;
   const avatarStyle = avatarColors[diseaseStage] ?? 'bg-foreground/10 text-foreground';
   const initial = patientName.charAt(0).toUpperCase();
 

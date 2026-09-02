@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -8,7 +8,7 @@ interface ConfirmDialogProps {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: "default" | "danger";
+  variant?: 'default' | 'danger';
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -17,9 +17,9 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
-  variant = "default",
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'default',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -27,17 +27,17 @@ export function ConfirmDialog({
     if (!open) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onCancel();
       }
     };
 
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener('keydown', onKeyDown);
     const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = originalOverflow;
     };
   }, [open, onCancel]);
@@ -58,29 +58,31 @@ export function ConfirmDialog({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-b border-slate-200 px-6 py-5 dark:border-white/[0.06]">
-          <h2 id="confirm-dialog-title" className="mb-2 text-lg font-semibold text-foreground">{title}</h2>
+          <h2 id="confirm-dialog-title" className="mb-2 text-lg font-semibold text-foreground">
+            {title}
+          </h2>
           <p className="text-sm leading-relaxed text-foreground-muted">{message}</p>
         </div>
         <div className="bg-slate-50/55 px-6 py-5 dark:bg-transparent">
           <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="outline-button focus-ring flex-1 h-11 rounded-xl px-4 text-sm font-medium text-foreground transition-all hover:text-foreground active:scale-[0.98]"
-          >
-            {cancelLabel}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className={`focus-ring flex-1 h-11 rounded-xl px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,37,42,0.12)] transition-all hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(23,37,42,0.16)] active:translate-y-0 active:scale-[0.98] ${
-              variant === "danger"
-                ? "bg-error hover:bg-error/90 dark:hover:bg-error/85"
-                : "bg-primary hover:bg-primary-dark"
-            }`}
-          >
-            {confirmLabel}
-          </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="outline-button focus-ring flex-1 h-11 rounded-xl px-4 text-sm font-medium text-foreground transition-all hover:text-foreground active:scale-[0.98]"
+            >
+              {cancelLabel}
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              className={`focus-ring flex-1 h-11 rounded-xl px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,37,42,0.12)] transition-all hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(23,37,42,0.16)] active:translate-y-0 active:scale-[0.98] ${
+                variant === 'danger'
+                  ? 'bg-error hover:bg-error/90 dark:hover:bg-error/85'
+                  : 'bg-primary hover:bg-primary-dark'
+              }`}
+            >
+              {confirmLabel}
+            </button>
           </div>
         </div>
       </div>

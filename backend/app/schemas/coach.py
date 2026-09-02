@@ -18,6 +18,7 @@ class CoachRequest(BaseModel):
 
 class CoachResponse(BaseModel):
     """Non-streaming fallback."""
+
     session_id: str
     response: str
 
@@ -51,6 +52,7 @@ class AcuteChangeScreenRequest(BaseModel):
     app/services/acute_change_screen.py for the (clinician-review-pending)
     decision logic.
     """
+
     access_code: str | None = Field(None, min_length=8, max_length=8)
     profile_id: str | None = None
     staff_id: str | None = None

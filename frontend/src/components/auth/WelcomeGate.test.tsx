@@ -41,7 +41,11 @@ describe('WelcomeGate', () => {
     mocks.getAccessCode.mockReturnValue('ABCD1234');
     mocks.getPatientName.mockReturnValue('Margaret');
 
-    render(<WelcomeGate><div>Welcome content</div></WelcomeGate>);
+    render(
+      <WelcomeGate>
+        <div>Welcome content</div>
+      </WelcomeGate>,
+    );
 
     await waitFor(() => {
       expect(mocks.replace).toHaveBeenCalledWith('/home');
@@ -53,7 +57,11 @@ describe('WelcomeGate', () => {
     mocks.getAccessCode.mockReturnValue('ABCD1234');
     mocks.getPatientName.mockReturnValue(null);
 
-    render(<WelcomeGate><div>Welcome content</div></WelcomeGate>);
+    render(
+      <WelcomeGate>
+        <div>Welcome content</div>
+      </WelcomeGate>,
+    );
 
     await waitFor(() => {
       expect(mocks.replace).toHaveBeenCalledWith('/login');
@@ -67,7 +75,11 @@ describe('WelcomeGate', () => {
       disease_stage: 'middle',
     });
 
-    render(<WelcomeGate><div>Welcome content</div></WelcomeGate>);
+    render(
+      <WelcomeGate>
+        <div>Welcome content</div>
+      </WelcomeGate>,
+    );
 
     await waitFor(() => {
       expect(mocks.setAccessCode).toHaveBeenCalledWith('EFGH5678');
@@ -77,7 +89,11 @@ describe('WelcomeGate', () => {
   });
 
   it('shows the welcome content for new users', async () => {
-    render(<WelcomeGate><div>Welcome content</div></WelcomeGate>);
+    render(
+      <WelcomeGate>
+        <div>Welcome content</div>
+      </WelcomeGate>,
+    );
 
     expect(screen.getByText('Welcome content')).toBeInTheDocument();
     expect(mocks.replace).not.toHaveBeenCalled();

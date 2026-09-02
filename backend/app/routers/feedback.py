@@ -1,7 +1,8 @@
 """Feedback endpoints — caregiver ratings of coach guidance."""
+
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
@@ -13,13 +14,13 @@ from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.response_feedback import ResponseFeedback
 from app.schemas.feedback import (
+    PREDEFINED_TAGS,
     FeedbackCreate,
     FeedbackEntry,
     FeedbackResponse,
     FeedbackSkip,
     PendingFeedbackResponse,
     SessionFeedbackResponse,
-    PREDEFINED_TAGS,
 )
 from app.schemas.profile import ErrorResponse
 from app.services.auth import hash_access_code
@@ -31,9 +32,7 @@ router = APIRouter(tags=["feedback"])
 
 async def _get_profile(access_code: str, db: AsyncSession) -> Profile:
     code_hash = hash_access_code(access_code)
-    result = await db.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await db.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one_or_none()
     if profile is None:
         raise HTTPException(
@@ -43,7 +42,9 @@ async def _get_profile(access_code: str, db: AsyncSession) -> Profile:
     return profile
 
 
-async def _validate_conversation(conversation_id: str, profile_id: str, db: AsyncSession) -> Conversation:
+async def _validate_conversation(
+    conversation_id: str, profile_id: str, db: AsyncSession
+) -> Conversation:
     result = await db.execute(
         select(Conversation).where(
             Conversation.id == conversation_id,
@@ -75,9 +76,7 @@ async def submit_feedback(
     await _validate_conversation(payload.conversation_id, profile.id, db)
 
     existing = await db.execute(
-        select(ResponseFeedback).where(
-            ResponseFeedback.conversation_id == payload.conversation_id
-        )
+        select(ResponseFeedback).where(ResponseFeedback.conversation_id == payload.conversation_id)
     )
     if existing.scalar_one_or_none() is not None:
         raise HTTPException(
@@ -89,7 +88,9 @@ async def submit_feedback(
         conversation_id=payload.conversation_id,
         helpful=payload.helpful,
         tags=encrypt(json.dumps(payload.tags)) if payload.tags else None,
-        negative_reasons=encrypt(json.dumps(payload.negative_reasons)) if payload.negative_reasons else None,
+        negative_reasons=encrypt(json.dumps(payload.negative_reasons))
+        if payload.negative_reasons
+        else None,
         source="home",
     )
     db.add(feedback)
@@ -113,9 +114,7 @@ async def skip_feedback(
     await _validate_conversation(payload.conversation_id, profile.id, db)
 
     existing = await db.execute(
-        select(ResponseFeedback).where(
-            ResponseFeedback.conversation_id == payload.conversation_id
-        )
+        select(ResponseFeedback).where(ResponseFeedback.conversation_id == payload.conversation_id)
     )
     if existing.scalar_one_or_none() is not None:
         return {"id": "already_exists"}
@@ -144,7 +143,7 @@ async def get_pending_feedback(
 ):
     """Get the most recent unfeedback'd session for the home screen card."""
     profile = await _get_profile(access_code, db)
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=48)
+    cutoff = datetime.now(UTC) - timedelta(hours=48)
 
     # Find session_ids that already have ANY feedback (including skips)
     feedbacked_session_ids = (
@@ -229,17 +228,17 @@ async def get_session_feedback(
         return SessionFeedbackResponse(feedback=[])
 
     fb_result = await db.execute(
-        select(ResponseFeedback).where(
-            ResponseFeedback.conversation_id.in_(conv_ids)
-        )
+        select(ResponseFeedback).where(ResponseFeedback.conversation_id.in_(conv_ids))
     )
     entries = []
     for fb in fb_result.scalars().all():
-        entries.append(FeedbackEntry(
-            conversation_id=fb.conversation_id,
-            helpful=fb.helpful,
-            tags=json.loads(decrypt(fb.tags)) if fb.tags else [],
-            created_at=fb.created_at.isoformat(),
-        ))
+        entries.append(
+            FeedbackEntry(
+                conversation_id=fb.conversation_id,
+                helpful=fb.helpful,
+                tags=json.loads(decrypt(fb.tags)) if fb.tags else [],
+                created_at=fb.created_at.isoformat(),
+            )
+        )
 
     return SessionFeedbackResponse(feedback=entries)

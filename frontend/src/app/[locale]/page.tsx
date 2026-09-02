@@ -18,7 +18,15 @@ function Container({ children, className = '' }: { children: ReactNode; classNam
   return <div className={`mx-auto max-w-landing px-5 md:px-8 ${className}`}>{children}</div>;
 }
 
-function Eyebrow({ children, className = '', color }: { children: ReactNode; className?: string; color?: string }) {
+function Eyebrow({
+  children,
+  className = '',
+  color,
+}: {
+  children: ReactNode;
+  className?: string;
+  color?: string;
+}) {
   return (
     <p
       className={`text-sm font-semibold uppercase tracking-wide text-primary ${className}`}
@@ -40,7 +48,18 @@ function StepNumber({ n }: { n: number }) {
 function CheckItem({ children }: { children: ReactNode }) {
   return (
     <li className="flex items-start gap-3">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0 text-primary" aria-hidden="true">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="mt-0.5 shrink-0 text-primary"
+        aria-hidden="true"
+      >
         <path d="M20 6 9 17l-5-5" />
       </svg>
       <span className="text-sm font-medium text-foreground">{children}</span>
@@ -76,7 +95,17 @@ const VALUE_ICON_PATHS: Record<string, ReactNode> = {
 function ValueIcon({ name }: { name: string }) {
   return (
     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-soft text-primary">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
         {VALUE_ICON_PATHS[name]}
       </svg>
     </span>
@@ -141,11 +170,19 @@ export default async function LandingPage() {
 
                 <p className="mt-5 text-sm text-foreground-muted">
                   {t('welcome.have_access_code')}{' '}
-                  <Link href="/login" className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline">
+                  <Link
+                    href="/login"
+                    className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline"
+                  >
                     {t('login.title')}
                   </Link>
-                  <span aria-hidden="true" className="mx-2 text-foreground-muted/40">·</span>
-                  <Link href="/facility/login" className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline">
+                  <span aria-hidden="true" className="mx-2 text-foreground-muted/40">
+                    ·
+                  </span>
+                  <Link
+                    href="/facility/login"
+                    className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline"
+                  >
                     {t('welcome.facility_login')}
                   </Link>
                 </p>
@@ -291,20 +328,28 @@ export default async function LandingPage() {
                 />
               </div>
               <div className="lg:order-1">
-                <Eyebrow className="text-center lg:text-start" color="#6F7FD8">{t('landing.coach.eyebrow')}</Eyebrow>
+                <Eyebrow className="text-center lg:text-start" color="#6F7FD8">
+                  {t('landing.coach.eyebrow')}
+                </Eyebrow>
                 <h2
                   className="mt-3 text-center text-4xl font-bold tracking-tight text-ink lg:text-start"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {t('landing.coach.title')}
                 </h2>
-                <p className="mt-4 text-center text-lg text-foreground-muted lg:text-start">{t('landing.coach.subtitle')}</p>
+                <p className="mt-4 text-center text-lg text-foreground-muted lg:text-start">
+                  {t('landing.coach.subtitle')}
+                </p>
 
                 <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {(['right_now', 'why', 'when_help', 'not_to_do'] as const).map((key) => (
                     <div key={key} className="card-shell rounded-2xl p-4">
-                      <h3 className="text-sm font-semibold text-primary">{t(`landing.coach.${key}.title`)}</h3>
-                      <p className="mt-1 text-sm text-foreground-muted">{t(`landing.coach.${key}.desc`)}</p>
+                      <h3 className="text-sm font-semibold text-primary">
+                        {t(`landing.coach.${key}.title`)}
+                      </h3>
+                      <p className="mt-1 text-sm text-foreground-muted">
+                        {t(`landing.coach.${key}.desc`)}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -358,13 +403,27 @@ export default async function LandingPage() {
 
               <ol className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-2">
                 {safetySteps.map((step, i) => (
-                  <li key={step} className="flex flex-1 items-center gap-3 sm:flex-col sm:items-center sm:gap-2 sm:text-center">
+                  <li
+                    key={step}
+                    className="flex flex-1 items-center gap-3 sm:flex-col sm:items-center sm:gap-2 sm:text-center"
+                  >
                     <span className="card-shell flex w-full items-center gap-3 rounded-xl p-4 sm:flex-col sm:gap-2">
                       <StepNumber n={i + 1} />
                       <span className="text-sm font-medium text-foreground">{step}</span>
                     </span>
                     {i < safetySteps.length - 1 && (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hidden shrink-0 text-foreground-muted/50 sm:block" aria-hidden="true">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="hidden shrink-0 text-foreground-muted/50 sm:block"
+                        aria-hidden="true"
+                      >
                         <path d="M9 6l6 6-6 6" />
                       </svg>
                     )}
@@ -391,8 +450,22 @@ export default async function LandingPage() {
                 </h2>
                 <ul className="mx-auto mt-8 grid max-w-md grid-cols-1 gap-3 sm:grid-cols-2 lg:mx-0">
                   {threeAmItems.map((item) => (
-                    <li key={item} className="flex items-start gap-3 rounded-xl border border-theme-soft bg-surface p-4 text-start">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0 text-primary" aria-hidden="true">
+                    <li
+                      key={item}
+                      className="flex items-start gap-3 rounded-xl border border-theme-soft bg-surface p-4 text-start"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mt-0.5 shrink-0 text-primary"
+                        aria-hidden="true"
+                      >
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
                       <span className="text-sm font-medium text-foreground">{item}</span>
@@ -421,22 +494,34 @@ export default async function LandingPage() {
                 >
                   {t('landing.interop.title')}
                 </h2>
-                <p className="mt-4 leading-relaxed text-foreground-muted">{t('landing.interop.desc')}</p>
+                <p className="mt-4 leading-relaxed text-foreground-muted">
+                  {t('landing.interop.desc')}
+                </p>
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
                   {['FHIR', 'HL7', 'OMOP', 'SNOMED CT', 'LOINC'].map((standard) => (
-                    <span key={standard} className="rounded-full border border-theme-soft bg-surface px-3 py-1.5 text-sm font-medium text-foreground">
+                    <span
+                      key={standard}
+                      className="rounded-full border border-theme-soft bg-surface px-3 py-1.5 text-sm font-medium text-foreground"
+                    >
                       {standard}
                     </span>
                   ))}
                 </div>
-                <p className="mx-auto mt-4 max-w-xl text-sm text-foreground-muted">{t('landing.interop.caveat')}</p>
+                <p className="mx-auto mt-4 max-w-xl text-sm text-foreground-muted">
+                  {t('landing.interop.caveat')}
+                </p>
               </div>
 
               <div className="mt-10 border-t border-theme-soft pt-10">
-                <p className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">{t('landing.technology.eyebrow')}</p>
+                <p className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">
+                  {t('landing.technology.eyebrow')}
+                </p>
                 <div className="mx-auto mt-4 flex max-w-xl flex-wrap items-center justify-center gap-2">
                   {techItems.map((tech) => (
-                    <span key={tech} className="rounded-full bg-primary-soft px-3.5 py-1.5 text-sm font-medium text-primary">
+                    <span
+                      key={tech}
+                      className="rounded-full bg-primary-soft px-3.5 py-1.5 text-sm font-medium text-primary"
+                    >
                       {tech}
                     </span>
                   ))}
@@ -481,30 +566,81 @@ export default async function LandingPage() {
                   height={724}
                   className="h-8 w-auto"
                 />
-                <p className="mt-3 max-w-xs text-sm text-footer-muted">{t('landing.partner_line')}</p>
+                <p className="mt-3 max-w-xs text-sm text-footer-muted">
+                  {t('landing.partner_line')}
+                </p>
               </div>
 
-              <nav aria-label={t('landing.footer.nav_heading')} className="flex flex-col items-center gap-2 md:items-start">
-                <p className="text-sm font-semibold text-footer-text">{t('landing.footer.nav_heading')}</p>
-                <a href="#what-we-do" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.what_we_do')}</a>
-                <a href="#how-it-works" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.how_it_works')}</a>
-                <a href="#safety" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.safety')}</a>
-                <a href="#technology" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.technology')}</a>
+              <nav
+                aria-label={t('landing.footer.nav_heading')}
+                className="flex flex-col items-center gap-2 md:items-start"
+              >
+                <p className="text-sm font-semibold text-footer-text">
+                  {t('landing.footer.nav_heading')}
+                </p>
+                <a href="#what-we-do" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.nav.what_we_do')}
+                </a>
+                <a
+                  href="#how-it-works"
+                  className="text-sm text-footer-muted hover:text-footer-text"
+                >
+                  {t('landing.nav.how_it_works')}
+                </a>
+                <a href="#safety" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.nav.safety')}
+                </a>
+                <a href="#technology" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.nav.technology')}
+                </a>
               </nav>
 
-              <nav aria-label={t('landing.footer.for_you_heading')} className="flex flex-col items-center gap-2 md:items-start">
-                <p className="text-sm font-semibold text-footer-text">{t('landing.footer.for_you_heading')}</p>
-                <a href="#for-caregivers" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.for_caregivers')}</a>
-                <a href="#for-healthcare" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.for_healthcare')}</a>
-                <a href="#about" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.about')}</a>
-                <Link href="/profile/setup" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.nav.cta')}</Link>
+              <nav
+                aria-label={t('landing.footer.for_you_heading')}
+                className="flex flex-col items-center gap-2 md:items-start"
+              >
+                <p className="text-sm font-semibold text-footer-text">
+                  {t('landing.footer.for_you_heading')}
+                </p>
+                <a
+                  href="#for-caregivers"
+                  className="text-sm text-footer-muted hover:text-footer-text"
+                >
+                  {t('landing.nav.for_caregivers')}
+                </a>
+                <a
+                  href="#for-healthcare"
+                  className="text-sm text-footer-muted hover:text-footer-text"
+                >
+                  {t('landing.nav.for_healthcare')}
+                </a>
+                <a href="#about" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.nav.about')}
+                </a>
+                <Link
+                  href="/profile/setup"
+                  className="text-sm text-footer-muted hover:text-footer-text"
+                >
+                  {t('landing.nav.cta')}
+                </Link>
               </nav>
 
-              <nav aria-label={t('landing.footer.resources_heading')} className="flex flex-col items-center gap-2 md:items-start">
-                <p className="text-sm font-semibold text-footer-text">{t('landing.footer.resources_heading')}</p>
-                <Link href="/login" className="text-sm text-footer-muted hover:text-footer-text">{t('welcome.have_access_code')}</Link>
-                <Link href="/privacy" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.footer.privacy')}</Link>
-                <Link href="/terms" className="text-sm text-footer-muted hover:text-footer-text">{t('landing.footer.terms')}</Link>
+              <nav
+                aria-label={t('landing.footer.resources_heading')}
+                className="flex flex-col items-center gap-2 md:items-start"
+              >
+                <p className="text-sm font-semibold text-footer-text">
+                  {t('landing.footer.resources_heading')}
+                </p>
+                <Link href="/login" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('welcome.have_access_code')}
+                </Link>
+                <Link href="/privacy" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.footer.privacy')}
+                </Link>
+                <Link href="/terms" className="text-sm text-footer-muted hover:text-footer-text">
+                  {t('landing.footer.terms')}
+                </Link>
               </nav>
 
               <div className="shrink-0 rounded-xl bg-white px-4 py-2.5">
@@ -518,12 +654,17 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            <p id="about" className="mt-10 max-w-3xl border-t border-[color:var(--color-footer-border)] pt-6 text-center text-xs leading-relaxed text-footer-muted md:text-start">
+            <p
+              id="about"
+              className="mt-10 max-w-3xl border-t border-[color:var(--color-footer-border)] pt-6 text-center text-xs leading-relaxed text-footer-muted md:text-start"
+            >
               {t('landing.about.body')}
             </p>
 
             <div className="mt-6 flex flex-col items-center gap-3 border-t border-[color:var(--color-footer-border)] pt-6 text-center text-xs text-footer-muted md:flex-row md:justify-between">
-              <p>© {new Date().getFullYear()} CalmGuide. {t('landing.footer.rights')}</p>
+              <p>
+                © {new Date().getFullYear()} CalmGuide. {t('landing.footer.rights')}
+              </p>
               <LocaleSwitcher triggerClassName="text-footer-muted hover:text-footer-text" />
             </div>
           </Container>

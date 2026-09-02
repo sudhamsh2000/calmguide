@@ -1,6 +1,6 @@
-import { getPreferredLanguage } from "./storage";
-import { getFacilityToken } from "./facility-storage";
-import { resolveSupportedLocale } from "./locale";
+import { getPreferredLanguage } from './storage';
+import { getFacilityToken } from './facility-storage';
+import { resolveSupportedLocale } from './locale';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -119,10 +119,7 @@ async function fetchWithTimeout(
   }
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const resolvedLanguage = getActiveLocale();
   const headers: HeadersInit = {
@@ -153,9 +150,7 @@ async function request<T>(
   return response.json() as Promise<T>;
 }
 
-export async function createProfile(
-  data: CreateProfileData,
-): Promise<CreateProfileResponse> {
+export async function createProfile(data: CreateProfileData): Promise<CreateProfileResponse> {
   return request<CreateProfileResponse>('/api/profiles', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -170,9 +165,7 @@ export interface ValidateInviteCodeResponse {
  * by the signup wizard's invite-code step for immediate feedback. The
  * server re-validates independently in createProfile(), so this is purely
  * a UX convenience, not the actual enforcement point. */
-export async function validateInviteCode(
-  code: string,
-): Promise<ValidateInviteCodeResponse> {
+export async function validateInviteCode(code: string): Promise<ValidateInviteCodeResponse> {
   return request<ValidateInviteCodeResponse>('/api/invite-codes/validate', {
     method: 'POST',
     body: JSON.stringify({ code }),
@@ -229,11 +222,7 @@ export async function coachChat(
     } catch {
       errorBody = await response.text();
     }
-    throw new ApiError(
-      `Coach chat request failed: ${response.status}`,
-      response.status,
-      errorBody,
-    );
+    throw new ApiError(`Coach chat request failed: ${response.status}`, response.status, errorBody);
   }
 
   if (!response.body) {
@@ -243,10 +232,7 @@ export async function coachChat(
   return response.body;
 }
 
-export async function getScenarios(
-  diseaseStage?: string,
-  category?: string,
-): Promise<Scenario[]> {
+export async function getScenarios(diseaseStage?: string, category?: string): Promise<Scenario[]> {
   const params = new URLSearchParams();
   if (diseaseStage) params.set('disease_stage', diseaseStage);
   if (category) params.set('category', category);
@@ -271,9 +257,7 @@ export interface ConversationSummary {
   message_count: number;
 }
 
-export async function getConversations(
-  accessCode: string,
-): Promise<ConversationSummary[]> {
+export async function getConversations(accessCode: string): Promise<ConversationSummary[]> {
   const data = await request<{ conversations: ConversationSummary[] }>(
     `/api/conversations/${encodeURIComponent(accessCode)}`,
   );
@@ -320,11 +304,7 @@ export async function checkIn(
     } catch {
       errorBody = await response.text();
     }
-    throw new ApiError(
-      `Check-in request failed: ${response.status}`,
-      response.status,
-      errorBody,
-    );
+    throw new ApiError(`Check-in request failed: ${response.status}`, response.status, errorBody);
   }
 
   if (!response.body) {
@@ -408,14 +388,26 @@ export async function getImpact(): Promise<ImpactResponse> {
 // ── Feedback ──────────────────────────────────────────────────────────────
 
 export const PREDEFINED_TAGS = [
-  'calm_approach', 'music', 'redirection', 'physical_space',
-  'familiar_objects', 'routine', 'lighting', 'simple_words',
-  'physical_touch', 'called_for_help', 'waited_it_out', 'left_the_room',
+  'calm_approach',
+  'music',
+  'redirection',
+  'physical_space',
+  'familiar_objects',
+  'routine',
+  'lighting',
+  'simple_words',
+  'physical_touch',
+  'called_for_help',
+  'waited_it_out',
+  'left_the_room',
 ] as const;
 
 export const NEGATIVE_REASON_TAGS = [
-  'too_generic', 'wrong_situation', 'didnt_understand',
-  'felt_unsafe', 'already_tried',
+  'too_generic',
+  'wrong_situation',
+  'didnt_understand',
+  'felt_unsafe',
+  'already_tried',
 ] as const;
 
 export const TAG_LABELS: Record<string, string> = {
@@ -472,10 +464,7 @@ export async function submitFeedback(
   });
 }
 
-export async function skipFeedback(
-  accessCode: string,
-  conversationId: string,
-): Promise<void> {
+export async function skipFeedback(accessCode: string, conversationId: string): Promise<void> {
   await request('/api/feedback/skip', {
     method: 'POST',
     body: JSON.stringify({
@@ -495,9 +484,7 @@ export async function getSessionFeedback(
   return data.feedback;
 }
 
-export async function getPendingFeedback(
-  accessCode: string,
-): Promise<PendingFeedback | null> {
+export async function getPendingFeedback(accessCode: string): Promise<PendingFeedback | null> {
   try {
     return await request<PendingFeedback>(
       `/api/feedback/pending/${encodeURIComponent(accessCode)}`,
@@ -541,12 +528,8 @@ export async function submitDailyCheckin(
   });
 }
 
-export async function getDailyCheckinStatus(
-  accessCode: string,
-): Promise<DailyCheckinStatus> {
-  return request<DailyCheckinStatus>(
-    `/api/checkin/daily/${encodeURIComponent(accessCode)}/today`,
-  );
+export async function getDailyCheckinStatus(accessCode: string): Promise<DailyCheckinStatus> {
+  return request<DailyCheckinStatus>(`/api/checkin/daily/${encodeURIComponent(accessCode)}/today`);
 }
 
 // ── Care Patterns (What We're Noticing) ──────────────────────────────────
@@ -568,13 +551,9 @@ export interface CarePatternData {
   } | null;
 }
 
-export async function getCarePatterns(
-  accessCode: string,
-): Promise<CarePatternData | null> {
+export async function getCarePatterns(accessCode: string): Promise<CarePatternData | null> {
   try {
-    return await request<CarePatternData>(
-      `/api/care-patterns/${encodeURIComponent(accessCode)}`,
-    );
+    return await request<CarePatternData>(`/api/care-patterns/${encodeURIComponent(accessCode)}`);
   } catch (err) {
     if (err instanceof ApiError && (err.status === 204 || err.status === 404)) return null;
     throw err;
@@ -598,25 +577,11 @@ export type SeverityLevel = 'mild' | 'moderate' | 'severe';
 export type DurationCategory = 'seconds' | 'minutes' | 'about_an_hour' | 'longer';
 
 export type AntecedentCategory =
-  | 'task_demand'
-  | 'transition'
-  | 'environmental'
-  | 'social'
-  | 'physical_state'
-  | 'unknown';
+  'task_demand' | 'transition' | 'environmental' | 'social' | 'physical_state' | 'unknown';
 
-export type InterventionOutcome =
-  | 'resolved'
-  | 'partially_resolved'
-  | 'unresolved'
-  | 'escalated';
+export type InterventionOutcome = 'resolved' | 'partially_resolved' | 'unresolved' | 'escalated';
 
-export type CaregiverRole =
-  | 'spouse'
-  | 'adult_child'
-  | 'paid_aide'
-  | 'other_family'
-  | 'other';
+export type CaregiverRole = 'spouse' | 'adult_child' | 'paid_aide' | 'other_family' | 'other';
 
 export interface IncidentCreate {
   behavior_category: BehaviorCategory;
@@ -781,9 +746,7 @@ export async function verifyIncident(
   );
 }
 
-export async function getPatterns(
-  accessCode: string,
-): Promise<PatternResponse | null> {
+export async function getPatterns(accessCode: string): Promise<PatternResponse | null> {
   try {
     return await request<PatternResponse>(
       `/api/incidents/${encodeURIComponent(accessCode)}/patterns`,
@@ -829,13 +792,10 @@ export async function createCareChange(
   accessCode: string,
   data: CareChangeCreate,
 ): Promise<{ id: string }> {
-  return request<{ id: string }>(
-    `/api/care-changes/${encodeURIComponent(accessCode)}`,
-    {
-      method: 'POST',
-      body: JSON.stringify(data),
-    },
-  );
+  return request<{ id: string }>(`/api/care-changes/${encodeURIComponent(accessCode)}`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
 
 export async function getCareChanges(

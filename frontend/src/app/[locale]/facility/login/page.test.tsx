@@ -1,7 +1,7 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { FacilityState } from "@/context/FacilityContext";
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { FacilityState } from '@/context/FacilityContext';
 
 const mocks = vi.hoisted(() => ({
   push: vi.fn(),
@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   emailLogin: vi.fn(),
 }));
 
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mocks.push }),
 }));
 
@@ -32,22 +32,22 @@ let mockFacilityState: FacilityState = {
   error: null,
 };
 
-vi.mock("@/context/FacilityContext", () => ({
+vi.mock('@/context/FacilityContext', () => ({
   useFacility: () => ({
     state: mockFacilityState,
     dispatch: mocks.dispatch,
   }),
 }));
 
-vi.mock("@/components/ui/BackButton", () => ({
+vi.mock('@/components/ui/BackButton', () => ({
   BackButton: ({ label }: { label: string }) => <button>{label}</button>,
 }));
 
-vi.mock("@/components/facility/PinPad", () => ({
+vi.mock('@/components/facility/PinPad', () => ({
   PinPad: () => <div>PIN pad</div>,
 }));
 
-vi.mock("@/components/facility/StaffSelector", () => ({
+vi.mock('@/components/facility/StaffSelector', () => ({
   StaffSelector: ({
     staff,
     loading,
@@ -66,7 +66,7 @@ vi.mock("@/components/facility/StaffSelector", () => ({
           <button
             key={member.id}
             type="button"
-            onClick={() => onSelect({ ...member, role: "staff" })}
+            onClick={() => onSelect({ ...member, role: 'staff' })}
           >
             {member.name}
           </button>
@@ -76,7 +76,7 @@ vi.mock("@/components/facility/StaffSelector", () => ({
   ),
 }));
 
-vi.mock("@/lib/facility-storage", () => ({
+vi.mock('@/lib/facility-storage', () => ({
   getFacilityCode: mocks.getFacilityCode,
   getFacilityName: mocks.getFacilityName,
   getFacilityLoginMode: mocks.getFacilityLoginMode,
@@ -86,14 +86,14 @@ vi.mock("@/lib/facility-storage", () => ({
   clearFacilityCode: mocks.clearFacilityCode,
 }));
 
-vi.mock("@/lib/facility-api", () => {
+vi.mock('@/lib/facility-api', () => {
   class FacilityApiError extends Error {
     status: number;
 
     constructor(message: string, status: number) {
       super(message);
       this.status = status;
-      this.name = "FacilityApiError";
+      this.name = 'FacilityApiError';
     }
   }
 
@@ -106,8 +106,8 @@ vi.mock("@/lib/facility-api", () => {
   };
 });
 
-let FacilityLoginPage: typeof import("./page").default;
-let FacilityApiErrorClass: typeof import("@/lib/facility-api").FacilityApiError;
+let FacilityLoginPage: typeof import('./page').default;
+let FacilityApiErrorClass: typeof import('@/lib/facility-api').FacilityApiError;
 
 beforeEach(async () => {
   mockFacilityState = {
@@ -137,16 +137,16 @@ beforeEach(async () => {
   mocks.getFacilityName.mockReturnValue(null);
   mocks.getFacilityLoginMode.mockReturnValue(null);
   mocks.verifyFacilityCode.mockResolvedValue({
-    id: "fac-1",
-    name: "Harbor Memory Care",
+    id: 'fac-1',
+    name: 'Harbor Memory Care',
     is_active: true,
   });
   mocks.getActiveStaff.mockResolvedValue({
-    staff: [{ id: "s1", name: "Asha RN", role: "staff" }],
+    staff: [{ id: 's1', name: 'Asha RN', role: 'staff' }],
   });
 
-  FacilityLoginPage = (await import("./page")).default;
-  FacilityApiErrorClass = (await import("@/lib/facility-api")).FacilityApiError;
+  FacilityLoginPage = (await import('./page')).default;
+  FacilityApiErrorClass = (await import('@/lib/facility-api')).FacilityApiError;
 });
 
 afterEach(() => {
@@ -154,65 +154,65 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("FacilityLoginPage", () => {
-  it("restores the admin email screen on refresh", () => {
-    mocks.getFacilityLoginMode.mockReturnValue("email");
-    mocks.getFacilityCode.mockReturnValue("ABCD1234");
-    mocks.getFacilityName.mockReturnValue("Harbor Memory Care");
+describe('FacilityLoginPage', () => {
+  it('restores the admin email screen on refresh', () => {
+    mocks.getFacilityLoginMode.mockReturnValue('email');
+    mocks.getFacilityCode.mockReturnValue('ABCD1234');
+    mocks.getFacilityName.mockReturnValue('Harbor Memory Care');
 
     render(<FacilityLoginPage />);
 
-    expect(screen.getByRole("heading", { name: "Admin Login" })).toBeInTheDocument();
-    expect(screen.queryByLabelText("Facility Code")).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Admin Login' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Facility Code')).not.toBeInTheDocument();
     expect(mocks.verifyFacilityCode).not.toHaveBeenCalled();
     expect(mocks.getActiveStaff).not.toHaveBeenCalled();
   });
 
-  it("shows the staff restore state immediately for remembered staff login", () => {
-    mocks.getFacilityLoginMode.mockReturnValue("staff-select");
-    mocks.getFacilityCode.mockReturnValue("ABCD1234");
+  it('shows the staff restore state immediately for remembered staff login', () => {
+    mocks.getFacilityLoginMode.mockReturnValue('staff-select');
+    mocks.getFacilityCode.mockReturnValue('ABCD1234');
     mocks.verifyFacilityCode.mockImplementation(() => new Promise(() => {}));
     mocks.getActiveStaff.mockImplementation(() => new Promise(() => {}));
 
     render(<FacilityLoginPage />);
 
     expect(screen.getByText("Who's here?")).toBeInTheDocument();
-    expect(screen.getByText("Loading staff")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Facility Code")).not.toBeInTheDocument();
+    expect(screen.getByText('Loading staff')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Facility Code')).not.toBeInTheDocument();
   });
 
-  it("falls back to the facility code form if remembered staff restore fails", async () => {
-    mocks.getFacilityLoginMode.mockReturnValue("staff-select");
-    mocks.getFacilityCode.mockReturnValue("ABCD1234");
+  it('falls back to the facility code form if remembered staff restore fails', async () => {
+    mocks.getFacilityLoginMode.mockReturnValue('staff-select');
+    mocks.getFacilityCode.mockReturnValue('ABCD1234');
     mocks.verifyFacilityCode.mockRejectedValue(
-      new FacilityApiErrorClass("Facility not found", 404),
+      new FacilityApiErrorClass('Facility not found', 404),
     );
     mocks.getActiveStaff.mockResolvedValue({ staff: [] });
 
     render(<FacilityLoginPage />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Facility Code")).toBeInTheDocument();
+      expect(screen.getByLabelText('Facility Code')).toBeInTheDocument();
     });
 
     expect(screen.getByText(/facility code not recognized/i)).toBeInTheDocument();
   });
 
-  it("redirects authenticated admins away from the login page on refresh", async () => {
+  it('redirects authenticated admins away from the login page on refresh', async () => {
     mockFacilityState = {
       staff: {
-        id: "admin-1",
-        name: "Maya Admin",
-        email: "maya@example.com",
-        role: "admin",
-        language_preference: "en",
+        id: 'admin-1',
+        name: 'Maya Admin',
+        email: 'maya@example.com',
+        role: 'admin',
+        language_preference: 'en',
         is_active: true,
         last_login_at: null,
         assigned_patients_count: 0,
-        created_at: "2026-01-01T00:00:00Z",
+        created_at: '2026-01-01T00:00:00Z',
       },
-      facilityCode: "ABCD1234",
-      facilityName: "Harbor Memory Care",
+      facilityCode: 'ABCD1234',
+      facilityName: 'Harbor Memory Care',
       authenticated: true,
       loading: false,
       error: null,
@@ -221,41 +221,41 @@ describe("FacilityLoginPage", () => {
     render(<FacilityLoginPage />);
 
     await waitFor(() => {
-      expect(mocks.push).toHaveBeenCalledWith("/facility/dashboard");
+      expect(mocks.push).toHaveBeenCalledWith('/facility/dashboard');
     });
   });
 
-  it("reloads the staff roster when returning from admin login to staff login", async () => {
+  it('reloads the staff roster when returning from admin login to staff login', async () => {
     const user = userEvent.setup();
-    mocks.getFacilityLoginMode.mockReturnValue("email");
-    mocks.getFacilityCode.mockReturnValue("ABCD1234");
-    mocks.getFacilityName.mockReturnValue("Harbor Memory Care");
+    mocks.getFacilityLoginMode.mockReturnValue('email');
+    mocks.getFacilityCode.mockReturnValue('ABCD1234');
+    mocks.getFacilityName.mockReturnValue('Harbor Memory Care');
 
     render(<FacilityLoginPage />);
 
-    await user.click(screen.getByRole("button", { name: /back to staff login/i }));
+    await user.click(screen.getByRole('button', { name: /back to staff login/i }));
 
     await waitFor(() => {
-      expect(mocks.verifyFacilityCode).toHaveBeenCalledWith("ABCD1234");
-      expect(mocks.getActiveStaff).toHaveBeenCalledWith("ABCD1234");
+      expect(mocks.verifyFacilityCode).toHaveBeenCalledWith('ABCD1234');
+      expect(mocks.getActiveStaff).toHaveBeenCalledWith('ABCD1234');
     });
     expect(screen.getByText("Who's here?")).toBeInTheDocument();
   });
 
-  it("clears remembered facility state when the user changes facility", async () => {
+  it('clears remembered facility state when the user changes facility', async () => {
     const user = userEvent.setup();
-    mocks.getFacilityLoginMode.mockReturnValue("staff-select");
-    mocks.getFacilityCode.mockReturnValue("ABCD1234");
+    mocks.getFacilityLoginMode.mockReturnValue('staff-select');
+    mocks.getFacilityCode.mockReturnValue('ABCD1234');
 
     render(<FacilityLoginPage />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /change facility/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /change facility/i })).toBeInTheDocument();
     });
-    await user.click(screen.getByRole("button", { name: /change facility/i }));
+    await user.click(screen.getByRole('button', { name: /change facility/i }));
 
     expect(mocks.clearFacilityCode).toHaveBeenCalled();
-    expect(mocks.dispatch).toHaveBeenCalledWith({ type: "CLEAR_FACILITY" });
-    expect(screen.getByLabelText("Facility Code")).toBeInTheDocument();
+    expect(mocks.dispatch).toHaveBeenCalledWith({ type: 'CLEAR_FACILITY' });
+    expect(screen.getByLabelText('Facility Code')).toBeInTheDocument();
   });
 });

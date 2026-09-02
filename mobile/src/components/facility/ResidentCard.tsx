@@ -64,7 +64,14 @@ export function ResidentCard({ resident, patientName, onPress }: ResidentCardPro
       })}
     >
       {/* Header: location + risk badge */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 10,
+        }}
+      >
         <Text
           style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, flex: 1 }}
           numberOfLines={1}
@@ -81,7 +88,10 @@ export function ResidentCard({ resident, patientName, onPress }: ResidentCardPro
 
       {/* Key info — plain text, no colored cards */}
       {resident.top_effective && (
-        <Text style={{ fontSize: 13, color: colors.foreground, marginBottom: 6, lineHeight: 18 }} numberOfLines={2}>
+        <Text
+          style={{ fontSize: 13, color: colors.foreground, marginBottom: 6, lineHeight: 18 }}
+          numberOfLines={2}
+        >
           {resident.top_effective}
         </Text>
       )}

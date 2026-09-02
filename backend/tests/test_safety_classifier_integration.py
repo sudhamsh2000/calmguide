@@ -65,6 +65,7 @@ async def test_classifier_escalation_logs_safety_event(app, client, db_session, 
 
     # Background task needs a moment to flush after the response completes.
     import asyncio
+
     await asyncio.sleep(0.05)
 
     result = await db_session.execute(select(SafetyEvent))

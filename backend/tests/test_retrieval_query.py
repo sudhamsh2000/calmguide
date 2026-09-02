@@ -49,7 +49,7 @@ def test_build_rewrite_prompt_includes_context():
 
 @patch("app.services.retrieval_query._is_rag_configured", return_value=True)
 async def test_build_english_rag_query_rewrites_non_english_requests(_mock_rag):
-    llm = FakeLLM('nighttime agitation asking if caregiver is okay')
+    llm = FakeLLM("nighttime agitation asking if caregiver is okay")
     result = await build_english_rag_query(
         llm,
         locale_code="ta-IN",

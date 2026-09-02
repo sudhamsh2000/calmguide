@@ -40,9 +40,7 @@ from app.models.invite_code import InviteCode
 from app.services.auth import hash_access_code
 
 # Same alphabet as B2C access codes — exclude visually ambiguous characters.
-ALPHABET = "".join(
-    c for c in string.ascii_uppercase + string.digits if c not in "0O1IL"
-)
+ALPHABET = "".join(c for c in string.ascii_uppercase + string.digits if c not in "0O1IL")
 CODE_LENGTH = 8
 
 
@@ -73,7 +71,9 @@ async def main(count: int, label: str | None) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         "--count", type=int, default=1, help="Number of codes to generate (default: 1)"
     )

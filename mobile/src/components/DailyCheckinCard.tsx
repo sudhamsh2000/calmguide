@@ -9,11 +9,7 @@ type Severity = 'calm' | 'mild' | 'tough';
 const TIME_SLOTS = ['overnight', 'morning', 'afternoon', 'evening'] as const;
 
 interface DailyCheckinCardProps {
-  onCheckin: (
-    severity: Severity,
-    timeSlot?: string,
-    tags?: string[],
-  ) => Promise<void>;
+  onCheckin: (severity: Severity, timeSlot?: string, tags?: string[]) => Promise<void>;
 }
 
 export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
@@ -83,11 +79,7 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
     if (!expanded) return;
     setSubmitting(true);
     try {
-      await onCheckin(
-        expanded,
-        selectedTimeSlot ?? undefined,
-        selectedTags,
-      );
+      await onCheckin(expanded, selectedTimeSlot ?? undefined, selectedTags);
       setSubmitted(true);
     } finally {
       setSubmitting(false);
@@ -153,7 +145,9 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
               accessibilityRole="button"
               accessibilityLabel={t(cfg.labelKey)}
             >
-              <Text style={{ fontSize: 13, fontWeight: '500', color: cfg.color, textAlign: 'center' }}>
+              <Text
+                style={{ fontSize: 13, fontWeight: '500', color: cfg.color, textAlign: 'center' }}
+              >
                 {t(cfg.labelKey)}
               </Text>
             </Pressable>
@@ -191,20 +185,13 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
               {TIME_SLOTS.map((slot) => (
                 <Pressable
                   key={slot}
-                  onPress={() =>
-                    setSelectedTimeSlot((prev) => (prev === slot ? null : slot))
-                  }
+                  onPress={() => setSelectedTimeSlot((prev) => (prev === slot ? null : slot))}
                   style={({ pressed }) => ({
                     borderRadius: 99,
                     borderWidth: 1,
-                    borderColor:
-                      selectedTimeSlot === slot
-                        ? colors.primary
-                        : colors.border,
+                    borderColor: selectedTimeSlot === slot ? colors.primary : colors.border,
                     backgroundColor:
-                      selectedTimeSlot === slot
-                        ? colors.primary + '18'
-                        : colors.background,
+                      selectedTimeSlot === slot ? colors.primary + '18' : colors.background,
                     paddingHorizontal: 14,
                     minHeight: 44,
                     justifyContent: 'center',
@@ -217,10 +204,7 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
                     style={{
                       fontSize: 12,
                       fontWeight: selectedTimeSlot === slot ? '600' : '400',
-                      color:
-                        selectedTimeSlot === slot
-                          ? colors.primary
-                          : colors.mutedForeground,
+                      color: selectedTimeSlot === slot ? colors.primary : colors.mutedForeground,
                     }}
                   >
                     {t(`daily_checkin.time_${slot}`)}
@@ -246,9 +230,7 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
                       borderRadius: 99,
                       borderWidth: 1,
                       borderColor: selected ? colors.primary : colors.border,
-                      backgroundColor: selected
-                        ? colors.primary + '18'
-                        : colors.background,
+                      backgroundColor: selected ? colors.primary + '18' : colors.background,
                       paddingHorizontal: 10,
                       paddingVertical: 10,
                       minHeight: 44,
@@ -263,9 +245,7 @@ export function DailyCheckinCard({ onCheckin }: DailyCheckinCardProps) {
                       style={{
                         fontSize: 12,
                         fontWeight: selected ? '600' : '400',
-                        color: selected
-                          ? colors.primary
-                          : colors.mutedForeground,
+                        color: selected ? colors.primary : colors.mutedForeground,
                       }}
                     >
                       {TAG_LABELS[tag] ?? tag}

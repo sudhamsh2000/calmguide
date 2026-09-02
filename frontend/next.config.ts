@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
-import createNextIntlPlugin from "next-intl/plugin";
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 /**
  * Derive the API origin from NEXT_PUBLIC_API_URL so the CSP `connect-src`
@@ -10,11 +10,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
  * crash the build.
  */
 function getApiOrigin(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const raw = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
   try {
     return new URL(raw).origin;
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -35,7 +35,7 @@ const apiOrigin = getApiOrigin();
  * - `font-src` allows self and data: for embedded/next-font assets.
  */
 function buildContentSecurityPolicy(): string {
-  const connectSrc = ["'self'", apiOrigin, "ws:", "wss:"].filter(Boolean).join(" ");
+  const connectSrc = ["'self'", apiOrigin, 'ws:', 'wss:'].filter(Boolean).join(' ');
 
   const directives = [
     "default-src 'self'",
@@ -51,58 +51,58 @@ function buildContentSecurityPolicy(): string {
     "manifest-src 'self'",
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
-    "upgrade-insecure-requests",
+    'upgrade-insecure-requests',
   ];
 
-  return directives.join("; ");
+  return directives.join('; ');
 }
 
 const securityHeaders = [
   {
-    key: "Content-Security-Policy",
+    key: 'Content-Security-Policy',
     value: buildContentSecurityPolicy(),
   },
   {
-    key: "X-Frame-Options",
-    value: "DENY",
+    key: 'X-Frame-Options',
+    value: 'DENY',
   },
   {
-    key: "X-Content-Type-Options",
-    value: "nosniff",
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
   },
   {
-    key: "Referrer-Policy",
-    value: "strict-origin-when-cross-origin",
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
   },
   {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
   },
   {
-    key: "Permissions-Policy",
+    key: 'Permissions-Policy',
     // Crisis Mode uses the microphone (voice input) so it is allowed for self.
     // Everything else is disabled by default.
     value: [
-      "accelerometer=()",
-      "autoplay=()",
-      "camera=()",
-      "display-capture=()",
-      "encrypted-media=()",
-      "fullscreen=(self)",
-      "geolocation=()",
-      "gyroscope=()",
-      "magnetometer=()",
-      "microphone=(self)",
-      "midi=()",
-      "payment=()",
-      "usb=()",
-    ].join(", "),
+      'accelerometer=()',
+      'autoplay=()',
+      'camera=()',
+      'display-capture=()',
+      'encrypted-media=()',
+      'fullscreen=(self)',
+      'geolocation=()',
+      'gyroscope=()',
+      'magnetometer=()',
+      'microphone=(self)',
+      'midi=()',
+      'payment=()',
+      'usb=()',
+    ].join(', '),
   },
 ];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  output: "standalone",
+  output: 'standalone',
   images: {
     // Next's default for the image optimizer route is
     // `Content-Disposition: attachment`, which some Chromium builds treat as
@@ -113,12 +113,12 @@ const nextConfig: NextConfig = {
     // `load` or `error` and simply never render, with no console error to
     // point at. Serving them inline fixes rendering without weakening the
     // CSP already applied to the route (see securityHeaders above).
-    contentDispositionType: "inline",
+    contentDispositionType: 'inline',
   },
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: '/:path*',
         headers: securityHeaders,
       },
     ];

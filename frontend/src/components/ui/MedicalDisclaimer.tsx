@@ -39,8 +39,8 @@ export function MedicalDisclaimer({ children }: { children: React.ReactNode }) {
             </li>
             <li>{t('bullet_doctor')}</li>
             <li>
-              {t('bullet_helpline_lead')}{' '}
-              <strong>{t('bullet_helpline_emph')}</strong> {t('bullet_helpline_at')}{' '}
+              {t('bullet_helpline_lead')} <strong>{t('bullet_helpline_emph')}</strong>{' '}
+              {t('bullet_helpline_at')}{' '}
               <a href="tel:18002723900" className="underline text-primary font-semibold">
                 1-800-272-3900
               </a>

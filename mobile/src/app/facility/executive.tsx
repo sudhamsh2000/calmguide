@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/components/ThemeContext';
 import { KpiCard } from '@/components/facility/KpiCard';
@@ -45,7 +39,14 @@ export default function ExecutiveScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -56,16 +57,31 @@ export default function ExecutiveScreen() {
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+          />
         }
         onScrollBeginDrag={recordActivity}
       >
-        <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 8 }}>
+        <Text
+          style={{ fontSize: 22, fontWeight: '700', color: colors.foreground, marginBottom: 8 }}
+        >
           {t('executive.title')}
         </Text>
 
         {error && (
-          <View style={{ backgroundColor: colors.surface, padding: 16, borderRadius: 12, marginBottom: 16, borderWidth: 1, borderColor: colors.error }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              padding: 16,
+              borderRadius: 12,
+              marginBottom: 16,
+              borderWidth: 1,
+              borderColor: colors.error,
+            }}
+          >
             <Text style={{ color: colors.error, fontSize: 14, textAlign: 'center' }}>{error}</Text>
           </View>
         )}
@@ -80,12 +96,24 @@ export default function ExecutiveScreen() {
               <KpiCard
                 value={`${data.incident_rate.change_pct > 0 ? '+' : ''}${data.incident_rate.change_pct}%`}
                 label={t('executive.incident_reduction')}
-                urgency={data.incident_rate.change_pct < 0 ? 'positive' : data.incident_rate.change_pct > 0 ? 'alert' : undefined}
+                urgency={
+                  data.incident_rate.change_pct < 0
+                    ? 'positive'
+                    : data.incident_rate.change_pct > 0
+                      ? 'alert'
+                      : undefined
+                }
               />
               <KpiCard
                 value={`${data.adoption_rate.staff_pct}%`}
                 label={t('executive.staff_adoption')}
-                urgency={data.adoption_rate.staff_pct >= 80 ? 'positive' : data.adoption_rate.staff_pct < 50 ? 'warning' : undefined}
+                urgency={
+                  data.adoption_rate.staff_pct >= 80
+                    ? 'positive'
+                    : data.adoption_rate.staff_pct < 50
+                      ? 'warning'
+                      : undefined
+                }
               />
             </View>
 
@@ -99,7 +127,14 @@ export default function ExecutiveScreen() {
                 marginBottom: 16,
               }}
             >
-              <Text style={{ fontSize: 16, fontWeight: '700', color: colors.foreground, marginBottom: 12 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: colors.foreground,
+                  marginBottom: 12,
+                }}
+              >
                 {t('executive.monthly_impact')}
               </Text>
               {[
@@ -110,10 +145,22 @@ export default function ExecutiveScreen() {
               ].map((row) => (
                 <View
                   key={row.label}
-                  style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border }}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    paddingVertical: 8,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                  }}
                 >
                   <Text style={{ fontSize: 14, color: colors.foreground }}>{row.label}</Text>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: row.value === '—' ? colors.mutedForeground : '#16A34A' }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: '600',
+                      color: row.value === '—' ? colors.mutedForeground : '#16A34A',
+                    }}
+                  >
                     {row.value}
                   </Text>
                 </View>

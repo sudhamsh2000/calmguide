@@ -1,13 +1,13 @@
 """Behavioral insights endpoint — per-profile pattern data (auth required)."""
+
 import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import distinct, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
-from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.profile_insights import ProfileInsights
 from app.schemas.insights import InsightsPayload, InsightsResponse
@@ -30,9 +30,7 @@ async def get_insights(
 ):
     """Return behavioral pattern insights for the caregiver's profile."""
     code_hash = hash_access_code(access_code)
-    profile_result = await db.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    profile_result = await db.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = profile_result.scalar_one_or_none()
     if profile is None:
         raise HTTPException(
@@ -56,5 +54,3 @@ async def get_insights(
         computed_at=row.computed_at.isoformat(),
         insights=InsightsPayload(**payload_dict),
     )
-
-

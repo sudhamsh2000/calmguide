@@ -9,20 +9,21 @@ This script:
 3. Encrypts any conversations.suggested_tags not starting with ENC: (if non-null)
 4. Computes and upserts insights for all profiles with ≥3 sessions
 """
+
 import asyncio
 import logging
-import sys
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 async def main():
-    from sqlalchemy import select, distinct
+    from sqlalchemy import distinct, select
+
     from app.db import get_engine, get_session_factory
     from app.models.conversation import Conversation
     from app.models.profile import Profile
-    from app.services.crypto import encrypt, decrypt, validate_encryption_key
+    from app.services.crypto import encrypt, validate_encryption_key
 
     # Validate key first
     validate_encryption_key()
@@ -85,7 +86,9 @@ async def main():
         except Exception as exc:
             logger.warning("Insights failed for %s: %s", pid, exc)
 
-    logger.info("Insights: %d processed, %d skipped, %d total", processed, skipped, len(profile_ids))
+    logger.info(
+        "Insights: %d processed, %d skipped, %d total", processed, skipped, len(profile_ids)
+    )
     logger.info("Done!")
 
 

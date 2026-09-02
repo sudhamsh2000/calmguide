@@ -1,7 +1,7 @@
 """Conversation history model — linked by session_id, not user ID (privacy)."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -32,18 +32,14 @@ class Conversation(Base):
     is_safety_gate: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false"
     )
-    staff_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("staff.id"), nullable=True
-    )
+    staff_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("staff.id"), nullable=True)
     facility_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("facilities.id"), nullable=True
     )
-    extra_metadata: Mapped[str | None] = mapped_column(
-        "metadata", String, nullable=True
-    )
+    extra_metadata: Mapped[str | None] = mapped_column("metadata", String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )

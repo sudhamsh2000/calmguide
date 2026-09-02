@@ -26,9 +26,7 @@ async def embed_texts(texts: list[str]) -> list[list[float]]:
     for i in range(0, len(texts), _OPENAI_BATCH_LIMIT):
         batch = texts[i : i + _OPENAI_BATCH_LIMIT]
         response = await client.embeddings.create(
-            input=batch,
-            model=settings.embedding_model,
-            dimensions=settings.embedding_dim
+            input=batch, model=settings.embedding_model, dimensions=settings.embedding_dim
         )
         all_embeddings.extend(item.embedding for item in response.data)
 

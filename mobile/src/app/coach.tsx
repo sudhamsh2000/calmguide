@@ -35,13 +35,36 @@ interface ChatExchange {
   sections: CoachSection[];
 }
 
-const SECTION_STYLES: Record<CoachSectionId, {
-  bg: string; borderColor: string; borderLeft?: boolean; labelColor: string; labelKey: string;
-}> = {
-  'right-now': { bg: 'primary', borderColor: 'primary', labelColor: 'primaryDark', labelKey: 'sections.right_now' },
+const SECTION_STYLES: Record<
+  CoachSectionId,
+  {
+    bg: string;
+    borderColor: string;
+    borderLeft?: boolean;
+    labelColor: string;
+    labelKey: string;
+  }
+> = {
+  'right-now': {
+    bg: 'primary',
+    borderColor: 'primary',
+    labelColor: 'primaryDark',
+    labelKey: 'sections.right_now',
+  },
   why: { bg: 'surface', borderColor: 'border', labelColor: 'foreground', labelKey: 'sections.why' },
-  'what-not-to-do': { bg: 'surface', borderColor: 'border', borderLeft: true, labelColor: 'error', labelKey: 'sections.what_not_to_do' },
-  escalation: { bg: 'surface', borderColor: 'border', labelColor: 'mutedForeground', labelKey: 'sections.escalation' },
+  'what-not-to-do': {
+    bg: 'surface',
+    borderColor: 'border',
+    borderLeft: true,
+    labelColor: 'error',
+    labelKey: 'sections.what_not_to_do',
+  },
+  escalation: {
+    bg: 'surface',
+    borderColor: 'border',
+    labelColor: 'mutedForeground',
+    labelKey: 'sections.escalation',
+  },
 };
 
 function SectionCardComponent({ section }: { section: CoachSection }) {
@@ -59,14 +82,14 @@ function SectionCardComponent({ section }: { section: CoachSection }) {
         padding: 18,
         gap: 8,
         backgroundColor: isRightNow ? colors.primary + '14' : colors.surface,
-        borderWidth: isWhatNot ? 1 : (isRightNow ? 2 : 1),
+        borderWidth: isWhatNot ? 1 : isRightNow ? 2 : 1,
         borderColor: isRightNow ? colors.primary : colors.border,
-        ...(isWhatNot
-          ? { borderStartWidth: 4, borderStartColor: colors.error }
-          : {}),
+        ...(isWhatNot ? { borderStartWidth: 4, borderStartColor: colors.error } : {}),
       }}
     >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <View
+        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}
+      >
         <Text
           accessibilityRole="header"
           style={{
@@ -74,14 +97,20 @@ function SectionCardComponent({ section }: { section: CoachSection }) {
             fontWeight: '700',
             textTransform: 'uppercase',
             letterSpacing: 0.4,
-            color: isRightNow ? colors.primaryDark : isWhatNot ? colors.error : colors.mutedForeground,
+            color: isRightNow
+              ? colors.primaryDark
+              : isWhatNot
+                ? colors.error
+                : colors.mutedForeground,
           }}
         >
           {t(style.labelKey)}
         </Text>
         <SpeakButton text={section.content} />
       </View>
-      <MarkdownText baseSize={15} lineHeight={23}>{section.content}</MarkdownText>
+      <MarkdownText baseSize={15} lineHeight={23}>
+        {section.content}
+      </MarkdownText>
     </View>
   );
 }
@@ -93,13 +122,21 @@ function SectionCardComponent({ section }: { section: CoachSection }) {
  */
 const SectionCard = React.memo(SectionCardComponent);
 
-function SectionRenderer({ sections, rawResponse }: { sections: CoachSection[]; rawResponse: string }) {
+function SectionRenderer({
+  sections,
+  rawResponse,
+}: {
+  sections: CoachSection[];
+  rawResponse: string;
+}) {
   const { colors } = useTheme();
 
   if (sections.length > 0) {
     return (
       <View style={{ gap: 12 }}>
-        {sections.map((section) => <SectionCard key={section.id} section={section} />)}
+        {sections.map((section) => (
+          <SectionCard key={section.id} section={section} />
+        ))}
       </View>
     );
   }
@@ -107,7 +144,9 @@ function SectionRenderer({ sections, rawResponse }: { sections: CoachSection[]; 
   if (rawResponse.trim()) {
     return (
       <Card variant="default" padding={16}>
-        <MarkdownText baseSize={15} lineHeight={24}>{rawResponse}</MarkdownText>
+        <MarkdownText baseSize={15} lineHeight={24}>
+          {rawResponse}
+        </MarkdownText>
       </Card>
     );
   }
@@ -130,9 +169,7 @@ function GreetingCard() {
     >
       <Text style={{ fontSize: 17, color: colors.foreground, lineHeight: 26 }}>
         {t('greeting')}{' '}
-        <Text style={{ color: colors.mutedForeground }}>
-          {t('greeting_detail')}
-        </Text>
+        <Text style={{ color: colors.mutedForeground }}>{t('greeting_detail')}</Text>
       </Text>
     </View>
   );
@@ -152,7 +189,16 @@ function UserMessageBubble({ message }: { message: string }) {
         paddingVertical: 12,
       }}
     >
-      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.mutedForeground, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: '700',
+          color: colors.mutedForeground,
+          textTransform: 'uppercase',
+          letterSpacing: 0.8,
+          marginBottom: 4,
+        }}
+      >
         {t('you_asked')}
       </Text>
       <Text style={{ fontSize: 16, fontWeight: '500', color: colors.foreground, lineHeight: 24 }}>
@@ -175,7 +221,14 @@ function CoachScreenInner() {
   const insets = useSafeAreaInsets();
   const { t, i18n } = useTranslation('coach');
   const { t: tc } = useTranslation('common');
-  const { session_id: initialSessionId, profile_id, unit, room, bed, risk } = useLocalSearchParams<{
+  const {
+    session_id: initialSessionId,
+    profile_id,
+    unit,
+    room,
+    bed,
+    risk,
+  } = useLocalSearchParams<{
     session_id?: string;
     profile_id?: string;
     unit?: string;
@@ -224,90 +277,101 @@ function CoachScreenInner() {
 
         // Load past messages when resuming a session
         if (initialSessionId && code) {
-          getConversationMessages(code, initialSessionId).then((messages) => {
-            const exchanges: ChatExchange[] = [];
-            for (let i = 0; i < messages.length; i++) {
-              const msg = messages[i];
-              if (msg.role === 'user') {
-                const next = messages[i + 1];
-                if (next?.role === 'assistant') {
-                  exchanges.push({
-                    userMessage: msg.content,
-                    response: next.content,
-                    sections: parseCoachResponse(next.content),
-                  });
-                  i++;
+          getConversationMessages(code, initialSessionId)
+            .then((messages) => {
+              const exchanges: ChatExchange[] = [];
+              for (let i = 0; i < messages.length; i++) {
+                const msg = messages[i];
+                if (msg.role === 'user') {
+                  const next = messages[i + 1];
+                  if (next?.role === 'assistant') {
+                    exchanges.push({
+                      userMessage: msg.content,
+                      response: next.content,
+                      sections: parseCoachResponse(next.content),
+                    });
+                    i++;
+                  }
                 }
               }
-            }
-            setHistory(exchanges);
-          }).catch(() => {});
+              setHistory(exchanges);
+            })
+            .catch(() => {});
         }
       });
     }
-    return () => { abortRef.current?.(); cancelPendingFlush(); };
+    return () => {
+      abortRef.current?.();
+      cancelPendingFlush();
+    };
   }, [isFacilityMode, cancelPendingFlush]);
 
-  const sendMessage = useCallback((message: string) => {
-    if (!message.trim() || (!accessCode && !isFacilityMode)) return;
-    lastAttemptedRef.current = message;
-    setCurrentMessage(message);
-    setShowInitial(false);
-    setIsStreaming(true);
-    setStreamError('');
-    setRawResponse('');
-    rawRef.current = '';
-    cancelPendingFlush();
+  const sendMessage = useCallback(
+    (message: string) => {
+      if (!message.trim() || (!accessCode && !isFacilityMode)) return;
+      lastAttemptedRef.current = message;
+      setCurrentMessage(message);
+      setShowInitial(false);
+      setIsStreaming(true);
+      setStreamError('');
+      setRawResponse('');
+      rawRef.current = '';
+      cancelPendingFlush();
 
-    const FLUSH_INTERVAL_MS = 150;
-    const scheduleFlush = () => {
-      if (flushTimerRef.current !== null) return; // a flush is already pending
-      flushTimerRef.current = setTimeout(() => {
-        flushTimerRef.current = null;
-        setRawResponse(rawRef.current);
-        scrollRef.current?.scrollToEnd({ animated: true });
-      }, FLUSH_INTERVAL_MS);
-    };
+      const FLUSH_INTERVAL_MS = 150;
+      const scheduleFlush = () => {
+        if (flushTimerRef.current !== null) return; // a flush is already pending
+        flushTimerRef.current = setTimeout(() => {
+          flushTimerRef.current = null;
+          setRawResponse(rawRef.current);
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, FLUSH_INTERVAL_MS);
+      };
 
-    const safePatientName = patientName.trim() || 'Patient';
-    abortRef.current = streamCoachChat(
-      isFacilityMode
-        ? { profile_id: profile_id!, patient_name: safePatientName, message: message.trim() }
-        : { access_code: accessCode, patient_name: safePatientName, message: message.trim() },
-      (chunk) => {
-        rawRef.current += chunk;
-        scheduleFlush();
-      },
-      () => {
-        cancelPendingFlush();
-        setIsStreaming(false);
-        const finalRaw = rawRef.current;
-        const parsed = parseCoachResponse(finalRaw);
-        setHistory((h) => [...h, { userMessage: message.trim(), response: finalRaw, sections: parsed }]);
-        setCurrentMessage('');
-        setRawResponse('');
-        rawRef.current = '';
-        AccessibilityInfo.announceForAccessibility('Guidance is ready');
-        setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
-      },
-      (err) => {
-        cancelPendingFlush();
-        setIsStreaming(false);
-        setRawResponse('');
-        rawRef.current = '';
-        // A known-offline device almost certainly failed because of that, not
-        // a server-side problem — say so, since "we can't connect" reads very
-        // differently from "check your own connection" to a stressed caregiver.
-        setStreamError(
-          isOnlineRef.current === false
-            ? tc('network.offline_detail')
-            : err.message.includes('422')
-              ? t('error.profile_not_found')
-              : t('error.server_error')
-        );
-      }
-    );
-  }, [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush]);
+      const safePatientName = patientName.trim() || 'Patient';
+      abortRef.current = streamCoachChat(
+        isFacilityMode
+          ? { profile_id: profile_id!, patient_name: safePatientName, message: message.trim() }
+          : { access_code: accessCode, patient_name: safePatientName, message: message.trim() },
+        (chunk) => {
+          rawRef.current += chunk;
+          scheduleFlush();
+        },
+        () => {
+          cancelPendingFlush();
+          setIsStreaming(false);
+          const finalRaw = rawRef.current;
+          const parsed = parseCoachResponse(finalRaw);
+          setHistory((h) => [
+            ...h,
+            { userMessage: message.trim(), response: finalRaw, sections: parsed },
+          ]);
+          setCurrentMessage('');
+          setRawResponse('');
+          rawRef.current = '';
+          AccessibilityInfo.announceForAccessibility('Guidance is ready');
+          setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+        },
+        (err) => {
+          cancelPendingFlush();
+          setIsStreaming(false);
+          setRawResponse('');
+          rawRef.current = '';
+          // A known-offline device almost certainly failed because of that, not
+          // a server-side problem — say so, since "we can't connect" reads very
+          // differently from "check your own connection" to a stressed caregiver.
+          setStreamError(
+            isOnlineRef.current === false
+              ? tc('network.offline_detail')
+              : err.message.includes('422')
+                ? t('error.profile_not_found')
+                : t('error.server_error'),
+          );
+        },
+      );
+    },
+    [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush],
+  );
 
   const currentSections = useMemo(() => parseCoachResponse(rawResponse), [rawResponse]);
 
@@ -369,19 +433,32 @@ function CoachScreenInner() {
                     accessibilityHint={t('subtitle')}
                   />
                   <View style={{ position: 'absolute', bottom: 10, end: 10 }}>
-                    <MicButton onTranscript={(t) => setInputText((prev) => prev ? prev + ' ' + t : t)} />
+                    <MicButton
+                      onTranscript={(t) => setInputText((prev) => (prev ? prev + ' ' + t : t))}
+                    />
                   </View>
                 </View>
                 <Button
                   size="lg"
                   variant="primary"
                   disabled={!inputText.trim()}
-                  onPress={() => { sendMessage(inputText); setInputText(''); }}
+                  onPress={() => {
+                    sendMessage(inputText);
+                    setInputText('');
+                  }}
                   style={{ minHeight: 56 }}
                 >
                   {t('submit_button')}
                 </Button>
-                <Text style={{ fontSize: 12, color: colors.mutedForeground, textAlign: 'center', lineHeight: 18, opacity: 0.8 }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: colors.mutedForeground,
+                    textAlign: 'center',
+                    lineHeight: 18,
+                    opacity: 0.8,
+                  }}
+                >
                   {tc('privacy_hint')}
                 </Text>
               </View>
@@ -420,7 +497,10 @@ function CoachScreenInner() {
               <Button
                 size="sm"
                 variant="secondary"
-                onPress={() => { setStreamError(''); sendMessage(lastAttemptedRef.current); }}
+                onPress={() => {
+                  setStreamError('');
+                  sendMessage(lastAttemptedRef.current);
+                }}
               >
                 {tc('actions.try_again', { defaultValue: 'Try Again' })}
               </Button>
@@ -434,7 +514,14 @@ function CoachScreenInner() {
               {isStreaming && currentSections.length === 0 && !rawResponse && (
                 <View style={{ alignItems: 'center', paddingVertical: 8 }}>
                   <BreathingIndicator size={36} />
-                  <Text style={{ fontSize: 14, color: colors.mutedForeground, marginTop: 8, textAlign: 'center' }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: colors.mutedForeground,
+                      marginTop: 8,
+                      textAlign: 'center',
+                    }}
+                  >
                     {t('finding_guidance')}
                   </Text>
                 </View>
@@ -449,9 +536,16 @@ function CoachScreenInner() {
                   <View
                     accessibilityElementsHidden
                     importantForAccessibility="no-hide-descendants"
-                    style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary }}
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: colors.primary,
+                    }}
                   />
-                  <Text style={{ fontSize: 13, color: colors.mutedForeground }}>{t('still_working')}</Text>
+                  <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                    {t('still_working')}
+                  </Text>
                 </View>
               )}
             </View>
@@ -473,19 +567,21 @@ function CoachScreenInner() {
               gap: 10,
             }}
           >
-            <View style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: colors.surface,
-              borderWidth: 1,
-              borderColor: colors.border,
-              borderRadius: 24,
-              paddingStart: 14,
-              paddingEnd: 4,
-              paddingVertical: 4,
-              gap: 4,
-            }}>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: colors.surface,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: 24,
+                paddingStart: 14,
+                paddingEnd: 4,
+                paddingVertical: 4,
+                gap: 4,
+              }}
+            >
               <TextInput
                 style={{
                   flex: 1,
@@ -505,25 +601,37 @@ function CoachScreenInner() {
                 accessibilityLabel={t('followup_aria_label')}
               />
               <MicButton
-                onTranscript={(t) => setFooterText((prev) => prev ? prev + ' ' + t : t)}
+                onTranscript={(t) => setFooterText((prev) => (prev ? prev + ' ' + t : t))}
                 disabled={isStreaming}
                 transparent
               />
               <Pressable
                 disabled={!footerText.trim() || isStreaming}
-                onPress={() => { sendMessage(footerText); setFooterText(''); }}
+                onPress={() => {
+                  sendMessage(footerText);
+                  setFooterText('');
+                }}
                 accessibilityRole="button"
                 accessibilityLabel={tc('accessibility.send_message')}
                 accessibilityState={{ disabled: !footerText.trim() || isStreaming }}
                 style={{
-                  backgroundColor: (!footerText.trim() || isStreaming) ? colors.mutedForeground + '22' : colors.primary,
+                  backgroundColor:
+                    !footerText.trim() || isStreaming
+                      ? colors.mutedForeground + '22'
+                      : colors.primary,
                   borderRadius: 22,
                   paddingHorizontal: 18,
                   minHeight: 44,
                   justifyContent: 'center',
                 }}
               >
-                <Text style={{ fontSize: 15, fontWeight: '600', color: (!footerText.trim() || isStreaming) ? colors.mutedForeground : '#FFF' }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: '600',
+                    color: !footerText.trim() || isStreaming ? colors.mutedForeground : '#FFF',
+                  }}
+                >
                   {tc('actions.send')}
                 </Text>
               </Pressable>

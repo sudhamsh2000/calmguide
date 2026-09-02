@@ -4,7 +4,6 @@ import hashlib
 
 import pytest
 
-
 VALID_PROFILE = {
     "disease_stage": "middle",
     "behavioral_patterns": ["sundowning", "wandering", "repetitive questions"],
@@ -105,8 +104,9 @@ async def test_update_nonexistent_profile(client):
 
 async def test_access_code_stored_as_hash(client, db_session):
     """The raw access code must not appear in the database."""
-    from app.models.profile import Profile
     from sqlalchemy import select
+
+    from app.models.profile import Profile
 
     create_resp = await client.post("/api/profiles", json=VALID_PROFILE)
     code = create_resp.json()["access_code"]
@@ -132,14 +132,18 @@ async def test_access_code_stored_as_hash(client, db_session):
 async def test_profile_fields_encrypted_in_db(db_session, client):
     """Profile JSON fields must be stored encrypted, not as plaintext JSON."""
     from sqlalchemy import select
+
     from app.models.profile import Profile
 
-    resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["wandering"],
-        "calming_strategies": ["music"],
-        "safety_concerns": ["falling"],
-    })
+    resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["wandering"],
+            "calming_strategies": ["music"],
+            "safety_concerns": ["falling"],
+        },
+    )
     assert resp.status_code == 201
     profile_id = resp.json()["id"]
 
@@ -154,12 +158,15 @@ async def test_profile_fields_encrypted_in_db(db_session, client):
 @pytest.mark.asyncio
 async def test_profile_get_returns_plaintext(client):
     """GET /api/profiles/{code} must return decrypted JSON arrays."""
-    resp = await client.post("/api/profiles", json={
-        "disease_stage": "middle",
-        "behavioral_patterns": ["wandering"],
-        "calming_strategies": ["music"],
-        "safety_concerns": ["falling"],
-    })
+    resp = await client.post(
+        "/api/profiles",
+        json={
+            "disease_stage": "middle",
+            "behavioral_patterns": ["wandering"],
+            "calming_strategies": ["music"],
+            "safety_concerns": ["falling"],
+        },
+    )
     assert resp.status_code == 201
     code = resp.json()["access_code"]
 

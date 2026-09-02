@@ -25,10 +25,10 @@ from app.models.profile import Profile
 from app.services.auth import hash_access_code
 from app.services.crypto import decrypt, encrypt
 
-
 # ---------------------------------------------------------------------------
 # Unit tests for _safe_decrypt_list (profile router helper)
 # ---------------------------------------------------------------------------
+
 
 def test_safe_decrypt_list_valid_roundtrip():
     """Encrypting a list and passing through _safe_decrypt_list returns the original."""
@@ -71,6 +71,7 @@ def test_safe_decrypt_list_returns_empty_on_invalid_json():
 # ---------------------------------------------------------------------------
 # Unit tests for _safe_decrypt_json (coach router helper)
 # ---------------------------------------------------------------------------
+
 
 def test_safe_decrypt_json_valid_roundtrip():
     """Valid encrypted JSON dict roundtrips through _safe_decrypt_json."""
@@ -121,10 +122,11 @@ def test_safe_decrypt_json_returns_empty_on_non_json_plaintext():
 # Key rotation — encrypt with key A, try to decrypt with key B
 # ---------------------------------------------------------------------------
 
+
 def test_key_rotation_safe_decrypt_list_returns_empty(monkeypatch):
     """Data encrypted with old key yields [] when decrypted under new key."""
-    from app.routers.profile import _safe_decrypt_list
     from app import config
+    from app.routers.profile import _safe_decrypt_list
 
     # Encrypt under the test key (set in conftest)
     encrypted_with_old_key = encrypt(json.dumps(["sundowning"]))
@@ -144,8 +146,8 @@ def test_key_rotation_safe_decrypt_list_returns_empty(monkeypatch):
 
 def test_key_rotation_safe_decrypt_json_returns_default(monkeypatch):
     """Data encrypted with old key yields default when decrypted under new key."""
-    from app.routers.coach import _safe_decrypt_json
     from app import config
+    from app.routers.coach import _safe_decrypt_json
 
     encrypted_with_old_key = encrypt(json.dumps({"behavior": "wandering"}))
 
@@ -197,9 +199,7 @@ async def test_get_profile_with_corrupted_behavioral_patterns_returns_empty_arra
 
     # Directly corrupt the encrypted fields in the DB
     code_hash = hash_access_code(code)
-    result = await db_session.execute(
-        select(Profile).where(Profile.access_code_hash == code_hash)
-    )
+    result = await db_session.execute(select(Profile).where(Profile.access_code_hash == code_hash))
     profile = result.scalar_one()
 
     corrupted = "ENC:" + base64.b64encode(b"\xff\xff\xff" * 20).decode()
@@ -279,6 +279,7 @@ async def test_update_profile_rejects_empty_lists(client):
 # Profile access code alphabet — no ambiguous characters
 # ---------------------------------------------------------------------------
 
+
 async def test_generated_access_code_excludes_ambiguous_characters(client):
     """Access codes must not contain 0, O, 1, I, L (visually ambiguous)."""
     for _ in range(10):
@@ -287,12 +288,15 @@ async def test_generated_access_code_excludes_ambiguous_characters(client):
         code = resp.json()["access_code"]
         assert len(code) == 8
         for char in code:
-            assert char not in "0O1IL", f"Ambiguous character '{char}' found in access code '{code}'"
+            assert char not in "0O1IL", (
+                f"Ambiguous character '{char}' found in access code '{code}'"
+            )
 
 
 # ---------------------------------------------------------------------------
 # Direct crypto module roundtrip
 # ---------------------------------------------------------------------------
+
 
 def test_encrypt_decrypt_roundtrip():
     """encrypt() and decrypt() are inverse operations."""

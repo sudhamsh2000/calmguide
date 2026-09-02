@@ -16,10 +16,7 @@ export default function HomeError({
 
   return (
     <div className="flex min-h-screen items-center justify-center px-5 py-8">
-      <ErrorState
-        message="We could not load your home screen. Please try again."
-        onRetry={reset}
-      />
+      <ErrorState message="We could not load your home screen. Please try again." onRetry={reset} />
     </div>
   );
 }

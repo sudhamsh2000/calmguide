@@ -48,25 +48,26 @@ export function StepChipSelector({
   }
 
   // Custom items are those in selected but not in the predefined options
-  const customItems = selected.filter(
-    (item) => !options.includes(item),
-  );
+  const customItems = selected.filter((item) => !options.includes(item));
 
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       <div>
         <h2
           className="text-2xl font-bold tracking-tight text-ink"
-          style={{ fontFamily: "var(--font-display)" }}
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {title}
         </h2>
-        <p className="mt-3 text-base text-foreground-muted leading-relaxed">
-          {description}
-        </p>
+        <p className="mt-3 text-base text-foreground-muted leading-relaxed">{description}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2" role="listbox" aria-multiselectable="true" aria-label={title}>
+      <div
+        className="flex flex-wrap gap-2"
+        role="listbox"
+        aria-multiselectable="true"
+        aria-label={title}
+      >
         {options.map((option) => (
           <Chip
             key={option}
@@ -76,12 +77,7 @@ export function StepChipSelector({
           />
         ))}
         {customItems.map((item) => (
-          <Chip
-            key={item}
-            label={item}
-            selected={true}
-            onToggle={() => handleToggle(item)}
-          />
+          <Chip key={item} label={item} selected={true} onToggle={() => handleToggle(item)} />
         ))}
       </div>
 

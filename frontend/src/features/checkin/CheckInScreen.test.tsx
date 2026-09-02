@@ -13,7 +13,12 @@ vi.mock('@/lib/storage', () => ({
 vi.mock('@/lib/api', () => ({
   checkIn: vi.fn(),
   ApiError: class ApiError extends Error {
-    constructor(msg: string, public status: number) { super(msg); }
+    constructor(
+      msg: string,
+      public status: number,
+    ) {
+      super(msg);
+    }
   },
   // Pulled in transitively by SpeakButton -> useSpeechSynthesis, which asks
   // the server once on mount whether neural read-aloud is available. Stubbed

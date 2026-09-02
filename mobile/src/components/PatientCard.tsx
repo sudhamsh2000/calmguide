@@ -23,15 +23,24 @@ const avatarText: Record<DiseaseStage, string> = {
   late: '#7B8FA1',
 };
 
-export function PatientCard({ patientName, diseaseStage, behavioralPatternsCount, onEditPress }: PatientCardProps) {
+export function PatientCard({
+  patientName,
+  diseaseStage,
+  behavioralPatternsCount,
+  onEditPress,
+}: PatientCardProps) {
   const { colors } = useTheme();
   const { t } = useTranslation('profile');
   const { t: tc } = useTranslation('common');
   const initial = patientName.charAt(0).toUpperCase();
   const stageLabel = t(`view.${diseaseStage}_stage`, diseaseStage);
-  const behaviorsLabel = behavioralPatternsCount > 0
-    ? t('card.behaviors_tracked', { count: behavioralPatternsCount, defaultValue: `${behavioralPatternsCount} behaviors tracked` })
-    : null;
+  const behaviorsLabel =
+    behavioralPatternsCount > 0
+      ? t('card.behaviors_tracked', {
+          count: behavioralPatternsCount,
+          defaultValue: `${behavioralPatternsCount} behaviors tracked`,
+        })
+      : null;
   const meta = [stageLabel, behaviorsLabel].filter(Boolean).join(' · ');
 
   return (
@@ -65,10 +74,18 @@ export function PatientCard({ patientName, diseaseStage, behavioralPatternsCount
         </Text>
       </View>
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-        <Text style={{ fontSize: 15, fontWeight: '600', color: colors.foreground }} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.85}>
+        <Text
+          style={{ fontSize: 15, fontWeight: '600', color: colors.foreground }}
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
+        >
           {patientName}
         </Text>
-        <Text style={{ fontSize: 13, color: colors.mutedForeground, flexShrink: 1 }} numberOfLines={2}>
+        <Text
+          style={{ fontSize: 13, color: colors.mutedForeground, flexShrink: 1 }}
+          numberOfLines={2}
+        >
           {meta}
         </Text>
       </View>

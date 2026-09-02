@@ -11,13 +11,13 @@ from app.services.prompt import (
     get_request_locale_header,
     render_learn_prompt,
     resolve_language,
-    resolve_locale_code,
     resolve_language_constraint,
+    resolve_locale_code,
     resolve_model_for_locale,
 )
-from app.services.retrieval_query import build_english_rag_query
 from app.services.rate_limit import rate_limit
 from app.services.response_guard import guard_response_text
+from app.services.retrieval_query import build_english_rag_query
 from app.services.safety_gate import check_safety_gate
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,7 @@ async def _fetch_rag_context(message: str) -> str:
     """Retrieve RAG context for a learn scenario. Graceful fallback."""
     try:
         from rag.retrieve import get_rag_context  # noqa: PLC0415
+
         context = await get_rag_context(message, k=3, min_score=0.20)
         if context:
             chunk_count = len(context.split("\n\n---\n\n"))
@@ -37,6 +38,7 @@ async def _fetch_rag_context(message: str) -> str:
     except Exception as exc:
         logger.warning("RAG: unavailable for learn — %s", exc)
         return ""
+
 
 router = APIRouter(tags=["learn"])
 
@@ -188,7 +190,10 @@ async def learn_interact(
     )
 
     messages = [
-        {"role": "user", "content": f"Scenario: {scenario['description']}\n\nMy response: {payload.message}"},
+        {
+            "role": "user",
+            "content": f"Scenario: {scenario['description']}\n\nMy response: {payload.message}",
+        },
     ]
 
     raw_response = await llm.completion(system_prompt, messages, model_override=model_override)

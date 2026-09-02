@@ -75,9 +75,7 @@ describe('ScenarioList', () => {
   it('renders the heading and subtitle', async () => {
     render(<ScenarioList />);
     expect(screen.getByText('Practice Scenarios')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Practice common situations/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Practice common situations/)).toBeInTheDocument();
   });
 
   it('renders scenario cards after loading', async () => {
@@ -135,9 +133,7 @@ describe('ScenarioList', () => {
     mockGetScenarios.mockRejectedValue(new Error('Network error'));
     render(<ScenarioList />);
 
-    expect(
-      await screen.findByText(/Unable to load scenarios/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Unable to load scenarios/)).toBeInTheDocument();
   });
 
   it('renders category filter chips', async () => {
@@ -196,9 +192,7 @@ describe('ScenarioList', () => {
     render(<ScenarioList />);
     await screen.findByText('Sundowning Agitation');
 
-    const description = screen.getByText(
-      /Your loved one becomes increasingly agitated/,
-    );
+    const description = screen.getByText(/Your loved one becomes increasingly agitated/);
     expect(description.className).toContain('line-clamp-2');
   });
 

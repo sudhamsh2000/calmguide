@@ -6,14 +6,14 @@ be usable to silently extend a PIN-issued session back up to the standard
 window ("session isolation" for a device handed between staff members).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 import pytest_asyncio
 
 from app.models.facility import Facility
 from app.models.staff import Staff
 from app.services.auth import hash_access_code
-from app.services.facility_auth import hash_pin, hash_password
+from app.services.facility_auth import hash_password, hash_pin
 from app.services.jwt_service import verify_token
 
 PIN_TOKEN_EXPIRY_SECONDS = 60
@@ -27,11 +27,18 @@ async def facility_with_staff(db_session):
     await db_session.flush()
 
     nurse = Staff(
-        facility_id=fac.id, name="Nurse", role="staff", is_active=True,
+        facility_id=fac.id,
+        name="Nurse",
+        role="staff",
+        is_active=True,
         pin_hash=hash_pin("4242"),
     )
     admin = Staff(
-        facility_id=fac.id, name="Admin", email="admin@a.x", role="admin", is_active=True,
+        facility_id=fac.id,
+        name="Admin",
+        email="admin@a.x",
+        role="admin",
+        is_active=True,
         password_hash=hash_password("correct horse battery staple"),
     )
     db_session.add_all([nurse, admin])
@@ -59,7 +66,7 @@ async def test_pin_login_issues_short_lived_token(client, facility_with_staff):
     assert _expiry_seconds(body["token"]) == PIN_TOKEN_EXPIRY_SECONDS
 
     expires_at = datetime.fromisoformat(body["expires_at"])
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     assert 50 <= (expires_at - now).total_seconds() <= 65
 
 

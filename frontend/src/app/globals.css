@@ -4,17 +4,17 @@
 
 @layer base {
   :root {
-    --color-primary: #2B7A78;
-    --color-primary-light: #3AAFA9;
-    --color-primary-dark: #17252A;
-    --color-primary-soft: #EAF7F6;
-    --color-background: #FAFAF5;
-    --color-foreground: #2D3436;
-    --color-foreground-muted: #636E72;
-    --color-success: #00B894;
-    --color-warning: #FDCB6E;
-    --color-error: #B84C36;
-    --color-surface: #FFFFFF;
+    --color-primary: #2b7a78;
+    --color-primary-light: #3aafa9;
+    --color-primary-dark: #17252a;
+    --color-primary-soft: #eaf7f6;
+    --color-background: #fafaf5;
+    --color-foreground: #2d3436;
+    --color-foreground-muted: #636e72;
+    --color-success: #00b894;
+    --color-warning: #fdcb6e;
+    --color-error: #b84c36;
+    --color-surface: #ffffff;
     --color-border: rgba(0, 0, 0, 0.1);
 
     /* --- Design-system extensions (design/design.md) ---------------------
@@ -23,30 +23,30 @@
      * resolves exactly as before. These new tokens exist for the landing
      * page and for future primitive refinement; see design/design.md §3 for
      * the full table and rationale. */
-    --color-navy: #183B56;      /* deep brand navy — marketing headline accent, light mode only */
-    --color-ink: #1A2E3B;       /* deep ink — alt strong heading tone */
-    --color-surface-elevated: #FFFFFF;
-    --color-border-soft: #E9EEEC;
-    --color-border-strong: #C9D5D2;
-    --color-success-bg: #E8F8F3;
-    --color-success-text: #087A64;
-    --color-warning-bg: #FFF7E3;
-    --color-warning-text: #805F18;
-    --color-error-bg: #FBEDEA;
-    --color-emergency: #A63D2C;
-    --color-emergency-bg: #FFF1EE;
-    --color-accent-mint: #EFF8F5;
-    --color-accent-aqua: #EAF7F6;
-    --color-accent-lavender: #F3F1F8;
-    --color-accent-peach: #F7E4DC;
-    --color-accent-blue: #EAF4FB;   /* landing-page only — hero blob gradient */
+    --color-navy: #183b56; /* deep brand navy — marketing headline accent, light mode only */
+    --color-ink: #1a2e3b; /* deep ink — alt strong heading tone */
+    --color-surface-elevated: #ffffff;
+    --color-border-soft: #e9eeec;
+    --color-border-strong: #c9d5d2;
+    --color-success-bg: #e8f8f3;
+    --color-success-text: #087a64;
+    --color-warning-bg: #fff7e3;
+    --color-warning-text: #805f18;
+    --color-error-bg: #fbedea;
+    --color-emergency: #a63d2c;
+    --color-emergency-bg: #fff1ee;
+    --color-accent-mint: #eff8f5;
+    --color-accent-aqua: #eaf7f6;
+    --color-accent-lavender: #f3f1f8;
+    --color-accent-peach: #f7e4dc;
+    --color-accent-blue: #eaf4fb; /* landing-page only — hero blob gradient */
 
     /* Landing-page footer band — deliberately a fixed deep navy regardless
      * of site theme (a common marketing-site pattern), so these are defined
      * once here and NOT overridden under `.dark` below. */
-    --color-footer-bg: #1A2332;
-    --color-footer-text: #F5F6F8;
-    --color-footer-text-muted: #A7B3C4;
+    --color-footer-bg: #1a2332;
+    --color-footer-text: #f5f6f8;
+    --color-footer-text-muted: #a7b3c4;
     --color-footer-border: rgba(255, 255, 255, 0.08);
 
     /* Moment Coach response sections (design/design.md §25). Each of the four
@@ -55,50 +55,50 @@
      * coral = avoid, muted navy = escalation. Defined as tokens (rather than
      * per-component classes) so the same four colours can be reused by any
      * surface that mirrors this structure. */
-    --color-coach-now-bg: #EAF7F6;
-    --color-coach-now-text: #1F5F5D;
-    --color-coach-why-bg: #F3F1F8;
-    --color-coach-why-text: #3F3A63;
-    --color-coach-avoid-bg: #FBEDEA;
-    --color-coach-avoid-text: #8F3A28;
-    --color-coach-escalate-bg: #EEF2F5;
-    --color-coach-escalate-text: #2C4457;
+    --color-coach-now-bg: #eaf7f6;
+    --color-coach-now-text: #1f5f5d;
+    --color-coach-why-bg: #f3f1f8;
+    --color-coach-why-text: #3f3a63;
+    --color-coach-avoid-bg: #fbedea;
+    --color-coach-avoid-text: #8f3a28;
+    --color-coach-escalate-bg: #eef2f5;
+    --color-coach-escalate-text: #2c4457;
   }
 
   .dark {
-    --color-background: #1A2332;
-    --color-foreground: #E8E8E8;
-    --color-foreground-muted: #B8C3CC;
+    --color-background: #1a2332;
+    --color-foreground: #e8e8e8;
+    --color-foreground-muted: #b8c3cc;
     --color-surface: #243447;
 
     /* Section tints re-derived for dark: low-alpha washes of the same hues so
      * they read as the same four categories without glowing on a dark ground. */
     --color-coach-now-bg: rgba(58, 175, 169, 0.14);
-    --color-coach-now-text: #6FD3CD;
+    --color-coach-now-text: #6fd3cd;
     --color-coach-why-bg: rgba(154, 140, 209, 0.16);
-    --color-coach-why-text: #B9AEE6;
+    --color-coach-why-text: #b9aee6;
     --color-coach-avoid-bg: rgba(240, 147, 127, 0.14);
-    --color-coach-avoid-text: #F0937F;
-    --color-coach-escalate-bg: rgba(184, 199, 214, 0.10);
-    --color-coach-escalate-text: #B8C3CC;
+    --color-coach-avoid-text: #f0937f;
+    --color-coach-escalate-bg: rgba(184, 199, 214, 0.1);
+    --color-coach-escalate-text: #b8c3cc;
     --color-border: rgba(255, 255, 255, 0.045);
-    --color-error: #F0937F;
+    --color-error: #f0937f;
 
-    --color-primary-soft: #244C4C;
+    --color-primary-soft: #244c4c;
     --color-navy: var(--color-foreground);
     --color-ink: var(--color-foreground);
-    --color-surface-elevated: #2A3D52;
+    --color-surface-elevated: #2a3d52;
     --color-border-soft: #33465c;
-    --color-border-strong: #4A5D70;
-    --color-success: #43C9A8;
+    --color-border-strong: #4a5d70;
+    --color-success: #43c9a8;
     --color-success-bg: rgba(67, 201, 168, 0.14);
-    --color-success-text: #43C9A8;
-    --color-warning: #F4C96B;
+    --color-success-text: #43c9a8;
+    --color-warning: #f4c96b;
     --color-warning-bg: rgba(244, 201, 107, 0.14);
-    --color-warning-text: #F4C96B;
+    --color-warning-text: #f4c96b;
     --color-error-bg: rgba(240, 147, 127, 0.12);
-    --color-emergency: #F0937F;
-    --color-emergency-bg: #4A2928;
+    --color-emergency: #f0937f;
+    --color-emergency-bg: #4a2928;
     --color-accent-mint: rgba(67, 201, 168, 0.12);
     --color-accent-aqua: rgba(58, 175, 169, 0.12);
     --color-accent-lavender: rgba(154, 140, 209, 0.14);
@@ -204,7 +204,9 @@
   .field-shell {
     @apply rounded-xl border bg-surface text-foreground transition-colors outline-none;
     border-color: rgb(203 213 225 / 1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 1px 2px rgba(23, 37, 42, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 1px 2px rgba(23, 37, 42, 0.06);
   }
 
   .field-shell::placeholder {
@@ -213,7 +215,9 @@
 
   .field-shell:hover {
     border-color: rgb(148 163 184 / 1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 3px rgba(23, 37, 42, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 1px 3px rgba(23, 37, 42, 0.08);
   }
 
   .field-shell:focus,
@@ -224,7 +228,9 @@
 
   .dark .field-shell {
     border-color: #31445f;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(26, 35, 50, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.02),
+      0 0 0 1px rgba(26, 35, 50, 0.14);
   }
 
   .dark .field-shell::placeholder {
@@ -233,13 +239,18 @@
 
   .dark .field-shell:hover {
     border-color: #3a4f6d;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(36, 52, 71, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 0 0 1px rgba(36, 52, 71, 0.18);
   }
 
   .dark .field-shell:focus,
   .dark .field-shell:focus-visible {
     border-color: #57c7c2;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(87, 199, 194, 0.38), 0 0 0 4px rgba(43, 122, 120, 0.16);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 0 0 1px rgba(87, 199, 194, 0.38),
+      0 0 0 4px rgba(43, 122, 120, 0.16);
   }
 
   .field-shell-error {
@@ -262,7 +273,9 @@
 
   .dark .field-readonly-shell {
     border-color: #31445f;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(26, 35, 50, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.02),
+      0 0 0 1px rgba(26, 35, 50, 0.12);
     background-color: color-mix(in srgb, var(--color-surface) 92%, black);
   }
 
@@ -296,24 +309,31 @@
 
   /* Landing-page-only decorative gradients (design/design.md §18/§3.6). */
   .landing-gradient-hero {
-    background: linear-gradient(135deg, #EAF7F6 0%, #EAF4FB 55%, #F3F1F8 100%);
+    background: linear-gradient(135deg, #eaf7f6 0%, #eaf4fb 55%, #f3f1f8 100%);
   }
 
   .dark .landing-gradient-hero {
-    background: linear-gradient(135deg, rgba(58, 175, 169, 0.16) 0%, rgba(88, 157, 214, 0.14) 55%, rgba(154, 140, 209, 0.16) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(58, 175, 169, 0.16) 0%,
+      rgba(88, 157, 214, 0.14) 55%,
+      rgba(154, 140, 209, 0.16) 100%
+    );
   }
 
   .landing-gradient-cta {
-    background: linear-gradient(100deg, #13B8AA 0%, #079EB4 45%, #0877B7 100%);
+    background: linear-gradient(100deg, #13b8aa 0%, #079eb4 45%, #0877b7 100%);
   }
 
   .landing-gradient-footer {
-    background: linear-gradient(120deg, #102D4E 0%, #0A3155 55%, #08294B 100%);
+    background: linear-gradient(120deg, #102d4e 0%, #0a3155 55%, #08294b 100%);
   }
 
   .dark .card-shell {
     border-color: #31445f;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(26, 35, 50, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.02),
+      0 0 0 1px rgba(26, 35, 50, 0.14);
   }
 
   .card-shell-interactive {
@@ -328,7 +348,9 @@
   .dark .card-shell-interactive:hover {
     border-color: rgba(58, 175, 169, 0.25);
     background-color: rgba(58, 175, 169, 0.05);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(36, 52, 71, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 0 0 1px rgba(36, 52, 71, 0.18);
   }
 
   .card-shell-selected {
@@ -341,7 +363,9 @@
   .dark .card-shell-selected {
     border-color: rgba(58, 175, 169, 0.45);
     background-color: rgba(58, 175, 169, 0.11);
-    box-shadow: inset 0 0 0 1px rgba(58, 175, 169, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow:
+      inset 0 0 0 1px rgba(58, 175, 169, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
   .outline-button {
@@ -466,27 +490,27 @@ html[data-landing] body {
  * in this file) rather than hand-picked, so nothing beyond the one supplied
  * hex was invented. */
 html[data-landing] {
-  --color-primary: #E1BFFB;
-  --color-primary-light: color-mix(in srgb, #E1BFFB 85%, white);
-  --color-primary-dark: color-mix(in srgb, #E1BFFB 65%, black);
-  --color-primary-soft: color-mix(in srgb, #E1BFFB 22%, white);
+  --color-primary: #e1bffb;
+  --color-primary-light: color-mix(in srgb, #e1bffb 85%, white);
+  --color-primary-dark: color-mix(in srgb, #e1bffb 65%, black);
+  --color-primary-soft: color-mix(in srgb, #e1bffb 22%, white);
 }
 
 /* RTL support */
-[dir="rtl"] {
+[dir='rtl'] {
   direction: rtl;
 }
 
 .select-chevron {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23999%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23999%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
   background-size: 16px;
   background-position: right 12px center;
   padding-inline-end: 2.5rem;
 }
 
-[dir="rtl"] .select-chevron {
+[dir='rtl'] .select-chevron {
   background-position: left 12px center;
   padding-inline-start: 2.5rem;
   padding-inline-end: 1rem;
@@ -497,7 +521,7 @@ html[data-landing] {
   padding-inline-end: 2rem;
 }
 
-[dir="rtl"] .select-chevron-sm {
+[dir='rtl'] .select-chevron-sm {
   background-position: left 8px center;
   padding-inline-start: 2rem;
   padding-inline-end: 0.75rem;
@@ -540,9 +564,9 @@ html[data-landing] {
   .skeleton {
     background: linear-gradient(
       90deg,
-      var(--color-foreground-muted, #636E72) 25%,
-      var(--color-foreground, #2D3436) 50%,
-      var(--color-foreground-muted, #636E72) 75%
+      var(--color-foreground-muted, #636e72) 25%,
+      var(--color-foreground, #2d3436) 50%,
+      var(--color-foreground-muted, #636e72) 75%
     );
     opacity: 0.08;
     background-size: 200% 100%;

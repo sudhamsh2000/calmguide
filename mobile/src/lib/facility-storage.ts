@@ -133,7 +133,9 @@ export async function clearToken(): Promise<void> {
     if (SecureStore) await SecureStore.deleteItemAsync(JWT_TOKEN_KEY);
     await AsyncStorage.removeItem(JWT_TOKEN_KEY);
     await AsyncStorage.removeItem(JWT_EXPIRY_KEY);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 // Staff name + role identify a real person — stored in SecureStore (MOB-2/MOB-3),
@@ -168,9 +170,5 @@ export async function clearFacilitySession(): Promise<void> {
 
 export async function clearAllFacilityData(): Promise<void> {
   await clearToken();
-  await purgeKeys([
-    FACILITY_CODE_KEY,
-    FACILITY_NAME_KEY,
-    STAFF_KEY,
-  ]);
+  await purgeKeys([FACILITY_CODE_KEY, FACILITY_NAME_KEY, STAFF_KEY]);
 }

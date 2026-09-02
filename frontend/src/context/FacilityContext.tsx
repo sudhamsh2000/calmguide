@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   createContext,
@@ -8,9 +8,9 @@ import {
   useReducer,
   useRef,
   type ReactNode,
-} from "react";
-import type { StaffInfo, StaffRole } from "@/lib/facility-api";
-import { refreshToken, logout as apiLogout } from "@/lib/facility-api";
+} from 'react';
+import type { StaffInfo, StaffRole } from '@/lib/facility-api';
+import { refreshToken, logout as apiLogout } from '@/lib/facility-api';
 import {
   getFacilityCode,
   getFacilityName,
@@ -22,7 +22,7 @@ import {
   getStoredStaff,
   setStoredStaff,
   clearStoredStaff,
-} from "@/lib/facility-storage";
+} from '@/lib/facility-storage';
 
 // --- State ---
 
@@ -45,7 +45,7 @@ const initialState: FacilityState = {
 };
 
 function hydrateInitialState(): FacilityState {
-  if (typeof window === "undefined") return initialState;
+  if (typeof window === 'undefined') return initialState;
   const storedStaff = getStoredStaff();
   const token = getRawFacilityToken();
   const code = getFacilityCode();
@@ -70,19 +70,22 @@ function hydrateInitialState(): FacilityState {
 // --- Actions ---
 
 type FacilityAction =
-  | { type: "LOGIN_START" }
-  | { type: "LOGIN_SUCCESS"; payload: { staff: StaffInfo; facilityCode: string; facilityName: string } }
-  | { type: "LOGIN_ERROR"; payload: string }
-  | { type: "TOKEN_REFRESHED"; payload: { staff: StaffInfo } }
-  | { type: "LOGOUT" }
-  | { type: "CLEAR_FACILITY" }
-  | { type: "SET_FACILITY"; payload: { facilityCode: string; facilityName: string } };
+  | { type: 'LOGIN_START' }
+  | {
+      type: 'LOGIN_SUCCESS';
+      payload: { staff: StaffInfo; facilityCode: string; facilityName: string };
+    }
+  | { type: 'LOGIN_ERROR'; payload: string }
+  | { type: 'TOKEN_REFRESHED'; payload: { staff: StaffInfo } }
+  | { type: 'LOGOUT' }
+  | { type: 'CLEAR_FACILITY' }
+  | { type: 'SET_FACILITY'; payload: { facilityCode: string; facilityName: string } };
 
 function facilityReducer(state: FacilityState, action: FacilityAction): FacilityState {
   switch (action.type) {
-    case "LOGIN_START":
+    case 'LOGIN_START':
       return { ...state, loading: true, error: null };
-    case "LOGIN_SUCCESS":
+    case 'LOGIN_SUCCESS':
       return {
         staff: action.payload.staff,
         facilityCode: action.payload.facilityCode,
@@ -91,16 +94,24 @@ function facilityReducer(state: FacilityState, action: FacilityAction): Facility
         loading: false,
         error: null,
       };
-    case "LOGIN_ERROR":
+    case 'LOGIN_ERROR':
       return { ...state, loading: false, error: action.payload };
-    case "TOKEN_REFRESHED":
+    case 'TOKEN_REFRESHED':
       return { ...state, staff: action.payload.staff };
-    case "LOGOUT":
-      return { ...initialState, facilityCode: state.facilityCode, facilityName: state.facilityName };
-    case "CLEAR_FACILITY":
+    case 'LOGOUT':
+      return {
+        ...initialState,
+        facilityCode: state.facilityCode,
+        facilityName: state.facilityName,
+      };
+    case 'CLEAR_FACILITY':
       return { ...state, facilityCode: null, facilityName: null };
-    case "SET_FACILITY":
-      return { ...state, facilityCode: action.payload.facilityCode, facilityName: action.payload.facilityName };
+    case 'SET_FACILITY':
+      return {
+        ...state,
+        facilityCode: action.payload.facilityCode,
+        facilityName: action.payload.facilityName,
+      };
     default:
       return state;
   }
@@ -130,11 +141,11 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
   const [state, rawDispatch] = useReducer(facilityReducer, undefined, hydrateInitialState);
 
   const dispatch = useCallback((action: FacilityAction) => {
-    if (action.type === "LOGIN_SUCCESS" && action.payload.staff) {
+    if (action.type === 'LOGIN_SUCCESS' && action.payload.staff) {
       setStoredStaff(action.payload.staff);
-    } else if (action.type === "TOKEN_REFRESHED" && action.payload.staff) {
+    } else if (action.type === 'TOKEN_REFRESHED' && action.payload.staff) {
       setStoredStaff(action.payload.staff);
-    } else if (action.type === "LOGOUT") {
+    } else if (action.type === 'LOGOUT') {
       clearStoredStaff();
     }
     rawDispatch(action);
@@ -157,7 +168,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
     } catch {
       removeFacilityToken();
     }
-    dispatch({ type: "LOGOUT" });
+    dispatch({ type: 'LOGOUT' });
   }, []);
 
   const resetInactivityTimer = useCallback(() => {
@@ -175,7 +186,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
 
     resetInactivityTimer();
 
-    const events = ["mousedown", "touchstart", "keydown", "scroll"] as const;
+    const events = ['mousedown', 'touchstart', 'keydown', 'scroll'] as const;
     const handler = () => resetInactivityTimer();
     for (const event of events) {
       window.addEventListener(event, handler, { passive: true });
@@ -188,7 +199,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
       }
       try {
         const data = await refreshToken();
-        dispatch({ type: "TOKEN_REFRESHED", payload: { staff: data.staff } });
+        dispatch({ type: 'TOKEN_REFRESHED', payload: { staff: data.staff } });
       } catch {
         handleLogout();
       }
@@ -217,7 +228,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         setStoredStaff(data.staff);
         dispatch({
-          type: "TOKEN_REFRESHED",
+          type: 'TOKEN_REFRESHED',
           payload: { staff: data.staff },
         });
       })
@@ -226,7 +237,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
         if (!isNetworkError) {
           removeFacilityToken();
           clearStoredStaff();
-          dispatch({ type: "LOGOUT" });
+          dispatch({ type: 'LOGOUT' });
         }
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -251,7 +262,7 @@ export function FacilityProvider({ children }: { children: ReactNode }) {
 export function useFacility(): FacilityContextValue {
   const context = useContext(FacilityContext);
   if (!context) {
-    throw new Error("useFacility must be used within a FacilityProvider");
+    throw new Error('useFacility must be used within a FacilityProvider');
   }
   return context;
 }

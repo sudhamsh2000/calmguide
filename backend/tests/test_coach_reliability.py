@@ -2,9 +2,9 @@
 localized static fallback and a clean [DONE] — never silence (REL-1, REL-4)."""
 
 import json
+from collections.abc import AsyncGenerator
 
 import pytest_asyncio
-from collections.abc import AsyncGenerator
 
 from app.models.profile import Profile
 from app.services.auth import hash_access_code
@@ -15,7 +15,9 @@ from app.services.llm_provider import LLMProvider
 class FailMidStream(LLMProvider):
     """Yields one chunk, then raises — simulating a provider drop/timeout."""
 
-    async def stream_completion(self, system_prompt, messages, model_override=None) -> AsyncGenerator[str, None]:
+    async def stream_completion(
+        self, system_prompt, messages, model_override=None
+    ) -> AsyncGenerator[str, None]:
         yield "Here is what "
         raise RuntimeError("provider connection reset")
 
@@ -26,7 +28,9 @@ class FailMidStream(LLMProvider):
 class FailImmediately(LLMProvider):
     """Raises before any chunk is produced."""
 
-    async def stream_completion(self, system_prompt, messages, model_override=None) -> AsyncGenerator[str, None]:
+    async def stream_completion(
+        self, system_prompt, messages, model_override=None
+    ) -> AsyncGenerator[str, None]:
         raise RuntimeError("provider 503")
         yield ""  # pragma: no cover
 

@@ -1,4 +1,4 @@
-import "../lib/i18n";
+import '../lib/i18n';
 import { EmergencyBar } from '@/components/EmergencyBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider, useTheme } from '@/components/ThemeContext';
@@ -11,13 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { getPreferredLanguage } from '@/lib/storage';
 import { getDeviceLocale, resolveSupportedLocale } from '@/lib/i18n';
 
-function HeaderBackControl({
-  tintColor,
-  onPress,
-}: {
-  tintColor: string;
-  onPress: () => void;
-}) {
+function HeaderBackControl({ tintColor, onPress }: { tintColor: string; onPress: () => void }) {
   const isRtl = I18nManager.isRTL;
   return (
     <Pressable
@@ -64,7 +58,9 @@ function RootStack() {
   useEffect(() => {
     const handler = (lng: string) => setLangKey(lng);
     i18n.on('languageChanged', handler);
-    return () => { i18n.off('languageChanged', handler); };
+    return () => {
+      i18n.off('languageChanged', handler);
+    };
   }, [i18n]);
 
   useEffect(() => {
@@ -83,9 +79,10 @@ function RootStack() {
     }
 
     void applyLanguagePreference();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [i18n]);
-
 
   if (!isLocaleReady) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
@@ -133,28 +130,70 @@ function RootStack() {
             }}
           />
           <Stack.Screen name="check-in" options={{ title: tCheckIn('title', 'Check In') }} />
-          <Stack.Screen name="profile/setup" options={{ title: tProfile('setup_title', 'Create Profile') }} />
-          <Stack.Screen name="profile/edit" options={{ title: tProfile('edit_title', 'Edit Profile') }} />
+          <Stack.Screen
+            name="profile/setup"
+            options={{ title: tProfile('setup_title', 'Create Profile') }}
+          />
+          <Stack.Screen
+            name="profile/edit"
+            options={{ title: tProfile('edit_title', 'Edit Profile') }}
+          />
           <Stack.Screen name="learn/[id]" options={{ title: tLearn('title', 'Practice') }} />
           <Stack.Screen name="terms" options={{ title: tc('nav.terms'), presentation: 'modal' }} />
-          <Stack.Screen name="privacy" options={{ title: tc('nav.privacy'), presentation: 'modal' }} />
+          <Stack.Screen
+            name="privacy"
+            options={{ title: tc('nav.privacy'), presentation: 'modal' }}
+          />
           <Stack.Screen name="journey/noticing" options={{ title: tJourney('noticing.title') }} />
           <Stack.Screen name="journey/diagnosis" options={{ title: tJourney('diagnosis.title') }} />
           <Stack.Screen name="journey/hospice" options={{ title: tJourney('hospice.title') }} />
-          <Stack.Screen name="journey/bereavement" options={{ title: tJourney('bereavement.title') }} />
-          <Stack.Screen name="incidents/index" options={{ title: tIncidents('history.title', 'Incident History') }} />
-          <Stack.Screen name="incidents/[id]" options={{ title: tIncidents('detail.title', 'Incident Detail') }} />
-          <Stack.Screen name="incidents/new" options={{ title: tIncidents('logger.title', 'Log an Incident') }} />
-          <Stack.Screen name="facility/login" options={{ title: tFacility('login.facility_code'), headerBackTitle: '' }} />
+          <Stack.Screen
+            name="journey/bereavement"
+            options={{ title: tJourney('bereavement.title') }}
+          />
+          <Stack.Screen
+            name="incidents/index"
+            options={{ title: tIncidents('history.title', 'Incident History') }}
+          />
+          <Stack.Screen
+            name="incidents/[id]"
+            options={{ title: tIncidents('detail.title', 'Incident Detail') }}
+          />
+          <Stack.Screen
+            name="incidents/new"
+            options={{ title: tIncidents('logger.title', 'Log an Incident') }}
+          />
+          <Stack.Screen
+            name="facility/login"
+            options={{ title: tFacility('login.facility_code'), headerBackTitle: '' }}
+          />
           <Stack.Screen name="facility/(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="facility/residents-all" options={{ title: tFacility('residents_all.title') }} />
-          <Stack.Screen name="facility/residents/[id]" options={{ title: tFacility('residents.behavioral_card') }} />
-          <Stack.Screen name="facility/residents/new" options={{ title: tFacility('add_resident.title') }} />
+          <Stack.Screen
+            name="facility/residents-all"
+            options={{ title: tFacility('residents_all.title') }}
+          />
+          <Stack.Screen
+            name="facility/residents/[id]"
+            options={{ title: tFacility('residents.behavioral_card') }}
+          />
+          <Stack.Screen
+            name="facility/residents/new"
+            options={{ title: tFacility('add_resident.title') }}
+          />
           <Stack.Screen name="facility/staff/index" options={{ title: tFacility('staff.title') }} />
-          <Stack.Screen name="facility/staff/new" options={{ title: tFacility('staff.add_title') }} />
-          <Stack.Screen name="facility/staff/[id]/assign" options={{ title: tFacility('staff.assign_title', { name: '' }) }} />
+          <Stack.Screen
+            name="facility/staff/new"
+            options={{ title: tFacility('staff.add_title') }}
+          />
+          <Stack.Screen
+            name="facility/staff/[id]/assign"
+            options={{ title: tFacility('staff.assign_title', { name: '' }) }}
+          />
           <Stack.Screen name="facility/trends" options={{ title: tFacility('trends.title') }} />
-          <Stack.Screen name="facility/executive" options={{ title: tFacility('executive.title') }} />
+          <Stack.Screen
+            name="facility/executive"
+            options={{ title: tFacility('executive.title') }}
+          />
           <Stack.Screen name="facility/settings" options={{ title: tFacility('settings.title') }} />
           <Stack.Screen name="facility/audit" options={{ title: tFacility('audit.title') }} />
         </Stack>

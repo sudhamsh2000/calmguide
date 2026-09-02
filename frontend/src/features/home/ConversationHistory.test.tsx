@@ -5,7 +5,8 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const messages: Record<string, string> = {
       'conversations.heading': 'Recent',
-      'conversations.empty_detail': 'No recent conversations yet. Tap the coach button when you need guidance.',
+      'conversations.empty_detail':
+        'No recent conversations yet. Tap the coach button when you need guidance.',
     };
     return messages[key] ?? key;
   },
@@ -24,9 +25,7 @@ import type { ConversationSummary } from './ConversationHistory';
 describe('ConversationHistory', () => {
   it('shows empty state when no conversations', () => {
     render(<ConversationHistory conversations={[]} />);
-    expect(
-      screen.getByText(/no recent conversations/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no recent conversations/i)).toBeInTheDocument();
   });
 
   it('renders conversation cards when conversations exist', () => {
@@ -83,7 +82,8 @@ describe('ConversationHistory', () => {
     const conversations: ConversationSummary[] = [
       {
         id: '1',
-        title: 'This is an extremely long title that should be truncated because it exceeds the reasonable display width for a card',
+        title:
+          'This is an extremely long title that should be truncated because it exceeds the reasonable display width for a card',
         timestamp: new Date(),
       },
     ];

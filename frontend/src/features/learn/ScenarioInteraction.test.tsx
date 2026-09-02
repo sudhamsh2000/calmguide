@@ -163,9 +163,7 @@ describe('ScenarioInteraction', () => {
     await user.type(textarea, 'Stay calm');
     await user.click(screen.getByRole('button', { name: /Get Feedback/ }));
 
-    expect(
-      await screen.findByText(/Unable to get feedback/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Unable to get feedback/)).toBeInTheDocument();
   });
 
   it('renders a back button that navigates to /learn', async () => {
@@ -191,9 +189,7 @@ describe('ScenarioInteraction', () => {
     mockGetScenarios.mockRejectedValue(new Error('Not found'));
     render(<ScenarioInteraction scenarioId="sc-1" />);
 
-    expect(
-      await screen.findByText(/Unable to load this scenario/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Unable to load this scenario/)).toBeInTheDocument();
   });
 
   it('renders the category badge on the scenario', async () => {

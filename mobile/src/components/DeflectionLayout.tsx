@@ -26,7 +26,9 @@ export function DeflectionLayout({ title, subtitle, body, resources, resourcesHe
     >
       <View style={{ gap: 8 }}>
         <Text style={{ fontSize: 24, fontWeight: '700', color: colors.foreground }}>{title}</Text>
-        <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>{subtitle}</Text>
+        <Text style={{ fontSize: 15, color: colors.mutedForeground, lineHeight: 22 }}>
+          {subtitle}
+        </Text>
       </View>
 
       <View style={{ gap: 12 }}>{body}</View>
@@ -67,7 +69,9 @@ export function DeflectionLayout({ title, subtitle, body, resources, resourcesHe
               gap: 4,
             }}
           >
-            <Text style={{ fontSize: 15, fontWeight: '600', color: colors.primary }}>{r.label}</Text>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: colors.primary }}>
+              {r.label}
+            </Text>
             {r.description && (
               <Text style={{ fontSize: 13, color: colors.mutedForeground, lineHeight: 19 }}>
                 {r.description}

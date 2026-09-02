@@ -18,7 +18,13 @@ interface DeflectionLayoutProps {
   resourcesHeading?: string;
 }
 
-export function DeflectionLayout({ title, subtitle, children, resources, resourcesHeading }: DeflectionLayoutProps) {
+export function DeflectionLayout({
+  title,
+  subtitle,
+  children,
+  resources,
+  resourcesHeading,
+}: DeflectionLayoutProps) {
   const tc = useTranslations('common');
   return (
     <main className="flex-1 overflow-y-auto px-5 py-6 animate-page-enter">
@@ -36,9 +42,7 @@ export function DeflectionLayout({ title, subtitle, children, resources, resourc
         <p className="mt-2 text-base text-foreground-muted leading-relaxed">{subtitle}</p>
       </div>
 
-      <div className="space-y-4 text-base text-foreground leading-relaxed mb-8">
-        {children}
-      </div>
+      <div className="space-y-4 text-base text-foreground leading-relaxed mb-8">{children}</div>
 
       <div className="card-shell rounded-2xl bg-primary/5 p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground-muted mb-4">
@@ -57,11 +61,11 @@ export function DeflectionLayout({ title, subtitle, children, resources, resourc
                 <span className="inline-flex items-center gap-1.5 font-semibold text-primary">
                   {r.label}
                   {external && (
-                    <span aria-hidden className="text-xs">↗</span>
+                    <span aria-hidden className="text-xs">
+                      ↗
+                    </span>
                   )}
-                  {external && (
-                    <span className="sr-only"> (opens in new tab)</span>
-                  )}
+                  {external && <span className="sr-only"> (opens in new tab)</span>}
                 </span>
                 {r.description && (
                   <span className="block text-sm text-foreground-muted mt-1">{r.description}</span>
