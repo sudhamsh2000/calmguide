@@ -29,8 +29,8 @@ Detailed architecture, data flows, and system design for CalmGuide.
 |                         |    FastAPI Backend     |                          |
 |                         |                       |                          |
 |  +-------------------+  |  +----------------+   |  +-------------------+   |
-|  | Profile Router    |  |  | Crisis Router  |   |  | Learn Router     |   |
-|  | /api/profiles     |  |  | /api/crisis    |   |  | /api/learn       |   |
+|  | Profile Router    |  |  | Coach Router   |   |  | Learn Router     |   |
+|  | /api/profiles     |  |  | /api/coach     |   |  | /api/learn       |   |
 |  +-------------------+  |  +-------+--------+   |  +-------------------+   |
 |                         |          |             |                          |
 |                         |  +-------v--------+   |                          |
@@ -55,7 +55,7 @@ Detailed architecture, data flows, and system design for CalmGuide.
 
 ---
 
-## Crisis Mode Data Flow
+## Moment Coach Data Flow
 
 The most important flow in CalmGuide. This is what happens when a caregiver types "Dad woke up screaming at midnight" and taps "Get Guidance".
 
@@ -63,7 +63,7 @@ The most important flow in CalmGuide. This is what happens when a caregiver type
 Step 1: FRONTEND
 +------------------------------------------------------------------+
 |  Caregiver types message                                          |
-|  CrisisPage -> useStreamingChat -> POST /api/crisis/chat          |
+|  CoachPage -> useStreamingChat -> POST /api/coach/chat            |
 |  Body: { access_code, patient_name, message, session_id? }       |
 +--------------------------------+---------------------------------+
                                  |
@@ -71,7 +71,7 @@ Step 1: FRONTEND
 
 Step 2: BACKEND - Profile Lookup
 +------------------------------------------------------------------+
-|  crisis_chat()                                                    |
+|  coach_chat()                                                    |
 |  1. Hash access_code (SHA-256)                                    |
 |  2. SELECT profile WHERE access_code_hash = hash                  |
 |  3. Load: disease_stage, behavioral_patterns, calming_strategies  |
@@ -97,9 +97,9 @@ Step 3: BACKEND - RAG Context Retrieval
 
 Step 4: BACKEND - Prompt Assembly
 +------------------------------------------------------------------+
-|  render_crisis_prompt() via Jinja2:                               |
+|  render_coach_prompt() via Jinja2:                               |
 |                                                                   |
-|  crisis_system.jinja2 template:                                   |
+|  coach_system.jinja2 template:                                   |
 |  +------------------------------------------------------------+  |
 |  | You are CalmGuide...                                        |  |
 |  |                                                             |  |
@@ -144,8 +144,8 @@ Step 5: BACKEND - LLM Streaming
 Step 6: FRONTEND - Rendering
 +------------------------------------------------------------------+
 |  useStreamingChat accumulates text chunks                         |
-|  parseCrisisResponse() extracts 4 sections                        |
-|  CrisisResponseRenderer renders with visual hierarchy:            |
+|  parseCoachResponse() extracts 4 sections                        |
+|  CoachResponseRenderer renders with visual hierarchy:            |
 |                                                                   |
 |  ┌─────────────────────────────────────┐                          |
 |  │ RIGHT NOW          (primary bg,     │                          |
@@ -373,7 +373,7 @@ localStorage is cleared, the name is gone.
 ```
 First visit:                     Return visit (tap recent conversation):
 
-/crisis                          /crisis?session_id=abc-123
+/coach                           /coach?session_id=abc-123
     │                                │
     v                                v
 Phase 1: Greeting + Big Input    Load history from API:
@@ -382,7 +382,7 @@ Phase 1: Greeting + Big Input    Load history from API:
     v                                v
 Phase 2: Chat layout             Phase 2: Chat layout with past exchanges
     │                                │
-    │ POST /api/crisis/chat          │ POST /api/crisis/chat
+    │ POST /api/coach/chat           │ POST /api/coach/chat
     │ (new session_id assigned)      │ (same session_id reused)
     v                                v
 SSE streaming response           SSE streaming response
@@ -551,7 +551,7 @@ CROSS-PATIENT STRATEGIES TABLE
 
 USE 1: NEW CAREGIVER BOOST              USE 2: PROMPT INJECTION
 +---------------------------+    +----------------------------------+
-| PatternInsights section:  |    | crisis_system.jinja2:            |
+| PatternInsights section:  |    | coach_system.jinja2:            |
 | "What works for similar   |    |                                  |
 |  patients"                |    | ## What Has Worked for Similar   |
 | Music (6/8)               |    |    Patients                      |
@@ -678,7 +678,7 @@ LLM streaming completes
                        └───────────────────────────────────────┘
 ```
 
-Used in: `crisis.py`, `checkin.py`, `learn.py` (all streaming endpoints).
+Used in: `coach.py`, `checkin.py`, `learn.py` (all streaming endpoints).
 
 ---
 
@@ -737,7 +737,9 @@ Caregiver (Tamil): "அப்பா இரவில் அலைகிறார�
         LLM responds in Tamil (language_constraint in prompt)
 ```
 
-Enables 11-language access to English-only RAG knowledge without requiring a multilingual knowledge base.
+Enables non-English access to English-only RAG knowledge without requiring a
+multilingual knowledge base — across both the 3 translated locales and the 8
+experimental model-response languages.
 
 ---
 
@@ -799,31 +801,49 @@ vs. Daily Behavioral Log (POST /api/checkin/daily):
 
 ---
 
-## Internationalization (i18n) — 11 Languages
+## Internationalization (i18n) — 3 Translated Languages
+
+Two different counts appear in this codebase and they are not the same thing:
+
+- **Translated UI: 3 languages** — `en`, `es`, `hi`. These are the locale
+  directories that exist, and the only values in `SUPPORTED_LOCALES`.
+- **Model response languages: 11** — the registry in
+  `backend/app/services/language_support.py` also tiers 8 `EXPERIMENTAL`
+  languages (fr, de, ar, ta, ja, ko, pt-BR, zh). The model may be asked to
+  answer in those; their UI chrome falls back to English because no translation
+  files exist for them.
 
 ```
-Languages: en, es, fr, de, ar, hi, ta, ja, ko, pt-BR, zh
+Languages (translated UI): en, es, hi
 
-Locale Files:
+Locale Files — repo-root /locales/ is the source of truth:
 /locales/{lang}/{namespace}.json
-  ├── common.json    (nav, actions, errors, tag labels)
-  ├── home.json      (greeting, patterns, feedback, prediction, check-in)
-  ├── crisis.json    (sections, input, streaming)
-  ├── checkin.json   (emotional check-in)
-  ├── learn.json     (scenarios, interaction)
-  ├── profile.json   (setup, edit, disease stages)
-  └── impact.json    (public impact page)
+  ├── common.json     (nav, actions, errors, tag labels, accessibility)
+  ├── home.json       (greeting, patterns, feedback, prediction, check-in)
+  ├── coach.json      (Moment Coach sections, input, streaming — was crisis.json)
+  ├── checkin.json    (emotional check-in)
+  ├── learn.json      (scenarios, interaction)
+  ├── profile.json    (setup, edit, disease stages)
+  ├── incidents.json  (incident logging + verification)
+  ├── journey.json    (journey / stage content)
+  ├── facility.json   (B2B staff-facing surface)
+  └── impact.json     (public impact page)
+
+frontend/locales/ and mobile/locales/ are generated copies, rsynced from the
+root with --delete. Never edit them directly.
 ```
 
 ### Frontend (Next.js + next-intl)
-- URL-based routing: `/[locale]/crisis`, `/[locale]/home`
+- URL-based routing: `/[locale]/coach`, `/[locale]/home`
 - Middleware negotiates locale: URL → X-App-Locale header → Accept-Language → default (en-US)
 - Server-side translation loading from `/locales/` via `fs.readFileSync`
 
 ### Mobile (React Native + i18next)
-- Static imports: all 11 locales × 7 namespaces bundled at build time
+- Static imports: 3 locales × 10 namespaces bundled at build time
 - Device locale detection via `expo-localization`
-- RTL layout for Arabic (`I18nManager.forceRTL()`)
+- RTL scaffolding via `I18nManager.forceRTL()` is still present but currently
+  unreachable: `isRtlLocale()` matches only `ar`, which is no longer a shipped
+  locale. It is kept so re-adding Arabic doesn't mean rebuilding it.
 
 ### Backend Locale Handling
 - `X-App-Locale` header from client → `resolve_locale_code()`
@@ -838,36 +858,50 @@ Full-featured mobile app with feature parity to the web frontend.
 
 ```
 /mobile/src
-├── app/
-│   ├── _layout.tsx              # Root: theme, i18n, safe areas
+├── app/                          # expo-router — the file tree IS the navigation
+│   ├── _layout.tsx               # Root: theme, i18n, safe areas
+│   ├── index.tsx                 # Entry / gate
 │   ├── (tabs)/
-│   │   ├── _layout.tsx          # Tab bar: Home, Learn, Profile
-│   │   ├── home.tsx             # Dashboard (card stack)
-│   │   ├── learn.tsx            # Scenario list
-│   │   └── profile.tsx          # Profile view/edit
-│   ├── crisis.tsx               # Crisis mode (full-screen, SSE streaming)
-│   ├── check-in.tsx             # Emotional check-in
-│   ├── impact.tsx               # Impact showcase
-│   ├── login.tsx                # Access code entry
-│   └── privacy.tsx / terms.tsx  # Legal
-├── components/
-│   ├── PatternInsights.tsx      # Cycle, trends, cross-patient
-│   ├── FeedbackWidget.tsx       # Thumbs + strategy tags
-│   ├── HomeFeedbackCard.tsx     # "How did it go?" card
-│   ├── DailyCheckinCard.tsx     # "How was today?" card
-│   ├── TonightOutlookCard.tsx   # Predictive alert card
-│   ├── MicButton.tsx            # Voice input (expo-speech-recognition)
-│   └── MarkdownText.tsx         # Crisis response rendering
+│   │   ├── _layout.tsx           # Tab bar: Home, Learn, Profile
+│   │   ├── home.tsx              # Dashboard (card stack)
+│   │   ├── learn.tsx             # Scenario list
+│   │   └── profile.tsx           # Profile view/edit
+│   ├── coach.tsx                 # Moment Coach (full-screen, SSE streaming)
+│   ├── check-in.tsx              # Emotional check-in
+│   ├── incidents/                # index, new, [id]
+│   ├── journey/                  # noticing, diagnosis, hospice, bereavement
+│   ├── learn/[id].tsx            # Scenario detail
+│   ├── profile/                  # setup, edit
+│   ├── facility/                 # B2B: (tabs), login, residents, staff,
+│   │                             #   audit, trends, executive, settings
+│   ├── impact.tsx                # Impact showcase
+│   ├── login.tsx                 # Access code entry
+│   └── privacy.tsx / terms.tsx   # Legal
+├── components/                   # ~28 shared components, incl. facility/
+│   ├── PatternInsights.tsx       # Cycle, trends, cross-patient
+│   ├── FeedbackWidget.tsx        # Thumbs + strategy tags
+│   ├── IncidentLogger.tsx        # 3am-friendly incident capture
+│   ├── EmergencyBar.tsx          # Always-reachable escalation
+│   ├── MicButton.tsx             # Voice input (expo-speech-recognition)
+│   ├── SpeakButton.tsx           # Read-aloud (neural TTS + local fallback)
+│   └── MarkdownText.tsx          # Coach response rendering
+├── hooks/                        # Speech (recognition + synthesis), theme,
+│   │                             #   color scheme, facility session guard
+├── constants/theme.ts            # Design tokens
 └── lib/
-    ├── api.ts                   # Same endpoints as web frontend
-    ├── i18n.ts                  # i18next setup + 11 locales
-    ├── storage.ts               # AsyncStorage (access code, patient name)
-    └── parse-response.ts        # Crisis response section parser
+    ├── api.ts                    # Same endpoints as web frontend
+    ├── facility-api.ts           # B2B endpoints + facility-storage/-utils
+    ├── i18n.ts                   # i18next setup — 3 locales x 10 namespaces
+    ├── network.ts                # NetInfo-based connectivity
+    ├── storage.ts                # AsyncStorage (access code, patient name)
+    └── parse-response.ts         # Coach response section parser
 ```
 
 **Connects to same backend** — all API calls go to the same FastAPI server. SSE streaming uses XHR `onprogress` (fetch ReadableStream is unreliable in React Native).
 
-**Unique to mobile:** voice input via `expo-speech-recognition`, device locale auto-detection, RTL for Arabic, offline-bundled translations.
+**Unique to mobile:** voice input via `expo-speech-recognition`, device locale
+auto-detection, offline-bundled translations. RTL scaffolding exists but is
+currently inert — see the i18n section above.
 
 ---
 

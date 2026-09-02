@@ -52,7 +52,7 @@ files, so eight languages dropped from the product stayed behind and kept
 shipping in the app bundle.
 
 Supported locales are declared in `src/lib/i18n.ts` and must match the
-directories present. Adding a language means adding it there *and* at the repo
+directories present. Adding a language means adding it there _and_ at the repo
 root — the static imports won't resolve otherwise.
 
 ## Configuration
@@ -67,11 +67,13 @@ EXPO_PUBLIC_API_URL=http://localhost:8000
 Note that `localhost` won't resolve from a physical device — use your machine's
 LAN IP, and make sure it's in the backend's `CORS_ORIGINS`.
 
-## Tests
+## Tests and formatting
 
 ```bash
 npm test
 npx tsc --noEmit
+npm run format          # Prettier — shared config in the repo root
+npm run format:check    # verify without writing
 ```
 
 ## Building and releasing
@@ -79,16 +81,34 @@ npx tsc --noEmit
 Builds run through [EAS](https://docs.expo.dev/build/introduction/). Profiles
 are in `eas.json`:
 
-| Profile | Purpose |
-|---|---|
-| `development` | Dev client, internal distribution |
-| `preview` | Internal testing — Android APK |
-| `production` | Store builds — Android App Bundle, iOS auto-increment |
+| Profile       | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `development` | Dev client, internal distribution                     |
+| `preview`     | Internal testing — Android APK                        |
+| `production`  | Store builds — Android App Bundle, iOS auto-increment |
 
 ```bash
+eas login                                     # required first — free Expo account
 eas build --profile preview  --platform all   # internal testing
 eas build --profile production --platform all # store submission
 ```
+
+### The two platforms are not symmetric
+
+**Android needs no developer account.** EAS generates and stores the signing
+keystore itself, so `--platform android` produces an installable APK as soon as
+you're logged into Expo.
+
+**iOS cannot produce an installable build without an Apple Developer Program
+membership.** Every iOS binary must be code-signed with Apple-issued
+certificates — there is no unsigned `.ipa`. EAS will stop and ask for Apple
+credentials to mint the certificate and provisioning profile. This is a
+prerequisite for building at all, not just for submitting.
+
+A DUNS number is only required for an _organization_ Apple account. An
+_individual_ account needs just an Apple ID, and skips the DUNS verification
+wait — at the cost of the App Store seller name being a person rather than a
+company.
 
 **Before the first store submission**, fill in the placeholders in `eas.json`
 under `submit.production.ios` (`appleId`, `ascAppId`, `appleTeamId`). They come
@@ -101,7 +121,8 @@ platforms.
 
 - The visual redesign applied to the web app hasn't been carried across, so
   mobile is internally coherent but doesn't match the web look yet.
-- Test coverage is thin (5 files) relative to the web app's.
+- Test coverage is thin (6 files, 28 tests) relative to the web app's (32 files,
+  250 tests).
 - The facility section is built but untested past login — it needs
   `JWT_SECRET_KEY` set on the backend, without which facility auth fails closed
   on every client.

@@ -58,7 +58,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Encryption** | AES-256-GCM for all conversations, profile data, and feedback at rest |
 | **Safety Gate + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier ahead of every LLM call; regression-tested via an engineering-authored red-team dataset (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)) |
 | **Acute-Change Screening** | Structured onset/context screening prompt for new or sudden behavior changes, run before a Moment Coach session starts |
-| **11 Languages, Tiered** | English, Spanish, French, German, Arabic, Hindi, Tamil, Japanese, Korean, Portuguese (BR), Chinese --- each tagged MVP-validated or experimental, with per-language native-review status (see `backend/app/services/language_support.py`) |
+| **Tiered Language Support** | **Translated UI in 3 languages** --- English, Spanish, Hindi (the MVP-validated tier). The model may additionally be asked to answer in 8 **experimental** languages (French, German, Arabic, Tamil, Japanese, Korean, Portuguese (BR), Chinese); those have no translated UI chrome and fall back to English. Tiering and per-language native-review status live in `backend/app/services/language_support.py` and [locales/REVIEW_STATUS.md](locales/REVIEW_STATUS.md) |
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
 | **Mobile App** | React Native (Expo) with full feature parity |
 | **Offline/Degraded-Mode Awareness** | Mobile and web both detect connectivity loss (NetInfo / `navigator.onLine`) and show a localized offline banner + distinct "you're offline" error copy instead of a generic server error; `/health` also reports a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) alongside DB status. Detection only --- no request queueing or background sync yet, see [docs/DEFERRED.md](docs/DEFERRED.md) |
@@ -223,63 +223,121 @@ cd mobile
 npx jest
 ```
 
+## Formatting and Linting
+
+Two formatters split the repo by language. Both are configured once, at the
+repo root, so every package shares the same rules.
+
+| Scope | Tool | Config |
+|---|---|---|
+| TypeScript, JS, JSON, CSS, Markdown | Prettier | `.prettierrc.json` + `.prettierignore` |
+| Python (`backend/` and `rag/`) | Ruff | `ruff.toml` |
+
+```bash
+# TypeScript / web + mobile
+cd frontend && npm run format      # or: npm run format:check
+cd mobile   && npm run format
+
+# Python — run from the repo root so both backend/ and rag/ are covered
+backend/.venv/bin/python -m ruff format .
+backend/.venv/bin/python -m ruff check .
+```
+
+Prettier uses `printWidth: 100` and Ruff `line-length = 100` so both languages
+wrap at the same column.
+
+Two Ruff rules are switched off deliberately, and the reasons are written into
+`ruff.toml` rather than left to be rediscovered:
+
+- **E711/E712** — every occurrence is a SQLAlchemy column comparison
+  (`Facility.is_active == True`). Ruff's suggested `is True` / `is None`
+  produces a plain Python bool instead of a SQL expression and silently breaks
+  the query. Applying that "fix" would be a correctness bug.
+- **UP042** — rewriting `class X(str, Enum)` as `StrEnum` changes what
+  `str(member)` returns. The classes it flags are all on safety paths, and the
+  change buys nothing functional.
+
+Translation JSON under `locales/` is excluded from formatting; it is data, and
+both apps hold generated copies of it (see Project Structure).
+
 ## Project Structure
 
 ```
 calmguide/
+├── locales/                    # ← SOURCE OF TRUTH for all translations
+│   ├── en/  es/  hi/           #   One JSON file per namespace, per language
+│   └── REVIEW_STATUS.md        #   Native-speaker review state
+│
 ├── frontend/                   # Next.js 16 App Router
 │   ├── src/
 │   │   ├── app/[locale]/       # Pages (welcome, profile, home, coach, learn, check-in,
 │   │   │                       #   incidents, journey, facility, login, impact)
-│   │   ├── components/ui/      # Shared UI (Button, Input, Card) with tests
-│   │   ├── features/           # Feature-specific components
-│   │   │   ├── coach/          # Moment Coach (input, footer, renderer, parser, streaming)
-│   │   │   ├── checkin/        # Daily check-in / behavioral journal
-│   │   │   ├── home/           # Home screen, patient card, conversation history
-│   │   │   ├── incidents/      # Incident logging + verification
-│   │   │   ├── learn/          # Learning scenarios
-│   │   │   └── profile/        # Profile wizard, profile view
-│   │   ├── lib/                # API client (with fetch-timeout handling), storage helpers, theme
-│   │   ├── hooks/               # useNetworkStatus (online/offline), useSpeechSynthesis, etc.
-│   │   └── context/            # React Context (profile state)
-│   ├── vitest.config.ts
+│   │   ├── components/         # Shared UI (ui/, landing/, facility/) with tests
+│   │   ├── features/           # Feature-specific components — checkin, coach, home,
+│   │   │                       #   incidents, learn, profile, welcome
+│   │   ├── lib/                # API client (with fetch-timeout handling), storage, theme
+│   │   ├── hooks/              # useNetworkStatus, useSpeechSynthesis, useSpeechRecognition
+│   │   ├── context/            # React Context (profile state)
+│   │   ├── i18n/               # next-intl routing + navigation wrappers
+│   │   ├── types/              # Shared TypeScript types
+│   │   └── middleware.ts       # Locale negotiation / redirects
+│   ├── locales/                # ⚙ generated — copied from ../locales, gitignored
+│   ├── vitest.config.ts        # 32 test files
 │   └── tailwind.config.ts      # CalmGuide design tokens
 │
-├── backend/                    # FastAPI (Python)
+├── backend/                    # FastAPI (Python 3.11+)
 │   ├── app/
-│   │   ├── models/             # SQLAlchemy models (Profile, Conversation, DailyCheckin, etc.)
+│   │   ├── models/             # SQLAlchemy models (Profile, Conversation, DailyCheckin, …)
 │   │   ├── schemas/            # Pydantic v2 request/response schemas
-│   │   ├── routers/            # API endpoints (coach, feedback, care_patterns/prediction,
-│   │   │                       #   impact, incidents, care_changes, languages, facility_*, etc.)
+│   │   ├── routers/            # API endpoints (coach, speech, feedback, care_patterns,
+│   │   │                       #   impact, incidents, languages, facility_*, …)
 │   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
 │   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam,
-│   │   │                       #   availability + response_timing (LLM health/latency
-│   │   │                       #   trackers feeding /health)
-│   │   └── prompts/            # Jinja2 system prompt templates
-│   ├── tests/                  # pytest-asyncio tests (1500+)
+│   │   │                       #   speech (TTS), token_usage, availability, response_timing
+│   │   ├── prompts/            # Jinja2 system prompt templates
+│   │   ├── config.py           # Pydantic settings — NOTE: @lru_cache'd, restart on .env change
+│   │   └── db.py               # Async engine / session factory
+│   ├── tests/                  # pytest-asyncio — 1601 tests
 │   └── alembic/                # Database migrations
 │
-├── mobile/                     # React Native (Expo)
+├── mobile/                     # React Native (Expo SDK 55)
 │   ├── src/
-│   │   ├── app/                # Expo Router screens (tabs, coach, check-in, impact)
-│   │   ├── components/         # Shared components (PatternInsights, FeedbackWidget,
-│   │   │                       #   OfflineBanner, etc.)
-│   │   └── lib/                # API client (with fetch-timeout handling), i18n, storage,
-│   │                           #   theme, network status (NetInfo-based)
-│   └── locales/                # i18n translations (11 languages) + REVIEW_STATUS.md
+│   │   ├── app/                # Expo Router — the file tree IS the navigation
+│   │   │   ├── (tabs)/         #   home, learn, profile
+│   │   │   └── facility/       #   B2B: dashboard, residents, staff, audit, trends
+│   │   ├── components/         # Shared components (facility/, EmergencyBar, …)
+│   │   ├── hooks/              # Speech, network, theme, session guard
+│   │   ├── lib/                # API clients, storage, i18n, response parsing
+│   │   └── constants/          # Design tokens
+│   ├── locales/                # ⚙ generated — rsynced from ../locales (tracked, see mobile/README)
+│   └── eas.json                # Build/submit profiles
 │
-├── rag/                        # RAG pipeline
+├── rag/                        # RAG pipeline (standalone; own requirements.txt)
 │   ├── scraper/                # Web scraper + token-based chunker
 │   ├── embeddings/             # OpenAI embeddings wrapper
 │   ├── vectorstores/           # pgvector backend (hybrid search)
-│   ├── retrieve.py             # get_rag_context() for FastAPI
-│   ├── pipeline.py             # CLI: scrape -> chunk -> embed -> store
+│   ├── retrieve.py             # get_rag_context() — the only part the backend imports
+│   ├── pipeline.py             # CLI: scrape → chunk → embed → store
 │   └── config.py               # Pydantic settings (RAG_ env prefix)
 │
-├── docs/                       # SAFETY_ARCHITECTURE.md, memory-graph-design.md, DEFERRED.md, etc.
+├── design/                     # Design references, logos, product screens
+├── docs/                       # SAFETY_ARCHITECTURE.md, DEFERRED.md, audits, mermaid/ diagrams
 ├── docker-compose.yml          # PostgreSQL + pgvector
 └── ARCHITECTURE.md             # Detailed architecture & data flow diagrams
 ```
+
+### Two rules this layout depends on
+
+**Translations are authored only in the repo-root `locales/`.** Both apps keep a
+local copy that is generated at build time — `frontend/locales/` (gitignored)
+and `mobile/locales/` (tracked). Editing either copy directly is silently
+undone on the next sync.
+
+**The backend imports `rag.retrieve` and `rag.vectorstores`, and nothing else.**
+Those imports are deliberately function-level, and `backend/requirements.txt`
+carries only the retrieval dependencies. Scraping dependencies
+(`beautifulsoup4`, `html2text`) live in `rag/requirements.txt` and are imported
+lazily, so ingestion stays an offline job the API never needs installed.
 
 ## API Endpoints
 
@@ -377,7 +435,7 @@ CalmGuide is going through an ongoing hardening pass driven by an external facul
   - Validated-vs-experimental language configuration (`GET /api/languages`, per-language native-review-pending status)
 - **P2 --- validation / real-world use**
   - Safety red-team evaluation harness with regression-tested sensitivity/specificity/false-positive-rate floors ([docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md))
-  - **P2-12** --- Offline/degraded-mode support scaffolding: in-process LLM availability tracker feeding a degraded `/health` status (backend/app/services/availability.py); connectivity detection (`useNetworkStatus`) + offline banners on both mobile (NetInfo) and web (`navigator.onLine`); localized offline error copy across 11 locales that distinguishes "you're offline" from a generic server error; AbortController-based fetch timeouts on the web frontend (parity with mobile's existing `fetchWithTimeout`). Deliberately does not include request queueing, background sync, or offline read caching --- and does not run the safety gate client-side while offline --- see [docs/DEFERRED.md](docs/DEFERRED.md) and the "Known gaps" section of [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for why those are deliberate, documented gaps rather than oversights.
+  - **P2-12** --- Offline/degraded-mode support scaffolding: in-process LLM availability tracker feeding a degraded `/health` status (backend/app/services/availability.py); connectivity detection (`useNetworkStatus`) + offline banners on both mobile (NetInfo) and web (`navigator.onLine`); localized offline error copy across every shipped locale that distinguishes "you're offline" from a generic server error; AbortController-based fetch timeouts on the web frontend (parity with mobile's existing `fetchWithTimeout`). Deliberately does not include request queueing, background sync, or offline read caching --- and does not run the safety gate client-side while offline --- see [docs/DEFERRED.md](docs/DEFERRED.md) and the "Known gaps" section of [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for why those are deliberate, documented gaps rather than oversights.
   - **P2-13** --- Response-timing instrumentation: in-process rolling p50/p95 latency tracker (`backend/app/services/response_timing.py`), same per-process/informational-only scope as P2-12's availability tracker. Records LLM time-to-first-chunk and total stream duration around both Moment Coach's and check-in's `stream_completion()` calls (successful streams only --- a failed call's duration isn't a meaningful latency sample, and `availability.py` already tracks failure rate separately), plus RAG retrieval duration in `_fetch_rag_context`. Surfaced as a `timing` block on `GET /health` alongside the existing `llm` field; never gates the HTTP status code. No new DB table --- this is a lightweight visibility layer, not a metrics store; back it with a real backend (Prometheus, Datadog, etc.) before relying on it for SLOs across instances.
 
 **In progress / planned:**
