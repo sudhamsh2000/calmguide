@@ -75,7 +75,9 @@
             "usesCleartextTraffic": false
           }
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,

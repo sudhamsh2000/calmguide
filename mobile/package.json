@@ -23,9 +23,12 @@
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
     "expo": "~55.0.31",
+    "expo-asset": "~55.0.20",
+    "expo-audio": "~55.0.18",
     "expo-build-properties": "~55.0.18",
     "expo-constants": "~55.0.17",
     "expo-device": "~55.0.21",
+    "expo-file-system": "~55.0.26",
     "expo-font": "~55.0.8",
     "expo-haptics": "~55.0.18",
     "expo-image": "~55.0.11",
@@ -62,7 +65,8 @@
     "typescript": "~5.9.2"
   },
   "overrides": {
-    "@xmldom/xmldom": "~0.8.10"
+    "@xmldom/xmldom": "~0.8.10",
+    "expo-asset": "~55.0.20"
   },
   "private": true
 }

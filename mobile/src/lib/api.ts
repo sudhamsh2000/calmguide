@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 import { i18n } from './i18n';
 import { getToken } from './facility-storage';
@@ -90,6 +91,14 @@ async function fetchWithTimeout(
     clearTimeout(timer);
   }
 }
+
+/**
+ * Synthesis takes noticeably longer than a JSON round trip — the model has to
+ * render the whole response to audio — so it gets a longer budget than
+ * DEFAULT_FETCH_TIMEOUT_MS. Timing out here is not fatal; it falls back to the
+ * device voice.
+ */
+const SPEECH_TIMEOUT_MS = 45_000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -953,4 +962,73 @@ export function streamCheckIn(
   onReplace?: (text: string) => void,
 ): () => void {
   return streamSSE(`${API_BASE}/api/checkin`, params, onChunk, onDone, onError, onReplace);
+}
+
+// ─── Speech (read-aloud) ──────────────────────────────────────────────────────
+
+/**
+ * Whether the server can produce neural speech.
+ *
+ * Asked once on load so the client can decide up front whether to use the
+ * neural voice or the device's own, rather than discovering it per press after
+ * a failed round trip. Never throws — a false here just means "use the device
+ * voice", which is always available.
+ */
+export async function getSpeechStatus(): Promise<boolean> {
+  try {
+    const res = await fetchWithTimeout(`${API_BASE}/api/speech/status`, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { available?: boolean };
+    return data.available === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Synthesize `text` server-side and write the audio to a cache file, returning
+ * its `file://` URI for expo-audio to play.
+ *
+ * A file rather than an in-memory buffer because expo-audio takes a URI, and
+ * React Native has no object-URL equivalent. The caller owns the file and
+ * should delete it once playback finishes.
+ *
+ * Returns null on every failure (503, timeout, offline, empty body) so callers
+ * fall back to the device voice on a single null check — read-aloud degrades
+ * rather than disappearing.
+ */
+export async function synthesizeSpeechToFile(text: string): Promise<string | null> {
+  try {
+    const res = await fetchWithTimeout(
+      `${API_BASE}/api/speech`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      },
+      SPEECH_TIMEOUT_MS,
+    );
+    if (!res.ok) return null;
+
+    const buffer = await res.arrayBuffer();
+    if (!buffer || buffer.byteLength === 0) return null;
+
+    const file = new File(Paths.cache, `calmguide-tts-${Date.now()}.mp3`);
+    file.write(new Uint8Array(buffer));
+    return file.uri;
+  } catch {
+    return null;
+  }
+}
+
+/** Best-effort cleanup of a file produced by synthesizeSpeechToFile(). */
+export function deleteSpeechFile(uri: string): void {
+  try {
+    const file = new File(uri);
+    if (file.exists) file.delete();
+  } catch {
+    // Cache directory; the OS reclaims it regardless.
+  }
 }
