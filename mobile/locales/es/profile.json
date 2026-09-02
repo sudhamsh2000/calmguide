@@ -56,11 +56,19 @@
   },
   "progress": {
     "step_of": "Paso {current} de {total}",
+    "invite_code": "Acceso",
     "name": "Nombre",
     "stage": "Etapa",
     "behaviors": "Conductas",
     "calming": "Calma",
     "safety": "Seguridad"
+  },
+  "invite": {
+    "heading": "Ingresa tu código de acceso",
+    "subtitle": "CalmGuide está actualmente en fase de prueba privada. Ingresa el código de invitación que te dieron para continuar.",
+    "code_label": "Código de invitación",
+    "code_placeholder": "p. ej., ABCD1234",
+    "hint": "¿No tienes uno? Pídele un código a quien te invitó a CalmGuide."
   },
   "chip": {
     "add_your_own": "Agregar el tuyo",
@@ -79,6 +87,7 @@
   },
   "errors": {
     "no_access_code": "No se encontró código de acceso. Por favor, crea un nuevo perfil.",
+    "invalid_invite_code": "Ese código de invitación no es válido. Verifícalo e inténtalo de nuevo.",
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo."
   },
   "view": {

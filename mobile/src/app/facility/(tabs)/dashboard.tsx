@@ -133,7 +133,10 @@ export default function DashboardScreen() {
                 </Text>
                 {data.escalating_residents.map((r, i) => (
                   <Text key={i} style={{ fontSize: 14, color: colors.foreground, paddingVertical: 4 }}>
-                    {r.name ?? r.profile_id} — {r.trend ?? t('dashboard.escalating')}
+                    {/* The dashboard endpoint returns {profile_id, category, trend}
+                      * only — there is no `name` on this payload, so the previous
+                      * `r.name ?? …` was dead and always fell through to the id. */}
+                    {r.profile_id} — {r.trend || t('dashboard.escalating')}
                   </Text>
                 ))}
               </View>

@@ -226,13 +226,16 @@ function SectionCard({
   return (
     <View
       style={{
-        backgroundColor: colors.surface,
         borderRadius: 16,
         borderCurve: 'continuous',
         padding: 16,
         marginBottom: 16,
         borderWidth: 1,
         borderColor: accentColor + '33',
+        // Was declared twice — a `colors.surface` above this line was silently
+        // overridden by the accent tint, so this is what already rendered.
+        // Kept as-is deliberately: removing the dead key must not change how
+        // the card looks.
         backgroundColor: accentColor + '08',
       }}
     >

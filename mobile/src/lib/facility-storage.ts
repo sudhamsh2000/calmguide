@@ -13,10 +13,27 @@ const JWT_TOKEN_KEY = 'calmguide_facility_jwt';
 const JWT_EXPIRY_KEY = 'calmguide_facility_jwt_expiry';
 const STAFF_KEY = 'calmguide_facility_staff';
 
+/** Staff roles, mirroring STAFF_ROLES in the backend's schemas/staff.py. */
+export type StaffRole = 'staff' | 'admin' | 'owner';
+
+const STAFF_ROLES: readonly StaffRole[] = ['staff', 'admin', 'owner'];
+
+/**
+ * Narrow an arbitrary role string from the API to a known role.
+ *
+ * The wire type is a plain string, and this value decides whether someone is
+ * routed to the admin dashboard — so an unrecognised role must not be trusted
+ * through. Anything unexpected (a new backend role, a malformed response)
+ * falls back to the least-privileged option rather than being passed along.
+ */
+export function toStaffRole(role: string): StaffRole {
+  return (STAFF_ROLES as readonly string[]).includes(role) ? (role as StaffRole) : 'staff';
+}
+
 export interface StoredStaff {
   id: string;
   name: string;
-  role: 'staff' | 'admin' | 'owner';
+  role: StaffRole;
   language_preference: string;
 }
 

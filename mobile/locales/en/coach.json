@@ -22,7 +22,11 @@
   "error": {
     "profile_not_found": "We couldn't find a profile for that code. Double-check the code on the Profile tab, or set up a new profile if needed.",
     "server_error": "We can't connect right now. While we try again, remember: you are doing your best. If this is an emergency, call 911.",
-    "something_wrong": "Something went wrong"
+    "something_wrong": "Something went wrong",
+    "something_wrong_status": "Something went wrong ({status}). Please try again.",
+    "connection_failed": "Unable to connect. Please check your connection and try again.",
+    "no_access_code": "No access code found. Please set up your profile first.",
+    "loading_failed": "We hit an issue loading the Moment Coach. Please try again."
   },
   "safety_disclosure": {
     "safety_headline": "AI assistant — not for emergencies.",

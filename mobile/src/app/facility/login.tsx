@@ -30,6 +30,7 @@ import {
   setFacilityName,
   setToken,
   setStoredStaff,
+  toStaffRole,
 } from '@/lib/facility-storage';
 
 type Phase = 'code' | 'select' | 'pin' | 'email';
@@ -128,7 +129,7 @@ export default function FacilityLoginScreen() {
         await setStoredStaff({
           id: result.staff.id,
           name: result.staff.name,
-          role: result.staff.role as 'staff' | 'admin' | 'owner',
+          role: toStaffRole(result.staff.role),
           language_preference: result.staff.language_preference,
         });
         if (result.staff.role === 'admin' || result.staff.role === 'owner') {
@@ -161,7 +162,12 @@ export default function FacilityLoginScreen() {
     try {
       const data = await emailLogin(email, password);
       await setToken(data.token, data.expires_at);
-      await setStoredStaff(data.staff);
+      await setStoredStaff({
+        id: data.staff.id,
+        name: data.staff.name,
+        role: toStaffRole(data.staff.role),
+        language_preference: data.staff.language_preference,
+      });
       if (data.staff.role === 'admin' || data.staff.role === 'owner') {
         router.replace('/facility/(tabs)/dashboard');
       } else {

@@ -17,18 +17,13 @@ import { getFacilityCode } from '@/lib/facility-storage';
 
 type StaffRole = 'staff' | 'admin';
 
+// Must stay in step with SUPPORTED_LOCALES in src/lib/i18n.ts — offering a
+// staff member a language the app can no longer render would set a preference
+// that silently falls back to English. The web equivalent lists the same three.
 const LANGUAGES = [
   { value: 'en-US', label: 'English' },
   { value: 'es-ES', label: 'Español' },
-  { value: 'zh-CN', label: '中文' },
   { value: 'hi-IN', label: 'हिन्दी' },
-  { value: 'ta-IN', label: 'தமிழ்' },
-  { value: 'ar-SA', label: 'العربية' },
-  { value: 'fr-FR', label: 'Français' },
-  { value: 'pt-BR', label: 'Português' },
-  { value: 'ja-JP', label: '日本語' },
-  { value: 'de-DE', label: 'Deutsch' },
-  { value: 'ko-KR', label: '한국어' },
 ] as const;
 
 export default function AddStaffScreen() {

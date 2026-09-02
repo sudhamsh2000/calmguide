@@ -20,7 +20,11 @@
   "error": {
     "profile_not_found": "No pudimos encontrar un perfil para ese código. Verifica el código en la pestaña de Perfil, o configura un nuevo perfil si es necesario.",
     "server_error": "No podemos conectarnos ahora. Mientras lo intentamos de nuevo, recuerda: estás haciendo lo mejor que puedes. Si es una emergencia, llama al 911.",
-    "something_wrong": "Algo salió mal"
+    "something_wrong": "Algo salió mal",
+    "something_wrong_status": "Algo salió mal ({status}). Por favor, inténtalo de nuevo.",
+    "connection_failed": "No se pudo conectar. Comprueba tu conexión e inténtalo de nuevo.",
+    "no_access_code": "No se encontró ningún código de acceso. Configura tu perfil primero.",
+    "loading_failed": "Tuvimos un problema al cargar el Asistente del Momento. Inténtalo de nuevo."
   },
   "honesty_disclaimer": "Moment Coach le ayuda cuando tiene tiempo para escribir y leer — tardes difíciles, episodios de conducta, síndrome del atardecer. NO reemplaza la ayuda de emergencia. Si no puede soltar el teléfono, si le tiemblan las manos, si alguien está en peligro — llame al 911.",
   "safety_disclosure": {

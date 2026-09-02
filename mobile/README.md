@@ -1,56 +1,107 @@
-# Welcome to your Expo app 👋
+# CalmGuide Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The iOS and Android app for CalmGuide, built with Expo (React Native) and
+expo-router. Feature parity with the web app in `../frontend`, including the
+facility (B2B) section, and it talks to the same FastAPI backend.
 
-## Get started
+See the repo-root [`README.md`](../README.md) for what CalmGuide is and how the
+backend is structured.
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting started
 
 ```bash
-npm run reset-project
+npm install
+npm start          # syncs locales, then starts the Expo dev server
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then press `i` for the iOS simulator, `a` for an Android emulator, or scan the
+QR code with Expo Go.
 
-### Other setup steps
+Native builds (needed for anything using a config plugin — speech recognition,
+secure storage):
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npm run ios
+npm run android
+```
 
-## Learn more
+## Layout
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+src/
+  app/          expo-router routes — the file tree IS the navigation
+    (tabs)/     home, learn, profile
+    facility/   B2B: dashboard, residents, staff, audit, trends, executive
+  components/   shared UI
+  hooks/        speech, network, theme
+  lib/          api clients, storage, i18n, response parsing
+locales/        synced from ../locales — see below
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Locales
 
-## Join the community
+**`mobile/locales/` is generated, not authored.** It's an rsync of the
+repo-root `../locales/`, run by `prestart` and again by EAS before a build.
 
-Join our community of developers creating universal apps.
+Edit translations in `../locales/` only. Anything added directly here is
+overwritten on the next sync.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The sync uses `rsync --delete`, so a language removed at the repo root is
+removed here too. That matters: it previously used `cp`, which only ever added
+files, so eight languages dropped from the product stayed behind and kept
+shipping in the app bundle.
+
+Supported locales are declared in `src/lib/i18n.ts` and must match the
+directories present. Adding a language means adding it there *and* at the repo
+root — the static imports won't resolve otherwise.
+
+## Configuration
+
+The API base URL comes from `EXPO_PUBLIC_API_URL`. Production is set in
+`eas.json`; for local development against a local backend, use a `.env`:
+
+```
+EXPO_PUBLIC_API_URL=http://localhost:8000
+```
+
+Note that `localhost` won't resolve from a physical device — use your machine's
+LAN IP, and make sure it's in the backend's `CORS_ORIGINS`.
+
+## Tests
+
+```bash
+npm test
+npx tsc --noEmit
+```
+
+## Building and releasing
+
+Builds run through [EAS](https://docs.expo.dev/build/introduction/). Profiles
+are in `eas.json`:
+
+| Profile | Purpose |
+|---|---|
+| `development` | Dev client, internal distribution |
+| `preview` | Internal testing — Android APK |
+| `production` | Store builds — Android App Bundle, iOS auto-increment |
+
+```bash
+eas build --profile preview  --platform all   # internal testing
+eas build --profile production --platform all # store submission
+```
+
+**Before the first store submission**, fill in the placeholders in `eas.json`
+under `submit.production.ios` (`appleId`, `ascAppId`, `appleTeamId`). They come
+from an enrolled Apple Developer account and can't be guessed.
+
+Bundle identifiers are already claimed as `com.calmguide.app` on both
+platforms.
+
+## Known gaps
+
+- The visual redesign applied to the web app hasn't been carried across, so
+  mobile is internally coherent but doesn't match the web look yet.
+- Test coverage is thin (5 files) relative to the web app's.
+- The facility section is built but untested past login — it needs
+  `JWT_SECRET_KEY` set on the backend, without which facility auth fails closed
+  on every client.

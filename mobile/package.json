@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "scripts": {
-    "prestart": "mkdir -p ./locales && cp -r ../locales/. ./locales",
-    "eas-build-pre-install": "mkdir -p ./locales && cp -r ../locales/. ./locales",
+    "prestart": "rsync -a --delete --exclude 'REVIEW_STATUS.md' ../locales/ ./locales/",
+    "eas-build-pre-install": "rsync -a --delete --exclude 'REVIEW_STATUS.md' ../locales/ ./locales/",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
