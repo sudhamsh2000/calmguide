@@ -18,9 +18,18 @@ Last updated: 2026-05-09
 - [x] Profiles and patient name migrated to SecureStore
 - [x] `allowBackup=false` + `fullBackupContent=false`
 - [x] `SYSTEM_ALERT_WINDOW` blocked via `app.json`
-- [x] Release manifest disables cleartext traffic
-- [x] R8 minification and resource shrinking enabled
-- [x] EAS build profiles created (dev/preview/production)
+- [x] Release manifest disables cleartext traffic — now set explicitly via
+      `expo-build-properties` (`usesCleartextTraffic: false`). Previously this
+      relied only on the API-28+ platform default and was not declared anywhere;
+      debug builds still allow cleartext so LAN dev over http keeps working.
+- [x] R8 minification and resource shrinking enabled — **this was previously
+      recorded as done but was not.** Both Gradle flags default to `false` and
+      nothing set them, so every release build shipped unminified. Now enabled
+      through `expo-build-properties`. Because R8 can strip reflectively-used
+      classes, the first release APK must be smoke-tested before submission.
+- [x] EAS build profiles created (dev/preview/production) — `development`,
+      `preview` and `production` now actually `extends: base`. The `base`
+      profile existed but nothing referenced it, so its Node pin never applied.
 - [x] `@xmldom/xmldom >=0.8.13` override for CVEs
 - [x] Access code removed from error messages
 - [x] Feedback API calls log warnings on failure
@@ -64,14 +73,21 @@ Last updated: 2026-05-09
 - [ ] Configure in `eas.json` or EAS credentials
 
 ### Store Listing
-- [ ] App icon: Export 512x512 PNG from existing 1024x1024 `icon.png`
-- [ ] Feature graphic: Design 1024x500 PNG (healthcare-calm aesthetic)
+- [x] App icon: `store-assets/play-icon-512.png` — 512x512, flattened on white.
+      Play applies its own rounded mask, so the icon must be a full-bleed square
+      with no alpha; a pre-rounded icon with transparent corners double-rounds.
+- [x] Feature graphic: `store-assets/play-feature-graphic-1024x500.png`. The
+      existing `feature-graphic.png` is 2048x1000 and would be rejected — Play
+      requires exactly 1024x500.
 - [ ] Screenshots: Minimum 2, recommended 4-8 (1080x1920 or 1080x2340)
   - Home screen with patient card
   - Moment Coach conversation
   - Incident logger
   - Learning mode
-- [ ] Short description (80 chars max): e.g., "AI companion for dementia caregivers — guidance in 11 languages"
+- [ ] Short description (80 chars max). Do **not** claim 11 languages — the app
+      ships translated UI in 3 (English, Spanish, Hindi). Claiming 11 in a store
+      listing is a misrepresentation. e.g. "AI guidance for dementia caregivers,
+      in English, Spanish and Hindi" (63 chars).
 - [ ] Full description (4000 chars max)
 
 ### Compliance

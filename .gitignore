@@ -2,6 +2,11 @@
 node_modules/
 frontend/node_modules/
 
+# Built mobile binaries — large, reproducible from source, never reviewed
+*.apk
+*.aab
+*.ipa
+
 # Python
 backend/venv/
 backend/.venv/
