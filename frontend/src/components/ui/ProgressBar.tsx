@@ -29,7 +29,11 @@ export function ProgressBar({
               data-testid={`progress-segment-${i + 1}`}
               className={[
                 'h-2.5 w-full rounded-full transition-colors',
-                i < currentStep ? 'bg-primary' : 'bg-[rgba(43,122,120,0.25)]',
+                // Pending segments were a hardcoded 25%-opacity teal, which read
+                // as almost-filled and blurred the done/remaining boundary. A
+                // neutral themed track makes progress legible at a glance and
+                // drops another hardcoded colour value.
+                i < currentStep ? 'bg-primary' : 'bg-foreground/12',
               ].join(' ')}
             />
             <span

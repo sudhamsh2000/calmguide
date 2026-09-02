@@ -21,7 +21,10 @@ export function StepInviteCode({
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       <div>
-        <h2 className="text-2xl font-bold text-primary-dark dark:text-primary-light">
+        <h2
+          className="text-2xl font-bold tracking-tight text-ink"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
           {t("invite.heading")}
         </h2>
         <p className="mt-3 text-base text-foreground-muted leading-relaxed">
@@ -39,7 +42,7 @@ export function StepInviteCode({
         error={error}
       />
 
-      <div className="rounded-xl bg-primary/5 dark:bg-primary/8 p-4 border border-primary/12 dark:border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+      <div className="card-shell p-4">
         <p className="text-sm text-foreground-muted leading-relaxed">
           {t("invite.hint")}
         </p>

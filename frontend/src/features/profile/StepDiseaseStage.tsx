@@ -18,7 +18,10 @@ export function StepDiseaseStage({ selectedStage, onSelect, className = '' }: St
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       <div>
-        <h2 className="text-2xl font-bold text-primary-dark dark:text-primary-light">
+        <h2
+          className="text-2xl font-bold tracking-tight text-ink"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
           {t('setup.stage_heading')}
         </h2>
         <p className="mt-3 text-base text-foreground-muted leading-relaxed">
