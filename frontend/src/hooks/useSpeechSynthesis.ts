@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 
+import { getSpeechStatus, synthesizeSpeech } from "@/lib/api";
+
 interface UseSpeechSynthesisOptions {
   locale?: string;
 }
@@ -84,6 +86,17 @@ export function useSpeechSynthesis(
   const [isSupported, setIsSupported] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
+  // Neural TTS, when the server has it enabled. The browser's own voices are
+  // limited to the platform's basic bundled set, which reads robotically no
+  // matter how it's tuned — see app/services/speech.py. `neuralRef` holds the
+  // active <audio> element and its object URL so playback can be stopped and
+  // the URL revoked without leaking.
+  const [neuralAvailable, setNeuralAvailable] = useState(false);
+  const neuralRef = useRef<{ audio: HTMLAudioElement; url: string } | null>(null);
+  // Guards against an out-of-order response: if the user stops or starts a new
+  // read while synthesis is still in flight, the stale audio must not play.
+  const requestIdRef = useRef(0);
+
   useEffect(() => {
     const supported = typeof window !== "undefined" && !!window.speechSynthesis;
     setIsSupported(supported);
@@ -98,14 +111,36 @@ export function useSpeechSynthesis(
     window.speechSynthesis.getVoices();
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    getSpeechStatus().then((ok) => {
+      if (!cancelled) setNeuralAvailable(ok);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** Tear down any in-flight neural playback and release its object URL. */
+  const stopNeural = useCallback(() => {
+    const current = neuralRef.current;
+    if (!current) return;
+    current.audio.pause();
+    current.audio.src = "";
+    URL.revokeObjectURL(current.url);
+    neuralRef.current = null;
+  }, []);
+
   const stop = useCallback(() => {
-    if (!isSupported) return;
-    window.speechSynthesis.cancel();
+    requestIdRef.current += 1; // invalidate any synthesis still in flight
+    stopNeural();
+    if (isSupported) window.speechSynthesis.cancel();
     setIsSpeaking(false);
     setIsPaused(false);
-  }, [isSupported]);
+  }, [isSupported, stopNeural]);
 
-  const speak = useCallback(
+  /** Browser-local speech. Always available as the fallback path. */
+  const speakLocal = useCallback(
     (text: string) => {
       if (!isSupported) return;
       window.speechSynthesis.cancel();
@@ -133,21 +168,91 @@ export function useSpeechSynthesis(
     [isSupported, locale],
   );
 
+  /**
+   * Speak `text`, preferring the neural voice and falling back to the
+   * browser's own on any failure. Marked speaking immediately rather than on
+   * playback start, so the button reacts to the press even though synthesis
+   * takes a moment — otherwise it reads as an unresponsive control.
+   */
+  const speak = useCallback(
+    (text: string) => {
+      stop();
+      const requestId = requestIdRef.current;
+
+      if (!neuralAvailable) {
+        speakLocal(text);
+        return;
+      }
+
+      setIsSpeaking(true);
+      synthesizeSpeech(text)
+        .then((url) => {
+          // Superseded by a newer press, or stopped while synthesizing.
+          if (requestId !== requestIdRef.current) {
+            if (url) URL.revokeObjectURL(url);
+            return;
+          }
+          if (!url) {
+            setIsSpeaking(false);
+            speakLocal(text);
+            return;
+          }
+
+          const audio = new Audio(url);
+          neuralRef.current = { audio, url };
+          audio.onended = () => {
+            setIsSpeaking(false);
+            setIsPaused(false);
+            stopNeural();
+          };
+          audio.onerror = () => {
+            // Synthesis succeeded but playback didn't; still better to read it
+            // aloud badly than not at all.
+            setIsSpeaking(false);
+            stopNeural();
+            speakLocal(text);
+          };
+          audio.play().catch(() => {
+            setIsSpeaking(false);
+            stopNeural();
+            speakLocal(text);
+          });
+        })
+        .catch(() => {
+          if (requestId !== requestIdRef.current) return;
+          setIsSpeaking(false);
+          speakLocal(text);
+        });
+    },
+    [neuralAvailable, speakLocal, stop, stopNeural],
+  );
+
   const pause = useCallback(() => {
+    if (neuralRef.current) {
+      neuralRef.current.audio.pause();
+      setIsPaused(true);
+      return;
+    }
     if (!isSupported) return;
     window.speechSynthesis.pause();
   }, [isSupported]);
 
   const resume = useCallback(() => {
+    if (neuralRef.current) {
+      void neuralRef.current.audio.play();
+      setIsPaused(false);
+      return;
+    }
     if (!isSupported) return;
     window.speechSynthesis.resume();
   }, [isSupported]);
 
   useEffect(() => {
     return () => {
+      stopNeural();
       if (isSupported) window.speechSynthesis?.cancel();
     };
-  }, [isSupported]);
+  }, [isSupported, stopNeural]);
 
   return { speak, stop, pause, resume, isSpeaking, isPaused, isSupported };
 }

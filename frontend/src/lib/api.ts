@@ -846,5 +846,49 @@ export async function getCareChanges(
   );
 }
 
+/**
+ * Whether the server can synthesize neural speech for read-aloud.
+ *
+ * Asked once on mount so the client can decide up front between neural audio
+ * and the browser's local voice, instead of finding out per-press via a
+ * failed round trip. Never throws: any failure means "use local speech",
+ * which is a working experience, not an error worth surfacing.
+ */
+export async function getSpeechStatus(): Promise<boolean> {
+  try {
+    const res = await fetchWithTimeout(`${BASE_URL}/api/speech/status`, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { available?: boolean };
+    return data.available === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Synthesize `text` server-side and return playable audio.
+ *
+ * Returns null rather than throwing when synthesis isn't available (503,
+ * network failure, TTS disabled) so callers fall back to local speech on a
+ * single null check. The caller owns the returned object URL and must
+ * revokeObjectURL it when done.
+ */
+export async function synthesizeSpeech(text: string): Promise<string | null> {
+  try {
+    const res = await fetchWithTimeout(`${BASE_URL}/api/speech`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  } catch {
+    return null;
+  }
+}
+
 // Re-export ProfileResponse as Profile for backward compatibility with ProfileContext
 export type { ProfileResponse as Profile };

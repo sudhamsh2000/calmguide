@@ -49,6 +49,10 @@ def test_settings() -> Settings:
         # Tests that specifically exercise the invite-code gate turn it back
         # on for themselves (see test_invite_codes.py).
         INVITE_CODE_REQUIRED=False,
+        # Neural TTS bills per character and calls a real provider. Forced off
+        # in tests so a suite run can never make a paid API call; the speech
+        # tests opt in explicitly and stub the provider.
+        TTS_ENABLED=False,
     )
 
 
@@ -67,6 +71,7 @@ def override_get_settings(test_settings, monkeypatch):
     monkeypatch.setenv("JWT_SECRET_KEY", test_settings.JWT_SECRET_KEY)
     monkeypatch.setenv("RATE_LIMIT_ENABLED", "false")
     monkeypatch.setenv("INVITE_CODE_REQUIRED", "false")
+    monkeypatch.setenv("TTS_ENABLED", "false")
     config.get_settings.cache_clear()
     yield
     config.get_settings.cache_clear()

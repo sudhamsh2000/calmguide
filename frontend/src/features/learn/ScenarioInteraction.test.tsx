@@ -15,6 +15,12 @@ vi.mock('@/i18n/navigation', () => ({
 vi.mock('@/lib/api', () => ({
   getScenarios: vi.fn(),
   interactWithScenario: vi.fn(),
+  // Pulled in transitively by SpeakButton -> useSpeechSynthesis, which asks
+  // the server once on mount whether neural read-aloud is available. Stubbed
+  // false so these tests exercise the local-speech path and never touch the
+  // network.
+  getSpeechStatus: vi.fn().mockResolvedValue(false),
+  synthesizeSpeech: vi.fn().mockResolvedValue(null),
 }));
 
 // Mock the storage module

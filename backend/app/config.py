@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     # for multi-instance deployments back it with Redis.
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_PER_MINUTE: int = 30
+    # Neural text-to-speech for read-aloud (app.services.speech). Off by
+    # default: it bills per character, so it must be opted into rather than
+    # switched on silently by deploying. When disabled the client falls back
+    # to the browser's built-in speech, so read-aloud still works either way.
+    TTS_ENABLED: bool = False
     # HMAC key for access/facility code hashing. Defeats offline dictionary
     # attacks on the stored hashes. Falls back to CONVERSATION_ENCRYPTION_KEY
     # when unset so existing deployments keep working.
