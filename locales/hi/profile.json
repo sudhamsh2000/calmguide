@@ -158,5 +158,10 @@
       "Driving risk": "गाड़ी चलाने का खतरा",
       "Pool/water nearby": "पास में तालाब / पानी"
     }
+  },
+  "voice": {
+    "label": "आवाज़",
+    "auto_speak_replies": "जवाब अपने आप ज़ोर से पढ़ें",
+    "auto_speak_replies_hint": "Moment Coach और Check-In के जवाब आने पर अपने आप बोले जाएंगे, स्पीकर आइकन दबाने की ज़रूरत नहीं होगी।"
   }
 }

@@ -111,6 +111,22 @@ export async function setPreferredLanguage(locale: string): Promise<void> {
   await AsyncStorage.setItem(PREFERRED_LANGUAGE_KEY, locale);
 }
 
+const AUTO_SPEAK_REPLIES_KEY = 'calmguide_auto_speak_replies';
+
+/**
+ * Whether Moment Coach / Check-In replies should be read aloud automatically
+ * as soon as they finish streaming, instead of requiring a tap on each
+ * section's speak button. Off by default — see the matching web function in
+ * frontend/src/lib/storage.ts for why.
+ */
+export async function getAutoSpeakReplies(): Promise<boolean> {
+  return (await AsyncStorage.getItem(AUTO_SPEAK_REPLIES_KEY)) === 'true';
+}
+
+export async function setAutoSpeakReplies(enabled: boolean): Promise<void> {
+  await AsyncStorage.setItem(AUTO_SPEAK_REPLIES_KEY, enabled ? 'true' : 'false');
+}
+
 // ── Multi-profile support ────────────────────────────────────────────────
 
 export interface StoredProfile {

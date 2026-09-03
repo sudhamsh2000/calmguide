@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { AccessibilityInfo, Pressable, StyleSheet } from 'react-native';
+import { useCallback, useEffect } from 'react';
+import { AccessibilityInfo, Alert, Pressable, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/components/ThemeContext';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -20,9 +20,33 @@ export function MicButton({
 }: MicButtonProps) {
   const { colors } = useTheme();
   const { t, i18n } = useTranslation('common');
+
+  const handleError = useCallback(
+    (code: string) => {
+      // Mapped to what the caregiver can actually do about it, not the raw
+      // platform error code. 'no-speech' / 'speech-timeout' invite a retry;
+      // everything else (denied permission, no recognizer on the device, no
+      // network, a busy service) all land on the same place — type instead —
+      // because there's no in-app remedy for any of them.
+      const key =
+        code === 'not-allowed'
+          ? 'not_allowed'
+          : code === 'service-not-allowed' || code === 'audio-capture'
+            ? 'not_available'
+            : code === 'no-speech' || code === 'speech-timeout'
+              ? 'no_speech'
+              : code === 'network'
+                ? 'network'
+                : 'generic';
+      Alert.alert(t('accessibility.voice_input'), t(`voice_error.${key}`));
+    },
+    [t],
+  );
+
   const { start, stop, isListening, isSupported } = useSpeechRecognition({
     locale: i18n.language,
     onResult: onTranscript,
+    onError: handleError,
   });
 
   useEffect(() => {

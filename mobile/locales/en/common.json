@@ -337,5 +337,12 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     }
+  },
+  "voice_error": {
+    "not_available": "Voice input isn't available on this device right now. Please type instead.",
+    "not_allowed": "Microphone access is off. Please type instead, or turn on microphone permission in Settings.",
+    "no_speech": "Didn't catch that — please try again or type instead.",
+    "network": "No connection for voice input right now. Please type instead.",
+    "generic": "Voice input didn't work. Please type instead."
   }
 }

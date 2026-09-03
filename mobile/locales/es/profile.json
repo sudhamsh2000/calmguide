@@ -158,5 +158,10 @@
       "Driving risk": "Riesgo al conducir",
       "Pool/water nearby": "Piscina / agua cerca"
     }
+  },
+  "voice": {
+    "label": "Voz",
+    "auto_speak_replies": "Leer las respuestas en voz alta automáticamente",
+    "auto_speak_replies_hint": "Las respuestas de Moment Coach y Check-In se leerán en voz alta en cuanto lleguen, sin necesidad de pulsar el icono del altavoz."
   }
 }

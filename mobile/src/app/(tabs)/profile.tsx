@@ -9,7 +9,13 @@ import {
   type SupportedLocale,
 } from '@/lib/i18n';
 import { getProfile, type ProfileResponse } from '@/lib/api';
-import { clearAll, getAccessCode, getPatientName } from '@/lib/storage';
+import {
+  clearAll,
+  getAccessCode,
+  getAutoSpeakReplies,
+  getPatientName,
+  setAutoSpeakReplies,
+} from '@/lib/storage';
 import { router, Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -19,6 +25,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -104,6 +111,12 @@ export default function ProfileScreen() {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [changingLanguage, setChangingLanguage] = useState(false);
   const [showCode, setShowCode] = useState(false);
+  const [autoSpeak, setAutoSpeakState] = useState(false);
+
+  async function handleAutoSpeakChange(value: boolean) {
+    setAutoSpeakState(value);
+    await setAutoSpeakReplies(value);
+  }
 
   const translateOption = (group: 'behavioral' | 'calming' | 'safety', value: string): string =>
     t(`options.${group}.${value}`, value);
@@ -144,6 +157,7 @@ export default function ProfileScreen() {
     }
     setAccessCodeState(code);
     setPatientNameState(name ?? '');
+    setAutoSpeakState(await getAutoSpeakReplies());
     try {
       const p = await getProfile(code);
       setProfile(p);
@@ -378,6 +392,44 @@ export default function ProfileScreen() {
           >
             {t('actions.edit', 'Edit Profile')}
           </Button>
+
+          {/* Auto-speak toggle row — first settings row, per product decision
+              that auto-read is a caregiver-visibility feature worth
+              surfacing before appearance/language. */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingHorizontal: 16,
+              paddingVertical: 14,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+              marginBottom: 10,
+              gap: 12,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, color: colors.foreground, fontWeight: '500' }}>
+                {t('voice.auto_speak_replies', 'Read replies aloud automatically')}
+              </Text>
+              <Text style={{ fontSize: 13, color: colors.mutedForeground, marginTop: 3 }}>
+                {t(
+                  'voice.auto_speak_replies_hint',
+                  'Moment Coach and Check-In responses will be read aloud as soon as they arrive.',
+                )}
+              </Text>
+            </View>
+            <Switch
+              value={autoSpeak}
+              onValueChange={handleAutoSpeakChange}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor="#FFFFFF"
+              accessibilityLabel={t('voice.auto_speak_replies', 'Read replies aloud automatically')}
+            />
+          </View>
 
           {/* Theme toggle row */}
           <View

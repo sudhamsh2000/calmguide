@@ -30,6 +30,8 @@ vi.mock('@/lib/storage', () => ({
   getAccessCode: (...args: unknown[]) => mockGetAccessCode(...args),
   getPatientName: (...args: unknown[]) => mockGetPatientName(...args),
   clearAll: vi.fn(),
+  getAutoSpeakReplies: vi.fn(() => false),
+  setAutoSpeakReplies: vi.fn(),
 }));
 
 const mockProfile = {

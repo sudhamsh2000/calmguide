@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CoachInput } from '@/features/coach/CoachInput';
 import { CoachFooterInput } from '@/features/coach/CoachFooterInput';
 import { CoachResponseRenderer } from '@/features/coach/CoachResponseRenderer';
@@ -18,7 +18,8 @@ import { FacilityModeShell } from '@/components/facility/FacilityModeShell';
 import { MedicalDisclaimer } from '@/components/ui/MedicalDisclaimer';
 import { getConversationMessages, getSessionFeedback } from '@/lib/api';
 import type { FeedbackEntry } from '@/lib/api';
-import { getAccessCode } from '@/lib/storage';
+import { getAccessCode, getAutoSpeakReplies } from '@/lib/storage';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import type { CoachSection } from '@/features/coach/parseResponse';
 
 interface ChatExchange {
@@ -68,6 +69,8 @@ function CoachPageInner() {
     profileId ?? undefined,
     residentName,
   );
+  const locale = useLocale();
+  const { speak } = useSpeechSynthesis({ locale });
   const [history, setHistory] = useState<ChatExchange[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [showInitial, setShowInitial] = useState(!initialSessionId);
@@ -139,7 +142,12 @@ function CoachPageInner() {
   // actually changes, not on every unrelated re-render.
   const currentSections = useMemo(() => parseCoachResponse(response), [response]);
 
-  // Archive exchange into history when streaming completes
+  // Archive exchange into history when streaming completes, and — if the
+  // caregiver has turned it on in Profile settings — read the reply aloud
+  // without waiting for a tap on a section's speak button. Gated on the same
+  // "streaming just transitioned to done" edge as archiving, so this fires
+  // exactly once per live response and never replays when history is loaded
+  // or re-rendered.
   const prevStreamingRef = useRef(isStreaming);
   useEffect(() => {
     if (prevStreamingRef.current && !isStreaming && response && currentMessage) {
@@ -152,9 +160,12 @@ function CoachPageInner() {
         },
       ]);
       setCurrentMessage(null);
+      if (getAutoSpeakReplies()) {
+        speak(response);
+      }
     }
     prevStreamingRef.current = isStreaming;
-  }, [isStreaming, response, currentMessage]);
+  }, [isStreaming, response, currentMessage, speak]);
 
   const handleSendMessage = useCallback(
     (message: string) => {

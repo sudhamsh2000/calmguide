@@ -4,10 +4,16 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useProfile } from '@/context/ProfileContext';
-import { getPatientName, getAccessCode } from '@/lib/storage';
+import {
+  getPatientName,
+  getAccessCode,
+  getAutoSpeakReplies,
+  setAutoSpeakReplies,
+} from '@/lib/storage';
 import { getProfile } from '@/lib/api';
 import { BackButton } from '@/components/ui/BackButton';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { Switch } from '@/components/ui/Switch';
 import { SignOutButton } from '@/components/ui/SignOutButton';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, type SupportedLocale } from '@/lib/locale';
 
@@ -30,6 +36,17 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   const { state, dispatch } = useProfile();
   const [patientName, setPatientNameState] = useState<string | null>(null);
   const [accessCode, setAccessCodeState] = useState<string | null>(null);
+  // Read from localStorage only after mount (SSR has no storage to read),
+  // so this starts false and is corrected on the client immediately after —
+  // same pattern the rest of this component already uses for patientName.
+  const [autoSpeak, setAutoSpeakState] = useState(false);
+  useEffect(() => {
+    setAutoSpeakState(getAutoSpeakReplies());
+  }, []);
+  const handleAutoSpeakChange = (checked: boolean) => {
+    setAutoSpeakState(checked);
+    setAutoSpeakReplies(checked);
+  };
   const [langOpen, setLangOpen] = useState(false);
   const langMenuId = useId();
   const langButtonRef = useRef<HTMLButtonElement>(null);
@@ -225,8 +242,30 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
         {t('actions.edit')}
       </Link>
 
-      {/* Settings Section */}
+      {/* Voice Section — first settings section, per product decision that
+          auto-read is a caregiver-visibility feature worth surfacing before
+          appearance/language. */}
       <div className="mt-8 pb-4 border-b border-foreground/10">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-4">
+          {t('voice.label')}
+        </p>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <span className="text-base text-foreground">{t('voice.auto_speak_replies')}</span>
+            <p className="mt-1 text-sm text-foreground-muted leading-relaxed">
+              {t('voice.auto_speak_replies_hint')}
+            </p>
+          </div>
+          <Switch
+            checked={autoSpeak}
+            onChange={handleAutoSpeakChange}
+            label={t('voice.auto_speak_replies')}
+          />
+        </div>
+      </div>
+
+      {/* Settings Section */}
+      <div className="mt-5 pb-4 border-b border-foreground/10">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-4">
           {t('appearance')}
         </p>

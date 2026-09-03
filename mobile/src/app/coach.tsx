@@ -10,7 +10,8 @@ import { streamCoachChat, getConversationMessages } from '@/lib/api';
 import { ResidentContextBanner } from '@/components/facility/ResidentContextBanner';
 import { MarkdownText } from '@/components/MarkdownText';
 import { parseCoachResponse, type CoachSection, type CoachSectionId } from '@/lib/parse-response';
-import { getAccessCode, getPatientName } from '@/lib/storage';
+import { getAccessCode, getAutoSpeakReplies, getPatientName } from '@/lib/storage';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useNetworkStatus } from '@/lib/network';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
@@ -221,6 +222,7 @@ function CoachScreenInner() {
   const insets = useSafeAreaInsets();
   const { t, i18n } = useTranslation('coach');
   const { t: tc } = useTranslation('common');
+  const { speak } = useSpeechSynthesis({ locale: i18n.language });
   const {
     session_id: initialSessionId,
     profile_id,
@@ -349,6 +351,9 @@ function CoachScreenInner() {
           setCurrentMessage('');
           setRawResponse('');
           rawRef.current = '';
+          getAutoSpeakReplies().then((enabled) => {
+            if (enabled && finalRaw.trim()) speak(finalRaw);
+          });
           AccessibilityInfo.announceForAccessibility('Guidance is ready');
           setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
         },
@@ -370,7 +375,7 @@ function CoachScreenInner() {
         },
       );
     },
-    [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush],
+    [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush, speak],
   );
 
   const currentSections = useMemo(() => parseCoachResponse(rawResponse), [rawResponse]);

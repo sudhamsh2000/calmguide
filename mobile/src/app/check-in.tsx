@@ -4,7 +4,8 @@ import { MedicalDisclaimer } from '@/components/MedicalDisclaimer';
 import { MicButton } from '@/components/MicButton';
 import { useTheme } from '@/components/ThemeContext';
 import { streamCheckIn } from '@/lib/api';
-import { getAccessCode, getPatientName } from '@/lib/storage';
+import { getAccessCode, getAutoSpeakReplies, getPatientName } from '@/lib/storage';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useNetworkStatus } from '@/lib/network';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { router, Stack } from 'expo-router';
@@ -49,6 +50,11 @@ function CheckInScreenInner() {
   const { isOnline } = useNetworkStatus();
   const isOnlineRef = useRef(isOnline);
   isOnlineRef.current = isOnline;
+  const { speak } = useSpeechSynthesis({ locale: i18n.language });
+  // The onDone callback below is created fresh each handleShare() call but
+  // only closes over `response` as it was at call time, not as it ends up
+  // after streaming — mirrors rawRef in coach.tsx for the same reason.
+  const responseRef = useRef('');
 
   useEffect(() => {
     getAccessCode().then((c) => setAccessCodeState(c ?? ''));
@@ -62,6 +68,7 @@ function CheckInScreenInner() {
     if (!message.trim() || !accessCode) return;
     setPhase('streaming');
     setResponse('');
+    responseRef.current = '';
     setError('');
 
     abortRef.current = streamCheckIn(
@@ -71,6 +78,7 @@ function CheckInScreenInner() {
         message: message.trim(),
       },
       (chunk) => {
+        responseRef.current += chunk;
         setResponse((prev) => prev + chunk);
         scrollRef.current?.scrollToEnd({ animated: true });
       },
@@ -78,6 +86,9 @@ function CheckInScreenInner() {
         setPhase('done');
         AccessibilityInfo.announceForAccessibility('Response is ready');
         scrollRef.current?.scrollToEnd({ animated: true });
+        getAutoSpeakReplies().then((enabled) => {
+          if (enabled && responseRef.current.trim()) speak(responseRef.current);
+        });
       },
       () => {
         setPhase('done');
@@ -86,7 +97,7 @@ function CheckInScreenInner() {
         );
       },
     );
-  }, [message, accessCode, patientName, tc]);
+  }, [message, accessCode, patientName, tc, speak]);
 
   function handleReset() {
     abortRef.current?.();

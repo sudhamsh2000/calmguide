@@ -3,6 +3,7 @@ const KEYS = {
   ACCESS_CODE: 'calmguide_access_code',
   PREFERRED_LANGUAGE: 'calmguide_preferred_language',
   DISCLAIMER_ACCEPTED: 'calmguide_disclaimer_accepted',
+  AUTO_SPEAK_REPLIES: 'calmguide_auto_speak_replies',
 } as const;
 
 function isLocalStorageAvailable(): boolean {
@@ -171,6 +172,22 @@ export function switchProfile(index: number): void {
     setAccessCode(profile.access_code);
     setPatientName(profile.patient_name);
   }
+}
+
+/**
+ * Whether Moment Coach / Check-In replies should be read aloud automatically
+ * as soon as they finish streaming, instead of requiring a tap on each
+ * section's speak button. Off by default: it starts audio (and, when the
+ * neural voice is configured, a billed request) without an explicit action,
+ * so a caregiver should opt in rather than have it start unexpectedly the
+ * first time they open the app.
+ */
+export function getAutoSpeakReplies(): boolean {
+  return getItem(KEYS.AUTO_SPEAK_REPLIES) === 'true';
+}
+
+export function setAutoSpeakReplies(enabled: boolean): void {
+  setItem(KEYS.AUTO_SPEAK_REPLIES, enabled ? 'true' : 'false');
 }
 
 export { KEYS as STORAGE_KEYS };

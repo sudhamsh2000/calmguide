@@ -3,15 +3,15 @@
 This file is the single source of truth. `mobile/locales/REVIEW_STATUS.md` is a
 generated copy — edit this one.
 
-CalmGuide ships UI translations for 3 locales: English (`en`, default), Spanish
-(`es`), and Hindi (`hi`). Translation files for zh, ta, ar, fr, pt-BR, ja, de,
-ko were removed — see `design/design.md` §17 / §24 change log.
+CalmGuide supports exactly 3 locales: English (`en`, default), Spanish (`es`),
+and Hindi (`hi`). Translation files for zh, ta, ar, fr, pt-BR, ja, de, ko were
+removed — see `design/design.md` §17 / §24 change log.
 
-Those 8 removed languages are still listed as `EXPERIMENTAL` in
-`backend/app/services/language_support.py`, which serves `GET /languages`. That
-registry describes which languages the *model* may be asked to answer in; it is
-no longer a claim that translated UI chrome exists for them. The two counts are
-meant to differ.
+Those 8 languages have also been removed from
+`backend/app/services/language_support.py`, so `GET /languages` now returns the
+same three this directory contains. The registry, these files, and
+`SUPPORTED_LOCALES` in both clients are meant to stay in step — a registry
+wider than the translations advertises languages the product cannot render.
 
 "MVP-validated" (English, Spanish, Hindi) is a support-priority designation,
 not a claim that review is complete — as the tables below show, the

@@ -4,15 +4,16 @@ import { Link } from '@/i18n/navigation';
 import { useState, useCallback, useRef } from 'react';
 
 const CHECKIN_MAX_CHARS = 1000;
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { checkIn, ApiError } from '@/lib/api';
-import { getAccessCode } from '@/lib/storage';
+import { getAccessCode, getAutoSpeakReplies } from '@/lib/storage';
 import { BackButton } from '@/components/ui/BackButton';
 import { Button } from '@/components/ui/Button';
 import { SpeakButton } from '@/components/ui/SpeakButton';
 import { MicButton } from '@/components/ui/MicButton';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 
 export function CheckInScreen() {
   const t = useTranslations('checkin');
@@ -23,6 +24,8 @@ export function CheckInScreen() {
   const [isDone, setIsDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isOnline } = useNetworkStatus();
+  const locale = useLocale();
+  const { speak } = useSpeechSynthesis({ locale });
   // Read in the (stable) submit callback below without adding isOnline to
   // its dependency array — mirrors the pattern in useStreamingChat.ts.
   const isOnlineRef = useRef(isOnline);
@@ -82,6 +85,9 @@ export function CheckInScreen() {
         }
       }
       setIsDone(true);
+      if (getAutoSpeakReplies() && accumulated.trim()) {
+        speak(accumulated);
+      }
     } catch (err) {
       if (isOnlineRef.current === false) {
         // Known offline — distinct copy so the caregiver knows retrying
@@ -95,7 +101,7 @@ export function CheckInScreen() {
     } finally {
       setIsStreaming(false);
     }
-  }, [message]);
+  }, [message, speak]);
 
   return (
     <div className="flex flex-col gap-5 px-5 pt-5 pb-8">

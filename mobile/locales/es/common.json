@@ -337,5 +337,12 @@
       "privacy": "Política de Privacidad",
       "terms": "Términos de Servicio"
     }
+  },
+  "voice_error": {
+    "not_available": "La entrada de voz no está disponible en este dispositivo ahora mismo. Por favor, escribe en su lugar.",
+    "not_allowed": "El acceso al micrófono está desactivado. Escribe en su lugar, o activa el permiso del micrófono en Configuración.",
+    "no_speech": "No se detectó ninguna voz. Inténtalo de nuevo o escribe en su lugar.",
+    "network": "No hay conexión para la entrada de voz en este momento. Por favor, escribe en su lugar.",
+    "generic": "La entrada de voz no funcionó. Por favor, escribe en su lugar."
   }
 }

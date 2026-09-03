@@ -20,6 +20,16 @@ try {
 interface UseSpeechRecognitionOptions {
   locale?: string;
   onResult?: (transcript: string) => void;
+  /**
+   * Fired whenever recognition fails to produce a transcript, including a
+   * denied permission. Without this, the only visible symptom was the mic
+   * icon flashing to "listening" and silently reverting a moment later — on
+   * a real device that happens for perfectly ordinary reasons (no network,
+   * a busy recognition service, a revoked permission), not just on an
+   * emulator without a recognizer installed, so it needed surfacing rather
+   * than being swallowed.
+   */
+  onError?: (code: string) => void;
 }
 
 interface UseSpeechRecognitionReturn {
@@ -35,10 +45,12 @@ const noopEventHook = (_event: string, _handler: (e: unknown) => void) => {};
 export function useSpeechRecognition(
   options: UseSpeechRecognitionOptions = {},
 ): UseSpeechRecognitionReturn {
-  const { locale, onResult } = options;
+  const { locale, onResult, onError } = options;
   const [isListening, setIsListening] = useState(false);
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
   const useEvent = useSpeechRecognitionEvent ?? noopEventHook;
 
@@ -51,12 +63,19 @@ export function useSpeechRecognition(
   });
 
   useEvent('end', () => setIsListening(false));
-  useEvent('error', () => setIsListening(false));
+  useEvent('error', (event: unknown) => {
+    setIsListening(false);
+    const e = event as { error?: string };
+    onErrorRef.current?.(e.error ?? 'unknown');
+  });
 
   const start = useCallback(async () => {
     if (!ExpoSpeechRecognitionModule) return;
     const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!granted) return;
+    if (!granted) {
+      onErrorRef.current?.('not-allowed');
+      return;
+    }
 
     ExpoSpeechRecognitionModule.start({
       lang: locale ?? 'en-US',

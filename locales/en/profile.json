@@ -159,5 +159,10 @@
       "Driving risk": "Driving Risk",
       "Pool/water nearby": "Pool / Water Nearby"
     }
+  },
+  "voice": {
+    "label": "Voice",
+    "auto_speak_replies": "Read replies aloud automatically",
+    "auto_speak_replies_hint": "Moment Coach and Check-In responses will be read aloud as soon as they arrive, without needing to tap the speaker icon."
   }
 }
