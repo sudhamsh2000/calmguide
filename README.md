@@ -9,6 +9,17 @@ CalmGuide helps family caregivers (typically 55-70 years old) navigate difficult
 3. **When to Get More Help** --- Specific escalation criteria
 4. **What NOT to Do** --- Counter-intuitive mistakes caregivers commonly make
 
+## Live Deployment
+
+| Layer | Where |
+|---|---|
+| Web app | [calmguide.vercel.app](https://calmguide.vercel.app) --- Vercel, auto-deploys from `main` |
+| Backend API | Railway (Docker) |
+| Database | Railway PostgreSQL + pgvector |
+| Mobile | Android APK, distributed for testing outside the Play Store; EAS Update pushes JS/UI changes to installed builds without a new APK |
+
+The web app is currently gated behind a private invite code (`INVITE_CODE_REQUIRED=true` on the backend) --- it's in private testing, not open signup. This does not affect local development; see [Quick Start](#quick-start).
+
 ## Architecture
 
 ```
@@ -62,6 +73,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
 | **Mobile App** | React Native (Expo) with full feature parity |
 | **Offline/Degraded-Mode Awareness** | Mobile and web both detect connectivity loss (NetInfo / `navigator.onLine`) and show a localized offline banner + distinct "you're offline" error copy instead of a generic server error; `/health` also reports a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) alongside DB status. Detection only --- no request queueing or background sync yet, see [docs/DEFERRED.md](docs/DEFERRED.md) |
+| **Neural Read-Aloud + Voice Input** | AI responses can be read aloud in a natural neural voice (OpenAI `gpt-4o-mini-tts`, gated by `TTS_ENABLED` + `OPENAI_API_KEY`), with an automatic fallback to the browser's/device's own speech synthesis if neural TTS is unavailable. An "auto-speak replies" setting (Profile → Voice) reads every response aloud without tapping the speaker button. Voice *input* (mic dictation) auto-submits once the caregiver finishes speaking, instead of requiring a separate tap. |
 
 ## Tech Stack
 
@@ -122,6 +134,13 @@ npm run dev
 
 The app will be available at `http://localhost:3000`.
 
+**Note on signup:** by default `INVITE_CODE_REQUIRED=true` in the backend, so creating a new profile requires an invite code first. For local development, either set `INVITE_CODE_REQUIRED=false` in `backend/.env`, or generate a code yourself:
+
+```bash
+cd backend
+python scripts/generate_invite_codes.py --count 1 --label "local-dev"
+```
+
 ### 4. Set up RAG (optional but recommended)
 
 ```bash
@@ -139,6 +158,10 @@ python -m rag.pipeline
 ```
 
 This scrapes content from 6 trusted sources, embeds it, and stores it in PostgreSQL. Every Moment Coach query will then automatically retrieve relevant guidance and inject it into the LLM prompt.
+
+### 5. Set up mobile (optional)
+
+See [mobile/README.md](mobile/README.md) for the full Expo/EAS setup, including the local Android build path and its JDK 17 requirement.
 
 ## RAG Pipeline
 
@@ -416,6 +439,7 @@ Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, ex
 - [docs/DEFERRED.md](docs/DEFERRED.md) --- Deferred features and future roadmap (push notifications, key rotation, care team sharing, etc.)
 - [docs/AUDIT.md](docs/AUDIT.md) --- Running audit log: test/type/lint/build results, dependency CVEs, open findings and incidents, each stamped with the date and commit it was measured against
 - [docs/mobile-launch-checklist.md](docs/mobile-launch-checklist.md) --- Store submission checklist for Play and the App Store
+- [docs/MILESTONE_3_REPORT.md](docs/MILESTONE_3_REPORT.md) --- Milestone 3 report: infrastructure migration, voice/UX fixes, testing status, known limitations
 
 `docs/superpowers/` (design specs and implementation plans) is local scratch and
 is gitignored, so it is not present in a fresh clone.

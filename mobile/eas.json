@@ -5,34 +5,38 @@
   },
   "build": {
     "base": {
-      "node": "22.14.0"
+      "node": "22.14.0",
+      "channel": "base"
     },
     "development": {
       "extends": "base",
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
       "extends": "base",
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://cgapi.trybabble.io"
+        "EXPO_PUBLIC_API_URL": "https://calmguide-production.up.railway.app"
       },
       "android": {
         "buildType": "apk"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "extends": "base",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://cgapi.trybabble.io"
+        "EXPO_PUBLIC_API_URL": "https://calmguide-production.up.railway.app"
       },
       "android": {
         "buildType": "app-bundle"
       },
       "ios": {
         "autoIncrement": true
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {

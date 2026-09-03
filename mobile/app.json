@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CalmGuide",
-    "slug": "calmguide",
+    "slug": "calmguid",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -26,7 +26,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": ["android.permission.RECORD_AUDIO"],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
       "package": "com.calmguide.app",
       "allowBackup": false,
       "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW"]
@@ -60,7 +65,9 @@
         {
           "microphonePermission": "CalmGuide needs microphone access so you can describe caregiving situations by voice.",
           "speechRecognitionPermission": "CalmGuide uses speech recognition to convert your voice to text.",
-          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
         }
       ],
       "expo-secure-store",
@@ -72,7 +79,8 @@
           "android": {
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true,
-            "usesCleartextTraffic": false
+            "usesCleartextTraffic": false,
+            "enableMinifyInReleaseBuilds": true
           }
         }
       ],
@@ -86,8 +94,15 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4eaa78af-a5b7-448f-b1f6-d23842eadfe2"
+        "projectId": "76f3d2f3-86c3-40b1-b68d-891fc23235c6"
       }
+    },
+    "owner": "sudhamsh8s-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/76f3d2f3-86c3-40b1-b68d-891fc23235c6"
     }
   }
 }
