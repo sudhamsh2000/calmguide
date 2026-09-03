@@ -111,6 +111,17 @@ export interface CreateProfileData {
   behavioral_patterns: string[];
   calming_strategies: string[];
   safety_concerns: string[];
+  /**
+   * Required only when the backend has INVITE_CODE_REQUIRED set (private
+   * testing — the default). Optional here so the type doesn't lie to callers
+   * running against a backend with the gate off, but omitting it against a
+   * gated backend gets a 403.
+   */
+  invite_code?: string;
+}
+
+export interface ValidateInviteCodeResponse {
+  valid: boolean;
 }
 
 export interface CreateProfileResponse {
@@ -171,6 +182,24 @@ export interface ScenarioInteractParams {
 }
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
+
+/**
+ * Pre-flight check for the invite code shown before profile creation. The
+ * server re-validates independently in createProfile(), so this is purely a
+ * UX convenience — it lets the wizard reject a bad code on its own step
+ * instead of failing at the final "Create Profile" press, several steps later.
+ */
+export async function validateInviteCode(code: string): Promise<ValidateInviteCodeResponse> {
+  const res = await fetchWithTimeout(`${API_BASE}/api/invite-codes/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getLocaleHeaders() },
+    body: JSON.stringify({ code }),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to validate invite code');
+  }
+  return res.json() as Promise<ValidateInviteCodeResponse>;
+}
 
 export async function createProfile(data: CreateProfileData): Promise<CreateProfileResponse> {
   const res = await fetchWithTimeout(`${API_BASE}/api/profiles`, {

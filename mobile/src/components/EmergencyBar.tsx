@@ -18,13 +18,17 @@ export function EmergencyBar() {
   const [expanded, setExpanded] = useState(false);
 
   const isTabRoute = segments.includes('(tabs)');
-  const hasStickyPrimaryAction = pathname === '/login' || pathname === '/profile/setup';
+  // Every route with its own fixed bottom input/action bar needs the larger
+  // offset, or the FAB sits on top of it — on /coach this covered the Send
+  // button badly enough to intercept its taps, not just look bad.
+  const hasStickyPrimaryAction =
+    pathname === '/login' || pathname === '/profile/setup' || pathname === '/coach';
   // The welcome screen ends in the Leap of Faith partner band. Without its own
   // offset this button lands squarely on top of the partner logo, which is the
   // one thing on that screen that must not be obscured.
   const hasPartnerBand = pathname === '/';
   const bottomOffset =
-    insets.bottom + (isTabRoute ? 68 : hasStickyPrimaryAction ? 92 : hasPartnerBand ? 80 : 14);
+    insets.bottom + (isTabRoute ? 68 : hasStickyPrimaryAction ? 118 : hasPartnerBand ? 80 : 14);
 
   function handleCall(number: string) {
     setExpanded(false);
@@ -45,12 +49,19 @@ export function EmergencyBar() {
           onPress={() => setExpanded(true)}
           accessibilityRole="button"
           accessibilityLabel={t('emergency.label', 'Emergency contacts')}
+          hitSlop={4}
+          // A standard-size circular FAB (52dp), not a labeled pill. The pill
+          // was ~370px wide and, being an absolutely-positioned overlay with no
+          // awareness of what's beneath it, regularly covered real content —
+          // list card text, form fields — on any screen with enough content to
+          // reach the bottom-right corner. A FAB-sized circle still covers
+          // something in that corner, but only a small fixed patch of it,
+          // which is the standard tradeoff for a persistent floating control.
           style={({ pressed }) => ({
-            minHeight: 52,
-            minWidth: 52,
+            height: 52,
+            width: 52,
             borderRadius: 26,
             backgroundColor: colors.error,
-            paddingHorizontal: 16,
             alignItems: 'center',
             justifyContent: 'center',
             borderWidth: 1,
@@ -63,9 +74,7 @@ export function EmergencyBar() {
             elevation: 6,
           })}
         >
-          <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 15 }}>
-            {t('emergency.label', 'Emergency')}
-          </Text>
+          <Text style={{ color: '#FFF', fontWeight: '900', fontSize: 24, lineHeight: 26 }}>!</Text>
         </Pressable>
       </View>
 
