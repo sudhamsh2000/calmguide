@@ -102,7 +102,16 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  // 'standalone' bundles a self-contained server.js — frontend/Dockerfile
+  // copies .next/standalone directly (see its runner stage) for the
+  // self-hosted Docker deployment. Vercel needs the *opposite*: its own build
+  // pipeline post-processes the default output (traces
+  // .next/next-server.js.nft.json for its serverless function bundling), and
+  // 'standalone' skips producing that file, which breaks the build with
+  // `ENOENT … next-server.js.nft.json` after `next build` itself has already
+  // succeeded. Vercel sets VERCEL=1 during build, so this is off there and on
+  // everywhere else (Docker, local `npm run build`).
+  output: process.env.VERCEL ? undefined : 'standalone',
   images: {
     // Next's default for the image optimizer route is
     // `Content-Disposition: attachment`, which some Chromium builds treat as
