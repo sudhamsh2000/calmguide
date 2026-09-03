@@ -50,6 +50,12 @@ _TTS_INSTRUCTIONS = (
     "who is stressed and tired. Keep a steady, reassuring pace."
 )
 
+# The instructions above ask for an unhurried delivery, which combined with
+# the model's default rate reads as sluggish rather than calm. Nudging speed
+# above 1.0 keeps the warm tone while moving the pace closer to natural
+# conversational speech.
+_TTS_SPEED = 1.15
+
 
 class TTSUnavailable(RuntimeError):
     """Synthesis could not be produced; the caller should fall back to local speech."""
@@ -99,6 +105,7 @@ async def synthesize_speech(text: str) -> bytes:
             input=cleaned,
             instructions=_TTS_INSTRUCTIONS,
             response_format=_TTS_FORMAT,
+            speed=_TTS_SPEED,
         )
         return response.content
     except Exception as exc:
