@@ -4,9 +4,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "predev": "rsync -a --delete ../locales/ ./locales/",
+    "predev": "node scripts/sync-locales.js",
     "dev": "next dev --turbopack",
-    "prebuild": "rsync -a --delete ../locales/ ./locales/",
+    "prebuild": "node scripts/sync-locales.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
