@@ -181,6 +181,12 @@ export function useSpeechSynthesis(
   const stopNeural = useCallback(() => {
     const current = neuralRef.current;
     if (!current) return;
+    // Detach handlers first: assigning `src = ''` below fires the <audio>
+    // element's own `error` event, which would otherwise reach onerror and
+    // trigger the local-voice fallback right after a successful playback —
+    // reading every response aloud twice, once neural then once robotic.
+    current.audio.onended = null;
+    current.audio.onerror = null;
     current.audio.pause();
     current.audio.src = '';
     URL.revokeObjectURL(current.url);
