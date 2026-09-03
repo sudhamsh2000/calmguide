@@ -1,7 +1,8 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, type ComponentProps } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const CHECKIN_MAX_CHARS = 1000;
 import { useLocale, useTranslations } from 'next-intl';
@@ -14,6 +15,48 @@ import { MicButton } from '@/components/ui/MicButton';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
+
+const markdownComponents: ComponentProps<typeof ReactMarkdown>['components'] = {
+  p: ({ children }) => (
+    <p className="text-base leading-relaxed text-foreground mb-2 last:mb-0">{children}</p>
+  ),
+  ul: ({ children }) => (
+    <ul className="list-disc ps-5 space-y-1 text-base text-foreground">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal ps-5 space-y-1 text-base text-foreground">{children}</ol>
+  ),
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  h2: ({ children }) => (
+    <h2 className="font-semibold text-lg text-foreground mt-3 mb-1 first:mt-0">{children}</h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="font-semibold text-base text-foreground mt-3 mb-1 first:mt-0">{children}</h3>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="border-s-2 border-foreground/20 ps-3 text-foreground">
+      {children}
+    </blockquote>
+  ),
+};
+
+// Defense-in-depth allowlist for LLM-rendered markdown, matching
+// CoachResponseRenderer's — no img/a/embedded HTML, plus h2 since crisis
+// escalation copy (checkin's other frequent response shape) opens with one.
+const ALLOWED_MARKDOWN_ELEMENTS: ReadonlyArray<string> = [
+  'p',
+  'ul',
+  'ol',
+  'li',
+  'strong',
+  'em',
+  'h2',
+  'h3',
+  'br',
+  'blockquote',
+  'code',
+  'pre',
+];
 
 export function CheckInScreen() {
   const t = useTranslations('checkin');
@@ -156,6 +199,7 @@ export function CheckInScreen() {
               <MicButton
                 onTranscript={handleVoiceTranscript}
                 onListeningChange={handleListeningChange}
+                onSpeechEnd={handleSubmit}
               />
             </div>
           </div>
@@ -196,9 +240,14 @@ export function CheckInScreen() {
           <div className="flex justify-end mb-2">
             <SpeakButton text={response} />
           </div>
-          <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">
+          <ReactMarkdown
+            components={markdownComponents}
+            allowedElements={ALLOWED_MARKDOWN_ELEMENTS}
+            unwrapDisallowed
+            skipHtml
+          >
             {response}
-          </p>
+          </ReactMarkdown>
         </div>
       )}
 

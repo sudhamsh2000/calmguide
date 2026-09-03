@@ -131,6 +131,7 @@ export function CoachInput({
               onTranscript={handleVoiceTranscript}
               onInterim={handleInterim}
               onListeningChange={handleListeningChange}
+              onSpeechEnd={handleSubmit}
               disabled={disabled}
             />
           </div>

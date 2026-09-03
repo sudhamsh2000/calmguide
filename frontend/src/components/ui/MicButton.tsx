@@ -8,6 +8,14 @@ export interface MicButtonProps {
   onTranscript: (text: string) => void;
   onInterim?: (text: string) => void;
   onListeningChange?: (isListening: boolean) => void;
+  /**
+   * Fires once the recognition engine has actually finished — after any
+   * trailing final `onTranscript` for the last utterance. Use this (not
+   * `onListeningChange(false)`) to auto-submit on "done speaking": the
+   * listening-change callback fires the instant the button is clicked,
+   * before the browser delivers that last transcript.
+   */
+  onSpeechEnd?: () => void;
   disabled?: boolean;
   className?: string;
 }
@@ -16,6 +24,7 @@ export function MicButton({
   onTranscript,
   onInterim,
   onListeningChange,
+  onSpeechEnd,
   disabled = false,
   className = '',
 }: MicButtonProps) {
@@ -24,6 +33,7 @@ export function MicButton({
     locale,
     onResult: onTranscript,
     onInterim,
+    onEnd: onSpeechEnd,
   });
 
   const handleClick = useCallback(() => {

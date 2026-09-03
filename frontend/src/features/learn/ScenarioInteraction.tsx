@@ -263,6 +263,7 @@ export function ScenarioInteraction({ scenarioId, className = '' }: ScenarioInte
               <MicButton
                 onTranscript={handleVoiceTranscript}
                 onListeningChange={handleListeningChange}
+                onSpeechEnd={handleSubmit}
                 disabled={submitting}
               />
             </div>

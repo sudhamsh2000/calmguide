@@ -93,6 +93,7 @@ export function CoachFooterInput({ onSubmit, disabled = false }: CoachFooterInpu
         onTranscript={handleVoiceTranscript}
         onInterim={handleInterim}
         onListeningChange={handleListeningChange}
+        onSpeechEnd={handleSubmit}
         disabled={disabled}
         className="shrink-0"
       />
