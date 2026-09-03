@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { clearAll } from '@/lib/storage';
+import { clearAll, getAccessCode } from '@/lib/storage';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 /**
@@ -32,11 +32,25 @@ export function SignOutButton({
   const t = useTranslations('profile');
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // The header (icon variant) renders on every locale page, including
+  // /login before an access code is entered — with no signed-in session to
+  // sign out of there, the icon read as unexplained chrome and sat right
+  // next to the access-code flow, so a caregiver tapping near it landed on
+  // this confirmation instead. Hide it until a session actually exists.
+  // Starts false (not derived from localStorage) so server and first client
+  // render match; the effect flips it right after mount, before paint.
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    setSignedIn(!!getAccessCode());
+  }, []);
 
   const handleSignOut = () => {
     clearAll();
     router.push('/');
   };
+
+  if (variant === 'icon' && !signedIn) return null;
 
   return (
     <>
