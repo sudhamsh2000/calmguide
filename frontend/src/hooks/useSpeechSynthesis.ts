@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 import { getSpeechStatus, synthesizeSpeech } from '@/lib/api';
 
@@ -110,36 +110,226 @@ function pickVoice(
   return localeMatches.find((v) => !v.localService) ?? localeMatches[0];
 }
 
+/**
+ * Module-level playback state, shared by every component using this hook.
+ *
+ * Only one thing can audibly play at a time, but each call site (the
+ * per-message SpeakButton, plus the page-level auto-speak-on-reply effect)
+ * used to keep its own private `isSpeaking`/`isPaused` state and its own
+ * private <audio> ref. That meant a SpeakButton had no way to know that
+ * *some other* instance had started playback: tapping it saw its own
+ * `isSpeaking === false` and started a second, overlapping read instead of
+ * stopping the first, and leaving the page only tore down whichever
+ * instance happened to unmount — not whatever was actually still playing.
+ * Hoisting the live state here gives every instance the same view of what's
+ * really happening, and lets any of them stop it.
+ */
+interface SharedSpeechState {
+  isSpeaking: boolean;
+  isPaused: boolean;
+}
+
+let sharedState: SharedSpeechState = { isSpeaking: false, isPaused: false };
+const listeners = new Set<() => void>();
+
+function setSharedState(patch: Partial<SharedSpeechState>) {
+  sharedState = { ...sharedState, ...patch };
+  listeners.forEach((listener) => listener());
+}
+
+function subscribeShared(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getSharedSnapshot(): SharedSpeechState {
+  return sharedState;
+}
+
+function getServerSnapshot(): SharedSpeechState {
+  return { isSpeaking: false, isPaused: false };
+}
+
+// Neural TTS, when the server has it enabled. The browser's own voices are
+// limited to the platform's basic bundled set, which reads robotically no
+// matter how it's tuned — see app/services/speech.py.
+let neuralPlayback: { audio: HTMLAudioElement; url: string } | null = null;
+// Guards against an out-of-order response: if the caregiver stops or starts a
+// new read while synthesis is still in flight, the stale audio must not play.
+let activeRequestId = 0;
+// Keep-alive for Chrome's 15s cutoff, and a flag so it never fights a pause
+// the caregiver asked for.
+let keepAliveTimer: ReturnType<typeof setInterval> | null = null;
+let userPaused = false;
+
+function clearKeepAlive() {
+  if (keepAliveTimer !== null) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = null;
+  }
+}
+
+/** Tear down any in-flight neural playback and release its object URL. */
+function stopNeural() {
+  const current = neuralPlayback;
+  if (!current) return;
+  // Detach handlers first: assigning `src = ''` below fires the <audio>
+  // element's own `error` event, which would otherwise reach onerror and
+  // trigger the local-voice fallback right after a successful playback —
+  // reading every response aloud twice, once neural then once robotic.
+  current.audio.onended = null;
+  current.audio.onerror = null;
+  current.audio.pause();
+  current.audio.src = '';
+  URL.revokeObjectURL(current.url);
+  neuralPlayback = null;
+}
+
+function stopAll() {
+  activeRequestId += 1; // invalidate any synthesis still in flight
+  clearKeepAlive();
+  userPaused = false;
+  stopNeural();
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  setSharedState({ isSpeaking: false, isPaused: false });
+}
+
+/** Browser-local speech. Always available as the fallback path. */
+function speakLocal(text: string, locale?: string) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = SPEECH_RATE;
+  utterance.pitch = SPEECH_PITCH;
+
+  if (locale) {
+    const voices = window.speechSynthesis.getVoices();
+    const match = pickVoice(voices, locale);
+    if (match) utterance.voice = match;
+    utterance.lang = locale;
+  }
+
+  utterance.onstart = () => {
+    setSharedState({ isSpeaking: true, isPaused: false });
+    // See CHROME_RESUME_INTERVAL_MS. Only nudges when the caregiver has not
+    // deliberately paused, so this can't undo their own pause.
+    clearKeepAlive();
+    keepAliveTimer = setInterval(() => {
+      if (!userPaused && window.speechSynthesis.speaking) {
+        window.speechSynthesis.resume();
+      }
+    }, CHROME_RESUME_INTERVAL_MS);
+  };
+  utterance.onend = () => {
+    clearKeepAlive();
+    userPaused = false;
+    setSharedState({ isSpeaking: false, isPaused: false });
+  };
+  utterance.onerror = () => {
+    clearKeepAlive();
+    userPaused = false;
+    setSharedState({ isSpeaking: false, isPaused: false });
+  };
+  utterance.onpause = () => setSharedState({ isPaused: true });
+  utterance.onresume = () => setSharedState({ isPaused: false });
+
+  window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Speak `text`, preferring the neural voice and falling back to the
+ * browser's own on any failure. Marked speaking immediately rather than on
+ * playback start, so the button reacts to the press even though synthesis
+ * takes a moment — otherwise it reads as an unresponsive control.
+ */
+function speak(text: string, locale: string | undefined, neuralAvailable: boolean) {
+  stopAll();
+  const requestId = activeRequestId;
+
+  if (!neuralAvailable) {
+    speakLocal(text, locale);
+    return;
+  }
+
+  setSharedState({ isSpeaking: true, isPaused: false });
+  synthesizeSpeech(text)
+    .then((url) => {
+      // Superseded by a newer press, or stopped while synthesizing.
+      if (requestId !== activeRequestId) {
+        if (url) URL.revokeObjectURL(url);
+        return;
+      }
+      if (!url) {
+        setSharedState({ isSpeaking: false });
+        speakLocal(text, locale);
+        return;
+      }
+
+      const audio = new Audio(url);
+      neuralPlayback = { audio, url };
+      audio.onended = () => {
+        setSharedState({ isSpeaking: false, isPaused: false });
+        stopNeural();
+      };
+      audio.onerror = () => {
+        // Synthesis succeeded but playback didn't; still better to read it
+        // aloud badly than not at all.
+        setSharedState({ isSpeaking: false });
+        stopNeural();
+        speakLocal(text, locale);
+      };
+      audio.play().catch(() => {
+        setSharedState({ isSpeaking: false });
+        stopNeural();
+        speakLocal(text, locale);
+      });
+    })
+    .catch(() => {
+      if (requestId !== activeRequestId) return;
+      setSharedState({ isSpeaking: false });
+      speakLocal(text, locale);
+    });
+}
+
+function pauseAll() {
+  userPaused = true;
+  if (neuralPlayback) {
+    neuralPlayback.audio.pause();
+    setSharedState({ isPaused: true });
+    return;
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.pause();
+  }
+}
+
+function resumeAll() {
+  userPaused = false;
+  if (neuralPlayback) {
+    void neuralPlayback.audio.play();
+    setSharedState({ isPaused: false });
+    return;
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.resume();
+  }
+}
+
 export function useSpeechSynthesis(
   options: UseSpeechSynthesisOptions = {},
 ): UseSpeechSynthesisReturn {
   const { locale } = options;
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  // Neural TTS, when the server has it enabled. The browser's own voices are
-  // limited to the platform's basic bundled set, which reads robotically no
-  // matter how it's tuned — see app/services/speech.py. `neuralRef` holds the
-  // active <audio> element and its object URL so playback can be stopped and
-  // the URL revoked without leaking.
   const [neuralAvailable, setNeuralAvailable] = useState(false);
-  const neuralRef = useRef<{ audio: HTMLAudioElement; url: string } | null>(null);
-  // Guards against an out-of-order response: if the user stops or starts a new
-  // read while synthesis is still in flight, the stale audio must not play.
-  const requestIdRef = useRef(0);
-  // Keep-alive for Chrome's 15s cutoff, and a flag so it never fights a pause
-  // the caregiver asked for.
-  const keepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const userPausedRef = useRef(false);
 
-  const clearKeepAlive = useCallback(() => {
-    if (keepAliveRef.current !== null) {
-      clearInterval(keepAliveRef.current);
-      keepAliveRef.current = null;
-    }
-  }, []);
+  const { isSpeaking, isPaused } = useSyncExternalStore(
+    subscribeShared,
+    getSharedSnapshot,
+    getServerSnapshot,
+  );
 
   useEffect(() => {
     const supported = typeof window !== 'undefined' && !!window.speechSynthesis;
@@ -177,176 +367,31 @@ export function useSpeechSynthesis(
     };
   }, []);
 
-  /** Tear down any in-flight neural playback and release its object URL. */
-  const stopNeural = useCallback(() => {
-    const current = neuralRef.current;
-    if (!current) return;
-    // Detach handlers first: assigning `src = ''` below fires the <audio>
-    // element's own `error` event, which would otherwise reach onerror and
-    // trigger the local-voice fallback right after a successful playback —
-    // reading every response aloud twice, once neural then once robotic.
-    current.audio.onended = null;
-    current.audio.onerror = null;
-    current.audio.pause();
-    current.audio.src = '';
-    URL.revokeObjectURL(current.url);
-    neuralRef.current = null;
-  }, []);
-
-  const stop = useCallback(() => {
-    requestIdRef.current += 1; // invalidate any synthesis still in flight
-    clearKeepAlive();
-    userPausedRef.current = false;
-    stopNeural();
-    if (isSupported) window.speechSynthesis.cancel();
-    setIsSpeaking(false);
-    setIsPaused(false);
-  }, [isSupported, stopNeural, clearKeepAlive]);
-
-  /** Browser-local speech. Always available as the fallback path. */
-  const speakLocal = useCallback(
-    (text: string) => {
-      if (!isSupported) return;
-      window.speechSynthesis.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utteranceRef.current = utterance;
-      utterance.rate = SPEECH_RATE;
-      utterance.pitch = SPEECH_PITCH;
-
-      if (locale) {
-        const voices = window.speechSynthesis.getVoices();
-        const match = pickVoice(voices, locale);
-        if (match) utterance.voice = match;
-        utterance.lang = locale;
-      }
-
-      utterance.onstart = () => {
-        setIsSpeaking(true);
-        setIsPaused(false);
-        // See CHROME_RESUME_INTERVAL_MS. Only nudges when the caregiver has not
-        // deliberately paused, so this can't undo their own pause.
-        clearKeepAlive();
-        keepAliveRef.current = setInterval(() => {
-          if (!userPausedRef.current && window.speechSynthesis.speaking) {
-            window.speechSynthesis.resume();
-          }
-        }, CHROME_RESUME_INTERVAL_MS);
-      };
-      utterance.onend = () => {
-        clearKeepAlive();
-        userPausedRef.current = false;
-        setIsSpeaking(false);
-        setIsPaused(false);
-      };
-      utterance.onerror = () => {
-        clearKeepAlive();
-        userPausedRef.current = false;
-        setIsSpeaking(false);
-        setIsPaused(false);
-      };
-      utterance.onpause = () => setIsPaused(true);
-      utterance.onresume = () => setIsPaused(false);
-
-      window.speechSynthesis.speak(utterance);
-    },
-    [isSupported, locale, clearKeepAlive],
+  const speakFn = useCallback(
+    (text: string) => speak(text, locale, neuralAvailable),
+    [locale, neuralAvailable],
   );
+  const stopFn = useCallback(() => stopAll(), []);
+  const pauseFn = useCallback(() => pauseAll(), []);
+  const resumeFn = useCallback(() => resumeAll(), []);
 
-  /**
-   * Speak `text`, preferring the neural voice and falling back to the
-   * browser's own on any failure. Marked speaking immediately rather than on
-   * playback start, so the button reacts to the press even though synthesis
-   * takes a moment — otherwise it reads as an unresponsive control.
-   */
-  const speak = useCallback(
-    (text: string) => {
-      stop();
-      const requestId = requestIdRef.current;
-
-      if (!neuralAvailable) {
-        speakLocal(text);
-        return;
-      }
-
-      setIsSpeaking(true);
-      synthesizeSpeech(text)
-        .then((url) => {
-          // Superseded by a newer press, or stopped while synthesizing.
-          if (requestId !== requestIdRef.current) {
-            if (url) URL.revokeObjectURL(url);
-            return;
-          }
-          if (!url) {
-            setIsSpeaking(false);
-            speakLocal(text);
-            return;
-          }
-
-          const audio = new Audio(url);
-          neuralRef.current = { audio, url };
-          audio.onended = () => {
-            setIsSpeaking(false);
-            setIsPaused(false);
-            stopNeural();
-          };
-          audio.onerror = () => {
-            // Synthesis succeeded but playback didn't; still better to read it
-            // aloud badly than not at all.
-            setIsSpeaking(false);
-            stopNeural();
-            speakLocal(text);
-          };
-          audio.play().catch(() => {
-            setIsSpeaking(false);
-            stopNeural();
-            speakLocal(text);
-          });
-        })
-        .catch(() => {
-          if (requestId !== requestIdRef.current) return;
-          setIsSpeaking(false);
-          speakLocal(text);
-        });
-    },
-    [neuralAvailable, speakLocal, stop, stopNeural],
-  );
-
-  const pause = useCallback(() => {
-    userPausedRef.current = true;
-    if (neuralRef.current) {
-      neuralRef.current.audio.pause();
-      setIsPaused(true);
-      return;
-    }
-    if (!isSupported) return;
-    window.speechSynthesis.pause();
-  }, [isSupported]);
-
-  const resume = useCallback(() => {
-    userPausedRef.current = false;
-    if (neuralRef.current) {
-      void neuralRef.current.audio.play();
-      setIsPaused(false);
-      return;
-    }
-    if (!isSupported) return;
-    window.speechSynthesis.resume();
-  }, [isSupported]);
-
+  // Stops whatever is actually playing when a screen using read-aloud is
+  // left — e.g. navigating away from Moment Coach mid-response. Safe to run
+  // from every instance's unmount (multiple instances on one page all
+  // unmount together on navigation): stopAll() is idempotent, and it always
+  // targets the one real shared playback rather than a possibly-empty local
+  // ref.
   useEffect(() => {
     return () => {
-      clearKeepAlive();
-      stopNeural();
-      if (isSupported) window.speechSynthesis?.cancel();
+      stopAll();
     };
-  }, [isSupported, stopNeural, clearKeepAlive]);
+  }, []);
 
   return {
-    speak,
-    stop,
-    pause,
-    resume,
+    speak: speakFn,
+    stop: stopFn,
+    pause: pauseFn,
+    resume: resumeFn,
     isSpeaking,
     isPaused,
     isSupported,
