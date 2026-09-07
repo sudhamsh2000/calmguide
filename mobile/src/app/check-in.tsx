@@ -176,6 +176,7 @@ function CheckInScreenInner() {
                 <MicButton
                   onTranscript={(text) => setMessage((prev) => (prev ? prev + ' ' + text : text))}
                   onListeningChange={setIsListening}
+                  onSpeechEnd={handleShare}
                 />
               </View>
               {isListening && (

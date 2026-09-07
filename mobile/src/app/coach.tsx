@@ -380,6 +380,21 @@ function CoachScreenInner() {
 
   const currentSections = useMemo(() => parseCoachResponse(rawResponse), [rawResponse]);
 
+  // Auto-submit handlers for the mic buttons' onSpeechEnd — fires once
+  // recognition truly finishes, mirroring the web CoachInput/CoachFooterInput
+  // handleSubmit wired to MicButton's onSpeechEnd.
+  const handleInitialSubmit = useCallback(() => {
+    if (!inputText.trim()) return;
+    sendMessage(inputText);
+    setInputText('');
+  }, [inputText, sendMessage]);
+
+  const handleFooterSubmit = useCallback(() => {
+    if (!footerText.trim() || isStreaming) return;
+    sendMessage(footerText);
+    setFooterText('');
+  }, [footerText, isStreaming, sendMessage]);
+
   return (
     <>
       <Stack.Screen options={{ title: t('title') }} />
@@ -440,6 +455,7 @@ function CoachScreenInner() {
                   <View style={{ position: 'absolute', bottom: 10, end: 10 }}>
                     <MicButton
                       onTranscript={(t) => setInputText((prev) => (prev ? prev + ' ' + t : t))}
+                      onSpeechEnd={handleInitialSubmit}
                     />
                   </View>
                 </View>
@@ -447,10 +463,7 @@ function CoachScreenInner() {
                   size="lg"
                   variant="primary"
                   disabled={!inputText.trim()}
-                  onPress={() => {
-                    sendMessage(inputText);
-                    setInputText('');
-                  }}
+                  onPress={handleInitialSubmit}
                   style={{ minHeight: 56 }}
                 >
                   {t('submit_button')}
@@ -607,15 +620,13 @@ function CoachScreenInner() {
               />
               <MicButton
                 onTranscript={(t) => setFooterText((prev) => (prev ? prev + ' ' + t : t))}
+                onSpeechEnd={handleFooterSubmit}
                 disabled={isStreaming}
                 transparent
               />
               <Pressable
                 disabled={!footerText.trim() || isStreaming}
-                onPress={() => {
-                  sendMessage(footerText);
-                  setFooterText('');
-                }}
+                onPress={handleFooterSubmit}
                 accessibilityRole="button"
                 accessibilityLabel={tc('accessibility.send_message')}
                 accessibilityState={{ disabled: !footerText.trim() || isStreaming }}
