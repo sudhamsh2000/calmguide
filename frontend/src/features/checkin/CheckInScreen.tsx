@@ -147,7 +147,15 @@ export function CheckInScreen() {
   }, [message, speak]);
 
   return (
-    <div className="flex flex-col gap-5 px-5 pt-5 pb-8">
+    <div className="relative flex flex-col gap-5 px-5 pt-5 pb-8">
+      {/* Decorative section glow (design/design.md §19) — one small, static
+       * blob behind the header only, well clear of the textarea and the
+       * streamed-response card (both sit on opaque surfaces), so nothing
+       * reduces legibility of a caregiver's own words or the coach's reply. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="decor-blob decor-blob-mint -top-10 -end-16 h-56 w-56" />
+      </div>
+
       {/* Header */}
       <div className="flex items-center gap-3">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
