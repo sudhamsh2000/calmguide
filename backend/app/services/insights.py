@@ -109,6 +109,9 @@ _STOPWORDS = {
     "told",
     "gave",
     "give",
+    "should",
+    "keeps",
+    "patient",
 }
 
 
@@ -200,15 +203,38 @@ async def compute_profile_insights(profile_id: str, db: AsyncSession) -> dict:
     resolved = sum(1 for msgs in sessions.values() if sum(1 for m in msgs if m.role == "user") == 1)
     resolution_rate = round(resolved / windowed_sessions, 2) if windowed_sessions > 0 else 0.0
 
-    # Top trigger keywords from user messages
-    words: list[str] = []
+    # Top trigger keywords from user messages.
+    #
+    # No structured "patient name" field exists here to filter against — by
+    # design, names are never persisted server-side (see the privacy note in
+    # README.md). But a caregiver's own loved one's name is the single most
+    # frequent word in nearly every message about them ("Chandler is
+    # agitated", "Chandler won't eat"), which drowned out every real trigger
+    # and, worse, surfaced the person's own name back to the caregiver
+    # labeled as a "trigger."
+    #
+    # A genuine trigger word (wandering, bathing, aggression) shows up
+    # lowercase whenever it isn't sentence-initial. A name is capitalized
+    # every single time, including mid-sentence — but caregivers often open
+    # a message with the name too ("Chandler is..."), so checking only
+    # "capitalized and not the first word" misses names that happen to
+    # always lead the sentence in this caregiver's phrasing. Instead: collect
+    # every occurrence's exact case first, then drop any word that was
+    # capitalized *every* time it appeared — a real trigger word will show up
+    # lowercase somewhere in a large-enough sample, a name never will.
+    raw_occurrences: list[str] = []
     for msgs in sessions.values():
         for m in msgs:
             if m.role == "user":
                 text = decrypt(m.content)
-                words.extend(
-                    w for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _STOPWORDS
-                )
+                raw_occurrences.extend(re.findall(r"[A-Za-z]{4,}", text))
+
+    lowercase_seen: set[str] = {w.lower() for w in raw_occurrences if w[0].islower()}
+    words = [
+        w.lower()
+        for w in raw_occurrences
+        if w.lower() in lowercase_seen and w.lower() not in _STOPWORDS
+    ]
     top_triggers = [w for w, _ in Counter(words).most_common(5)]
 
     # Feedback-based metrics
