@@ -162,6 +162,24 @@ let activeRequestId = 0;
 let keepAliveTimer: ReturnType<typeof setInterval> | null = null;
 let userPaused = false;
 
+/**
+ * How many `useSpeechSynthesis()` instances are currently mounted anywhere
+ * on the page. Moment Coach mounts one instance per rendered section
+ * (SpeakButton) plus one page-level instance for auto-speak, and those
+ * per-section instances mount and unmount individually as sections appear
+ * during streaming (CoachResponseRenderer swaps its raw-response fallback
+ * for the sectioned view once section markers are detected) — not only
+ * "together on navigation" as originally assumed. Calling stopAll() from
+ * every instance's unmount used to nuke ANY in-flight request — including
+ * one just started by a completely different instance, such as the
+ * page-level auto-speak effect's synthesizeSpeech() call racing a
+ * SpeakButton mounting/unmounting as the next section streams in — because
+ * stopAll() bumps the shared activeRequestId and the resolved fetch then
+ * finds itself invalidated. Only stop playback when the LAST instance
+ * leaves, which is what "the caregiver left this screen" actually means.
+ */
+let mountedInstanceCount = 0;
+
 function clearKeepAlive() {
   if (keepAliveTimer !== null) {
     clearInterval(keepAliveTimer);
@@ -376,14 +394,17 @@ export function useSpeechSynthesis(
   const resumeFn = useCallback(() => resumeAll(), []);
 
   // Stops whatever is actually playing when a screen using read-aloud is
-  // left — e.g. navigating away from Moment Coach mid-response. Safe to run
-  // from every instance's unmount (multiple instances on one page all
-  // unmount together on navigation): stopAll() is idempotent, and it always
-  // targets the one real shared playback rather than a possibly-empty local
-  // ref.
+  // left — e.g. navigating away from Moment Coach mid-response. Only the
+  // LAST instance to unmount triggers this (see mountedInstanceCount above)
+  // — otherwise a SpeakButton mounting/unmounting as a new section streams
+  // in would cancel an unrelated in-flight request from another instance.
   useEffect(() => {
+    mountedInstanceCount += 1;
     return () => {
-      stopAll();
+      mountedInstanceCount -= 1;
+      if (mountedInstanceCount <= 0) {
+        stopAll();
+      }
     };
   }, []);
 
