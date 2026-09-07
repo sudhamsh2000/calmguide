@@ -30,6 +30,16 @@ interface UseSpeechRecognitionOptions {
    * than being swallowed.
    */
   onError?: (code: string) => void;
+  /**
+   * Fired when recognition actually finishes — after any trailing final
+   * `onResult` for the last utterance. Use this (not the listening-state
+   * flip) to auto-submit on "done speaking": `stop()`/the listening state
+   * change happens the instant the mic button is pressed, before the
+   * recognizer delivers that last transcript, so acting on it directly would
+   * submit whatever was transcribed a moment too early. Mirrors the web
+   * hook's `onEnd` (frontend/src/hooks/useSpeechRecognition.ts).
+   */
+  onEnd?: () => void;
 }
 
 interface UseSpeechRecognitionReturn {
@@ -45,12 +55,14 @@ const noopEventHook = (_event: string, _handler: (e: unknown) => void) => {};
 export function useSpeechRecognition(
   options: UseSpeechRecognitionOptions = {},
 ): UseSpeechRecognitionReturn {
-  const { locale, onResult, onError } = options;
+  const { locale, onResult, onError, onEnd } = options;
   const [isListening, setIsListening] = useState(false);
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
+  const onEndRef = useRef(onEnd);
+  onEndRef.current = onEnd;
 
   const useEvent = useSpeechRecognitionEvent ?? noopEventHook;
 
@@ -62,7 +74,10 @@ export function useSpeechRecognition(
     }
   });
 
-  useEvent('end', () => setIsListening(false));
+  useEvent('end', () => {
+    setIsListening(false);
+    onEndRef.current?.();
+  });
   useEvent('error', (event: unknown) => {
     setIsListening(false);
     const e = event as { error?: string };

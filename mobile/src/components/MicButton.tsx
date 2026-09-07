@@ -8,6 +8,13 @@ import Svg, { Path, Line } from 'react-native-svg';
 interface MicButtonProps {
   onTranscript: (text: string) => void;
   onListeningChange?: (listening: boolean) => void;
+  /**
+   * Fires once recognition has actually finished — after any trailing final
+   * `onTranscript` for the last utterance. Wire this to a submit handler to
+   * auto-submit when the caregiver stops speaking, matching the web MicButton
+   * (frontend/src/components/ui/MicButton.tsx).
+   */
+  onSpeechEnd?: () => void;
   disabled?: boolean;
   transparent?: boolean;
 }
@@ -15,6 +22,7 @@ interface MicButtonProps {
 export function MicButton({
   onTranscript,
   onListeningChange,
+  onSpeechEnd,
   disabled = false,
   transparent = false,
 }: MicButtonProps) {
@@ -47,6 +55,7 @@ export function MicButton({
     locale: i18n.language,
     onResult: onTranscript,
     onError: handleError,
+    onEnd: onSpeechEnd,
   });
 
   useEffect(() => {
