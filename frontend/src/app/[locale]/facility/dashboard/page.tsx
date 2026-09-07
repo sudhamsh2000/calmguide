@@ -11,7 +11,6 @@ import type { DashboardSummary } from '@/lib/facility-api';
 
 export default function DashboardPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.dashboard');
   const { state } = useFacility();
@@ -59,6 +58,8 @@ export default function DashboardPage() {
       setExporting(false);
     }
   }, []);
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

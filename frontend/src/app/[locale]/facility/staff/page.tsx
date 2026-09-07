@@ -11,7 +11,6 @@ import type { StaffInfo } from '@/lib/facility-api';
 
 export default function StaffListPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.staff');
   const tEmpty = useTranslations('facility.empty');
@@ -22,15 +21,18 @@ export default function StaffListPage() {
 
   const [staff, setStaff] = useState<StaffInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!facilityCode) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await getStaffList(facilityCode);
       setStaff(data.staff);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('Failed to load staff list', err);
+      setError('Could not load staff right now. Try refreshing in a moment.');
     } finally {
       setLoading(false);
     }
@@ -41,6 +43,8 @@ export default function StaffListPage() {
   }, [state.authenticated, load]);
 
   const active = staff.filter((s) => s.is_active);
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">
@@ -53,6 +57,12 @@ export default function StaffListPage() {
           + {t('add_staff')}
         </Link>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-error/20 bg-error/5 p-4 mb-4">
+          <p className="text-sm text-error">{error}</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-2">
