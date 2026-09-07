@@ -119,22 +119,86 @@ _SIMILARITY_THRESHOLD = 0.72
 # a phrase embedded in a longer sentence can still match.
 _WINDOW_SLACK_WORDS = 3
 
+# How similar two individual words must be (character-level) to count as the
+# "same" word for the content-word gate below. Tolerates typos ("hart attak"
+# for "heart attack") without requiring exact spelling.
+_WORD_MATCH_THRESHOLD = 0.72
 
-def _windows(message_words: list[str], phrase_word_count: int):
-    span = phrase_word_count + _WINDOW_SLACK_WORDS
-    for start in range(len(message_words)):
-        yield " ".join(message_words[start : start + span])
+# Function words excluded when picking out a phrase's "content" words for the
+# gate. Deliberately short list of near-universal stopwords, not a full NLP
+# stopword corpus — the intent is only to strip words with essentially no
+# semantic content of their own ("to", "the", "a"), not to be linguistically
+# exhaustive.
+_STOPWORDS = frozenset(
+    {
+        "a", "an", "the", "i", "to", "of", "in", "on", "at", "is", "it", "be",
+        "do", "does", "did", "and", "or", "my", "he", "she", "him", "her",
+        "his", "its", "that", "this", "what", "who", "when", "where", "why",
+        "how", "just", "so", "too", "not", "no", "yes", "me", "you", "your",
+        "am", "are", "was", "were", "been", "being", "have", "has", "had",
+        "will", "would", "can", "could", "should", "might", "may", "must",
+        "if", "with", "for", "as", "by", "up", "out", "about", "into", "over",
+        "after", "before", "again", "ever", "some",
+    }
+)
+
+
+def _content_words(words: list[str]) -> list[str]:
+    filtered = [w for w in words if w not in _STOPWORDS]
+    # A phrase made entirely of stopwords (shouldn't happen with the current
+    # concept list, but a future addition might) falls back to the full word
+    # list rather than gating on nothing.
+    return filtered or words
 
 
 def _best_similarity(message: str, phrase: str) -> float:
+    """Similarity between a sliding window of `message` and `phrase`.
+
+    Two things had to both be true, and pulled in opposite directions:
+
+    - Comparing raw characters let short phrases with similar letters but
+      opposite meaning collide: "what to do" scored 0.76 against "want to
+      die" — sharing most of the same characters despite no shared words —
+      so "I don't know what to do" (one of the most common things a
+      caregiver says) was misclassified as self-harm.
+    - Switching to plain word-level matching (comparing tokenized word
+      lists) fixed that, but broke tolerance for typos and paraphrasing:
+      "hart attak" no longer matched "heart attack" at all, since the
+      tokens are just different strings to a list-based comparison.
+
+    The fix keeps the original character-level score (typo-tolerant) but
+    gates it: every content word (phrase words minus _STOPWORDS) must have
+    at least one word in the window that's a plausible match for it
+    (character-similarity >= _WORD_MATCH_THRESHOLD, so "hart" still matches
+    "heart"). A window with no real word-level relationship to the phrase —
+    like "what to do" against "want to die", which shares no content words
+    at all — never reaches the character-ratio scoring that used to let it
+    through on coincidental letter overlap.
+
+    Verified against safety_redteam.py's dataset and test_safety_classifier.py
+    to give equivalent detection recall to the original character-level
+    version while eliminating that false positive — rerun both before
+    changing this again.
+    """
     message_words = message.lower().split()
-    phrase_word_count = len(phrase.split())
-    if len(message_words) <= phrase_word_count + _WINDOW_SLACK_WORDS:
-        return SequenceMatcher(None, message.lower(), phrase).ratio()
+    phrase_words = phrase.lower().split()
+    phrase_content = _content_words(phrase_words)
+    span = len(phrase_words) + _WINDOW_SLACK_WORDS
+
+    if len(message_words) <= span:
+        windows = [message_words]
+    else:
+        windows = [message_words[start : start + span] for start in range(len(message_words))]
 
     best = 0.0
-    for window in _windows(message_words, phrase_word_count):
-        score = SequenceMatcher(None, window, phrase).ratio()
+    for window in windows:
+        has_support = all(
+            any(SequenceMatcher(None, content_word, w).ratio() >= _WORD_MATCH_THRESHOLD for w in window)
+            for content_word in phrase_content
+        )
+        if not has_support:
+            continue
+        score = SequenceMatcher(None, " ".join(window), phrase).ratio()
         if score > best:
             best = score
     return best
