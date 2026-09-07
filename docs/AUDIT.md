@@ -14,6 +14,90 @@ Point-in-time reports that are too large to inline live beside this file:
 
 ---
 
+## 2026-09-07 — Safety, data-quality, and RAG-reconnection fixes
+
+**Taken:** 2026-09-07 (branch `main`)
+**Commit at start:** `13da696`
+**Scope:** targeted — a caregiver-reported safety-classifier false positive,
+the `/api/insights` data-quality bug it surfaced alongside, and follow-up on
+Open finding #1 below (RAG corpus). Not a full repo-wide sweep like the
+2026-09-02 entry; see that entry's verification matrix for the last
+full-repo pass.
+
+### Fixed this session
+
+**Safety classifier false positive — "what to do" scored as "want to die."**
+`backend/app/services/safety_classifier.py`'s heuristic fallback classifier
+(behind the deterministic `safety_gate.py`, only reached when the gate
+doesn't fire) misrouted "he keeps wandering at night and I don't know what
+to do" — ordinary Moment Coach phrasing — to the suicide-prevention crisis
+fallback instead of an actual answer. Cause: `_best_similarity`'s
+character-level `SequenceMatcher` scored the window "what to do" at 0.762
+against the self-harm concept phrase "want to die" from shared letters
+alone (w, a, t, o, d), with no check that the two shared any actual words.
+Fixed by gating the existing character-level score (kept for typo
+tolerance) behind a word-level content-word check: every non-stopword word
+in the concept phrase must have a plausible character-similarity match
+among the message window's words before the character-ratio score is even
+computed. Verified against `safety_redteam.py` (0 false positives, same
+detection recall as before — the one case that moved was already
+independently caught by the deterministic gate) and the full backend suite
+(1572 passed, per commit `b323700`'s message — not independently re-run in
+this audit entry). The exact production message was added to
+`REDTEAM_DATASET` as a permanent regression case
+(`source="production_incident"`). See
+[SAFETY_ARCHITECTURE.md §3](SAFETY_ARCHITECTURE.md) for the full writeup.
+
+**`/api/insights` surfacing the patient's name as a "behavioral trigger."**
+`backend/app/services/insights.py`'s `top_triggers` word-frequency count had
+no way to distinguish a patient's name (typed naturally in nearly every
+message about them) from a real trigger word, and was missing "should,"
+"keeps," and "patient" from its stopword list — so a caregiver could see
+their own loved one's name listed as a trigger. Fixed with a two-pass
+heuristic: collect every occurrence's exact case first, then drop any word
+capitalized 100% of the times it appeared (a genuine trigger word shows up
+lowercase at least once outside sentence-initial position; a name doesn't).
+Verified against the full backend suite (1572 passed, per commit
+`13da696`'s message).
+
+**RAG corpus reconnected — resolves Open finding #1 below.** The retrieval
+pipeline is now pointed at and populated against the Railway Postgres
+instance (41 pages / 231 chunks from Alzheimer's Association, Mayo Clinic,
+and other trusted sources), closing the gap the 2026-09-02 audit entry and
+`docs/MILESTONE_3_REPORT.md` §5 both flagged: the infrastructure migration
+to Railway (see `docs/MILESTONE_3_REPORT.md` §2.1) had left the retrieval
+service defaulting to a localhost database connection, so `rag_chunks` was
+silently empty and every Moment Coach response was ungrounded despite the
+README/landing page describing answers as grounded in 41 pages. This entry
+records the ingestion outcome as reported by the session that ran it; unlike
+the two fixes above, there is no corresponding code diff in `git log` to
+point to (running `python -m rag.pipeline` populates data, it doesn't
+change tracked files) — a future audit that has direct database access
+should confirm the row/chunk counts independently rather than take this
+entry's word for it.
+
+### Open findings carried forward from 2026-09-02
+
+Findings #2 through #6 and #8 from the 2026-09-02 entry below were not
+in scope for this session and are presumed still open — this entry only
+re-verified/resolved finding #1. Finding #3 (mobile read-aloud has no
+neural voice) may also be stale: `297f111` ("Give the mobile app the neural
+voice the web already had") landed the same day as the 2026-09-02 audit and
+its ordering relative to that audit's snapshot commit (`2cbed43`) was not
+re-verified here — check `mobile/src/hooks/useSpeechSynthesis.ts` directly
+before relying on that finding.
+
+### Not verified in this entry
+
+This entry is scoped to the three fixes above, found and fixed via code
+reading and the test/verification claims already recorded in their commit
+messages (`b323700`, `13da696`) — it does not include an independent full
+`pytest`/`tsc`/`vitest`/`npm audit` re-run the way the 2026-09-02 entry did.
+A future full audit should re-run the verification matrix from that entry
+and confirm the RAG chunk counts against the live Railway database directly.
+
+---
+
 ## 2026-09-02 — Repo-wide audit
 
 **Taken:** 2026-09-02 14:53 CDT

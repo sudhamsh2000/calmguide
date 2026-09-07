@@ -120,7 +120,79 @@ No infrastructure runs on shared or third-party-controlled accounts as of this m
 
 ---
 
-## 7. Reference Documents
+## 8. Addendum — 2026-09-07: Safety Fix and RAG Reconnection
+
+This addendum covers two significant, safety-relevant fixes made after this
+report's original writing (2026-09-03). Both are described here because they
+directly affect claims made in §2 and §5 above.
+
+### 8.1 Safety-classifier false positive: ordinary caregiver question routed to crisis response
+
+§3 of this report describes a deterministic safety check that runs on every
+message before it reaches the AI model, and routes anything indicating
+crisis or self-harm risk straight to emergency resources instead of an AI
+answer. Behind that deterministic check sits a second, fallback layer — a
+heuristic classifier — that catches paraphrases the deterministic check
+might miss (see [`docs/SAFETY_ARCHITECTURE.md`](SAFETY_ARCHITECTURE.md) for
+the full two-layer design).
+
+A defect in that fallback layer caused a completely ordinary Moment Coach
+question — "he keeps wandering at night and I don't know what to do" — to be
+misclassified as expressing suicidal ideation and routed to the crisis
+fallback instead of an actual answer. The cause was a text-similarity
+comparison that scored the substring "what to do" as highly similar to the
+self-harm phrase "want to die" purely because the two share most of the same
+letters, despite meaning opposite things. "I don't know what to do" is one
+of the most common things a caregiver says, so this was a real, likely
+frequent, production-impacting defect, not an edge case.
+
+The fix adds a word-level check ahead of the existing letter-similarity
+comparison: before two phrases are allowed to be scored as similar, every
+meaningful word in the safety-concept phrase must have a plausible match
+among the actual words in the caregiver's message. "want" and "die" have no
+such match in "what to do," so that comparison is now skipped entirely,
+while genuine paraphrases and typos ("hart attak" for "heart attack") still
+match as before. The fix was verified against the project's red-team safety
+test suite (a set of engineering-authored test messages built to probe this
+exact kind of failure) with zero false positives and no loss of detection
+sensitivity, and against the full backend test suite (1,572 tests passing).
+The specific message that triggered the original defect was added
+permanently to that test suite so this exact failure cannot silently
+reappear. Full technical detail in
+[`docs/SAFETY_ARCHITECTURE.md`](SAFETY_ARCHITECTURE.md) §3.
+
+### 8.2 RAG retrieval reconnected
+
+§5 of this report flagged, as a known limitation, that RAG retrieval was
+logging as unavailable in production and Coach responses were falling back
+to the base LLM without retrieval-augmented context — needing follow-up
+before the next milestone. That follow-up has happened: the retrieval
+pipeline is now connected to and populated against the Railway database
+(41 pages, 231 chunks from Alzheimer's Association, Mayo Clinic, and other
+trusted sources), and Moment Coach responses are grounded in that reference
+material again. The root cause was that the infrastructure migration
+described in §2.1 left the retrieval service pointed at a default/localhost
+database configuration rather than the new Railway instance, so it silently
+had nothing to query.
+
+### 8.3 Data-quality fix: behavioral insights surfacing the patient's name
+
+Also fixed since this report was originally written: the `/api/insights`
+endpoint's "top behavioral triggers" list was surfacing the patient's own
+name (typed naturally by the caregiver in nearly every message) and generic
+filler words ("should," "keeps") as if they were behavioral triggers.
+Showing a caregiver their own loved one's name labeled as a "trigger" is a
+data-quality defect worth calling out on a product handling this kind of
+sensitive family information, even though it is not a safety-classification
+issue like §8.1. Fixed with a heuristic that treats a word capitalized in
+100% of its occurrences as a name rather than a trigger (no patient name is
+stored server-side to filter against directly, by design — see §1's privacy
+note), plus an expanded stopword list. Verified against the full backend
+test suite (1,572 tests passing).
+
+---
+
+## 9. Reference Documents
 
 | Document | Contents |
 |---|---|

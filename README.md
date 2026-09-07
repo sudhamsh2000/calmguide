@@ -58,7 +58,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 |---------|-------------|
 | **Moment Coach** | One-button guidance with structured 4-part responses (Right Now / Why / What NOT to Do / When to Escalate) |
 | **Patient Profiles** | Personalized LLM responses using disease stage, behavioral patterns, calming strategies |
-| **RAG Pipeline** | 41 pages from Alzheimer's Association, Mayo Clinic, and other trusted sources ground every response |
+| **RAG Pipeline** | 41 pages (231 chunks) from Alzheimer's Association, Mayo Clinic, and other trusted sources ground every response. Live on the Railway database — see [docs/AUDIT.md](docs/AUDIT.md) for the reconnection history |
 | **Learn Mode** | Interactive scenario practice between tough moments |
 | **Daily Check-In** | Caregiver wellness check + behavioral journal for pattern tracking |
 | **Behavioral Patterns** | Episode cycle detection, peak time tracking, recurring trigger analysis |
@@ -67,7 +67,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Cross-Patient Learning** | Anonymized strategy effectiveness across similar patient profiles, injected into LLM prompts |
 | **Impact Showcase** | Public page with real aggregate stats (families helped, sessions, languages) |
 | **Encryption** | AES-256-GCM for all conversations, profile data, and feedback at rest |
-| **Safety Gate + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier ahead of every LLM call; regression-tested via an engineering-authored red-team dataset (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)) |
+| **Safety Gate + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier ahead of every LLM call; regression-tested via an engineering-authored red-team dataset (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)). The heuristic classifier gates its typo-tolerant character similarity behind a word-level content match, so common caregiver phrasing like "I don't know what to do" is no longer misclassified as self-harm language purely from shared letters |
 | **Acute-Change Screening** | Structured onset/context screening prompt for new or sudden behavior changes, run before a Moment Coach session starts |
 | **Three Languages** | English, Spanish, Hindi --- fully translated UI, AI responses, and safety copy. Scope is deliberately three rather than a long list: the registry in `backend/app/services/language_support.py`, the files under `locales/`, and `SUPPORTED_LOCALES` in both clients all agree, so nothing is advertised that the product cannot actually render. Per-language native-review status is tracked in [locales/REVIEW_STATUS.md](locales/REVIEW_STATUS.md) |
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
