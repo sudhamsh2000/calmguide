@@ -309,12 +309,14 @@
 
   /* Landing-page-only decorative gradients (design/design.md §18/§3.6).
    * The hero's four bubbles (src/app/[locale]/page.tsx) each carry their
-   * own inline gradient, so only mix-blend-mode lives here — screen makes
-   * two overlapping bubbles brighten/blend into each other automatically,
-   * which is the "contact" effect, rather than anything tracking where
-   * they actually intersect. */
+   * own inline gradient, so only mix-blend-mode lives here — plus-lighter
+   * adds overlapping colors together (screen's gentler multiply-based
+   * lightening read as too subtle for the "cool effect on contact" this
+   * was asked for), so two overlapping bubbles flash bright where their
+   * circles intersect. That's the "contact" effect: a property of the
+   * blend mode, not anything tracking where they actually intersect. */
   .hero-bubble {
-    mix-blend-mode: screen;
+    mix-blend-mode: plus-lighter;
   }
 
   .landing-gradient-cta {
