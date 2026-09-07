@@ -188,13 +188,20 @@ export default async function LandingPage() {
                 </p>
 
                 <div className="mt-8 flex items-center justify-center gap-3 lg:justify-start">
-                  <Image
-                    src="/brand/leap-of-faith-logo.webp"
-                    alt="Leap of Faith"
-                    width={1500}
-                    height={449}
-                    className="h-6 w-auto shrink-0"
-                  />
+                  <a
+                    href="https://www.leapoffaith.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="focus-ring shrink-0 rounded"
+                  >
+                    <Image
+                      src="/brand/leap-of-faith-logo.webp"
+                      alt="Leap of Faith"
+                      width={1500}
+                      height={449}
+                      className="h-6 w-auto shrink-0"
+                    />
+                  </a>
                   <span className="text-sm text-foreground-muted">{t('landing.partner_line')}</span>
                 </div>
 
@@ -643,7 +650,12 @@ export default async function LandingPage() {
                 </Link>
               </nav>
 
-              <div className="shrink-0 rounded-xl bg-white px-4 py-2.5">
+              <a
+                href="https://www.leapoffaith.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="focus-ring shrink-0 rounded-xl bg-white px-4 py-2.5"
+              >
                 <Image
                   src="/brand/leap-of-faith-logo.webp"
                   alt="Leap of Faith"
@@ -651,7 +663,7 @@ export default async function LandingPage() {
                   height={449}
                   className="h-8 w-auto"
                 />
-              </div>
+              </a>
             </div>
 
             <p
