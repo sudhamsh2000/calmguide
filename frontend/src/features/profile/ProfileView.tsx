@@ -119,7 +119,14 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   };
 
   return (
-    <div className={`flex flex-col gap-0 ${className}`}>
+    <div className={`relative flex flex-col gap-0 ${className}`}>
+      {/* Decorative section glow (design/design.md §19) — static, confined to
+       * its own inset-0/overflow-hidden layer near the name card, well clear
+       * of the settings/language menu further down the page. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
+      </div>
+
       {/* Header */}
       <div className="flex items-center gap-3 py-3">
         <BackButton href="/home" label={tc('nav.back_to_home')} />

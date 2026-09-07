@@ -232,8 +232,20 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
      * 1-7 already precede 8-11 in the source order, the mobile stacking
      * order is byte-for-byte what it was before this split. */
     <div
-      className={`px-5 pt-5 pb-8 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 ${className}`}
+      className={`relative px-5 pt-5 pb-8 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 ${className}`}
     >
+      {/* Decorative section glow (design/design.md §19) — the landing page's
+       * soft-blob language extended in here, but static and low-opacity:
+       * this is the primary "act now" screen, so nothing should compete
+       * with the Moment Coach card or alert cards for attention. Confined
+       * to its own inset-0/overflow-hidden layer so it never affects the
+       * real content's layout or the ProfileSwitcher dropdown's ability to
+       * escape this container. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="decor-blob decor-blob-aqua -top-16 -start-10 h-72 w-72" />
+        <div className="decor-blob decor-blob-lavender top-[38%] -end-16 h-72 w-72" />
+      </div>
+
       <div className="flex flex-col gap-5">
         {/* Profile Switcher */}
         {hasMultipleProfiles && <ProfileSwitcher onSwitch={() => window.location.reload()} />}

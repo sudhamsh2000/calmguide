@@ -977,6 +977,61 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-07 — Extend landing-page decorative language into the app (static, in-app)
+
+Extends the landing page's soft radial-gradient "blob" language (§18) into
+three authenticated caregiver screens, per §19's brief that the app still
+carries the older, flatter treatment. New `.decor-blob` / `.decor-blob-{aqua,
+mint,lavender,peach}` utility classes in `globals.css`, reusing the exact
+rgba stops already used by the landing page's blobs/bubbles — no new colors
+invented. Deliberately **not** the landing page's animated/blended
+treatment: no `animate-bubble-*`, no `mix-blend-mode`. Motion and additive
+blending suit a marketing page's ambient feel; a caregiver reading a
+streamed response or filling in a form one-handed needs the background to
+stay put and stay quiet, so these are static, single low-opacity radial
+glows confined to their own `inset-0 overflow-hidden` layer (so they never
+clip a dropdown/popover sibling), applied via `aria-hidden`.
+
+**Added, one or two blobs each:**
+- `HomeScreen.tsx` — aqua behind the top-left greeting, lavender behind the
+  right-column "journey" card. The primary "act now" screen (§19), so both
+  are positioned over open background rather than the Moment Coach CTA or
+  alert cards.
+- `CheckInScreen.tsx` — one mint blob behind the header only, clear of the
+  textarea and the streamed-response card.
+- `ProfileView.tsx` — one peach blob behind the header/name card.
+
+**Deliberately not changed, with reasoning:**
+- **Moment Coach** (`coach/page.tsx`, `CoachResponseRenderer`) — no blobs
+  added. This is the mid-crisis, 3 a.m., text-dense streaming screen §1 and
+  §25.7 both center the whole design philosophy on; the four
+  `.coach-section-*` tints already carry the section hierarchy, and a
+  background glow competing with a caregiver actively reading guidance
+  would cut against the "calm, legible, nothing decorative competing for
+  attention" rule this document already states (§23 "Don't"). Left
+  untouched intentionally, not by oversight.
+- **`PageBrand.tsx`** — still the text wordmark, not the new transparent
+  `calmguide-logo-transparent.png`. §2.1's original reasoning (a raster
+  image reads soft at a ~40px header height, whereas real text stays
+  crisp at any size) is about size, not the opaque-white-box bug the
+  transparent PNG fixes — a clean transparent background doesn't change
+  how soft a detailed illustrated mark looks scaled down that small. Text
+  wordmark kept.
+- **Facility portal** (`app/[locale]/facility/**`) — not touched. These are
+  operational, table-heavy dashboards (§20); adding decoration risks
+  competing with data legibility for a use case this document already
+  says should stay denser and quieter than the caregiver app, not warmer.
+- **`/login`, `/facility/login`** — not touched, to keep this pass scoped
+  to the four screens named in the brief (Home, Coach, Check-in, Profile);
+  same static-blob treatment would apply cleanly if extended here later.
+
+**Verified:** `tsc --noEmit` clean; `vitest run` 256 passed, 1 skipped (no
+change from baseline). Visually checked in a live dev server (light + dark,
+desktop + mobile viewport) — Home, Check-in confirmed directly; Profile's
+live render could not be exercised (no seeded backend profile data in this
+session) so it was verified by code review plus `ProfileView.test.tsx`
+(6/6 passing, unchanged) instead.
+
 ### 2026-09-01 — Web + responsive mobile redesign (phases 1–6)
 
 Applied the approved mobile references to the in-app caregiver experience.

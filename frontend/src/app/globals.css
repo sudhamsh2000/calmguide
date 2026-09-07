@@ -327,6 +327,53 @@
     background: linear-gradient(120deg, #102d4e 0%, #0a3155 55%, #08294b 100%);
   }
 
+  /* In-app decorative blobs (design/design.md §19/§25) — the same soft
+   * radial-gradient "glow" language as the landing page's section blobs
+   * (§18), extended into the authenticated app, but deliberately static:
+   * no animate-bubble-*, no mix-blend-mode. Those two suit a marketing
+   * page's ambient feel; a caregiver reading a streamed response or
+   * filling in a form one-handed needs the background to stay put and stay
+   * quiet. Colors reuse the exact same rgba stops already used for the
+   * landing page's blobs/bubbles (teal/aqua, mint, lavender, peach) rather
+   * than inventing new ones. Dark-mode stops are a low-alpha version of the
+   * same hue, matching how .coach-section-* and --color-accent-* already
+   * re-derive for dark rather than just dimming. Always pointer-events:none
+   * and applied to elements marked aria-hidden — decoration only. */
+  .decor-blob {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(48px);
+  }
+
+  .decor-blob-aqua {
+    background: radial-gradient(circle, rgba(58, 175, 169, 0.32) 0%, rgba(58, 175, 169, 0) 72%);
+  }
+  .dark .decor-blob-aqua {
+    background: radial-gradient(circle, rgba(58, 175, 169, 0.2) 0%, rgba(58, 175, 169, 0) 72%);
+  }
+
+  .decor-blob-mint {
+    background: radial-gradient(circle, rgba(67, 201, 168, 0.3) 0%, rgba(67, 201, 168, 0) 72%);
+  }
+  .dark .decor-blob-mint {
+    background: radial-gradient(circle, rgba(67, 201, 168, 0.19) 0%, rgba(67, 201, 168, 0) 72%);
+  }
+
+  .decor-blob-lavender {
+    background: radial-gradient(circle, rgba(154, 140, 209, 0.3) 0%, rgba(154, 140, 209, 0) 72%);
+  }
+  .dark .decor-blob-lavender {
+    background: radial-gradient(circle, rgba(154, 140, 209, 0.22) 0%, rgba(154, 140, 209, 0) 72%);
+  }
+
+  .decor-blob-peach {
+    background: radial-gradient(circle, rgba(240, 147, 127, 0.27) 0%, rgba(240, 147, 127, 0) 72%);
+  }
+  .dark .decor-blob-peach {
+    background: radial-gradient(circle, rgba(240, 147, 127, 0.19) 0%, rgba(240, 147, 127, 0) 72%);
+  }
+
   .dark .card-shell {
     border-color: #31445f;
     box-shadow:
