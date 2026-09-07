@@ -10,7 +10,6 @@ import type { StaffRole } from '@/lib/facility-api';
 
 export default function AddStaffPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.staff');
   const router = useRouter();
@@ -63,6 +62,8 @@ export default function AddStaffPage() {
   );
 
   const isAdmin = role === 'admin' || role === 'owner';
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

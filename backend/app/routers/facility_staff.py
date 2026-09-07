@@ -28,6 +28,27 @@ router = APIRouter(prefix="/facilities", tags=["facility-staff"])
 async def _get_facility(
     facility_code: str, session: AsyncSession, staff: Staff | None = None
 ) -> Facility:
+    # "me" is a sentinel meaning "the authenticated caller's own facility" —
+    # used when the client only has a JWT and no plaintext facility code to
+    # supply (e.g. admin/owner logged in by email/password, where the code is
+    # never known client-side: facility codes are stored one-way-hashed, so
+    # even the backend cannot recover the plaintext for an existing facility).
+    # Only valid for authenticated calls; falls through to the normal
+    # code-hash lookup otherwise.
+    if facility_code == "me" and staff is not None:
+        result = await session.execute(
+            select(Facility).where(
+                Facility.id == staff.facility_id,
+                Facility.is_active == True,
+            )
+        )
+        facility = result.scalar_one_or_none()
+        if not facility:
+            raise HTTPException(
+                404, {"error": "Facility not found", "code": "FACILITY_NOT_FOUND"}
+            )
+        return facility
+
     code_hash = hash_access_code(facility_code)
     result = await session.execute(
         select(Facility).where(

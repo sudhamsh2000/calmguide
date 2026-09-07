@@ -47,7 +47,6 @@ function formatIncidentSummary(raw: string): string {
 
 export default function AllResidentsPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.residents_all');
   const tRisk = useTranslations('facility.residents');
@@ -100,6 +99,8 @@ export default function AllResidentsPage() {
     moderate: residents.filter((r) => r.risk_level === 'moderate').length,
     low: residents.filter((r) => r.risk_level === 'low').length,
   };
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

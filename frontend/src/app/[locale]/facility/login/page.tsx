@@ -201,12 +201,23 @@ export default function FacilityLoginPage() {
       setEmailError(null);
       try {
         const data = await emailLogin(email, password);
-        setFacilityCode(facilityCode || 'admin');
+        // Admin/owner email login never learns the facility's plaintext code
+        // (facility codes are stored one-way-hashed, so the backend can't
+        // hand it back either). When we don't already have the real code —
+        // e.g. this admin went straight to email login without ever typing
+        // one — fall back to the "me" sentinel, which facility-scoped
+        // endpoints resolve from the authenticated JWT instead of the code.
+        // Do NOT default to a fabricated real-looking code here: previously
+        // this fell back to the literal string 'admin', which silently
+        // pointed every facility-scoped request (staff list, staff create,
+        // settings, etc.) at a facility that doesn't exist.
+        const resolvedFacilityCode = facilityCode || 'me';
+        setFacilityCode(resolvedFacilityCode);
         dispatch({
           type: 'LOGIN_SUCCESS',
           payload: {
             staff: data.staff,
-            facilityCode: facilityCode || 'admin',
+            facilityCode: resolvedFacilityCode,
             facilityName: facilityName || 'Facility',
           },
         });

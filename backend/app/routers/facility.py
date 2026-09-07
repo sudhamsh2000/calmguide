@@ -40,6 +40,20 @@ async def _get_owned_facility(facility_code: str, staff: Staff, session: AsyncSe
     """Resolve a facility from its code and enforce that the authenticated
     caller belongs to it — the multi-tenancy boundary (prevents cross-facility
     IDOR where staff act on another facility by changing the URL code)."""
+    # "me" is a sentinel meaning "the authenticated caller's own facility" —
+    # used when the client only has a JWT and no plaintext facility code
+    # (e.g. admin/owner logged in by email/password never learns the code;
+    # facility codes are one-way-hashed, so even the backend can't recover
+    # the plaintext for an existing facility).
+    if facility_code == "me":
+        result = await session.execute(
+            select(Facility).where(Facility.id == staff.facility_id)
+        )
+        facility = result.scalar_one_or_none()
+        if not facility:
+            raise HTTPException(404, {"error": "Facility not found", "code": "FACILITY_NOT_FOUND"})
+        return facility
+
     code_hash = hash_access_code(facility_code)
     result = await session.execute(select(Facility).where(Facility.facility_code_hash == code_hash))
     facility = result.scalar_one_or_none()

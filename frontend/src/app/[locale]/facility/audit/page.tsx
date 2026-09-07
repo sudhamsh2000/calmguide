@@ -39,7 +39,6 @@ function exportToCsv(logs: AuditLogEntry[]) {
 
 export default function AuditPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.audit');
   const { state } = useFacility();
@@ -96,6 +95,8 @@ export default function AuditPage() {
       setExporting(false);
     }
   }, [total]);
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

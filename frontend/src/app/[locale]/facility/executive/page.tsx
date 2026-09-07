@@ -11,7 +11,6 @@ import type { ExecutiveOverview } from '@/lib/facility-api';
 
 export default function ExecutivePage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.executive');
   const params = useParams();
@@ -51,6 +50,8 @@ export default function ExecutivePage() {
       setExporting(false);
     }
   }, [t]);
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

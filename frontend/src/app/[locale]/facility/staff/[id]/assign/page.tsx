@@ -22,7 +22,6 @@ const RISK_DOT: Record<string, string> = {
 
 export default function AssignPatientsPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.staff');
   const tRisk = useTranslations('facility.residents');
@@ -96,6 +95,8 @@ export default function AssignPatientsPage() {
       setSaving(false);
     }
   }, [selected, assignments, facilityCode, staffId, router]);
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">

@@ -11,7 +11,6 @@ type Period = '7d' | '30d' | '90d';
 
 export default function TrendsPage() {
   const { allowed } = useRequireRole('admin', 'owner');
-  if (!allowed) return null;
 
   const t = useTranslations('facility.trends');
   const { state } = useFacility();
@@ -52,6 +51,8 @@ export default function TrendsPage() {
   }, [period]);
 
   const periods: Period[] = ['7d', '30d', '90d'];
+
+  if (!allowed) return null;
 
   return (
     <main className="flex flex-col h-full overflow-y-auto px-5 py-6">
