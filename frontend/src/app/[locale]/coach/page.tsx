@@ -142,12 +142,10 @@ function CoachPageInner() {
   // actually changes, not on every unrelated re-render.
   const currentSections = useMemo(() => parseCoachResponse(response), [response]);
 
-  // Archive exchange into history when streaming completes, and — if the
-  // caregiver has turned it on in Profile settings — read the reply aloud
-  // without waiting for a tap on a section's speak button. Gated on the same
-  // "streaming just transitioned to done" edge as archiving, so this fires
-  // exactly once per live response and never replays when history is loaded
-  // or re-rendered.
+  // Archive exchange into history when streaming completes. Gated on the
+  // "streaming just transitioned to done" edge, so this fires exactly once
+  // per live response and never replays when history is loaded or
+  // re-rendered.
   const prevStreamingRef = useRef(isStreaming);
   useEffect(() => {
     if (prevStreamingRef.current && !isStreaming && response && currentMessage) {
@@ -160,12 +158,39 @@ function CoachPageInner() {
         },
       ]);
       setCurrentMessage(null);
-      if (getAutoSpeakReplies()) {
-        speak(response);
-      }
     }
     prevStreamingRef.current = isStreaming;
-  }, [isStreaming, response, currentMessage, speak]);
+  }, [isStreaming, response, currentMessage]);
+
+  // Auto-speak (Profile settings toggle): read "Right Now" — the first,
+  // most urgent section — aloud as soon as ITS text is done streaming,
+  // rather than waiting for the full multi-section response to finish and
+  // then synthesizing the whole thing in one request. That old approach
+  // meant LLM generation time (several seconds) plus TTS synthesis of the
+  // entire response (measured ~11.7ms/char, so 10s+ for a realistic
+  // multi-section reply) both had to finish before any audio started — a
+  // caregiver could wait 20-30+ seconds in silence. "Right Now" is
+  // typically the shortest section and available earliest in the stream,
+  // so speaking just it gets audio guidance started in a few seconds. The
+  // rest of the response keeps streaming in visually and stays readable —
+  // and separately speakable — via each section's own speak button
+  // (CoachResponseRenderer), same as before.
+  const spokenFirstSectionRef = useRef(false);
+  useEffect(() => {
+    spokenFirstSectionRef.current = false;
+  }, [currentMessage]);
+  useEffect(() => {
+    if (spokenFirstSectionRef.current || !currentMessage || !getAutoSpeakReplies()) return;
+    const first = currentSections[0];
+    if (!first || !first.content.trim()) return;
+    // "Right Now" is done streaming once a second section's marker has
+    // appeared (proof the backend moved on), or the whole response ended
+    // with only one section total.
+    const firstSectionComplete = currentSections.length > 1 || !isStreaming;
+    if (!firstSectionComplete) return;
+    spokenFirstSectionRef.current = true;
+    speak(first.content);
+  }, [currentSections, isStreaming, currentMessage, speak]);
 
   const handleSendMessage = useCallback(
     (message: string) => {

@@ -14,6 +14,7 @@ vi.mock('next/navigation', () => ({
 // only ever renders the disclaimer gate instead of Phase 1/2 content.
 vi.mock('@/lib/storage', () => ({
   getDisclaimerAccepted: () => true,
+  getAutoSpeakReplies: () => false,
 }));
 
 vi.mock('@/features/coach/useStreamingChat', () => ({

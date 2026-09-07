@@ -837,11 +837,20 @@ export async function getSpeechStatus(): Promise<boolean> {
  */
 export async function synthesizeSpeech(text: string): Promise<string | null> {
   try {
-    const res = await fetchWithTimeout(`${BASE_URL}/api/speech`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
+    // Measured ~11.7ms/char for neural TTS synthesis (879 chars -> 10.3s).
+    // At MAX_TTS_CHARS (4000, see backend/app/services/speech.py) that's
+    // ~47s worst case -- comfortably past the default 20s timeout, which
+    // silently aborted the request and fell back to the flat local voice
+    // after a long dead wait. 60s covers the true worst case with margin.
+    const res = await fetchWithTimeout(
+      `${BASE_URL}/api/speech`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      },
+      60000,
+    );
     if (!res.ok) return null;
     const blob = await res.blob();
     return URL.createObjectURL(blob);
