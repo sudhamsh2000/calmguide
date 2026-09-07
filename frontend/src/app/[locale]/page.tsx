@@ -134,7 +134,7 @@ export default async function LandingPage() {
           <section className="relative overflow-hidden">
             <div
               aria-hidden="true"
-              className="landing-gradient-hero pointer-events-none absolute -top-24 start-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-90 blur-2xl lg:start-3/4"
+              className="landing-gradient-hero pointer-events-none absolute -top-24 start-1/2 h-[36rem] w-[36rem] animate-blob-drift rounded-full opacity-90 blur-2xl lg:start-3/4"
             />
             <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
               <div className="text-center lg:text-start">
@@ -436,13 +436,13 @@ export default async function LandingPage() {
                 <p className="mt-4 text-lg text-foreground-muted">{t('landing.safety.subtitle')}</p>
               </div>
 
-              <ol className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-2">
+              <ol className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-stretch sm:justify-center sm:gap-2">
                 {safetySteps.map((step, i) => (
                   <li
                     key={step}
-                    className="flex flex-1 items-center gap-3 sm:flex-col sm:items-center sm:gap-2 sm:text-center"
+                    className="flex flex-1 items-center gap-3 sm:flex-row sm:items-center sm:gap-2"
                   >
-                    <span className="card-shell flex w-full items-center gap-3 rounded-xl p-4 sm:flex-col sm:gap-2">
+                    <span className="card-shell flex w-full flex-1 items-center gap-3 self-stretch rounded-xl p-4 sm:flex-col sm:justify-center sm:gap-2 sm:text-center">
                       <StepNumber n={i + 1} />
                       <span className="text-sm font-medium text-foreground">{step}</span>
                     </span>

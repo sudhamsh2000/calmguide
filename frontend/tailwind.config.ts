@@ -107,6 +107,16 @@ const config: Config = {
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
+        // Slow, soft drift for decorative landing-page background blobs —
+        // a gentle wandering path (translate + scale) rather than a fixed
+        // pulse, so it reads as an ambient wave rather than a heartbeat.
+        // Long duration (18s) keeps it calm; disabled entirely under
+        // prefers-reduced-motion (see globals.css).
+        'blob-drift': {
+          '0%, 100%': { transform: 'translate(-50%, 0) scale(1)' },
+          '33%': { transform: 'translate(-46%, 3%) scale(1.06)' },
+          '66%': { transform: 'translate(-53%, -2%) scale(0.96)' },
+        },
       },
       animation: {
         breathing: 'breathing 4s ease-in-out infinite',
@@ -115,6 +125,7 @@ const config: Config = {
         'page-enter': 'page-enter 0.4s ease-out forwards',
         'skeleton-shimmer': 'skeleton-shimmer 1.5s ease-in-out infinite',
         shake: 'shake 0.5s ease-in-out',
+        'blob-drift': 'blob-drift 18s ease-in-out infinite',
       },
     },
   },
