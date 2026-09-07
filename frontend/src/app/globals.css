@@ -501,6 +501,18 @@ html[data-landing] {
   --color-primary-soft: color-mix(in srgb, #e1bffb 22%, white);
 }
 
+/* Dark-mode variant of the override above: mixing the same base hex with
+ * white (as the light-mode soft tint above does) produced a near-white pill
+ * on the landing page's dark navy background — a light-on-light chip
+ * background sitting on a dark page, which then broke text contrast a
+ * second time once the chip text itself switched to the (light, correct
+ * for dark mode) --color-foreground. Mixing with black instead keeps the
+ * same "soft tinted pill" pattern, just anchored to the dark end of the
+ * scale. */
+html.dark[data-landing] {
+  --color-primary-soft: color-mix(in srgb, #e1bffb 24%, black);
+}
+
 /* RTL support */
 [dir='rtl'] {
   direction: rtl;
