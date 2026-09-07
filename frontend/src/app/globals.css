@@ -309,15 +309,20 @@
 
   /* Landing-page-only decorative gradients (design/design.md §18/§3.6). */
   .landing-gradient-hero {
-    background: linear-gradient(135deg, #eaf7f6 0%, #eaf4fb 55%, #f3f1f8 100%);
+    background: radial-gradient(
+      circle,
+      rgba(58, 175, 169, 0.32) 0%,
+      rgba(88, 157, 214, 0.2) 45%,
+      rgba(58, 175, 169, 0) 75%
+    );
   }
 
   .dark .landing-gradient-hero {
-    background: linear-gradient(
-      135deg,
-      rgba(58, 175, 169, 0.16) 0%,
-      rgba(88, 157, 214, 0.14) 55%,
-      rgba(154, 140, 209, 0.16) 100%
+    background: radial-gradient(
+      circle,
+      rgba(58, 175, 169, 0.28) 0%,
+      rgba(88, 157, 214, 0.22) 45%,
+      rgba(58, 175, 169, 0) 75%
     );
   }
 

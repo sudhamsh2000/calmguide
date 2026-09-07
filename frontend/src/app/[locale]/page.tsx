@@ -134,7 +134,7 @@ export default async function LandingPage() {
           <section className="relative overflow-hidden">
             <div
               aria-hidden="true"
-              className="landing-gradient-hero pointer-events-none absolute -top-24 start-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-80 blur-3xl lg:start-3/4"
+              className="landing-gradient-hero pointer-events-none absolute -top-24 start-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-90 blur-2xl lg:start-3/4"
             />
             <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
               <div className="text-center lg:text-start">
