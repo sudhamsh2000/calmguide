@@ -55,12 +55,12 @@ export function LandingNav() {
       <div className="mx-auto flex h-16 max-w-landing items-center justify-between px-5 md:px-8">
         <Link href="/" className="flex items-center" aria-label="CalmGuide">
           <Image
-            src="/brand/calmguide-logo.png"
+            src="/brand/calmguide-logo-transparent.png"
             alt="CalmGuide"
             width={2172}
             height={724}
             priority
-            className="h-8 w-auto md:h-9"
+            className="h-10 w-auto md:h-12"
           />
         </Link>
 

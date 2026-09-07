@@ -567,11 +567,11 @@ export default async function LandingPage() {
             <div className="flex flex-col items-center gap-10 text-center md:flex-row md:items-start md:justify-between md:text-start">
               <div className="flex flex-col items-center md:items-start">
                 <Image
-                  src="/brand/calmguide-logo.png"
+                  src="/brand/calmguide-logo-transparent.png"
                   alt="CalmGuide"
                   width={2172}
                   height={724}
-                  className="h-8 w-auto"
+                  className="h-11 w-auto"
                 />
                 <p className="mt-3 max-w-xs text-sm text-footer-muted">
                   {t('landing.partner_line')}
