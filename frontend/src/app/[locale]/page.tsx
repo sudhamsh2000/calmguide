@@ -260,8 +260,15 @@ export default async function LandingPage() {
           </section>
 
           {/* What is CalmGuide */}
-          <section id="what-we-do" className="bg-accent-aqua/30 py-16 md:py-24">
-            <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <section id="what-we-do" className="relative overflow-hidden bg-accent-aqua/30 py-16 md:py-24">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -end-24 -top-32 h-[26rem] w-[26rem] rounded-full opacity-60 blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(58,175,169,0.35) 0%, rgba(58,175,169,0) 70%)',
+              }}
+            />
+            <Container className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="text-center lg:text-start">
                 <Eyebrow color="#6F7FD8">{t('landing.what_is.eyebrow')}</Eyebrow>
                 <h2
@@ -285,8 +292,15 @@ export default async function LandingPage() {
           </section>
 
           {/* How CalmGuide works */}
-          <section id="how-it-works" className="bg-accent-mint/50 py-16 md:py-24">
-            <Container>
+          <section id="how-it-works" className="relative overflow-hidden bg-accent-mint/50 py-16 md:py-24">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-28 -start-20 h-[24rem] w-[24rem] rounded-full opacity-60 blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(67,201,168,0.35) 0%, rgba(67,201,168,0) 70%)',
+              }}
+            />
+            <Container className="relative">
               <div className="mx-auto max-w-2xl text-center">
                 <Eyebrow color="#6F7FD8">{t('landing.how.eyebrow')}</Eyebrow>
                 <h2
@@ -365,8 +379,15 @@ export default async function LandingPage() {
           </section>
 
           {/* Behavioral context */}
-          <section className="bg-accent-lavender/50 py-16 md:py-24">
-            <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <section className="relative overflow-hidden bg-accent-lavender/50 py-16 md:py-24">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -end-16 top-1/2 h-[24rem] w-[24rem] -translate-y-1/2 rounded-full opacity-60 blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(154,140,209,0.38) 0%, rgba(154,140,209,0) 70%)',
+              }}
+            />
+            <Container className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="text-center lg:text-start">
                 <Eyebrow>{t('landing.behavioral_context.eyebrow')}</Eyebrow>
                 <h2
@@ -395,8 +416,15 @@ export default async function LandingPage() {
           </section>
 
           {/* Safety */}
-          <section id="safety" className="bg-accent-peach/40 py-16 md:py-24">
-            <Container className="max-w-2xl">
+          <section id="safety" className="relative overflow-hidden bg-accent-peach/40 py-16 md:py-24">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -start-24 -bottom-24 h-[26rem] w-[26rem] rounded-full opacity-60 blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(240,147,127,0.38) 0%, rgba(240,147,127,0) 70%)',
+              }}
+            />
+            <Container className="relative max-w-2xl">
               <div className="text-center">
                 <Eyebrow>{t('landing.safety.eyebrow')}</Eyebrow>
                 <h2
@@ -491,8 +519,15 @@ export default async function LandingPage() {
           </section>
 
           {/* Healthcare / Technology — "For Healthcare" */}
-          <section id="technology" className="bg-accent-lavender/40 py-16 md:py-24">
-            <Container className="max-w-2xl text-center">
+          <section id="technology" className="relative overflow-hidden bg-accent-lavender/40 py-16 md:py-24">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -end-20 -top-24 h-[24rem] w-[24rem] rounded-full opacity-50 blur-3xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(154,140,209,0.35) 0%, rgba(154,140,209,0) 70%)',
+              }}
+            />
+            <Container className="relative max-w-2xl text-center">
               <div id="for-healthcare">
                 <Eyebrow>{t('landing.interop.eyebrow')}</Eyebrow>
                 <h2
