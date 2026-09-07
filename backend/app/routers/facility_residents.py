@@ -15,7 +15,7 @@ from app.models.staff_patient_assignment import StaffPatientAssignment
 from app.services.audit_service import log_audit
 from app.services.crypto import decrypt
 from app.services.dossier import compute_dossier, get_dossier_if_fresh
-from app.services.rbac import require_role
+from app.services.rbac import require_role, staff_can_access_profile
 
 router = APIRouter(prefix="/facility", tags=["facility-residents"])
 
@@ -186,18 +186,14 @@ async def get_behavioral_card(
     staff: Staff = Depends(require_role("staff", "admin", "owner")),
     session: AsyncSession = Depends(get_session),
 ):
-    if staff.role == "staff":
-        assignment = await session.execute(
-            select(StaffPatientAssignment).where(
-                StaffPatientAssignment.staff_id == staff.id,
-                StaffPatientAssignment.profile_id == profile_id,
-                StaffPatientAssignment.ended_at == None,
-            )
-        )
-        if not assignment.scalar_one_or_none():
-            raise HTTPException(
-                403, {"error": "Not assigned to this patient", "code": "NOT_ASSIGNED"}
-            )
+    # Object-level authz: staff must be assigned; admin/owner must have the
+    # patient actively linked to their own facility. Without this check any
+    # authenticated facility admin/owner could pull the behavioral card
+    # (interventions, escalation pattern, recent incidents, delirium/pain
+    # flags) for ANY profile_id in the system, including patients belonging
+    # to other facilities or B2C-only profiles never linked to a facility.
+    if not await staff_can_access_profile(session, staff, profile_id):
+        raise HTTPException(403, {"error": "Not authorized for this patient", "code": "NOT_ASSIGNED"})
 
     d = await get_dossier_if_fresh(profile_id, session)
     if not d:
