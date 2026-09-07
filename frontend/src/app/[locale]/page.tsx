@@ -562,7 +562,7 @@ export default async function LandingPage() {
                   {techItems.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded-full bg-primary-soft px-3.5 py-1.5 text-sm font-medium text-primary"
+                      className="rounded-full bg-primary-soft px-3.5 py-1.5 text-sm font-medium text-ink"
                     >
                       {tech}
                     </span>
