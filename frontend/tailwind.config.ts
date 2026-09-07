@@ -107,15 +107,35 @@ const config: Config = {
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
-        // Slow, soft drift for decorative landing-page background blobs —
-        // a gentle wandering path (translate + scale) rather than a fixed
-        // pulse, so it reads as an ambient wave rather than a heartbeat.
-        // Disabled entirely under prefers-reduced-motion (see globals.css).
+        // Wandering path for the hero's decorative glow — sweeps across
+        // most of the hero area (not just a small wobble near center) and
+        // cycles through the app's own accent palette (teal → blue →
+        // lavender → peach) as it moves, so the color itself blends rather
+        // than just the position. Disabled entirely under
+        // prefers-reduced-motion (see globals.css); the plain
+        // .landing-gradient-hero background below is what shows in that
+        // case, so keep that in teal too rather than removing it.
         'blob-drift': {
-          '0%, 100%': { transform: 'translate(-50%, 0%) scale(1)' },
-          '25%': { transform: 'translate(-38%, 6%) scale(1.12)' },
-          '50%': { transform: 'translate(-50%, -8%) scale(0.94)' },
-          '75%': { transform: 'translate(-62%, 4%) scale(1.08)' },
+          '0%, 100%': {
+            transform: 'translate(-50%, 0%) scale(1)',
+            background:
+              'radial-gradient(circle, rgba(58,175,169,0.34) 0%, rgba(58,175,169,0) 72%)',
+          },
+          '25%': {
+            transform: 'translate(-15%, 12%) scale(1.18)',
+            background:
+              'radial-gradient(circle, rgba(88,157,214,0.32) 0%, rgba(88,157,214,0) 72%)',
+          },
+          '50%': {
+            transform: 'translate(-50%, -20%) scale(0.85)',
+            background:
+              'radial-gradient(circle, rgba(154,140,209,0.34) 0%, rgba(154,140,209,0) 72%)',
+          },
+          '75%': {
+            transform: 'translate(-85%, 10%) scale(1.12)',
+            background:
+              'radial-gradient(circle, rgba(240,147,127,0.3) 0%, rgba(240,147,127,0) 72%)',
+          },
         },
       },
       animation: {
@@ -125,7 +145,7 @@ const config: Config = {
         'page-enter': 'page-enter 0.4s ease-out forwards',
         'skeleton-shimmer': 'skeleton-shimmer 1.5s ease-in-out infinite',
         shake: 'shake 0.5s ease-in-out',
-        'blob-drift': 'blob-drift 9s ease-in-out infinite',
+        'blob-drift': 'blob-drift 6s ease-in-out infinite',
       },
     },
   },
