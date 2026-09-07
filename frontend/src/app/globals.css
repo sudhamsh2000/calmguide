@@ -307,23 +307,14 @@
     color: var(--color-coach-escalate-text);
   }
 
-  /* Landing-page-only decorative gradients (design/design.md §18/§3.6). */
-  .landing-gradient-hero {
-    background: radial-gradient(
-      circle,
-      rgba(58, 175, 169, 0.32) 0%,
-      rgba(88, 157, 214, 0.2) 45%,
-      rgba(58, 175, 169, 0) 75%
-    );
-  }
-
-  .dark .landing-gradient-hero {
-    background: radial-gradient(
-      circle,
-      rgba(58, 175, 169, 0.28) 0%,
-      rgba(88, 157, 214, 0.22) 45%,
-      rgba(58, 175, 169, 0) 75%
-    );
+  /* Landing-page-only decorative gradients (design/design.md §18/§3.6).
+   * The hero's four bubbles (src/app/[locale]/page.tsx) each carry their
+   * own inline gradient, so only mix-blend-mode lives here — screen makes
+   * two overlapping bubbles brighten/blend into each other automatically,
+   * which is the "contact" effect, rather than anything tracking where
+   * they actually intersect. */
+  .hero-bubble {
+    mix-blend-mode: screen;
   }
 
   .landing-gradient-cta {

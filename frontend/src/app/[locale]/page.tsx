@@ -132,9 +132,42 @@ export default async function LandingPage() {
         <main id="main-content">
           {/* Hero */}
           <section className="relative overflow-hidden">
+            {/* Four independently-wandering bubbles rather than one glow —
+             * mix-blend-screen (see .hero-bubble in globals.css) means
+             * wherever two bubbles' circles overlap, the colors
+             * automatically brighten/blend together. That's the "contact"
+             * effect: a property of the blend mode, not a tracked
+             * collision, so it works for any two bubbles at any position. */}
             <div
               aria-hidden="true"
-              className="landing-gradient-hero pointer-events-none absolute -top-24 start-1/2 h-[36rem] w-[36rem] animate-blob-drift rounded-full opacity-90 blur-2xl lg:start-3/4"
+              className="hero-bubble pointer-events-none absolute -top-16 start-[10%] h-72 w-72 animate-bubble-a rounded-full opacity-90 blur-2xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(58,175,169,0.4) 0%, rgba(58,175,169,0) 72%)',
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="hero-bubble pointer-events-none absolute top-10 start-[55%] h-80 w-80 animate-bubble-b rounded-full opacity-90 blur-2xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(88,157,214,0.38) 0%, rgba(88,157,214,0) 72%)',
+                animationDelay: '-4s',
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="hero-bubble pointer-events-none absolute -top-8 start-[30%] h-64 w-64 animate-bubble-c rounded-full opacity-90 blur-2xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(154,140,209,0.4) 0%, rgba(154,140,209,0) 72%)',
+                animationDelay: '-7s',
+              }}
+            />
+            <div
+              aria-hidden="true"
+              className="hero-bubble pointer-events-none absolute top-6 start-[75%] h-64 w-64 animate-bubble-d rounded-full opacity-90 blur-2xl"
+              style={{
+                background: 'radial-gradient(circle, rgba(240,147,127,0.36) 0%, rgba(240,147,127,0) 72%)',
+                animationDelay: '-2s',
+              }}
             />
             <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
               <div className="text-center lg:text-start">

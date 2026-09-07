@@ -107,35 +107,33 @@ const config: Config = {
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
-        // Wandering path for the hero's decorative glow — sweeps across
-        // most of the hero area (not just a small wobble near center) and
-        // cycles through the app's own accent palette (teal → blue →
-        // lavender → peach) as it moves, so the color itself blends rather
-        // than just the position. Disabled entirely under
-        // prefers-reduced-motion (see globals.css); the plain
-        // .landing-gradient-hero background below is what shows in that
-        // case, so keep that in teal too rather than removing it.
-        'blob-drift': {
-          '0%, 100%': {
-            transform: 'translate(-50%, 0%) scale(1)',
-            background:
-              'radial-gradient(circle, rgba(58,175,169,0.34) 0%, rgba(58,175,169,0) 72%)',
-          },
-          '25%': {
-            transform: 'translate(-15%, 12%) scale(1.18)',
-            background:
-              'radial-gradient(circle, rgba(88,157,214,0.32) 0%, rgba(88,157,214,0) 72%)',
-          },
-          '50%': {
-            transform: 'translate(-50%, -20%) scale(0.85)',
-            background:
-              'radial-gradient(circle, rgba(154,140,209,0.34) 0%, rgba(154,140,209,0) 72%)',
-          },
-          '75%': {
-            transform: 'translate(-85%, 10%) scale(1.12)',
-            background:
-              'radial-gradient(circle, rgba(240,147,127,0.3) 0%, rgba(240,147,127,0) 72%)',
-          },
+        // Four independent wandering paths for the hero's decorative
+        // bubbles — each bubble keeps a fixed color and just moves; the
+        // "contact" effect comes from mix-blend-mode (see
+        // .hero-bubble in globals.css) automatically brightening wherever
+        // two bubbles' circles overlap, not from tracking real collisions.
+        // Different corner-to-corner diagonals per bubble, offset via
+        // animation-delay in the markup, so they never move in lockstep.
+        // Disabled entirely under prefers-reduced-motion (see globals.css).
+        'bubble-a': {
+          '0%, 100%': { transform: 'translate(-10%, -15%) scale(1)' },
+          '33%': { transform: 'translate(55%, 10%) scale(1.15)' },
+          '66%': { transform: 'translate(15%, 60%) scale(0.88)' },
+        },
+        'bubble-b': {
+          '0%, 100%': { transform: 'translate(70%, 55%) scale(1)' },
+          '33%': { transform: 'translate(10%, 70%) scale(0.85)' },
+          '66%': { transform: 'translate(45%, 5%) scale(1.2)' },
+        },
+        'bubble-c': {
+          '0%, 100%': { transform: 'translate(20%, 70%) scale(1)' },
+          '33%': { transform: 'translate(65%, 25%) scale(1.1)' },
+          '66%': { transform: 'translate(5%, 5%) scale(0.9)' },
+        },
+        'bubble-d': {
+          '0%, 100%': { transform: 'translate(60%, 5%) scale(1)' },
+          '33%': { transform: 'translate(5%, 40%) scale(0.92)' },
+          '66%': { transform: 'translate(50%, 65%) scale(1.16)' },
         },
       },
       animation: {
@@ -145,7 +143,10 @@ const config: Config = {
         'page-enter': 'page-enter 0.4s ease-out forwards',
         'skeleton-shimmer': 'skeleton-shimmer 1.5s ease-in-out infinite',
         shake: 'shake 0.5s ease-in-out',
-        'blob-drift': 'blob-drift 6s ease-in-out infinite',
+        'bubble-a': 'bubble-a 13s ease-in-out infinite',
+        'bubble-b': 'bubble-b 16s ease-in-out infinite',
+        'bubble-c': 'bubble-c 11s ease-in-out infinite',
+        'bubble-d': 'bubble-d 14s ease-in-out infinite',
       },
     },
   },
