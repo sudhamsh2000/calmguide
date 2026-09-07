@@ -111,3 +111,31 @@ async def test_staff_sees_only_assigned(client, setup):
     assert resp.status_code == 200
     ids = {r["profile_id"] for r in resp.json()["residents"]}
     assert ids == {setup["p1"].id}
+
+
+async def test_admin_can_view_behavioral_card_for_own_facility_resident(client, setup):
+    resp = await client.get(
+        f"/api/facility/residents/{setup['p1'].id}/behavioral-card", headers=_auth(setup["admin"])
+    )
+    assert resp.status_code == 200
+    assert "what_works" in resp.json()
+
+
+async def test_admin_cannot_view_behavioral_card_for_other_facility_resident(client, setup):
+    """Regression test: admin/owner previously had NO object-level authz check
+    on this endpoint (only the staff-role branch checked assignment), so any
+    authenticated facility admin could pull another facility's — or a B2C-only
+    — profile's behavioral card by profile_id (IDOR / cross-tenant leak)."""
+    resp = await client.get(
+        f"/api/facility/residents/{setup['other_p'].id}/behavioral-card",
+        headers=_auth(setup["admin"]),
+    )
+    assert resp.status_code == 403
+    assert resp.json()["code"] == "NOT_ASSIGNED"
+
+
+async def test_staff_cannot_view_behavioral_card_for_unassigned_resident(client, setup):
+    resp = await client.get(
+        f"/api/facility/residents/{setup['p2'].id}/behavioral-card", headers=_auth(setup["nurse"])
+    )
+    assert resp.status_code == 403
