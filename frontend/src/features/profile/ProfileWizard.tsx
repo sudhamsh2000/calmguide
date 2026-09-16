@@ -193,7 +193,15 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
 
   if (successCode) {
     return (
-      <div className={`flex flex-col items-center gap-6 text-center ${className}`}>
+      <div className={`relative flex flex-col items-center gap-6 text-center ${className}`}>
+        {/* Decorative section glow (design/design.md §24) — same static,
+         * single peach blob as ProfileView, this screen's natural
+         * counterpart, so the create-profile flow doesn't end on a visibly
+         * flatter screen than the profile page it leads into. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
+        </div>
+
         {/* Checkmark circle */}
         <div
           className="w-20 h-20 rounded-full bg-success flex items-center justify-center shadow-lg mt-2"
@@ -262,7 +270,16 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
   }
 
   return (
-    <div className={`flex flex-col gap-6 ${className}`}>
+    <div className={`relative flex flex-col gap-6 ${className}`}>
+      {/* Decorative section glow (design/design.md §24) — extends the same
+       * static peach blob ProfileView already uses to this screen, which the
+       * 2026-09-07 pass left out and was still visibly flatter as a result.
+       * Positioned behind the progress bar/header, clear of the step content
+       * and the sticky footer buttons below. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
+      </div>
+
       <ProgressBar
         currentStep={step}
         totalSteps={TOTAL_STEPS}
