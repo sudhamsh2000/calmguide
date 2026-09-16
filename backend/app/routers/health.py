@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_session
 from app.services.availability import get_llm_status
 from app.services.response_timing import get_timing_stats
+from app.services.safety_observability import get_safety_observability_stats
 from app.services.token_usage import get_token_stats
 
 router = APIRouter(tags=["health"])
@@ -45,6 +46,18 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
     on a large prompt indicates the cacheable prefix is being broken early
     (see that module's docstring), which is a prompt-*structure* problem
     rather than a prompt-*length* one.
+
+    `safety` reflects `app.services.safety_observability`'s cumulative,
+    per-process counters (Safety Gate v2 Phase 7,
+    docs/SAFETY_GATE_V2_PLAN.md): decision counts by risk level/category/
+    action/source, how often RAG and normal LLM generation were skipped
+    due to a safety decision, RAG availability/retrieval-success counts,
+    which LLM provider actually served requests and how often failover was
+    used, and how often the response guard's repair path or static
+    fallback text was used. Categorical counts and booleans only — never
+    raw caregiver messages, PHI, or decrypted profile content. Same
+    per-process, informational-only, cumulative-since-start caveats as the
+    three siblings above.
     """
     db_status = "connected"
     try:
@@ -67,4 +80,5 @@ async def health(response: Response, session: AsyncSession = Depends(get_session
         "llm": llm_status,
         "timing": get_timing_stats(),
         "tokens": get_token_stats(),
+        "safety": get_safety_observability_stats(),
     }

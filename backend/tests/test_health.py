@@ -2,17 +2,19 @@
 
 import pytest
 
-from app.services import availability, response_timing
+from app.services import availability, response_timing, safety_observability
 
 
 @pytest.fixture(autouse=True)
 def _reset_availability_tracker():
-    """Each test gets a clean LLM-availability/timing window; state is process-global."""
+    """Each test gets a clean LLM-availability/timing/safety window; state is process-global."""
     availability.reset()
     response_timing.reset()
+    safety_observability.reset()
     yield
     availability.reset()
     response_timing.reset()
+    safety_observability.reset()
 
 
 async def test_health_returns_ok(client):
@@ -71,5 +73,33 @@ async def test_health_timing_reflects_recorded_samples(client):
     assert data["timing"]["llm"]["total"]["samples"] == 1
     assert data["timing"]["rag_retrieval"]["samples"] == 1
     # Timing is informational only — never gates status/HTTP code.
+    assert response.status_code == 200
+    assert data["status"] == "healthy"
+
+
+async def test_health_includes_safety_block_with_no_traffic(client):
+    response = await client.get("/health")
+    data = response.json()
+    assert "safety" in data
+    assert data["safety"]["safety_decisions"]["by_risk_level"] == {}
+    assert data["safety"]["rag"]["requested"] == 0
+    assert data["safety"]["llm"]["by_provider"] == {}
+
+
+async def test_health_safety_reflects_recorded_decisions(client):
+    safety_observability.record_safety_decision(
+        risk_level="emergency",
+        category="life_threat",
+        action="emergency_escalation",
+        source="deterministic_gate",
+        rag_requested=False,
+    )
+    safety_observability.record_response_guard_repair_used()
+    response = await client.get("/health")
+    data = response.json()
+    assert data["safety"]["safety_decisions"]["by_risk_level"] == {"emergency": 1}
+    assert data["safety"]["rag"]["skipped_due_to_safety"] == 1
+    assert data["safety"]["response_guard"]["repair_used"] == 1
+    # Safety observability is informational only — never gates status/HTTP code.
     assert response.status_code == 200
     assert data["status"] == "healthy"
