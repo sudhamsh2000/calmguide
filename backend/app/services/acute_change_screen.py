@@ -96,6 +96,21 @@ You mentioned you're not sure whether this is new or how quickly it started. Bec
 If you're confident this is the same kind of thing they've done before, you can continue on to coaching for this behavior."""
 
 
+def get_acute_change_advisory_message() -> str:
+    """Safety Gate v2 Phase 5 (docs/SAFETY_GATE_V2_PLAN.md): exposes this
+    screen's own MEDICAL_EVALUATION_RECOMMENDED message for reuse by the
+    main coach flow's free-text ACUTE_CHANGE detection
+    (safety_categories.py), which only recognizes surface phrasing
+    ("suddenly more confused") and has not run this screen's structured
+    concerning-flag evaluation. Reusing this exact, already-existing text
+    — rather than inventing new copy or reimplementing the questionnaire
+    inside coach_chat — is the explicit Phase 5 instruction. Still carries
+    the same TODO(CLINICAL-REVIEW-REQUIRED) status as the rest of this
+    module; nothing about that changes by being reused here.
+    """
+    return _MEDICAL_EVALUATION_MESSAGE
+
+
 def evaluate_acute_change_screen(answers: AcuteChangeScreenInput) -> AcuteChangeScreenResult:
     """Evaluate the acute-change screen answers and decide whether to route
     the caregiver to a medical-evaluation message before coaching.

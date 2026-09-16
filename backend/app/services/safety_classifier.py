@@ -20,16 +20,23 @@
 # missed. It never downgrades or suppresses a deterministic-gate trigger.
 """
 
+import re
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
-from enum import Enum
 
+from app.services.safety_gate import SafetyGateType
 
-class SafetyRiskCategory(str, Enum):
-    LIFE_THREAT = "life_threat"
-    SELF_HARM = "self_harm"
-    CAREGIVER_HARM_RISK = "caregiver_harm_risk"
-    ELDER_ABUSE_NEGLECT = "elder_abuse_neglect"
+# Safety Gate v2 Phase 2 (docs/SAFETY_GATE_V2_PLAN.md): this module used to
+# define its own `SafetyRiskCategory(str, Enum)` with values identical to
+# `safety_gate.SafetyGateType`, bridged only by string value at each call
+# site (`SafetyGateType(classifier_result.category.value)` in coach.py /
+# checkin.py). SafetyGateType is the canonical category enum going forward —
+# it has far more callers (both routers, safety_redteam.py, most safety
+# tests) and is the deterministic gate's own type. This alias keeps every
+# existing `SafetyRiskCategory.*` reference (including
+# test_safety_classifier.py) working unchanged rather than forcing a rename
+# across call sites for no behavioral gain.
+SafetyRiskCategory = SafetyGateType
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +150,53 @@ _STOPWORDS = frozenset(
 )
 
 
+# Safety Gate v2 Phase 4 (docs/SAFETY_GATE_V2_PLAN.md) — see
+# `_best_similarity`'s docstring for why this exists: fixing the window-
+# dilution bug (trying tighter window sizes) reintroduces a false positive
+# the deterministic gate already guards against with a regex negative
+# lookahead — "passed out" is a 2-word phrase whose only non-stopword
+# content word is "passed" ("out" is in _STOPWORDS), so once tighter
+# windows are tried, a window exactly reproducing "passed out" scores a
+# perfect 1.0 regardless of what follows it in the message, and a slightly
+# larger window that pulls the next word IN (rather than leaving it just
+# after the window) still scores high enough to clear threshold either
+# way. "I passed out FLYERS for the support group" is a caregiving
+# activity, not unconsciousness.
+#
+# A position-relative check (only looking at the word right after a given
+# window) turned out to be both insufficient (a larger window absorbs the
+# continuation word instead of leaving it just outside) and, in an earlier
+# draft, too broad when generalized (fuzzy-matching arbitrary words against
+# "out" produced unrelated false suppressions). Reusing the deterministic
+# gate's own mechanism instead avoids all of that: a literal, non-fuzzy
+# regex check against the raw message, exactly mirroring
+# safety_gate._LIFE_THREAT_PATTERNS's own "passed out" negative lookahead
+# list. This only suppresses this one phrase for messages that literally
+# spell "passed out" followed by one of these exact words — a typo'd
+# continuation ("passed out flyeers") does not match the exclusion and
+# still gets scored normally, which is the safe direction per this
+# module's "fail toward escalation under uncertainty" principle. Only
+# "passed out" needs this today — no other current concept phrase reduces
+# to a single content word this short and this ambiguous.
+_BENIGN_CONTINUATION_PATTERNS: dict[str, re.Pattern[str]] = {
+    "passed out": re.compile(
+        r"\bpassed\s+out\s+(?:the|of|with|flying|flyers|brochures|pamphlets|"
+        r"leaflets|candy|samples|cards|business\s+cards|awards|certificates|"
+        r"gifts|snacks|water\s+bottles)\b",
+        re.IGNORECASE,
+    ),
+}
+
+
+def _has_benign_continuation(phrase: str, message: str) -> bool:
+    """True if `message` literally contains one of `phrase`'s known-benign
+    continuations (e.g. "passed out flyers") — the whole phrase's fuzzy
+    match is suppressed for this message, exactly as the deterministic
+    gate's negative lookahead would exclude it."""
+    pattern = _BENIGN_CONTINUATION_PATTERNS.get(phrase)
+    return pattern is not None and pattern.search(message) is not None
+
+
 def _content_words(words: list[str]) -> list[str]:
     filtered = [w for w in words if w not in _STOPWORDS]
     # A phrase made entirely of stopwords (shouldn't happen with the current
@@ -179,29 +233,79 @@ def _best_similarity(message: str, phrase: str) -> float:
     to give equivalent detection recall to the original character-level
     version while eliminating that false positive — rerun both before
     changing this again.
+
+    # Safety Gate v2 Phase 4 (docs/SAFETY_GATE_V2_PLAN.md) — windowing fix.
+    #
+    # The above fixed the false-positive problem but introduced a false-
+    # negative one: every window tried was padded to a FIXED size
+    # (`len(phrase_words) + _WINDOW_SLACK_WORDS`), even when the phrase's
+    # words sit tightly together in the message. E.g. for "heart attack"
+    # (2 words), every window was forced to 5 words. In "he had a hart
+    # attak" (5 words), the only window tried was the whole 5-word message
+    # — so the character ratio was computed as
+    # ratio("he had a hart attak", "heart attack"), diluted well below
+    # threshold by "he had a ", even though the tight 2-word substring
+    # "hart attak" alone scores far above it. The content-word gate never
+    # had this problem (it checks each content word independently, not the
+    # padded string) — only the character-ratio scoring step did.
+    #
+    # Fix: try every window SIZE from `len(phrase_words)` (tightest) up to
+    # `len(phrase_words) + _WINDOW_SLACK_WORDS` (the original padding, kept
+    # as the upper bound so paraphrases genuinely needing that slack still
+    # match exactly as before), at every position, and keep the best score
+    # among windows that still pass the unchanged content-word gate. This
+    # only changes which window WIDTHS get tried — the gate, the threshold,
+    # and the character-ratio formula are all untouched.
     """
+    if _has_benign_continuation(phrase, message):
+        return 0.0
+
     message_words = message.lower().split()
     phrase_words = phrase.lower().split()
     phrase_content = _content_words(phrase_words)
-    span = len(phrase_words) + _WINDOW_SLACK_WORDS
-
-    if len(message_words) <= span:
-        windows = [message_words]
-    else:
-        windows = [message_words[start : start + span] for start in range(len(message_words))]
+    min_span = len(phrase_words)
+    max_span = min_span + _WINDOW_SLACK_WORDS
+    n = len(message_words)
 
     best = 0.0
-    for window in windows:
-        has_support = all(
-            any(SequenceMatcher(None, content_word, w).ratio() >= _WORD_MATCH_THRESHOLD for w in window)
-            for content_word in phrase_content
-        )
-        if not has_support:
-            continue
-        score = SequenceMatcher(None, " ".join(window), phrase).ratio()
-        if score > best:
-            best = score
+    for size in range(min_span, max_span + 1):
+        if n == 0:
+            break
+        if size >= n:
+            starts = [0]
+            window_size = n
+        else:
+            starts = list(range(n - size + 1))
+            window_size = size
+
+        for start in starts:
+            window = message_words[start : start + window_size]
+            has_support = all(
+                any(
+                    SequenceMatcher(None, content_word, w).ratio() >= _WORD_MATCH_THRESHOLD
+                    for w in window
+                )
+                for content_word in phrase_content
+            )
+            if not has_support:
+                continue
+            score = SequenceMatcher(None, " ".join(window), phrase).ratio()
+            if score > best:
+                best = score
     return best
+
+
+def phrase_similarity(message: str, phrase: str) -> float:
+    """Public entry point to `_best_similarity`'s typo-tolerant fuzzy match.
+
+    Safety Gate v2 Phase 3 (docs/SAFETY_GATE_V2_PLAN.md): `safety_categories.py`
+    reuses this exact matcher (word-gate + character-ratio) for
+    BREATHING_DIFFICULTY sub-classification, rather than duplicating the
+    algorithm or importing the private `_best_similarity` directly. Threshold
+    decisions stay with the caller — this returns a raw score, same as
+    `_best_similarity`.
+    """
+    return _best_similarity(message, phrase)
 
 
 def classify_message(message: str) -> ClassifierResult:

@@ -16,6 +16,25 @@ class SafetyGateType(str, Enum):
     CAREGIVER_HARM_RISK = "caregiver_harm_risk"
     ELDER_ABUSE_NEGLECT = "elder_abuse_neglect"
 
+    # Safety Gate v2 Phase 3 (docs/SAFETY_GATE_V2_PLAN.md) — added for richer
+    # classification/metadata on top of the four categories above, which
+    # remain the only ones `check_safety_gate` itself ever returns as
+    # `gate_type` (unchanged in this phase — see that function's docstring).
+    # These six are produced only by the new `safety_categories.py` module,
+    # consumed only by `safety_decision.SafetyDecision.category`. None of
+    # them has a `_GATE_RESPONSE_BUILDERS` entry and none is ever passed to
+    # `build_gate_response_text` — the user-facing emergency response text
+    # is still selected from the original LIFE_THREAT/SELF_HARM/etc. value
+    # exactly as before. Kept on this same enum (rather than a new one)
+    # because Phase 2 established SafetyGateType as the one canonical
+    # category type project-wide.
+    BREATHING_DIFFICULTY = "breathing_difficulty"
+    FALL_OR_HEAD_INJURY = "fall_or_head_injury"
+    REDUCED_CONSCIOUSNESS = "reduced_consciousness"
+    ACUTE_CHANGE = "acute_change"
+    MEDICATION_RISK = "medication_risk"
+    ROUTINE_CAREGIVER_ISSUE = "routine_caregiver_issue"
+
 
 @dataclass(frozen=True, slots=True)
 class SafetyGateResult:
@@ -367,8 +386,43 @@ def build_gate_response_text(gate_type: SafetyGateType, locale_code: str = "en")
     Lets callers outside this module (e.g. the second-layer classifier) reuse
     the exact same locale-aware deflection copy as the deterministic gate,
     so a classifier-only match escalates identically to a regex match.
+
+    Only accepts the four categories with an entry in `_GATE_RESPONSE_BUILDERS`
+    (the original four `check_safety_gate`/`classify_message` can return).
+    Safety Gate v2's finer categories (BREATHING_DIFFICULTY, etc.) have no
+    entry here by design — see `response_category_for_text` below, which
+    Phase 5 callers use to map them onto an existing builder instead of
+    calling this function with them directly.
     """
     return _GATE_RESPONSE_BUILDERS[gate_type](locale_code)
+
+
+# Safety Gate v2 Phase 5 (docs/SAFETY_GATE_V2_PLAN.md): categories Phase 3
+# added for richer classification/metadata that still need a user-facing
+# response when Phase 5 lets them escalate independently. Per the sprint's
+# explicit instruction to "reuse existing localized escalation responses...
+# do not add new clinical copy," each maps onto whichever of the four
+# original categories' response text already fits — not a new template.
+# The existing LIFE_THREAT (911) response already covers all three: it
+# explicitly mentions checking breathing/CPR and covers any acute physical
+# emergency generically, so BREATHING_DIFFICULTY, FALL_OR_HEAD_INJURY, and
+# REDUCED_CONSCIOUSNESS all resolve to it rather than to invented,
+# untested per-category copy.
+_RESPONSE_TEXT_CATEGORY_MAP: dict[SafetyGateType, SafetyGateType] = {
+    SafetyGateType.BREATHING_DIFFICULTY: SafetyGateType.LIFE_THREAT,
+    SafetyGateType.FALL_OR_HEAD_INJURY: SafetyGateType.LIFE_THREAT,
+    SafetyGateType.REDUCED_CONSCIOUSNESS: SafetyGateType.LIFE_THREAT,
+}
+
+
+def response_category_for_text(category: SafetyGateType) -> SafetyGateType:
+    """Map any SafetyDecision category onto one `build_gate_response_text`
+    already has a builder for. The four original categories pass through
+    unchanged; Phase 3's finer LIFE_THREAT sub-categories map to
+    LIFE_THREAT's own response. Raises KeyError (via build_gate_response_text)
+    for ACUTE_CHANGE/MEDICATION_RISK/ROUTINE_CAREGIVER_ISSUE — those never
+    reach this function; see safety_decision.py / coach.py for why."""
+    return _RESPONSE_TEXT_CATEGORY_MAP.get(category, category)
 
 
 def check_safety_gate(message: str, locale_code: str = "en") -> SafetyGateResult:

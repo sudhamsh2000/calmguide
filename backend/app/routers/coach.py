@@ -32,6 +32,7 @@ from app.schemas.profile import ErrorResponse
 from app.services.acute_change_screen import (
     AcuteChangeScreenInput,
     evaluate_acute_change_screen,
+    get_acute_change_advisory_message,
 )
 from app.services.auth import hash_access_code
 from app.services.availability import record_llm_failure, record_llm_success
@@ -53,14 +54,20 @@ from app.services.response_guard import (
 )
 from app.services.response_timing import record_llm_timing, record_rag_timing
 from app.services.retrieval_query import build_english_rag_query
-from app.services.safety_classifier import classify_message
+from app.services.safety_decision import RiskLevel, SafetyDecision, evaluate_safety_v2
 from app.services.safety_gate import (
     SafetyGateType,
     build_gate_response_text,
-    check_safety_gate,
     resolve_emergency_locale,
+    response_category_for_text,
 )
 from app.services.safety_log import log_safety_event
+from app.services.safety_observability import (
+    record_rag_outcome,
+    record_response_guard_repair_used,
+    record_safety_decision,
+    record_static_fallback_used,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -86,11 +93,14 @@ async def _fetch_rag_context(message: str) -> str:
                 len(context),
                 duration_ms,
             )
+            record_rag_outcome(available=True, chunk_count=chunk_count)
         else:
             logger.info("RAG: no chunks above min_score threshold duration_ms=%.0f", duration_ms)
+            record_rag_outcome(available=True, chunk_count=0)
         return context
     except Exception as exc:
         logger.warning("RAG: unavailable — %s", exc)
+        record_rag_outcome(available=False)
         return ""
 
 
@@ -122,6 +132,111 @@ def _spawn_background(coro, label: str) -> None:
     task = asyncio.create_task(_guarded())
     _BACKGROUND_TASKS.add(task)
     task.add_done_callback(_BACKGROUND_TASKS.discard)
+
+
+def _short_circuit_safety_response(
+    *,
+    decision: SafetyDecision,
+    session_id: str,
+    profile_id: str,
+    locale_code: str,
+    emergency_locale: str,
+    payload_message: str,
+    audit_staff_id: str | None,
+    audit_facility_id: str | None,
+) -> StreamingResponse:
+    """Safety Gate v2 Phase 5: the early-return path for any decision with
+    `allow_llm=False` — today, EMERGENCY (the original 4 categories plus
+    the 3 fine LIFE_THREAT sub-categories, all reusing existing
+    locale-aware escalation copy) and HIGH (only ACUTE_CHANGE today,
+    reusing the existing acute-change-screen's own advisory message).
+    MEDICATION_RISK (MODERATE) never reaches this function — it keeps
+    `allow_llm=True` and proceeds through the normal path in `coach_chat`.
+
+    Persistence/logging/streaming shape is identical to what the old
+    inline "if safety.triggered" block did before this phase — same
+    Conversation rows (is_safety_gate=True), same log_safety_event call,
+    same SSE shape — just parameterized by `decision` instead of the old
+    ad hoc `safety`/`safety_source`/`classifier_confidence` locals, and now
+    also reachable for HIGH, which didn't exist as a routing outcome
+    before this phase.
+    """
+    if decision.risk_level is RiskLevel.HIGH:
+        # Only ACUTE_CHANGE produces HIGH today (safety_decision.py). Its
+        # advisory text is the acute-change screen's own existing message,
+        # not new copy — see acute_change_screen.get_acute_change_advisory_message.
+        response_text = get_acute_change_advisory_message()
+    else:
+        response_text = build_gate_response_text(
+            response_category_for_text(decision.category), emergency_locale
+        )
+
+    async def _save_safety_turn() -> None:
+        from app.db import get_session_factory
+
+        factory = get_session_factory()
+        async with factory() as save_session:
+            save_session.add(
+                Conversation(
+                    session_id=session_id,
+                    profile_id=profile_id,
+                    role="user",
+                    content=encrypt(payload_message),
+                    locale_code=locale_code,
+                    is_safety_gate=True,
+                )
+            )
+            save_session.add(
+                Conversation(
+                    session_id=session_id,
+                    profile_id=profile_id,
+                    role="assistant",
+                    content=encrypt(response_text),
+                    locale_code=locale_code,
+                    is_safety_gate=True,
+                )
+            )
+            await save_session.commit()
+
+    async def _log_safety_gate_event() -> None:
+        await log_safety_event(
+            event_type="safety_gate_triggered",
+            source=decision.source.value,
+            category=decision.category.value if decision.category else None,
+            profile_id=profile_id,
+            session_id=session_id,
+            staff_id=audit_staff_id,
+            facility_id=audit_facility_id,
+            locale_code=locale_code,
+            confidence=decision.confidence,
+        )
+
+    async def safety_stream():
+        # Detached for the same reason as the main path: a safety-gated
+        # turn is the last one that should go unrecorded if the caregiver
+        # closes the app right after reading it.
+        _spawn_background(_save_safety_turn(), label=f"safety:{session_id}")
+        _spawn_background(_log_safety_gate_event(), label=f"safety-log:{session_id}")
+        yield f"data: {json.dumps({'session_id': session_id})}\n\n"
+        yield f"data: {json.dumps({'text': response_text})}\n\n"
+        yield "data: [DONE]\n\n"
+
+    logger.info(
+        "Safety Gate v2 short-circuit (%s, risk_level=%s, source=%s) for session %s",
+        decision.category,
+        decision.risk_level.value,
+        decision.source.value,
+        session_id,
+    )
+    return StreamingResponse(
+        safety_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 async def drain_background_tasks(timeout: float = 10.0) -> None:
@@ -527,6 +642,48 @@ async def coach_chat(
     language = resolve_language(locale_header)
     language_constraint = resolve_language_constraint(locale_header)
 
+    # Safety Gate v2 (docs/SAFETY_GATE_V2_PLAN.md, Phase 5): evaluated here —
+    # right after profile/locale resolution, before any RAG-query LLM call,
+    # RAG retrieval, dossier/incident/cross-patient DB reads, or prompt
+    # construction — so an emergency/high-risk message never pays for any of
+    # that work before being short-circuited. This is the fix for Phase 1's
+    # core finding: previously, safety ran LAST, after all of it. Profile
+    # resolution stays first (unchanged) so a safety turn can still be
+    # persisted against the correct profile_id, exactly as before.
+    decision = evaluate_safety_v2(payload.message, locale_code=emergency_locale)
+    record_safety_decision(
+        risk_level=decision.risk_level.value,
+        category=decision.category.value if decision.category else None,
+        action=decision.action.value,
+        source=decision.source.value,
+        rag_requested=decision.allow_rag,
+    )
+
+    if not decision.allow_llm:
+        return _short_circuit_safety_response(
+            decision=decision,
+            session_id=session_id,
+            profile_id=profile.id,
+            locale_code=locale_code,
+            emergency_locale=emergency_locale,
+            payload_message=payload.message,
+            audit_staff_id=audit_staff_id,
+            audit_facility_id=audit_facility_id,
+        )
+
+    if decision.category is SafetyGateType.MEDICATION_RISK:
+        # MODERATE tier: proceeds through the normal path below unchanged —
+        # the existing coach system prompt already instructs the model to
+        # refuse medication/dosing decisions and redirect to the patient's
+        # doctor (see safety_decision.py's _moderate_risk_decision
+        # docstring for why this doesn't skip generation). Logged for
+        # observability only; no schema, no new subsystem.
+        logger.info(
+            "Safety Gate v2: medication_risk concern detected (session=%s) — "
+            "proceeding with normal, prompt-constrained guidance",
+            session_id,
+        )
+
     # Build system prompt with profile context + transient patient name
     llm = request.app.state.llm_provider
     model_override = resolve_model_for_locale(locale_code)
@@ -698,101 +855,6 @@ async def coach_chat(
     history = await _get_conversation_history(session, session_id, profile.id)
     messages = history + [{"role": "user", "content": payload.message}]
 
-    safety = check_safety_gate(payload.message, locale_code=emergency_locale)
-    safety_source = "deterministic_gate"
-    classifier_confidence: float | None = None
-
-    # Second, lightweight (non-ML) classifier layer behind the deterministic
-    # gate: catches paraphrases/near-misses the regex gate doesn't match
-    # verbatim. Escalates using the identical locale-aware response text as
-    # the deterministic gate, so a caregiver never sees a "weaker" version of
-    # the same safety response depending on which layer caught it. The
-    # deterministic gate's decision is authoritative when it fires — this
-    # layer only adds coverage, it never suppresses a gate trigger.
-    if not safety.triggered:
-        classifier_result = classify_message(payload.message)
-        if classifier_result.flagged and classifier_result.category is not None:
-            gate_type = SafetyGateType(classifier_result.category.value)
-            safety = type(safety)(
-                triggered=True,
-                gate_type=gate_type,
-                response_text=build_gate_response_text(gate_type, emergency_locale),
-            )
-            safety_source = "classifier"
-            classifier_confidence = classifier_result.confidence
-
-    if safety.triggered:
-        safety_profile_id = profile.id
-        safety_gate_type = safety.gate_type
-        safety_event_source = safety_source
-        safety_event_confidence = classifier_confidence
-
-        async def _save_safety_turn() -> None:
-            from app.db import get_session_factory
-
-            factory = get_session_factory()
-            async with factory() as save_session:
-                save_session.add(
-                    Conversation(
-                        session_id=session_id,
-                        profile_id=safety_profile_id,
-                        role="user",
-                        content=encrypt(payload.message),
-                        locale_code=locale_code,
-                        is_safety_gate=True,
-                    )
-                )
-                save_session.add(
-                    Conversation(
-                        session_id=session_id,
-                        profile_id=safety_profile_id,
-                        role="assistant",
-                        content=encrypt(safety.response_text),
-                        locale_code=locale_code,
-                        is_safety_gate=True,
-                    )
-                )
-                await save_session.commit()
-
-        async def _log_safety_gate_event() -> None:
-            await log_safety_event(
-                event_type="safety_gate_triggered",
-                source=safety_event_source,
-                category=safety_gate_type.value if safety_gate_type else None,
-                profile_id=safety_profile_id,
-                session_id=session_id,
-                staff_id=audit_staff_id,
-                facility_id=audit_facility_id,
-                locale_code=locale_code,
-                confidence=safety_event_confidence,
-            )
-
-        async def safety_stream():
-            # Detached for the same reason as the main path: a safety-gated
-            # turn is the last one that should go unrecorded if the caregiver
-            # closes the app right after reading it.
-            _spawn_background(_save_safety_turn(), label=f"safety:{session_id}")
-            _spawn_background(_log_safety_gate_event(), label=f"safety-log:{session_id}")
-            yield f"data: {json.dumps({'session_id': session_id})}\n\n"
-            yield f"data: {json.dumps({'text': safety.response_text})}\n\n"
-            yield "data: [DONE]\n\n"
-
-        logger.info(
-            "Safety gate triggered (%s, source=%s) for session %s",
-            safety.gate_type,
-            safety_source,
-            session_id,
-        )
-        return StreamingResponse(
-            safety_stream(),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-            },
-        )
-
     # Save user message (no patient name stored)
     user_msg = Conversation(
         session_id=session_id,
@@ -879,6 +941,7 @@ async def coach_chat(
 
             if llm_failed:
                 assistant_text = get_localized_fallback("coach", locale_code)
+                record_static_fallback_used()
                 # Replace any partial text the caregiver already saw with the fallback.
                 event_key = "replace" if full_response else "text"
                 yield f"data: {json.dumps({event_key: assistant_text})}\n\n"
@@ -890,6 +953,7 @@ async def coach_chat(
                     logger.warning(
                         "Coach response failed validation (%s), repairing", validation.reason
                     )
+                    record_response_guard_repair_used()
                     try:
                         repaired_text = await guard_response_text(
                             llm,
@@ -901,6 +965,7 @@ async def coach_chat(
                     except Exception as exc:
                         logger.error("Response repair failed for session %s: %s", session_id, exc)
                         repaired_text = get_localized_fallback("coach", locale_code)
+                        record_static_fallback_used()
                     # Send replacement event so the client swaps out the bad response
                     yield f"data: {json.dumps({'replace': repaired_text})}\n\n"
                     assistant_text = repaired_text

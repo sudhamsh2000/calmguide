@@ -8,6 +8,7 @@ import logging
 from collections.abc import AsyncGenerator
 
 from app.services.llm_provider import LLMProvider
+from app.services.safety_observability import record_llm_provider_used
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ class FallbackLLMProvider(LLMProvider):
             ):
                 started = True
                 yield chunk
+            record_llm_provider_used(provider=type(self._primary).__name__, failover_used=False)
             return
         except Exception as exc:
             if started:
@@ -48,6 +50,7 @@ class FallbackLLMProvider(LLMProvider):
         # model_override is provider-specific, so the secondary uses its own model.
         async for chunk in self._secondary.stream_completion(system_prompt, messages):
             yield chunk
+        record_llm_provider_used(provider=type(self._secondary).__name__, failover_used=True)
 
     async def completion(
         self,
@@ -56,9 +59,13 @@ class FallbackLLMProvider(LLMProvider):
         model_override: str | None = None,
     ) -> str:
         try:
-            return await self._primary.completion(
+            result = await self._primary.completion(
                 system_prompt, messages, model_override=model_override
             )
+            record_llm_provider_used(provider=type(self._primary).__name__, failover_used=False)
+            return result
         except Exception as exc:
             logger.warning("Primary LLM completion failed; failing over: %s", exc)
-            return await self._secondary.completion(system_prompt, messages)
+            result = await self._secondary.completion(system_prompt, messages)
+            record_llm_provider_used(provider=type(self._secondary).__name__, failover_used=True)
+            return result

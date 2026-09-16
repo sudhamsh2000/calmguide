@@ -14,6 +14,7 @@ from app.db import get_session
 from app.models.profile import Profile
 from app.schemas.checkin import CheckInRequest
 from app.schemas.profile import ErrorResponse
+from app.services.acute_change_screen import get_acute_change_advisory_message
 from app.services.auth import hash_access_code
 from app.services.availability import record_llm_failure, record_llm_success
 from app.services.prompt import (
@@ -31,14 +32,19 @@ from app.services.response_guard import (
     validate_response_quality,
 )
 from app.services.response_timing import record_llm_timing
-from app.services.safety_classifier import classify_message
+from app.services.safety_decision import RiskLevel, evaluate_safety_v2
 from app.services.safety_gate import (
     SafetyGateType,
     build_gate_response_text,
-    check_safety_gate,
     resolve_emergency_locale,
+    response_category_for_text,
 )
 from app.services.safety_log import log_safety_event
+from app.services.safety_observability import (
+    record_response_guard_repair_used,
+    record_safety_decision,
+    record_static_fallback_used,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -91,41 +97,46 @@ async def caregiver_checkin(
     emergency_locale = resolve_emergency_locale(locale_header)
     language = resolve_language(locale_header)
     language_constraint = resolve_language_constraint(locale_header)
-    safety = check_safety_gate(payload.message, locale_code=emergency_locale)
-    safety_source = "deterministic_gate"
-    classifier_confidence: float | None = None
 
-    if not safety.triggered:
-        classifier_result = classify_message(payload.message)
-        if classifier_result.flagged and classifier_result.category is not None:
-            gate_type = SafetyGateType(classifier_result.category.value)
-            safety = type(safety)(
-                triggered=True,
-                gate_type=gate_type,
-                response_text=build_gate_response_text(gate_type, emergency_locale),
+    # Safety Gate v2 (docs/SAFETY_GATE_V2_PLAN.md, Phase 5): Check-In already
+    # ran safety before any LLM call, so this isn't a reordering — it's
+    # bringing Check-In onto the same decision model coach.py now uses, so a
+    # message like "can't catch his breath" escalates consistently in both
+    # places instead of only in Moment Coach.
+    decision = evaluate_safety_v2(payload.message, locale_code=emergency_locale)
+    record_safety_decision(
+        risk_level=decision.risk_level.value,
+        category=decision.category.value if decision.category else None,
+        action=decision.action.value,
+        source=decision.source.value,
+        rag_requested=decision.allow_rag,
+    )
+
+    if not decision.allow_llm:
+        if decision.risk_level is RiskLevel.HIGH:
+            response_text = get_acute_change_advisory_message()
+        else:
+            response_text = build_gate_response_text(
+                response_category_for_text(decision.category), emergency_locale
             )
-            safety_source = "classifier"
-            classifier_confidence = classifier_result.confidence
-
-    if safety.triggered:
-        safety_gate_type = safety.gate_type
-        safety_event_source = safety_source
-        safety_event_confidence = classifier_confidence
         safety_profile_id = profile.id
+        safety_category = decision.category.value if decision.category else None
+        safety_source = decision.source.value
+        safety_confidence = decision.confidence
 
         async def _log_safety_gate_event() -> None:
             await log_safety_event(
                 event_type="safety_gate_triggered",
-                source=safety_event_source,
-                category=safety_gate_type.value if safety_gate_type else None,
+                source=safety_source,
+                category=safety_category,
                 profile_id=safety_profile_id,
                 locale_code=locale_code,
-                confidence=safety_event_confidence,
+                confidence=safety_confidence,
             )
 
         async def safety_stream():
             _spawn_background(_log_safety_gate_event(), label="checkin-safety-log")
-            yield f"data: {json.dumps({'text': safety.response_text})}\n\n"
+            yield f"data: {json.dumps({'text': response_text})}\n\n"
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(
@@ -136,6 +147,12 @@ async def caregiver_checkin(
                 "Connection": "keep-alive",
                 "X-Accel-Buffering": "no",
             },
+        )
+
+    if decision.category is SafetyGateType.MEDICATION_RISK:
+        logger.info(
+            "Safety Gate v2: medication_risk concern detected in check-in — "
+            "proceeding with normal, prompt-constrained guidance"
         )
 
     system_prompt = render_checkin_prompt(
@@ -172,6 +189,7 @@ async def caregiver_checkin(
 
         if llm_failed:
             fallback = get_localized_fallback("checkin", locale_code)
+            record_static_fallback_used()
             event_key = "replace" if full_response else "text"
             yield f"data: {json.dumps({event_key: fallback})}\n\n"
             yield "data: [DONE]\n\n"
@@ -182,6 +200,7 @@ async def caregiver_checkin(
         validation = validate_response_quality(response_text, locale_code)
         if not validation.is_valid:
             logger.warning("Checkin response failed validation (%s), repairing", validation.reason)
+            record_response_guard_repair_used()
             try:
                 repaired_text = await guard_response_text(
                     llm,
@@ -193,6 +212,7 @@ async def caregiver_checkin(
             except Exception as exc:
                 logger.error("Checkin response repair failed: %s", exc)
                 repaired_text = get_localized_fallback("checkin", locale_code)
+                record_static_fallback_used()
             yield f"data: {json.dumps({'replace': repaired_text})}\n\n"
 
         yield "data: [DONE]\n\n"
