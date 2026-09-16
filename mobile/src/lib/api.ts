@@ -68,6 +68,28 @@ export class RequestTimeoutError extends Error {
   }
 }
 
+/** The server responded and definitively said this resource doesn't exist
+ * (404) — distinct from ApiError so callers can show "check your code" copy
+ * instead of "something's wrong with our servers" for the same failure. */
+export class ProfileNotFoundError extends Error {
+  constructor(message = 'Profile not found') {
+    super(message);
+    this.name = 'ProfileNotFoundError';
+  }
+}
+
+/** The server responded but with a non-2xx, non-404 status (5xx, 4xx other
+ * than "not found"). Carries the status so callers/logs can tell a 500 from
+ * a 403 without re-parsing the message string. */
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message = `Request failed with status ${status}`) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 /**
  * fetch() with an AbortController-based timeout. Aborts after `timeoutMs` and
  * throws RequestTimeoutError. Note: this is used only for the plain JSON
@@ -218,8 +240,11 @@ export async function getProfile(accessCode: string): Promise<ProfileResponse> {
   const res = await fetchWithTimeout(`${API_BASE}/api/profiles/${accessCode}`, {
     headers: getLocaleHeaders(),
   });
+  if (res.status === 404) {
+    throw new ProfileNotFoundError();
+  }
   if (!res.ok) {
-    throw new Error('Profile not found');
+    throw new ApiError(res.status);
   }
   return res.json() as Promise<ProfileResponse>;
 }

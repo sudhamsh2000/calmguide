@@ -1,11 +1,12 @@
 import { Button } from '@/components/Button';
 import { ThemedInput } from '@/components/ThemedInput';
 import { useTheme } from '@/components/ThemeContext';
-import { getProfile } from '@/lib/api';
+import { ApiError, ProfileNotFoundError, RequestTimeoutError, getProfile } from '@/lib/api';
+import { useNetworkStatus } from '@/lib/network';
 import { setAccessCode, setPatientName } from '@/lib/storage';
 import { ACCESS_CODE_LENGTH, sanitizeAccessCode, validateLoginInput } from '@/lib/login-validation';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,6 +21,9 @@ export default function LoginScreen() {
   const [patientName, setPatientNameState] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { isOnline } = useNetworkStatus();
+  const isOnlineRef = useRef(isOnline);
+  isOnlineRef.current = isOnline;
 
   async function handleSubmit() {
     setError('');
@@ -39,8 +43,21 @@ export default function LoginScreen() {
       await setAccessCode(code);
       await setPatientName(patientName.trim());
       router.replace('/(tabs)/home');
-    } catch {
-      setError(t('login.error_not_found'));
+    } catch (err) {
+      // A device that's known offline, or any error that isn't a definitive
+      // "no such profile" from the server (timeout, 5xx, network failure),
+      // gets connection-problem copy instead of "check your code" — telling
+      // a caregiver to re-check a code that was never actually looked up is
+      // worse than telling them nothing was reachable.
+      if (isOnlineRef.current === false) {
+        setError(t('network.offline_detail'));
+      } else if (err instanceof ProfileNotFoundError) {
+        setError(t('login.error_not_found'));
+      } else if (err instanceof RequestTimeoutError || err instanceof ApiError) {
+        setError(t('error.connection'));
+      } else {
+        setError(t('error.generic'));
+      }
     } finally {
       setLoading(false);
     }
