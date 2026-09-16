@@ -14,6 +14,123 @@ Point-in-time reports that are too large to inline live beside this file:
 
 ---
 
+## 2026-09-09 — Verification sweep + cross-tenant IDOR fix (backfilled)
+
+**Taken:** 2026-09-09 (branch `main`)
+**Commit at start:** `12151f4`
+**Range covered:** `13da696..12151f4` (21 commits, all dated 2026-09-07 —
+this entry backfills them, since none were written up at the time).
+**Scope:** full verification matrix re-run (tests/types/lint/build across
+backend, frontend, mobile) plus a review of every commit in range for
+anything security- or correctness-relevant. Not a fresh code-reading pass
+like 2026-09-02 — findings below are sourced from commit messages and
+targeted diff review, then confirmed against a live test run.
+
+### Verification matrix
+
+| Area | Check | Result |
+|---|---|---|
+| Backend | `pytest` | **1578 passed**, 0 failed |
+| Backend | `ruff check` | All checks passed |
+| Backend | `ruff format --check` | 5 test files cosmetically unformatted, 209 already formatted (not fixed this entry — no behavior risk) |
+| Frontend | `tsc --noEmit` | clean |
+| Frontend | `vitest run` | **256 passed**, 1 skipped, 33 files |
+| Frontend | `next build` | compiled successfully |
+| Frontend | `npm audit --omit=dev` | **0 vulnerabilities** |
+| Mobile | `tsc --noEmit` | clean |
+| Mobile | `jest` | **28 passed**, 6 suites |
+| Backend (prod) | `GET /health` against Railway | `200`, `database: connected` |
+
+Mobile `prettier --check`, `expo-doctor`, and an actual release build were
+not re-run this entry (no Android toolchain available in this session) —
+last confirmed in the 2026-09-02 entry.
+
+### Notable fixes in range
+
+**`e8ec35e` — Cross-tenant IDOR on the facility behavioral-card endpoint
+(security, confirmed exploitable in production).** `GET
+/api/facility/residents/{profile_id}/behavioral-card` checked staff-role
+callers against their facility assignment via `staff_can_access_profile()`,
+but admin/owner callers had **no object-level authorization check at
+all** — the endpoint trusted any valid admin/owner JWT for any
+`profile_id`. The commit message records this as confirmed live against
+Railway: a Sunrise Gardens admin token successfully retrieved the
+behavioral card (interventions, escalation pattern, recent incidents,
+delirium/pain flags) for an unrelated B2C demo profile (`DEMO1FAM`) that
+was never linked to any facility. Fixed by routing admin/owner callers
+through the same `staff_can_access_profile()` helper already used for
+staff and for incident creation. New regression tests cover same-facility
+access (200), cross-facility/unlinked access (403), and unassigned-staff
+access (403).
+
+**`aab66ac` — Facility Staff page permanently empty for admin/owner
+logins.** Facility codes are one-way-hashed
+(`Facility.facility_code_hash`), so the backend cannot return a caller's
+plaintext code — the email/password login flow was papering over this by
+fabricating the literal fallback string `"admin"` as a facility code,
+which then pointed every subsequent request at a facility that doesn't
+exist. Fixed by accepting a `"me"` path-segment sentinel that resolves the
+caller's own facility from their JWT server-side
+(`_get_owned_facility`/`_get_facility`), instead of relying on a
+client-guessed string. Also fixed a Rules-of-Hooks violation across 8
+facility pages (early return before all hooks ran) found while tracing
+this, and replaced a silently-swallowed `catch` on the Staff page with a
+visible error banner.
+
+**`e651418` — Moment Coach auto-speak silently never played (regression
+in the shared-state refactor the 2026-09-02 audit's read-aloud fixes were
+built on).** Every `useSpeechSynthesis()` instance called the shared
+`stopAll()` on its own unmount, assuming instances only unmount together
+on navigation. In practice, individual `SpeakButton`s mount/unmount one at
+a time as Moment Coach's sections stream in, so an unrelated button
+unmounting mid-stream silently invalidated the page-level auto-speak
+effect's in-flight `/api/speech` request the instant it resolved — audio
+was synthesized successfully but never played. Confirmed against a real
+`next build` production server, not a dev/StrictMode artifact. Fixed by
+tracking mounted-instance count and only stopping playback when the last
+instance unmounts.
+
+**`4b2b5d1` — Moment Coach auto-speak latency.** Auto-speak previously
+waited for the entire multi-section reply to finish streaming before
+synthesizing anything, then spoke it as one request — measured at
+~11.7 ms/char (879 chars → 10.3 s), plus LLM generation time before that
+even started, meaning a caregiver could wait 20-30+ seconds in silence.
+Now speaks the "Right Now" section (shortest, earliest available) as soon
+as its own content finishes streaming, rather than the whole reply.
+Also raised the `/api/speech` fetch timeout from 20 s to 60 s, since
+worst-case synthesis at `MAX_TTS_CHARS` is ~47 s and the old timeout would
+abort mid-request and silently fall back to the flat local voice.
+
+**`a50fe14` — Mobile voice input required a manual Send tap that web no
+longer needs.** Web's `MicButton` auto-submits on speech recognition's
+real `onEnd` event; mobile's `useSpeechRecognition` had no equivalent path.
+Added an `onEnd` option (from `expo-speech-recognition`'s `'end'` event)
+and wired it through on both Coach and Check-in.
+
+**Remaining 15 commits in range** are visual/landing-page work (hero
+decorative-blob iterations, contrast fixes on Technology/Safety sections,
+a logo asset fix, decorative blobs extended to Home/Check-in/Profile per
+`design/design.md` §20/§25.7) — reviewed, no correctness or security
+findings.
+
+### Open findings carried forward
+
+Findings #2 ( `JWT_SECRET_KEY` unset locally), #3 (recheck mobile neural
+voice — likely resolved by `297f111`, still not independently re-verified
+here), #4 (mobile icon alpha channel), #5 (thin mobile test coverage), #6
+(mobile transitive advisories, deliberately left), and #8 (incomplete
+safety-critical translation review) from 2026-09-02 are presumed still
+open — none were in scope for this sweep.
+
+### Not verified in this entry
+
+No independent DB check of RAG chunk counts (finding #1 from 2026-09-02,
+reported reconnected in the 2026-09-07 entry) — still resting on that
+entry's word per its own caveat. No mobile release build or
+`expo-doctor` run. The 5 unformatted backend test files were not fixed.
+
+---
+
 ## 2026-09-07 — Safety, data-quality, and RAG-reconnection fixes
 
 **Taken:** 2026-09-07 (branch `main`)
