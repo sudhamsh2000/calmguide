@@ -12,19 +12,25 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
+// `disabled:bg-primary/45` and friends compiled to fully transparent under
+// Tailwind 3.4 — an opacity modifier on a bare `var(...)` colour can't be
+// computed (see design/design.md changelog). `disabled:opacity-*` fades the
+// whole element instead and works on any fill.
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-white hover:bg-primary-light active:bg-primary-dark disabled:bg-primary/45 disabled:text-white',
-  secondary: 'outline-button disabled:text-primary/55',
-  danger: 'bg-error text-white hover:bg-error/90 active:bg-error/80 disabled:bg-error/45',
-  ghost:
-    'text-foreground hover:bg-foreground/5 active:bg-foreground/10 disabled:text-foreground-muted',
+    'bg-primary text-onPrimary hover:bg-primary-light active:bg-primary-dark disabled:opacity-45',
+  secondary: 'outline-button disabled:opacity-55',
+  danger: 'bg-error text-white hover:bg-error/90 active:bg-error/80 disabled:opacity-45',
+  ghost: 'text-foreground ghost-button disabled:text-foreground-muted',
 };
 
+// Pill, at every size — the palette's action shape, set on the landing
+// page's CTAs and carried through the app so a button reads as a button
+// before you read its label.
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-sm rounded-lg',
-  md: 'h-10 px-4 text-base rounded-xl',
-  lg: 'h-12 min-w-tap px-6 text-lg rounded-xl',
+  sm: 'h-8 px-4 text-sm rounded-full',
+  md: 'h-10 px-5 text-base rounded-full',
+  lg: 'h-12 min-w-tap px-7 text-lg rounded-full',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(

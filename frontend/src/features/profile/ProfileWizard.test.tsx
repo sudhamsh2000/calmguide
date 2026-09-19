@@ -28,6 +28,9 @@ vi.mock('@/lib/storage', () => ({
   setAccessCode: vi.fn(),
   getPatientName: vi.fn(),
   getAccessCode: vi.fn(),
+  saveActiveProfile: vi.fn(),
+  getActiveProfileAvatar: vi.fn(() => 'monogram'),
+  PROFILE_AVATARS: ['monogram', 'male', 'female'] as const,
 }));
 
 function renderWizard() {
@@ -191,7 +194,7 @@ describe('ProfileWizard', () => {
   it('calls createProfile API and redirects on submit', async () => {
     const user = userEvent.setup();
     const { createProfile } = await import('@/lib/api');
-    const { setPatientName, setAccessCode } = await import('@/lib/storage');
+    const { saveActiveProfile } = await import('@/lib/storage');
 
     const mockCreateProfile = vi.mocked(createProfile);
     mockCreateProfile.mockResolvedValueOnce({
@@ -228,9 +231,15 @@ describe('ProfileWizard', () => {
       });
     });
 
+    // Name, access code, stage and portrait are written as one stored
+    // profile now, rather than as two loose localStorage keys.
     await waitFor(() => {
-      expect(vi.mocked(setPatientName)).toHaveBeenCalledWith('Mom');
-      expect(vi.mocked(setAccessCode)).toHaveBeenCalledWith('ABCD1234');
+      expect(vi.mocked(saveActiveProfile)).toHaveBeenCalledWith({
+        access_code: 'ABCD1234',
+        patient_name: 'Mom',
+        disease_stage: 'middle',
+        avatar: 'monogram',
+      });
     });
 
     // Submission shows a success screen with the access code first; the
@@ -265,5 +274,58 @@ describe('ProfileWizard', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Network error');
     });
+  });
+
+  it('saves the portrait picked beside the name', async () => {
+    const user = userEvent.setup();
+    const { createProfile } = await import('@/lib/api');
+    const { saveActiveProfile } = await import('@/lib/storage');
+
+    vi.mocked(createProfile).mockResolvedValueOnce({
+      id: '1',
+      access_code: 'ABCD1234',
+      disease_stage: 'middle',
+      behavioral_patterns: ['Sundowning'],
+      calming_strategies: ['Family photos'],
+      safety_concerns: ['Fall risk'],
+    });
+
+    renderWizard();
+    await passInviteStep(user);
+
+    await user.type(screen.getByLabelText("What is your loved one's first name?"), 'Tarun');
+    await user.click(screen.getByRole('radio', { name: 'Man' }));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+
+    await user.click(screen.getByText('Middle Stage'));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(screen.getByText('Sundowning (evening agitation)'));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(screen.getByText('Family Photos'));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
+    await user.click(screen.getByText('Fall Risk'));
+    await user.click(screen.getByRole('button', { name: 'Create Profile' }));
+
+    await waitFor(() => {
+      expect(vi.mocked(saveActiveProfile)).toHaveBeenCalledWith(
+        expect.objectContaining({ patient_name: 'Tarun', avatar: 'male' }),
+      );
+    });
+  });
+
+  it('keeps the monogram when no portrait is picked', async () => {
+    const user = userEvent.setup();
+    renderWizard();
+    await passInviteStep(user);
+
+    await user.type(screen.getByLabelText("What is your loved one's first name?"), 'Tarun');
+
+    // The monogram is pre-selected, and previews the typed initial so the
+    // three options can be compared as pictures rather than labels.
+    expect(screen.getByRole('radio', { name: 'Initial' })).toBeChecked();
+    expect(screen.getByText('T')).toBeInTheDocument();
+
+    // And it never blocks the step.
+    expect(screen.getByRole('button', { name: 'Next' })).not.toBeDisabled();
   });
 });

@@ -145,7 +145,7 @@ function LearnScreenInner() {
                   style={{
                     fontSize: 14,
                     fontWeight: '500',
-                    color: isActive ? '#FFF' : colors.foreground,
+                    color: isActive ? colors.onPrimary : colors.foreground,
                   }}
                 >
                   {label}

@@ -278,7 +278,7 @@ function CheckInScreenInner() {
                 }}
               >
                 <Text
-                  style={{ color: '#fff', fontSize: 16, fontWeight: '600', textAlign: 'center' }}
+                  style={{ color: colors.onPrimary, fontSize: 16, fontWeight: '600', textAlign: 'center' }}
                 >
                   {t('start_over')}
                 </Text>

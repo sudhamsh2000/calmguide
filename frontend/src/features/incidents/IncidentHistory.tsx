@@ -35,9 +35,9 @@ const CATEGORY_COLORS: Record<BehaviorCategory, string> = {
 };
 
 const SEVERITY_COLORS: Record<SeverityLevel, string> = {
-  mild: 'bg-[#E0F0E7] text-[#3A7D5C]',
-  moderate: 'bg-[#FFF3CD] text-[#856404]',
-  severe: 'bg-[#F8D7DA] text-[#721C24]',
+  mild: 'bg-success-bg text-success-text',
+  moderate: 'bg-warning-bg text-warning-text',
+  severe: 'bg-error-bg text-error',
 };
 
 function formatIncidentDate(isoDate: string): string {
@@ -88,7 +88,7 @@ export function IncidentHistory({ className = '' }: IncidentHistoryProps) {
           className={`shrink-0 rounded-full px-4 py-2 min-h-[40px] text-sm font-medium border transition-all cursor-pointer ${
             !categoryFilter
               ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-              : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
+              : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
           }`}
         >
           {t('history.filter_all_types')}
@@ -101,7 +101,7 @@ export function IncidentHistory({ className = '' }: IncidentHistoryProps) {
             className={`shrink-0 rounded-full px-4 py-2 min-h-[40px] text-sm font-medium border transition-all cursor-pointer ${
               categoryFilter === cat
                 ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
+                : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
             }`}
           >
             {t(`logger.category.${cat}`).replace(/\n/g, ' ')}

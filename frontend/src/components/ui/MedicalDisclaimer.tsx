@@ -55,7 +55,7 @@ export function MedicalDisclaimer({ children }: { children: React.ReactNode }) {
             setDisclaimerAccepted();
             setAccepted(true);
           }}
-          className="w-full rounded-xl bg-primary px-6 py-3 min-h-[48px] text-base font-semibold text-white transition-colors hover:bg-primary-light dark:hover:bg-[#4ca9a4]"
+          className="w-full rounded-full bg-primary px-6 py-3 min-h-[48px] text-base font-semibold text-onPrimary transition-colors hover:bg-primary-light dark:hover:bg-accentSky"
         >
           {t('cta')}
         </button>

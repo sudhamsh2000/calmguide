@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { WelcomeGate } from '@/components/auth/WelcomeGate';
 import { LandingChromeSync } from '@/components/landing/LandingChromeSync';
 import { LandingNav } from '@/components/landing/LandingNav';
+import { ScrollReveal } from '@/components/landing/ScrollReveal';
 import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher';
 
 export const metadata: Metadata = {
@@ -20,26 +21,32 @@ function Container({ children, className = '' }: { children: ReactNode; classNam
 
 function Eyebrow({
   children,
-  className = '',
-  color,
+  alwaysCenter = false,
+  onDark = false,
 }: {
   children: ReactNode;
-  className?: string;
-  color?: string;
+  alwaysCenter?: boolean;
+  onDark?: boolean;
 }) {
   return (
     <p
-      className={`text-sm font-semibold uppercase tracking-wide text-primary ${className}`}
-      style={color ? { color } : undefined}
+      className={`flex items-center gap-2 text-sm font-semibold ${
+        onDark ? 'text-white/50' : 'text-foreground-muted'
+      } ${alwaysCenter ? 'justify-center' : 'justify-center lg:justify-start'}`}
     >
+      <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-accentCoral" />
       {children}
     </p>
   );
 }
 
-function StepNumber({ n }: { n: number }) {
+function StepNumber({ n, onDark = false }: { n: number; onDark?: boolean }) {
   return (
-    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-ink">
+    <span
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+        onDark ? 'bg-accentSky text-white' : 'bg-primary text-onPrimary'
+      }`}
+    >
       {n}
     </span>
   );
@@ -57,7 +64,7 @@ function CheckItem({ children }: { children: ReactNode }) {
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="mt-0.5 shrink-0 text-primary"
+        className="mt-0.5 shrink-0 text-accentSky"
         aria-hidden="true"
       >
         <path d="M20 6 9 17l-5-5" />
@@ -94,7 +101,7 @@ const VALUE_ICON_PATHS: Record<string, ReactNode> = {
 
 function ValueIcon({ name }: { name: string }) {
   return (
-    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-soft text-primary">
+    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accentSky-soft text-accentSky">
       <svg
         width="22"
         height="22"
@@ -126,77 +133,51 @@ export default async function LandingPage() {
   return (
     <WelcomeGate>
       <LandingChromeSync />
-      {/* Four independently-wandering bubbles, fixed to the viewport rather
-       * than scoped to the hero section — they stay put and keep drifting
-       * as you scroll the whole landing page, instead of scrolling away
-       * with the hero. mix-blend-plus-lighter (see .hero-bubble in
-       * globals.css) means wherever two bubbles' circles overlap, the
-       * colors add together into a bright flash. That's the "contact"
-       * effect: a property of the blend mode, not a tracked collision, so
-       * it works for any two bubbles at any position. Negative z-index
-       * keeps them behind every section's own background. */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div
-          className="hero-bubble absolute -top-16 start-[10%] h-72 w-72 animate-bubble-a rounded-full opacity-90 blur-2xl"
-          style={{
-            background: 'radial-gradient(circle, rgba(58,175,169,0.4) 0%, rgba(58,175,169,0) 72%)',
-          }}
-        />
-        <div
-          className="hero-bubble absolute top-10 start-[55%] h-80 w-80 animate-bubble-b rounded-full opacity-90 blur-2xl"
-          style={{
-            background: 'radial-gradient(circle, rgba(88,157,214,0.38) 0%, rgba(88,157,214,0) 72%)',
-            animationDelay: '-3s',
-          }}
-        />
-        <div
-          className="hero-bubble absolute -top-8 start-[30%] h-64 w-64 animate-bubble-c rounded-full opacity-90 blur-2xl"
-          style={{
-            background: 'radial-gradient(circle, rgba(154,140,209,0.4) 0%, rgba(154,140,209,0) 72%)',
-            animationDelay: '-5s',
-          }}
-        />
-        <div
-          className="hero-bubble absolute top-6 start-[75%] h-64 w-64 animate-bubble-d rounded-full opacity-90 blur-2xl"
-          style={{
-            background: 'radial-gradient(circle, rgba(240,147,127,0.36) 0%, rgba(240,147,127,0) 72%)',
-            animationDelay: '-1.5s',
-          }}
-        />
-      </div>
+      <ScrollReveal />
+      <noscript>
+        <style>{'[data-reveal] { opacity: 1 !important; transform: none !important; }'}</style>
+      </noscript>
       <div className="animate-page-enter">
         <LandingNav />
 
         <main id="main-content">
-          {/* Hero */}
-          <section className="relative overflow-hidden">
-            <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
+          {/* Hero. A real caregiver-and-parent moment (photo, not an
+           * abstract render) carries the warmth; a real product screenshot
+           * floats on top of it as proof this is a working app, not just a
+           * mood board — the same "photo + floating detail card" pairing
+           * repeats at smaller scale in What Is CalmGuide and Behavioral
+           * Context below, so it reads as one deliberate system rather
+           * than a one-off hero treatment. */}
+          {/* -mt-20/pt-20 cancel out for layout (matches the header's h-20)
+           * but let the gradient paint from y=0, behind the transparent
+           * header, instead of stopping at the header's bottom edge and
+           * leaving a visible seam against the page's flat background. */}
+          <section className="landing-hero-bg relative -mt-20 overflow-hidden pt-20">
+            <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-20 lg:grid-cols-2 lg:gap-16 lg:py-24">
               <div className="text-center lg:text-start">
-                <p className="text-sm font-semibold uppercase tracking-wide text-[#6F7FD8]">
-                  {t('landing.hero.eyebrow')}
-                </p>
+                <Eyebrow>{t('landing.hero.eyebrow')}</Eyebrow>
                 <h1
                   className="mx-auto mt-4 max-w-xl text-5xl font-bold leading-[1.1] tracking-tight text-navy md:text-6xl lg:mx-0"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {t('landing.hero.title_pre')}
-                  <span className="text-primary">{t('landing.hero.title_highlight')}</span>
+                  <span>{t('landing.hero.title_highlight')}</span>
                   {t('landing.hero.title_post')}
                 </h1>
-                <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-foreground-muted lg:mx-0">
+                <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-foreground-muted lg:mx-0">
                   {t('landing.hero.subtitle')}
                 </p>
 
-                <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+                <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
                   <Link
                     href="/profile/setup"
-                    className="focus-ring inline-flex min-h-tap w-full items-center justify-center rounded-xl bg-primary px-8 text-lg font-semibold text-ink shadow-lg transition-colors hover:bg-primary-light active:bg-primary-dark sm:w-auto"
+                    className="focus-ring inline-flex min-h-tap w-full items-center justify-center rounded-full bg-primary px-8 text-lg font-semibold text-onPrimary shadow-lg transition-colors hover:bg-primary-light active:bg-primary-dark sm:w-auto"
                   >
                     {t('landing.hero.cta_primary')}
                   </Link>
                   <a
                     href="#how-it-works"
-                    className="focus-ring inline-flex min-h-tap w-full items-center justify-center rounded-xl border border-[#6F7FD8]/35 bg-[#6F7FD8]/[0.02] px-8 text-lg font-semibold text-[#6F7FD8] transition-colors hover:border-[#6F7FD8]/48 hover:bg-[#6F7FD8]/[0.06] active:bg-[#6F7FD8]/10 sm:w-auto"
+                    className="ghost-button focus-ring inline-flex min-h-tap w-full items-center justify-center rounded-full border border-theme-strong px-8 text-lg font-semibold text-foreground sm:w-auto"
                   >
                     {t('landing.hero.cta_secondary')}
                   </a>
@@ -206,16 +187,20 @@ export default async function LandingPage() {
                   {t('welcome.have_access_code')}{' '}
                   <Link
                     href="/login"
-                    className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline"
+                    className="font-medium text-accentSky underline-offset-2 hover:underline"
                   >
                     {t('login.title')}
                   </Link>
-                  <span aria-hidden="true" className="mx-2 text-foreground-muted/40">
-                    ·
+                  <span
+                    aria-hidden="true"
+                    className="mx-2"
+                    style={{ color: 'color-mix(in srgb, var(--color-foreground-muted) 40%, transparent)' }}
+                  >
+                    /
                   </span>
                   <Link
                     href="/facility/login"
-                    className="font-medium text-[#6F7FD8] underline-offset-2 hover:underline"
+                    className="font-medium text-accentSky underline-offset-2 hover:underline"
                   >
                     {t('welcome.facility_login')}
                   </Link>
@@ -226,7 +211,7 @@ export default async function LandingPage() {
                     href="https://www.leapoffaith.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="focus-ring shrink-0 rounded"
+                    className="focus-ring shrink-0 rounded-xl bg-white px-2 py-1.5"
                   >
                     <Image
                       src="/brand/leap-of-faith-logo.webp"
@@ -239,72 +224,117 @@ export default async function LandingPage() {
                   <span className="text-sm text-foreground-muted">{t('landing.partner_line')}</span>
                 </div>
 
-                <p className="mx-auto mt-8 max-w-lg text-xs leading-relaxed text-foreground-muted/70 lg:mx-0">
+                <p
+                  className="mx-auto mt-8 max-w-lg text-xs leading-relaxed lg:mx-0"
+                  style={{ color: 'color-mix(in srgb, var(--color-foreground-muted) 70%, transparent)' }}
+                >
                   {t('landing.hero.disclaimer')}
                 </p>
               </div>
 
-              <div className="relative mx-auto h-[26rem] w-full max-w-sm lg:h-[30rem]">
-                <Image
-                  src="/brand/screens/calmguide-moment-coach-response.png"
-                  alt="CalmGuide Moment Coach showing structured guidance"
-                  width={1122}
-                  height={1402}
-                  className="absolute end-0 top-6 w-[52%] rotate-3 rounded-[1.75rem] shadow-2xl ring-1 ring-black/5"
-                />
+              <div className="relative mx-auto w-full max-w-md">
+                {/* Abstract translucent shape, gently rotating — evokes the
+                 * same mood as the user's reference clip without
+                 * reproducing its specific render, which belongs to
+                 * another site (see design/design.md changelog). Pure
+                 * SVG/CSS, no video file. */}
+                {/* Parallax (scroll) and rotation (time) are two separate
+                 * transforms, so they live on two nested elements — a CSS
+                 * animation targeting `transform` fully overrides any
+                 * static `transform` on the same element, they don't
+                 * compose on one node. */}
+                <div className="landing-glass-parallax pointer-events-none absolute -end-16 -top-16 -z-10 h-[70%] w-[70%] opacity-90">
+                  <svg aria-hidden="true" viewBox="0 0 200 200" className="landing-glass-shape h-full w-full">
+                    <defs>
+                      <linearGradient id="landingGlass" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#dcebfa" stopOpacity="0.95" />
+                        <stop offset="55%" stopColor="#3e8fd0" stopOpacity="0.5" />
+                        <stop offset="100%" stopColor="#ffffff" stopOpacity="0.85" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      fill="url(#landingGlass)"
+                      d="M100 18c26 0 40 22 56 40 16 18 32 30 22 50-10 19-36 18-56 30-20 12-34 34-56 28-22-6-30-32-40-52-10-20-20-40-6-58 14-18 54-38 80-38Z"
+                    />
+                  </svg>
+                </div>
+                <div className="landing-glass-parallax pointer-events-none absolute -bottom-14 -start-14 -z-10 h-[55%] w-[55%] opacity-70">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 200 200"
+                    className="landing-glass-shape h-full w-full"
+                    style={{ animationDirection: 'reverse', animationDuration: '28s' }}
+                  >
+                    <defs>
+                      <linearGradient id="landingGlass2" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#3e8fd0" stopOpacity="0.5" />
+                        <stop offset="100%" stopColor="#dcebfa" stopOpacity="0.85" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      fill="url(#landingGlass2)"
+                      d="M100 18c26 0 40 22 56 40 16 18 32 30 22 50-10 19-36 18-56 30-20 12-34 34-56 28-22-6-30-32-40-52-10-20-20-40-6-58 14-18 54-38 80-38Z"
+                    />
+                  </svg>
+                </div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-black/5">
+                  <Image
+                    src="/brand/caregivers/caregiver-companionship.png"
+                    alt="A caregiver sitting with an older woman, hands clasped, both smiling"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 28rem, 90vw"
+                    className="object-cover"
+                  />
+                </div>
                 <Image
                   src="/brand/screens/calmguide-home-coach.png"
                   alt="CalmGuide home screen"
                   width={1122}
                   height={1402}
-                  priority
-                  className="absolute start-0 bottom-0 w-[62%] -rotate-2 rounded-[1.75rem] shadow-2xl ring-1 ring-black/5"
+                  className="absolute -bottom-8 -start-10 w-[42%] -rotate-3 rounded-[1.5rem] shadow-2xl ring-1 ring-black/10"
                 />
               </div>
             </Container>
           </section>
 
           {/* Value strip */}
-          <section className="pb-16 md:pb-24">
+          <section data-reveal className="border-b border-theme-soft py-14 md:py-16">
             <Container>
-              <div className="card-shell rounded-3xl p-8 md:p-10">
-                <h2
-                  className="text-center text-3xl font-bold tracking-tight text-ink"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
-                  {t('landing.value_strip.title')}
-                </h2>
-                <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                  {valueItems.map((key) => (
-                    <div key={key} className="text-center">
-                      <div className="flex justify-center">
-                        <ValueIcon name={key} />
-                      </div>
-                      <h3 className="mt-3 text-base font-semibold text-foreground">
+              <h2
+                className="text-2xl font-bold tracking-tight text-ink md:text-3xl"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {t('landing.value_strip.title')}
+              </h2>
+              <div className="mt-9 grid grid-cols-1 divide-y divide-theme-soft sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+                {valueItems.map((key, i) => (
+                  <div
+                    key={key}
+                    className={`flex items-start gap-3 py-5 sm:py-0 sm:ps-6 ${
+                      i > 0 ? 'sm:border-s sm:border-theme-soft' : ''
+                    }`}
+                  >
+                    <ValueIcon name={key} />
+                    <div>
+                      <h3 className="text-base font-semibold text-foreground">
                         {t(`landing.value_strip.items.${key}.title`)}
                       </h3>
-                      <p className="mt-1.5 text-sm text-foreground-muted">
+                      <p className="mt-1 text-sm text-foreground-muted">
                         {t(`landing.value_strip.items.${key}.desc`)}
                       </p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </Container>
           </section>
 
           {/* What is CalmGuide */}
-          <section id="what-we-do" className="relative overflow-hidden bg-accent-aqua/30 py-16 md:py-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -end-24 -top-32 h-[26rem] w-[26rem] rounded-full opacity-60 blur-3xl"
-              style={{
-                background: 'radial-gradient(circle, rgba(58,175,169,0.35) 0%, rgba(58,175,169,0) 70%)',
-              }}
-            />
-            <Container className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <section id="what-we-do" data-reveal className="bg-accent-aqua/30 py-16 md:py-24">
+            <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="text-center lg:text-start">
-                <Eyebrow color="#6F7FD8">{t('landing.what_is.eyebrow')}</Eyebrow>
+                <Eyebrow>{t('landing.what_is.eyebrow')}</Eyebrow>
                 <h2
                   className="mt-3 text-4xl font-bold tracking-tight text-ink"
                   style={{ fontFamily: 'var(--font-display)' }}
@@ -315,30 +345,39 @@ export default async function LandingPage() {
                   {t('landing.what_is.desc')}
                 </p>
               </div>
-              <div className="card-shell mx-auto w-full max-w-md rounded-2xl p-6">
-                <ul className="space-y-4">
-                  {whatIsChecklist.map((item) => (
-                    <CheckItem key={item}>{item}</CheckItem>
-                  ))}
-                </ul>
+              <div className="relative mx-auto w-full max-w-md pb-24 sm:pb-8">
+                <div className="relative aspect-[5/4] w-full overflow-hidden rounded-[2rem] shadow-xl ring-1 ring-black/5">
+                  <Image
+                    src="/brand/caregivers/caregiver-medication-review.png"
+                    alt="A caregiver reviewing medication with an older couple"
+                    fill
+                    sizes="(min-width: 1024px) 28rem, 90vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="card-shell absolute bottom-0 start-1/2 w-[92%] -translate-x-1/2 rounded-2xl p-5 sm:bottom-auto sm:start-auto sm:end-[-2rem] sm:top-[calc(100%-4.5rem)] sm:w-[85%] sm:translate-x-0">
+                  <ul className="grid grid-cols-1 gap-x-4 gap-y-2.5 sm:grid-cols-2">
+                    {whatIsChecklist.map((item) => (
+                      <CheckItem key={item}>{item}</CheckItem>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </Container>
           </section>
 
-          {/* How CalmGuide works */}
-          <section id="how-it-works" className="relative overflow-hidden bg-accent-mint/50 py-16 md:py-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-28 -start-20 h-[24rem] w-[24rem] rounded-full opacity-60 blur-3xl"
-              style={{
-                background: 'radial-gradient(circle, rgba(67,201,168,0.35) 0%, rgba(67,201,168,0) 70%)',
-              }}
-            />
-            <Container className="relative">
+          {/* How CalmGuide works — the one dark panel on the page, echoing
+           * the reference's own black "How It Works" section. Everything
+           * else on the page stays light, so this is the single deliberate
+           * moment of contrast rather than one of several. */}
+          <section id="how-it-works" data-reveal className="bg-panelDark py-16 md:py-24">
+            <Container>
               <div className="mx-auto max-w-2xl text-center">
-                <Eyebrow color="#6F7FD8">{t('landing.how.eyebrow')}</Eyebrow>
+                <Eyebrow alwaysCenter onDark>
+                  {t('landing.how.eyebrow')}
+                </Eyebrow>
                 <h2
-                  className="mt-3 text-4xl font-bold tracking-tight text-ink"
+                  className="mt-3 text-4xl font-bold tracking-tight text-white"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {t('landing.how.title')}
@@ -347,14 +386,17 @@ export default async function LandingPage() {
 
               <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {howSteps.map((key, i) => (
-                  <div key={key} className="card-shell rounded-2xl p-5 text-center">
+                  <div
+                    key={key}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center"
+                  >
                     <div className="flex justify-center">
-                      <StepNumber n={i + 1} />
+                      <StepNumber n={i + 1} onDark />
                     </div>
-                    <h3 className="mt-3 text-base font-semibold text-foreground">
+                    <h3 className="mt-3 text-base font-semibold text-white">
                       {t(`landing.how.steps.${key}.title`)}
                     </h3>
-                    <p className="mt-1.5 text-sm text-foreground-muted">
+                    <p className="mt-1.5 text-sm text-white/60">
                       {t(`landing.how.steps.${key}.desc`)}
                     </p>
                   </div>
@@ -364,7 +406,7 @@ export default async function LandingPage() {
           </section>
 
           {/* Moment Coach showcase */}
-          <section className="py-16 md:py-24">
+          <section data-reveal className="py-16 md:py-24">
             <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="relative mx-auto w-full max-w-xs lg:order-2">
                 <Image
@@ -383,9 +425,7 @@ export default async function LandingPage() {
                 />
               </div>
               <div className="lg:order-1">
-                <Eyebrow className="text-center lg:text-start" color="#6F7FD8">
-                  {t('landing.coach.eyebrow')}
-                </Eyebrow>
+                <Eyebrow>{t('landing.coach.eyebrow')}</Eyebrow>
                 <h2
                   className="mt-3 text-center text-4xl font-bold tracking-tight text-ink lg:text-start"
                   style={{ fontFamily: 'var(--font-display)' }}
@@ -399,7 +439,7 @@ export default async function LandingPage() {
                 <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {(['right_now', 'why', 'when_help', 'not_to_do'] as const).map((key) => (
                     <div key={key} className="card-shell rounded-2xl p-4">
-                      <h3 className="text-sm font-semibold text-primary">
+                      <h3 className="text-sm font-semibold text-accentSky">
                         {t(`landing.coach.${key}.title`)}
                       </h3>
                       <p className="mt-1 text-sm text-foreground-muted">
@@ -413,15 +453,8 @@ export default async function LandingPage() {
           </section>
 
           {/* Behavioral context */}
-          <section className="relative overflow-hidden bg-accent-lavender/50 py-16 md:py-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -end-16 top-1/2 h-[24rem] w-[24rem] -translate-y-1/2 rounded-full opacity-60 blur-3xl"
-              style={{
-                background: 'radial-gradient(circle, rgba(154,140,209,0.38) 0%, rgba(154,140,209,0) 70%)',
-              }}
-            />
-            <Container className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <section data-reveal className="bg-accent-lavender/50 py-16 md:py-24">
+            <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="text-center lg:text-start">
                 <Eyebrow>{t('landing.behavioral_context.eyebrow')}</Eyebrow>
                 <h2
@@ -439,28 +472,32 @@ export default async function LandingPage() {
                   ))}
                 </ul>
               </div>
-              <Image
-                src="/brand/screens/calmguide-behavior-profile.png"
-                alt="CalmGuide behavior profile and memory insights"
-                width={1122}
-                height={1402}
-                className="mx-auto w-full max-w-xs rounded-[1.75rem] shadow-2xl ring-1 ring-black/5"
-              />
+              <div className="relative mx-auto w-full max-w-md">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] shadow-xl ring-1 ring-black/5">
+                  <Image
+                    src="/brand/caregivers/caregiver-mobility-support.png"
+                    alt="A caregiver helping an older man walk across a living room"
+                    fill
+                    sizes="(min-width: 1024px) 28rem, 90vw"
+                    className="object-cover"
+                  />
+                </div>
+                <Image
+                  src="/brand/screens/calmguide-behavior-profile.png"
+                  alt="CalmGuide behavior profile and memory insights"
+                  width={1122}
+                  height={1402}
+                  className="absolute -bottom-8 -end-6 w-[38%] rotate-3 rounded-2xl shadow-2xl ring-1 ring-black/10"
+                />
+              </div>
             </Container>
           </section>
 
           {/* Safety */}
-          <section id="safety" className="relative overflow-hidden bg-accent-peach/40 py-16 md:py-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -start-24 -bottom-24 h-[26rem] w-[26rem] rounded-full opacity-60 blur-3xl"
-              style={{
-                background: 'radial-gradient(circle, rgba(240,147,127,0.38) 0%, rgba(240,147,127,0) 70%)',
-              }}
-            />
-            <Container className="relative max-w-2xl">
+          <section id="safety" data-reveal className="bg-accent-peach/40 py-16 md:py-24">
+            <Container className="max-w-2xl">
               <div className="text-center">
-                <Eyebrow>{t('landing.safety.eyebrow')}</Eyebrow>
+                <Eyebrow alwaysCenter>{t('landing.safety.eyebrow')}</Eyebrow>
                 <h2
                   className="mt-3 text-4xl font-bold tracking-tight text-ink"
                   style={{ fontFamily: 'var(--font-display)' }}
@@ -490,7 +527,8 @@ export default async function LandingPage() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="hidden shrink-0 text-foreground-muted/50 sm:block"
+                        className="hidden shrink-0 sm:block"
+                        style={{ color: 'color-mix(in srgb, var(--color-foreground-muted) 50%, transparent)' }}
                         aria-hidden="true"
                       >
                         <path d="M9 6l6 6-6 6" />
@@ -507,7 +545,7 @@ export default async function LandingPage() {
           </section>
 
           {/* 3 a.m. experience — "For Caregivers" */}
-          <section id="for-caregivers" className="py-16 md:py-24">
+          <section id="for-caregivers" data-reveal className="py-16 md:py-24">
             <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
               <div className="text-center lg:text-start">
                 <Eyebrow>{t('landing.three_am.eyebrow')}</Eyebrow>
@@ -532,7 +570,7 @@ export default async function LandingPage() {
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="mt-0.5 shrink-0 text-primary"
+                        className="mt-0.5 shrink-0 text-accentSky"
                         aria-hidden="true"
                       >
                         <path d="M20 6 9 17l-5-5" />
@@ -553,16 +591,9 @@ export default async function LandingPage() {
           </section>
 
           {/* Healthcare / Technology — "For Healthcare" */}
-          <section id="technology" className="relative overflow-hidden bg-accent-lavender/40 py-16 md:py-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -end-20 -top-24 h-[24rem] w-[24rem] rounded-full opacity-50 blur-3xl"
-              style={{
-                background: 'radial-gradient(circle, rgba(154,140,209,0.35) 0%, rgba(154,140,209,0) 70%)',
-              }}
-            />
-            <Container className="relative max-w-2xl text-center">
-              <div id="for-healthcare">
+          <section id="technology" data-reveal className="bg-accent-lavender/40 py-16 md:py-24">
+            <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+              <div id="for-healthcare" className="text-center lg:text-start">
                 <Eyebrow>{t('landing.interop.eyebrow')}</Eyebrow>
                 <h2
                   className="mt-3 text-4xl font-bold tracking-tight text-ink"
@@ -573,7 +604,7 @@ export default async function LandingPage() {
                 <p className="mt-4 leading-relaxed text-foreground-muted">
                   {t('landing.interop.desc')}
                 </p>
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                   {['FHIR', 'HL7', 'OMOP', 'SNOMED CT', 'LOINC'].map((standard) => (
                     <span
                       key={standard}
@@ -583,45 +614,55 @@ export default async function LandingPage() {
                     </span>
                   ))}
                 </div>
-                <p className="mx-auto mt-4 max-w-xl text-sm text-foreground-muted">
+                <p className="mx-auto mt-4 max-w-xl text-sm text-foreground-muted lg:mx-0">
                   {t('landing.interop.caveat')}
                 </p>
+
+                <div className="mt-10 border-t border-theme-soft pt-8">
+                  <p className="text-sm font-semibold text-foreground-muted">
+                    {t('landing.technology.eyebrow')}
+                  </p>
+                  <div className="mx-auto mt-4 flex max-w-xl flex-wrap items-center justify-center gap-2 lg:mx-0 lg:justify-start">
+                    {techItems.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full bg-accentSky-soft px-3.5 py-1.5 text-sm font-medium text-accentSky"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-10 border-t border-theme-soft pt-10">
-                <p className="text-sm font-semibold uppercase tracking-wide text-foreground-muted">
-                  {t('landing.technology.eyebrow')}
-                </p>
-                <div className="mx-auto mt-4 flex max-w-xl flex-wrap items-center justify-center gap-2">
-                  {techItems.map((tech) => (
-                    <span
-                      key={tech}
-                      className="rounded-full bg-primary-soft px-3.5 py-1.5 text-sm font-medium text-ink"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
+              <div className="relative mx-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-[2rem] shadow-xl ring-1 ring-black/5">
+                <Image
+                  src="/brand/caregivers/caregiver-telehealth.png"
+                  alt="A caregiver and older woman on a video call with a clinician"
+                  fill
+                  sizes="(min-width: 1024px) 28rem, 90vw"
+                  className="object-cover"
+                />
               </div>
             </Container>
           </section>
 
           {/* Final CTA */}
-          <section className="py-16 md:py-20">
+          <section data-reveal className="py-16 md:py-20">
             <Container className="max-w-2xl">
-              <div className="landing-gradient-cta rounded-3xl px-8 py-14 text-center shadow-xl">
+              <div className="rounded-3xl bg-panelDark px-8 py-14 text-center shadow-xl">
                 <h2
-                  className="text-3xl font-bold tracking-tight text-white md:text-4xl"
+                  className="text-3xl font-bold tracking-tight text-panelDark-on md:text-4xl"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {t('landing.final_cta.title')}
                 </h2>
-                <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/85">
+                <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/70">
                   {t('landing.final_cta.desc')}
                 </p>
                 <Link
                   href="/profile/setup"
-                  className="focus-ring mt-8 inline-flex min-h-tap items-center justify-center rounded-xl bg-white px-8 text-lg font-semibold text-primary shadow-lg transition-colors hover:bg-white/90"
+                  className="focus-ring mt-8 inline-flex min-h-tap items-center justify-center rounded-full bg-white px-8 text-lg font-semibold text-panelDark shadow-lg transition-colors hover:bg-white/90"
                 >
                   {t('landing.hero.cta_primary')}
                 </Link>

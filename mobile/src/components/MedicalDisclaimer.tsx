@@ -74,7 +74,7 @@ export function MedicalDisclaimer({ children }: { children: React.ReactNode }) {
               onPress={() => Linking.openURL('tel:18002723900').catch(() => {})}
               accessibilityRole="link"
               accessibilityLabel="Call Alzheimer's Association at 1-800-272-3900"
-              style={{ fontWeight: '700', color: colors.primary, textDecorationLine: 'underline' }}
+              style={{ fontWeight: '700', color: colors.accent, textDecorationLine: 'underline' }}
             >
               1-800-272-3900
             </Text>

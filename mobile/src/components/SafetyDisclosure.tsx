@@ -102,7 +102,7 @@ export function SafetyDisclosure() {
               }
               accessibilityRole="link"
               accessibilityLabel={`Call ${numbers.helplineName} at ${numbers.helpline}`}
-              style={{ fontWeight: '700', color: colors.primary, textDecorationLine: 'underline' }}
+              style={{ fontWeight: '700', color: colors.accent, textDecorationLine: 'underline' }}
             >
               {t('safety_disclosure.safety_helpline', {
                 phone: numbers.helpline,

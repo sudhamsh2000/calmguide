@@ -119,7 +119,7 @@ export function StepChipSelector({
         <button
           type="button"
           onClick={() => setShowCustomInput(true)}
-          className="self-start text-primary font-medium text-base hover:underline focus-ring rounded min-h-tap flex items-center cursor-pointer"
+          className="self-start text-accentSky font-medium text-base hover:underline focus-ring rounded min-h-tap flex items-center cursor-pointer"
         >
           {t('chip.add_custom')}
         </button>

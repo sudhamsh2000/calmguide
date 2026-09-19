@@ -177,7 +177,7 @@ export function ScenarioInteraction({ scenarioId, className = '' }: ScenarioInte
       <button
         type="button"
         onClick={() => router.push('/learn')}
-        className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary hover:underline min-h-tap"
+        className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-accentSky hover:underline min-h-tap"
         aria-label={tc('nav.back_to_scenarios')}
       >
         <svg

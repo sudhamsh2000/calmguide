@@ -40,7 +40,7 @@ export function SafetyDisclosure() {
   const numbers = localeNumbers(locale);
 
   return (
-    <details className="group rounded-lg border border-warning/20 bg-warning/10 dark:border-[#31445f] dark:bg-warning/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.12)] [&_summary::-webkit-details-marker]:hidden">
+    <details className="group rounded-lg border border-warning/20 bg-warning/10 dark:border-theme-soft dark:bg-warning/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.12)] [&_summary::-webkit-details-marker]:hidden">
       <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-xs text-foreground list-none">
         <span aria-hidden="true">ⓘ</span>
         <span className="flex-1">

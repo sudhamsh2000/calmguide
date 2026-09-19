@@ -59,7 +59,7 @@ export function IncidentPatternCard({ patterns, className = '' }: IncidentPatter
 
       <Link
         href="/incidents"
-        className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+        className="mt-3 inline-block text-sm font-medium text-accentSky hover:underline"
       >
         {t('patterns.see_details')}
       </Link>

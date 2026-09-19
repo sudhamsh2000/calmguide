@@ -12,6 +12,14 @@ const config: Config = {
           dark: 'var(--color-primary-dark)',
           soft: 'var(--color-primary-soft)',
         },
+        // Label colour for anything sitting on a `bg-primary` fill. Exists
+        // because the pair inverts in dark mode — see globals.css.
+        onPrimary: 'var(--color-on-primary)',
+        // A deliberately dark panel + its label, in both themes.
+        panelDark: {
+          DEFAULT: 'var(--color-panel-dark)',
+          on: 'var(--color-on-panel-dark)',
+        },
         background: {
           DEFAULT: 'var(--color-background)',
         },
@@ -48,13 +56,19 @@ const config: Config = {
           aqua: 'var(--color-accent-aqua)',
           lavender: 'var(--color-accent-lavender)',
           peach: 'var(--color-accent-peach)',
-          blue: 'var(--color-accent-blue)',
         },
         footer: {
           DEFAULT: 'var(--color-footer-bg)',
           text: 'var(--color-footer-text)',
           muted: 'var(--color-footer-text-muted)',
         },
+        // The palette's two accents, app-wide as of 2026-09-19: sky for
+        // anything informational, coral only as a small marker dot.
+        accentSky: {
+          DEFAULT: 'var(--color-accent-sky)',
+          soft: 'var(--color-accent-sky-soft)',
+        },
+        accentCoral: 'var(--color-accent-coral)',
       },
       fontFamily: {
         sans: ['var(--font-body)', 'Nunito', 'system-ui', 'sans-serif'],
@@ -107,34 +121,6 @@ const config: Config = {
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
-        // Four independent wandering paths for the hero's decorative
-        // bubbles — each bubble keeps a fixed color and just moves; the
-        // "contact" effect comes from mix-blend-mode (see
-        // .hero-bubble in globals.css) automatically brightening wherever
-        // two bubbles' circles overlap, not from tracking real collisions.
-        // Different corner-to-corner diagonals per bubble, offset via
-        // animation-delay in the markup, so they never move in lockstep.
-        // Disabled entirely under prefers-reduced-motion (see globals.css).
-        'bubble-a': {
-          '0%, 100%': { transform: 'translate(-10%, -15%) scale(1)' },
-          '33%': { transform: 'translate(55%, 10%) scale(1.15)' },
-          '66%': { transform: 'translate(15%, 60%) scale(0.88)' },
-        },
-        'bubble-b': {
-          '0%, 100%': { transform: 'translate(70%, 55%) scale(1)' },
-          '33%': { transform: 'translate(10%, 70%) scale(0.85)' },
-          '66%': { transform: 'translate(45%, 5%) scale(1.2)' },
-        },
-        'bubble-c': {
-          '0%, 100%': { transform: 'translate(20%, 70%) scale(1)' },
-          '33%': { transform: 'translate(65%, 25%) scale(1.1)' },
-          '66%': { transform: 'translate(5%, 5%) scale(0.9)' },
-        },
-        'bubble-d': {
-          '0%, 100%': { transform: 'translate(60%, 5%) scale(1)' },
-          '33%': { transform: 'translate(5%, 40%) scale(0.92)' },
-          '66%': { transform: 'translate(50%, 65%) scale(1.16)' },
-        },
       },
       animation: {
         breathing: 'breathing 4s ease-in-out infinite',
@@ -143,10 +129,6 @@ const config: Config = {
         'page-enter': 'page-enter 0.4s ease-out forwards',
         'skeleton-shimmer': 'skeleton-shimmer 1.5s ease-in-out infinite',
         shake: 'shake 0.5s ease-in-out',
-        'bubble-a': 'bubble-a 9s ease-in-out infinite',
-        'bubble-b': 'bubble-b 11s ease-in-out infinite',
-        'bubble-c': 'bubble-c 7.5s ease-in-out infinite',
-        'bubble-d': 'bubble-d 10s ease-in-out infinite',
       },
     },
   },

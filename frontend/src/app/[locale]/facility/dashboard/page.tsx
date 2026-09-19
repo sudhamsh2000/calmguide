@@ -72,7 +72,7 @@ export default function DashboardPage() {
           )}
         </div>
         {state.staff && (
-          <Link href="/facility/profile" className="text-sm text-primary hover:underline">
+          <Link href="/facility/profile" className="text-sm text-accentSky hover:underline">
             {state.staff.name.split(' ')[0]} ↗
           </Link>
         )}
@@ -153,7 +153,7 @@ export default function DashboardPage() {
             type="button"
             onClick={handleExport}
             disabled={exporting}
-            className="focus-ring rounded-xl bg-primary text-white px-4 py-3 min-h-[48px] text-base font-semibold hover:bg-primary-light dark:hover:bg-primary-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="focus-ring rounded-full bg-primary text-onPrimary px-4 py-3 min-h-[48px] text-base font-semibold hover:bg-primary-light dark:hover:bg-primary-light active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {exporting ? `${t('export_pdf')}…` : t('export_pdf')}
           </button>

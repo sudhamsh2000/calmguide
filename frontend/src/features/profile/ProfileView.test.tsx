@@ -32,6 +32,7 @@ vi.mock('@/lib/storage', () => ({
   clearAll: vi.fn(),
   getAutoSpeakReplies: vi.fn(() => false),
   setAutoSpeakReplies: vi.fn(),
+  getActiveProfileAvatar: vi.fn(() => 'monogram'),
 }));
 
 const mockProfile = {

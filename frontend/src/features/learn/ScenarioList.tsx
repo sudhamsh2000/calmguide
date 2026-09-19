@@ -155,7 +155,7 @@ export function ScenarioList({ className = '' }: ScenarioListProps) {
           <button
             type="button"
             onClick={() => setSelectedCategory('all')}
-            className="text-primary font-medium hover:underline"
+            className="text-accentSky font-medium hover:underline"
           >
             {t('list.show_all')}
           </button>

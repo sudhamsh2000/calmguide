@@ -197,7 +197,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={!name.trim() || !canSave || saving}
-              className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light active:bg-primary-dark transition-colors"
+              className="w-full h-12 rounded-full bg-primary text-onPrimary font-semibold text-base disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light active:bg-primary-dark transition-colors"
             >
               {saving ? `${t('save_changes')}…` : t('save_changes')}
             </button>

@@ -4,30 +4,47 @@
 
 @layer base {
   :root {
-    --color-primary: #2b7a78;
-    --color-primary-light: #3aafa9;
-    --color-primary-dark: #17252a;
-    --color-primary-soft: #eaf7f6;
-    --color-background: #fafaf5;
-    --color-foreground: #2d3436;
-    --color-foreground-muted: #636e72;
+    /* Palette pass, 2026-09-19 — the landing page's near-black/icy-blue
+     * system promoted from a `[data-landing]` override to the app-wide
+     * default, so every screen (caregiver app, facility portal, landing)
+     * reads as one product. Semantic colours below (success/warning/error/
+     * emergency and the four Moment Coach section tints) are deliberately
+     * NOT folded into it: neutralising the general UI is exactly what makes
+     * those the only saturated things on screen, so they read as signal. */
+    --color-primary: #10141c;
+    --color-primary-light: #262c38;
+    --color-primary-dark: #05070a;
+    --color-primary-soft: #eef2f6;
+    /* Paired with --color-primary: whatever sits *on* a primary fill. The
+     * pair inverts in dark mode (near-white fill, near-black label), which
+     * a hardcoded `text-white` on every button could not do. */
+    --color-on-primary: #ffffff;
+    --color-background: #eef5fb;
+    --color-foreground: #16202c;
+    --color-foreground-muted: #5d6b7a;
     --color-success: #00b894;
     --color-warning: #fdcb6e;
     --color-error: #b84c36;
     --color-surface: #ffffff;
-    --color-border: rgba(0, 0, 0, 0.1);
+    --color-border: rgba(16, 20, 28, 0.1);
 
-    /* --- Design-system extensions (design/design.md) ---------------------
-     * Additive only — nothing above this line changed value or meaning, so
-     * every existing `bg-primary`, `text-foreground-muted`, etc. class still
-     * resolves exactly as before. These new tokens exist for the landing
-     * page and for future primitive refinement; see design/design.md §3 for
-     * the full table and rationale. */
-    --color-navy: #183b56; /* deep brand navy — marketing headline accent, light mode only */
-    --color-ink: #1a2e3b; /* deep ink — alt strong heading tone */
+    /* The two accents that carry the palette: sky for anything
+     * informational (icons, links, chips), coral only ever as a small
+     * marker dot. Everything tappable is near-black; nothing else is. */
+    --color-accent-sky: #3e8fd0;
+    --color-accent-sky-soft: #e3f0fa;
+    --color-accent-coral: #e8663d;
+
+    /* --- Design-system extensions (design/design.md §3) -------------------
+     * These were additive when introduced; as of the 2026-09-19 palette pass
+     * several were re-valued along with the core tokens above, so this block
+     * is no longer "nothing changed here". See the changelog entry for what
+     * moved and why. */
+    --color-navy: #16202c; /* strong heading tone */
+    --color-ink: #10141c; /* deepest heading tone — matches primary */
     --color-surface-elevated: #ffffff;
-    --color-border-soft: #e9eeec;
-    --color-border-strong: #c9d5d2;
+    --color-border-soft: #e4ebf2;
+    --color-border-strong: #c3ceda;
     --color-success-bg: #e8f8f3;
     --color-success-text: #087a64;
     --color-warning-bg: #fff7e3;
@@ -35,16 +52,27 @@
     --color-error-bg: #fbedea;
     --color-emergency: #a63d2c;
     --color-emergency-bg: #fff1ee;
-    --color-accent-mint: #eff8f5;
-    --color-accent-aqua: #eaf7f6;
-    --color-accent-lavender: #f3f1f8;
-    --color-accent-peach: #f7e4dc;
-    --color-accent-blue: #eaf4fb; /* landing-page only — hero blob gradient */
+    /* Section tints, previously a mint/aqua/lavender/peach rainbow. Now one
+     * neutral — sections are separated by a change in value, not hue, which
+     * is what keeps the saturated safety colours legible as signal. The four
+     * names are kept because ~20 in-app components reference them. */
+    --color-accent-mint: #f3f6f9;
+    --color-accent-aqua: #f3f6f9;
+    --color-accent-lavender: #f3f6f9;
+    --color-accent-peach: #f3f6f9;
 
-    /* Landing-page footer band — deliberately a fixed deep navy regardless
-     * of site theme (a common marketing-site pattern), so these are defined
-     * once here and NOT overridden under `.dark` below. */
-    --color-footer-bg: #1a2332;
+    /* A panel that is deliberately dark in BOTH themes — the landing page's
+     * "How it works" band and final CTA. Distinct from `--color-primary`,
+     * which inverts in dark mode: a panel whose whole point is contrast
+     * against the page cannot flip to near-white when the page does.
+     * Theme-invariant, so not overridden under `.dark`. */
+    --color-panel-dark: #10141c;
+    --color-on-panel-dark: #ffffff;
+
+    /* Footer band — a fixed near-black regardless of site theme (a common
+     * marketing-site pattern), so these are defined once here and NOT
+     * overridden under `.dark` below. */
+    --color-footer-bg: #10141c;
     --color-footer-text: #f5f6f8;
     --color-footer-text-muted: #a7b3c4;
     --color-footer-border: rgba(255, 255, 255, 0.08);
@@ -66,10 +94,18 @@
   }
 
   .dark {
-    --color-background: #1a2332;
-    --color-foreground: #e8e8e8;
-    --color-foreground-muted: #b8c3cc;
-    --color-surface: #243447;
+    /* Dark equivalents re-derived 2026-09-19 for the near-black palette —
+     * previously a navy-tinted set (#1a2332/#243447) that no longer had a
+     * light-mode counterpart to be the dark version *of*. Neutral-cool
+     * greys instead, so the accents and the safety colours stay the only
+     * hues on screen in either theme. */
+    --color-background: #0f1218;
+    --color-foreground: #e9edf2;
+    --color-foreground-muted: #9aa7b4;
+    --color-surface: #171b24;
+    --color-accent-sky: #6fb0e6;
+    --color-accent-sky-soft: rgba(62, 143, 208, 0.16);
+    --color-accent-coral: #f08059;
 
     /* Section tints re-derived for dark: low-alpha washes of the same hues so
      * they read as the same four categories without glowing on a dark ground. */
@@ -84,12 +120,18 @@
     --color-border: rgba(255, 255, 255, 0.045);
     --color-error: #f0937f;
 
-    --color-primary-soft: #244c4c;
+    /* Primary inverts in dark: a near-black fill on a near-black ground is
+     * not a button. Near-white fill, near-black label instead. */
+    --color-primary: #eef2f7;
+    --color-primary-light: #ffffff;
+    --color-primary-dark: #d5dde5;
+    --color-on-primary: #10141c;
+    --color-primary-soft: #1c2733;
     --color-navy: var(--color-foreground);
     --color-ink: var(--color-foreground);
-    --color-surface-elevated: #2a3d52;
-    --color-border-soft: #33465c;
-    --color-border-strong: #4a5d70;
+    --color-surface-elevated: #1f242e;
+    --color-border-soft: #2a313c;
+    --color-border-strong: #3d4653;
     --color-success: #43c9a8;
     --color-success-bg: rgba(67, 201, 168, 0.14);
     --color-success-text: #43c9a8;
@@ -99,10 +141,10 @@
     --color-error-bg: rgba(240, 147, 127, 0.12);
     --color-emergency: #f0937f;
     --color-emergency-bg: #4a2928;
-    --color-accent-mint: rgba(67, 201, 168, 0.12);
-    --color-accent-aqua: rgba(58, 175, 169, 0.12);
-    --color-accent-lavender: rgba(154, 140, 209, 0.14);
-    --color-accent-peach: rgba(240, 147, 127, 0.12);
+    --color-accent-mint: #161a22;
+    --color-accent-aqua: #161a22;
+    --color-accent-lavender: #161a22;
+    --color-accent-peach: #161a22;
   }
 
   html {
@@ -165,11 +207,11 @@
   }
 
   .dark .border-primary\/20 {
-    border-color: rgba(58, 175, 169, 0.14);
+    border-color: rgba(62, 143, 208, 0.14);
   }
 
   .dark .border-primary\/12 {
-    border-color: rgba(58, 175, 169, 0.08);
+    border-color: rgba(62, 143, 208, 0.08);
   }
 
   .dark .border-white\/10 {
@@ -177,15 +219,15 @@
   }
 
   .dark .border-primary\/40 {
-    border-color: rgba(58, 175, 169, 0.22);
+    border-color: rgba(62, 143, 208, 0.22);
   }
 
   .dark .hover\:border-primary\/40:hover {
-    border-color: rgba(58, 175, 169, 0.22);
+    border-color: rgba(62, 143, 208, 0.22);
   }
 
   .dark .hover\:border-primary\/50:hover {
-    border-color: rgba(58, 175, 169, 0.26);
+    border-color: rgba(62, 143, 208, 0.26);
   }
 
   .dark .border-t.border-foreground\/10,
@@ -222,8 +264,8 @@
 
   .field-shell:focus,
   .field-shell:focus-visible {
-    border-color: rgb(43 122 120 / 1);
-    box-shadow: 0 0 0 3px rgba(58, 175, 169, 0.18);
+    border-color: rgb(62 143 208 / 1);
+    box-shadow: 0 0 0 3px rgba(62, 143, 208, 0.18);
   }
 
   .dark .field-shell {
@@ -250,7 +292,7 @@
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.03),
       0 0 0 1px rgba(87, 199, 194, 0.38),
-      0 0 0 4px rgba(43, 122, 120, 0.16);
+      0 0 0 4px rgba(62, 143, 208, 0.16);
   }
 
   .field-shell-error {
@@ -307,24 +349,12 @@
     color: var(--color-coach-escalate-text);
   }
 
-  /* Landing-page-only decorative gradients (design/design.md §18/§3.6).
-   * The hero's four bubbles (src/app/[locale]/page.tsx) each carry their
-   * own inline gradient, so only mix-blend-mode lives here — plus-lighter
-   * adds overlapping colors together (screen's gentler multiply-based
-   * lightening read as too subtle for the "cool effect on contact" this
-   * was asked for), so two overlapping bubbles flash bright where their
-   * circles intersect. That's the "contact" effect: a property of the
-   * blend mode, not anything tracking where they actually intersect. */
-  .hero-bubble {
-    mix-blend-mode: plus-lighter;
-  }
-
-  .landing-gradient-cta {
-    background: linear-gradient(100deg, #13b8aa 0%, #079eb4 45%, #0877b7 100%);
-  }
-
+  /* Recolored 2026-09-19 to the same near-black as the rest of the
+   * palette pass (`--color-primary`/the "How It Works" and final-CTA
+   * panels) — was still the older teal-adjacent navy gradient from the
+   * 2026-09-01 pass, which no longer matched anything else on the page. */
   .landing-gradient-footer {
-    background: linear-gradient(120deg, #102d4e 0%, #0a3155 55%, #08294b 100%);
+    background: linear-gradient(160deg, #10141c 0%, #0a0d13 55%, #05070a 100%);
   }
 
   /* In-app decorative blobs (design/design.md §19/§25) — the same soft
@@ -346,32 +376,51 @@
     filter: blur(48px);
   }
 
+  /* The layer the blobs live in. `overflow: hidden` alone cut a 48px-blurred
+   * glow off flat wherever it reached the container edge — a visible hard
+   * rectangle on screen (2026-09-19). The mask fades the last few percent of
+   * every edge instead, so a blob dissolves into the page no matter how big
+   * it is or how far past the corner it sits. Two axes intersected, because
+   * a single gradient only fades two sides. Degrades to the old hard clip if
+   * `mask-composite` is unsupported, which is safe for decoration. */
+  .decor-layer {
+    overflow: hidden;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-composite: intersect;
+  }
+
   .decor-blob-aqua {
-    background: radial-gradient(circle, rgba(58, 175, 169, 0.32) 0%, rgba(58, 175, 169, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.32) 0%, rgba(62, 143, 208, 0) 72%);
   }
   .dark .decor-blob-aqua {
-    background: radial-gradient(circle, rgba(58, 175, 169, 0.2) 0%, rgba(58, 175, 169, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.2) 0%, rgba(62, 143, 208, 0) 72%);
   }
 
   .decor-blob-mint {
-    background: radial-gradient(circle, rgba(67, 201, 168, 0.3) 0%, rgba(67, 201, 168, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.3) 0%, rgba(62, 143, 208, 0) 72%);
   }
   .dark .decor-blob-mint {
-    background: radial-gradient(circle, rgba(67, 201, 168, 0.19) 0%, rgba(67, 201, 168, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.19) 0%, rgba(62, 143, 208, 0) 72%);
   }
 
   .decor-blob-lavender {
-    background: radial-gradient(circle, rgba(154, 140, 209, 0.3) 0%, rgba(154, 140, 209, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.3) 0%, rgba(62, 143, 208, 0) 72%);
   }
   .dark .decor-blob-lavender {
-    background: radial-gradient(circle, rgba(154, 140, 209, 0.22) 0%, rgba(154, 140, 209, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.22) 0%, rgba(62, 143, 208, 0) 72%);
   }
 
   .decor-blob-peach {
-    background: radial-gradient(circle, rgba(240, 147, 127, 0.27) 0%, rgba(240, 147, 127, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.27) 0%, rgba(62, 143, 208, 0) 72%);
   }
   .dark .decor-blob-peach {
-    background: radial-gradient(circle, rgba(240, 147, 127, 0.19) 0%, rgba(240, 147, 127, 0) 72%);
+    background: radial-gradient(circle, rgba(62, 143, 208, 0.19) 0%, rgba(62, 143, 208, 0) 72%);
   }
 
   .dark .card-shell {
@@ -386,13 +435,13 @@
   }
 
   .card-shell-interactive:hover {
-    border-color: rgba(43, 122, 120, 0.2);
-    background-color: rgba(43, 122, 120, 0.025);
+    border-color: rgba(62, 143, 208, 0.2);
+    background-color: rgba(62, 143, 208, 0.025);
   }
 
   .dark .card-shell-interactive:hover {
-    border-color: rgba(58, 175, 169, 0.25);
-    background-color: rgba(58, 175, 169, 0.05);
+    border-color: rgba(62, 143, 208, 0.25);
+    background-color: rgba(62, 143, 208, 0.05);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.03),
       0 0 0 1px rgba(36, 52, 71, 0.18);
@@ -400,16 +449,16 @@
 
   .card-shell-selected {
     @apply card-shell;
-    border-color: rgba(43, 122, 120, 0.6);
-    background-color: rgba(43, 122, 120, 0.07);
-    box-shadow: inset 0 0 0 1px rgba(58, 175, 169, 0.22);
+    border-color: rgba(62, 143, 208, 0.6);
+    background-color: rgba(62, 143, 208, 0.07);
+    box-shadow: inset 0 0 0 1px rgba(62, 143, 208, 0.22);
   }
 
   .dark .card-shell-selected {
-    border-color: rgba(58, 175, 169, 0.45);
-    background-color: rgba(58, 175, 169, 0.11);
+    border-color: rgba(62, 143, 208, 0.45);
+    background-color: rgba(62, 143, 208, 0.11);
     box-shadow:
-      inset 0 0 0 1px rgba(58, 175, 169, 0.18),
+      inset 0 0 0 1px rgba(62, 143, 208, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
@@ -435,23 +484,23 @@
   }
 
   .dark .outline-button {
-    border-color: rgba(58, 175, 169, 0.18);
-    background-color: rgba(58, 175, 169, 0.02);
+    border-color: rgba(62, 143, 208, 0.18);
+    background-color: rgba(62, 143, 208, 0.02);
   }
 
   .dark .outline-button:hover {
-    border-color: rgba(58, 175, 169, 0.26);
-    background-color: rgba(58, 175, 169, 0.06);
+    border-color: rgba(62, 143, 208, 0.26);
+    background-color: rgba(62, 143, 208, 0.06);
   }
 
   .dark .outline-button:active {
-    background-color: rgba(58, 175, 169, 0.1);
+    background-color: rgba(62, 143, 208, 0.1);
   }
 
   .dark .outline-button:disabled {
-    border-color: rgba(58, 175, 169, 0.12);
-    color: rgb(58 175 169 / 0.55);
-    background-color: rgba(58, 175, 169, 0.015);
+    border-color: rgba(62, 143, 208, 0.12);
+    color: rgb(62 143 208 / 0.55);
+    background-color: rgba(62, 143, 208, 0.015);
   }
 
   .danger-outline-button {
@@ -510,6 +559,23 @@ html[data-landing] #root-chrome-footer {
   display: none !important;
 }
 
+/* The home dashboard is a grid, not a reading column, so it gets a wider
+ * shell than `max-w-app` (which exists to keep prose line lengths sane —
+ * design/design.md §25.4). Set by HomeScreen while it is mounted. */
+html[data-dashboard] #root-content {
+  max-width: 1280px;
+}
+
+/* The dashboard rail already shows the logo and the theme control, so the
+ * shell header would be a duplicate of both. Hidden at lg+ only: the phone
+ * layout has no rail and still needs it. Sign-out moves into the rail so
+ * nothing becomes unreachable. */
+@media (min-width: 1024px) {
+  html[data-dashboard] #root-chrome-header {
+    display: none;
+  }
+}
+
 html[data-landing] #root-content {
   max-width: none;
 }
@@ -519,38 +585,118 @@ html[data-landing] #root-shell {
   overflow: visible;
 }
 
-html[data-landing],
-html[data-landing] body {
+/* Only `html` gets an explicit scroll container here — giving `body` its
+ * own `overflow-y` too (as an earlier pass did) makes `body` a second
+ * scroll-container ancestor that never itself overflows (it grows to fit
+ * its content instead), which is enough to make `position: sticky` inside
+ * it resolve against the wrong box: `LandingNav` reported `position:
+ * sticky` but never actually clamped to `top: 0` while scrolling. Fixed
+ * 2026-09-19 by scoping the overflow reset to `html` alone. */
+html[data-landing] {
   height: auto;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-/* Landing-page-only accent override, 2026-09-01 — every `bg-primary` /
- * `text-primary` / `border-primary` use on the landing page (buttons, step
- * badges, checkmarks, links, the highlighted hero word) resolves from
- * `#E1BFFB` instead of the app-wide teal, scoped via `[data-landing]` so no
- * other screen is affected. Light/dark/soft variants are derived from that
- * same base via `color-mix()` (matching the pattern already used elsewhere
- * in this file) rather than hand-picked, so nothing beyond the one supplied
- * hex was invented. */
-html[data-landing] {
-  --color-primary: #e1bffb;
-  --color-primary-light: color-mix(in srgb, #e1bffb 85%, white);
-  --color-primary-dark: color-mix(in srgb, #e1bffb 65%, black);
-  --color-primary-soft: color-mix(in srgb, #e1bffb 22%, white);
+html[data-landing] body {
+  height: auto;
+  /* Must be `visible`, not left unset — the base `body` rule above sets
+   * `overflow: hidden` unconditionally for the app shell, and `hidden`
+   * alone (regardless of the auto/hidden mismatch fixed above) is already
+   * enough to make body a second sticky-positioning scroll-container
+   * ancestor, which is what was actually breaking `LandingNav`. */
+  overflow: visible;
 }
 
-/* Dark-mode variant of the override above: mixing the same base hex with
- * white (as the light-mode soft tint above does) produced a near-white pill
- * on the landing page's dark navy background — a light-on-light chip
- * background sitting on a dark page, which then broke text contrast a
- * second time once the chip text itself switched to the (light, correct
- * for dark mode) --color-foreground. Mixing with black instead keeps the
- * same "soft tinted pill" pattern, just anchored to the dark end of the
- * scale. */
-html.dark[data-landing] {
-  --color-primary-soft: color-mix(in srgb, #e1bffb 24%, black);
+/* The palette these three blocks used to scope to `[data-landing]` is now
+ * the app-wide default (see `:root` / `.dark` at the top of this file) —
+ * every screen shares it, so there is nothing left to override here. */
+
+.landing-hero-bg {
+  background: linear-gradient(160deg, #dcebfa 0%, #eef5fb 45%, #ffffff 100%);
+}
+
+.dark .landing-hero-bg {
+  background: linear-gradient(160deg, #101a26 0%, #0d1520 55%, #0a0f17 100%);
+}
+
+/* Slow single rotation for the hero's abstract glass shape — not a decoded
+ * video, an SVG built to evoke the same "gently turning translucent form"
+ * mood the user's reference clip has, since that clip is a screen
+ * recording of another company's own site and its specific render isn't
+ * ours to reproduce (design/design.md changelog, 2026-09-19). Respects
+ * prefers-reduced-motion via the global catch-all below. */
+.landing-glass-shape {
+  animation: landing-glass-rotate 22s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes landing-glass-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Section-level scroll reveal (design/design.md changelog, 2026-09-19) —
+ * one fade+rise per top-level section, once, via ScrollReveal.tsx toggling
+ * `.is-visible`. Deliberately not applied per-card: a whole section
+ * arriving as one piece reads as an edit decision; twelve staggered child
+ * animations inside it reads as a template default. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero glass shapes drift a few px against scroll, on top of their own
+ * rotation — `--landing-scroll` is written by ScrollReveal.tsx, rAF
+ * throttled. Falls back to 0 (no drift) if the variable is never set. */
+.landing-glass-parallax {
+  transform: translateY(calc(var(--landing-scroll, 0) * -0.06px));
+}
+
+/* `bg-foreground/5` (and any `/NN` opacity modifier on a custom color
+ * that's a bare `var(...)` in tailwind.config.ts rather than the
+ * `withOpacityValue` function pattern) silently compiles to fully
+ * transparent under Tailwind 3.4 — the same class of bug already found and
+ * fixed on `LandingNav`'s header background (design/design.md changelog,
+ * 2026-09-19). Used here instead of the broken utility for the nav's
+ * hover/current-section tint. */
+.landing-nav-link {
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.landing-nav-link:hover,
+.landing-nav-link[aria-current='true'] {
+  background-color: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  color: var(--color-foreground);
+}
+
+/* Same fix, for any ghost/outline button (`hover:bg-foreground/5
+ * active:bg-foreground/10` compiled to fully transparent, so those buttons
+ * had no hover/press feedback at all). App-wide as of 2026-09-19. */
+.ghost-button {
+  transition: background-color 150ms;
+}
+
+.ghost-button:hover {
+  background-color: color-mix(in srgb, var(--color-foreground) 5%, transparent);
+}
+
+.ghost-button:active {
+  background-color: color-mix(in srgb, var(--color-foreground) 10%, transparent);
 }
 
 /* RTL support */

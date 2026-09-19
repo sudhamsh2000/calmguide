@@ -71,7 +71,7 @@ export default async function ImpactPage() {
             />
           </div>
 
-          <div className="mt-3 rounded-2xl bg-gradient-to-br from-primary to-[#1F5454] px-5 py-5 text-center">
+          <div className="mt-3 rounded-2xl bg-panelDark px-5 py-5 text-center">
             <span
               className="text-3xl font-bold text-white"
               style={{ fontFamily: 'var(--font-display)' }}

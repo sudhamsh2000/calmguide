@@ -977,6 +977,826 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-19 — Sign out actually signs out
+
+Signing out bounced straight back into the same profile.
+
+`clearAll()` removed the four legacy keys but never `calmguide_profiles`
+or `calmguide_active_profile_index`. Sign-out routes to `/`, where
+`WelcomeGate` treats a surviving `getActiveProfile()` as a session to
+resume — it rewrites the access code and name *from that list* and
+redirects to `/home`. The sign-out was undone on the next render.
+
+The bug predates this work, but was dormant: the wizard only ever wrote
+the two legacy keys, so the profile list was usually absent. The
+`saveActiveProfile()` change above always materialises it, which turned a
+latent bug into one that fired every time — worth noting as the cost of
+that change, not a coincidence.
+
+`clearAll()` now clears the list and the active index too. Guarded by two
+tests in `storage.test.ts`, including the multi-profile case; both were
+confirmed to fail with the two removals taken back out, so they are not
+passing vacuously.
+
+### 2026-09-19 — Dashboard scrolls again on desktop
+
+The single-screen desktop dashboard hid sections 8–11 (`lg:hidden`) —
+pattern insights, log/recent incidents, conversation history, journey
+links. **That was a mistake, and worse than a layout one.** The comment I
+left claimed each was "still reachable from the nav"; it isn't. `BottomNav`
+is *also* `lg:hidden`, and `#root-chrome-header` is hidden on the dashboard
+at lg+, so at desktop width there was no nav at all — `/incidents` had no
+route from anywhere on the screen. Measured at 1440×900: `document`
+scrollHeight 900, `body` overflow `hidden`, both blocks `display: none`.
+
+**Scroll restored, not bolted on.** `main` already carried
+`overflow-y-auto` at every width; the only thing suppressing it was
+`lg:h-full lg:overflow-hidden` on the HomeScreen root. Removing those two
+classes is the whole fix.
+
+**Laid out for the width it now has, rather than un-hidden.** The revealed
+sections were ordered and sized for a phone. In the main column they pair
+into two columns from `xl` (`xl:grid xl:grid-cols-2 xl:items-start`),
+where that column is ~900px and a single stack of full-width cards would
+just look stretched; at `lg` (~605px) it stays one readable column.
+
+**The rail sticks.** `lg:sticky lg:top-5` on the left column, so who
+you're caring for and the two things you might do next stay on screen
+while the supporting material scrolls past. `top-5` matches the section's
+`pt-5` rather than pinning flush to the edge.
+
+Verified at 375 / 1024 / 1280 / 1440: block `flex → flex → grid → grid
+(420.5px × 2)`, rail `static → sticky@20`, and at full scroll the last
+card's bottom sits inside the container at every width (802 vs 851 at
+1440), so nothing is clipped.
+
+### 2026-09-19 — Portrait chosen at signup
+
+The portrait is now picked while the profile is being created, on the
+**name step of the wizard** rather than as a seventh step. Name and
+portrait answer the same question — who is this? — and a six-step setup
+should not grow a seventh for a one-tap cosmetic choice.
+
+Keeping them on one step also makes the monogram option live: it previews
+the initial of whatever has been typed, so the three options are compared
+as pictures rather than as labels. Picking one is never required, and
+never blocks Next.
+
+**`saveActiveProfile()` replaces the wizard's two loose writes.** It used
+to set `calmguide_patient_name` and `calmguide_access_code` and nothing
+else, which left `getProfiles()` on its fallback path — and that path
+invents `disease_stage: 'unknown'`, which ProfileSwitcher then displayed.
+One idempotent write now stores code, name, real stage and portrait, keyed
+on access code so repeat calls update in place. (`addProfile()` turned out
+to be dead outside tests.)
+
+**ProfileSwitcher rebuilt on the shared avatar.** It held the third and
+fourth copies of the avatar markup, both with `bg-primary/10` — the
+bare-var opacity bug again, so those discs were transparent. Its selected
+row used `bg-primary/5`, also transparent, leaving the active profile
+distinguishable only by its checkmark; now `bg-accentSky-soft`. The
+switcher is the one place the portraits do real work: two profiles can
+share a name, and a face separates them instantly.
+
+### 2026-09-19 — Profile portraits
+
+Two illustrated portraits (`avatar-male.png`, `avatar-female.png`) now sit
+on the profile card and the profile page, in place of the lettered
+monogram.
+
+**Why it is a choice and not an inference.** The backend stores no name and
+no gender — `Profile` is explicitly PII-free — so nothing server-side can
+select a portrait, and picking one from the name would misgender people.
+The portrait is an explicit selection kept in `localStorage` next to the
+name (`StoredProfile.avatar`), set in a three-option radio group on the
+edit screen. **The monogram is one of the three options, not a fallback**:
+a caregiver who would rather not attach a gendered figure to someone keeps
+a lettered mark and loses nothing.
+
+**Assets.** Source art is 1254px square with the disc centred at
+(626, 635), r≈549. Cropped to the disc's bounding square — so the disc
+touches all four edges and clips cleanly in a round container — and
+downscaled to 256px: 830KB → ~60KB each. The disc tint is #D7EBF8, near
+enough to `--color-accent-sky-soft` (#E3F0FA) that the art already sits
+inside the palette.
+
+**Round, against a screen of squircles.** The portraits are drawn inside a
+circle, so a squircle would crop them; more usefully, the round form is the
+one human shape among the rectangles and tiles.
+
+**Two bugs found while consolidating.** `PatientCard` and `ProfileView` each
+carried their own copy of the avatar, and both used Tailwind opacity
+modifiers on bare-`var()` tokens (`bg-success/20`, `bg-error/15`,
+`bg-foreground/10`) — which compile to transparent, which is why the
+early-stage monogram rendered as green type on a blank disc. Rebuilt on
+`color-mix`. The copies had also drifted on the late-stage tint: one used
+`error` red, the other a soft grey. Consolidating forced a choice and the
+grey won — tinting a person's avatar red to mark late-stage dementia frames
+them as an error state, and this palette keeps red for actual safety.
+
+### 2026-09-19 — Progress chart: the data it needs, on the right days
+
+The "Your Progress" card was drawing at most one point, and the user asked
+why the graph wasn't there. Two separate faults, both mine.
+
+**The card was structurally starved.** I built a weekly chart on top of
+`/checkin/daily/{access_code}/today`, which filters to `check_date ==
+today` — it answers "has she checked in yet today?", not "how has the week
+gone?". No amount of seeded data could have produced a line. Added a
+read-only `/checkin/daily/{access_code}/history?days=N` (default 7, capped
+at 31) in `backend/app/routers/checkin_daily.py`, scoped to one profile by
+access code exactly as `/today` is, plus `getDailyCheckinHistory()` in
+`lib/api.ts`. **This is a functional change** in a pass that was otherwise
+design-only, and was flagged as such before being made — a chart that
+cannot be fed is not a design problem.
+
+**Entries landed on the wrong day west of UTC.** `new Date('2026-09-13')`
+parses as UTC midnight; keying it through a local-time `startOfDay()`
+shifted every check-in back a calendar day in any negative-offset zone —
+which silently dropped *today* off the chart and forced the streak to 0.
+Replaced with `parseCheckDate()`, which splits the `YYYY-MM-DD` string and
+builds a local date. Guarded by `ProgressCard.test.tsx`, which runs the
+full-week case under UTC / Los Angeles / Kolkata / Auckland; the fix was
+verified by reintroducing the bug and confirming only the Los Angeles case
+fails, so the matrix is not passing vacuously.
+
+**What the card still refuses to show.** The reference design's "Calm
+practices" tile stays replaced by the day streak (nothing records practice
+completions), and the y-axis stays Tough / Mild / Calm rather than a
+0–100% score the product does not compute.
+
+### 2026-09-19 — Orb: halo removed, lobes rotate, motion given a rhythm
+
+**Halo deleted.** It read as a blue cast parked behind the form rather than
+light coming off it. The rim carries the luminosity now, with a tight bloom
+(`shadowBlur` 0.22 → 0.1 of base) that belongs to the edge itself. Removing
+it also retires the clipping problem it caused — nothing large is drawn any
+more, so there is no glow to guillotine.
+
+**"Different angles" was the missing piece.** Previous passes only grew the
+amplitude, so the blob bulged in the same places — a pulse, not a turn.
+Each harmonic's lobes now drift around the perimeter at its own slow,
+counter-running rate (`LOBE_DRIFT`), so bulges arrive from different
+directions without the whole thing looking like it is simply spinning.
+
+**Rhythm, so it reads as thinking.** A new `activityAt(t)` envelope built
+from three incommensurate periods (2.6s / 1.7s / 0.9s) returns ~0.45–1.35
+and drives *both* how far the blob deforms and how fast it changes — morph
+time is `t * (0.55 + activity * 0.85)`. The result has spells of working at
+something and spells of settling, which is what separates considering from
+idling. Amplitudes roughly doubled (sum ~0.115 before the envelope) and
+harmonic speeds roughly doubled again on top of the previous pass.
+
+**Measured:** silhouette aspect ratio now travels 1.121 → 0.905 in about
+2.5s — a spread of 0.216 against 0.09 before, so ~2.4x the deformation and
+faster with it. Edge alpha remains 0 on all four sides, so the background
+still merges. `tsc` clean, 33 files / 256 tests pass, and the
+reduced-motion path re-checked (paints a still frame and holds it).
+
+### 2026-09-19 — Orb: halo clipping fixed, morph sped up and varied
+
+**The visible rectangle was the halo hitting the canvas wall.** Reported as
+"the background is not merged". Measured rather than guessed: canvas 290px
+(145px of radius available), halo drawn to `base * 1.8` = **188px** —
+overflowing 43px on every side and still at **alpha 50** where it met the
+boundary, so it was cut flat into a lighter box on the card. Exactly the
+same failure as the `decor-blob` edges earlier in the day: a soft glow
+guillotined by a hard bound.
+
+Fixed by clamping the halo to what the canvas can actually hold
+(`min(base * 1.8, min(w,h) * 0.495)`) and shrinking `base` 0.36 → 0.30 to
+leave it room; the canvas grew 290 → 350px so the orb keeps its on-card
+size. Edge alpha is now **0 on all four sides**, so there is nothing left
+to cut.
+
+**Faster, and through different shapes.** Harmonic speeds roughly
+quadrupled and breath 7.6s → 4.2s. More importantly each harmonic's
+*amplitude* now swings on its own long period (7.3–15.5s), so the dominant
+lobe changes over time — it goes oval, then round, then softly faceted,
+rather than looping one wobble. The swing floors at 0.35 rather than zero
+so no harmonic fully mutes and the form stays organic. Measured: aspect
+ratio travels 1.05 → 0.96 across three seconds, i.e. wider-than-tall to
+taller-than-wide.
+
+**Verified:** `tsc` clean, 33 files / 256 tests pass. Edge alpha 0 on every
+side; aspect-ratio samples confirm the shape varies; two screenshots two
+seconds apart show a different silhouette and no box.
+
+### 2026-09-19 — Orb rebuilt as a hollow morphing membrane
+
+The particle-globe approach was the wrong primitive and two rounds of
+tuning it (links, signals, brightness) never fixed that — a lattice of
+dots reads as *data being displayed* no matter how it moves. Replaced
+wholesale, per a supplied reference of a soft blue droplet.
+
+**Shape.** The outline is a sum of four sine harmonics at non-integer
+frequency ratios, so the silhouette is always rounded, never a circle, and
+never repeats. First attempt summed to ~14% radial deviation and looked
+like an amoeba; the reference is unmistakably round with a gentle wobble,
+so amplitudes came down to ~5% total.
+
+**Hollow.** The fill is a radial gradient that stays transparent to ~46%
+of the radius and only lights up past ~70%, with a bloomed stroke on the
+outline and two fainter membranes drifting inside on their own phases —
+enough structure that the middle reads as an interior rather than a hole.
+
+**One bug worth recording.** The first hollow version measured *more*
+opaque at the centre (alpha 87) than at the rim (40). The outer halo was
+`createRadialGradient(..., base*0.7, ..., base*1.8)` with 0.34 alpha at
+stop 0 — every pixel inside `base*0.7` got painted at 0.34, so the glow
+was flooding the hollow it was meant to surround. Rebuilt to ramp from
+fully transparent and peak *outside* the body. Radial profile now reads
+`0,0,0,2,6,10,14,18,56,93,149` centre→edge.
+
+Cheaper than what it replaced: three traced paths per frame instead of
+620 points, ~1,240 link candidates and 7 slerped signals.
+
+**Verified** at the real 290px this time, not enlarged: silhouette width
+varies frame to frame (morphing), the radial profile confirms the hollow,
+and two screenshots three seconds apart show the bright band travelling
+around the rim. `tsc` clean, 33 files / 256 tests pass.
+
+### 2026-09-19 — Moment Coach sphere reworked to read as agentic
+
+The first sphere was a rotating particle globe, which reads as *data*. An
+agent should look like it is attending to something, so three behaviours
+replace uniform spin:
+
+- **Breath.** The whole form swells and settles on a ~7.2s cycle, near a
+  resting breathing rate. The core glow and rim brighten with it.
+- **Associations.** Each point links to its two nearest neighbours, and
+  every link fades in and out on its own slow cycle, so the mesh is never
+  fully drawn — connections look considered rather than wireframed.
+- **Signals.** Five bright heads trace great circles (slerp, so they follow
+  the surface) with short trails, re-aiming from wherever they arrive so
+  paths chain instead of teleporting.
+
+Paced deliberately slowly. This sits on the screen a caregiver opens
+mid-crisis; it should look like it is listening, not like a machine
+working — §1's "calm, not clinical" applies to motion as much as colour.
+
+**Kept linear per frame.** The neighbour graph is O(n²) but built once at
+init; each frame skips any link with both endpoints behind the sphere and
+any link currently faded out, so the stroke count stays a few hundred.
+Point count dropped 900 → 620 to pay for the links. Frame delta is clamped
+to 64ms so a stalled tab resumes smoothly instead of jumping.
+
+**The `document.hidden` gate had to go, and it was hiding the whole
+rework.** The first version only animated when `entry.isIntersecting &&
+!document.hidden`. That second condition is redundant — browsers already
+stop delivering rAF to a backgrounded tab — and it is actively wrong in
+embedded contexts (preview panes, webviews) which report `hidden` while
+the user is plainly watching. There the sphere froze on one frame; since
+all three new behaviours are *temporal*, a frozen frame is nearly
+indistinguishable from the old static globe, so the rework looked like it
+had never landed. Gated on the intersection check alone now.
+
+**Tuned for the size it actually renders at.** The effects were first
+judged at 560px during inspection; the card shows the sphere at 290px,
+where the mesh and signal heads were close to invisible. Link alpha
+ceiling roughly doubled, line width 0.7 → 0.9, signal heads 2.1 → 2.8px
+and seven of them instead of five, breath amplitude 2.2% → 3.2%.
+
+**Verified:** `tsc` clean, 33 files / 256 tests pass. In-browser at the
+real 290px: 61fps, frame hashes differ across samples, lit-pixel count
+climbs between frames (the breath changing the footprint), and two
+screenshots two seconds apart show a visibly different mesh and diameter.
+`prefers-reduced-motion` re-checked by stubbing `matchMedia` and
+remounting — paints a considered still frame and holds it, rather than
+going blank or animating anyway.
+
+### 2026-09-19 — New brand mark rolled out; duplicate logo removed
+
+**New logo.** `design/references/logos/calguid logo transp.png` — a blue
+speech-bubble mark with a coral heart and a white winding path, beside a
+near-black "CalmGuide" wordmark. It happens to sit exactly on the current
+palette (sky `#3E8FD0`, coral, near-black), so nothing had to be adjusted
+around it. Both supplied files were verified genuinely transparent by
+decoding the PNGs and sampling corner alpha, not by eye — a white-boxed
+logo on the icy-blue page would have been the obvious failure mode.
+
+Installed to `frontend/public/brand/calmguide-logo{,-transparent}.png` and
+`mobile/assets/images/calmguide-lockup.png`. The icon set was regenerated
+by **cropping the mark out of the supplied lockup** (columns 122–554,
+trimmed to its own bbox and re-padded square) — extraction of the real
+artwork, not a redraw, so §2.1's standing "don't redraw the logo" rule
+holds: favicons 16/32, apple-touch 180, PWA 192/512, `og-image.png`, and
+mobile `icon`/`splash-icon`/`favicon`/`android-icon-foreground`.
+
+**The favicon was the real bug.** `/favicon.svg` was listed *first* in
+`layout.tsx`'s icon array, and every browser that supports SVG icons
+prefers it — so the tab kept showing the pre-2026 sage-green serif swirl
+(the mismatch §2.2 has flagged since August) no matter what the PNGs held.
+Reference dropped rather than the file redrawn; there is still no vector
+source for the current mark. `site.webmanifest` likewise pointed at
+`app-icon.svg` (same old mark) and still carried the pre-palette
+`#2B7A78`/`#FBF7EE` colours — now the new PNGs and `#10141C`/`#EEF5FB`.
+
+**Duplicate logo.** The dashboard showed two: the shell header's `PageBrand`
+text wordmark and the rail's image logo. The shell header is now hidden at
+lg+ under `html[data-dashboard]`, leaving one. `SignOutButton` moved into
+the rail so hiding the header strands nothing. The phone keeps the header —
+it has no rail.
+
+**Theme toggle.** New `variant="pill"` on `ThemeToggle` renders the
+design's segmented sun/moon track; `variant="icon"` stays the default, so
+the shell header and all existing tests are untouched. The thumb marks the
+theme that is currently on and slides on click — the mockup shows the
+filled side on the moon while the page is light, which reads as a static
+illustration rather than a state, so the standard behaviour was kept.
+
+**Verified:** `tsc` clean, 33 files / 256 tests pass. Confirmed in-browser
+that the served logo is byte-identical to the supplied file (354,214 bytes)
+and that exactly one `<img>` renders on the dashboard.
+
+### 2026-09-19 — Home dashboard rebuild + Moment Coach sphere
+
+Built to a supplied dashboard mockup: a narrow left rail (brand + theme
+toggle, greeting, patient card, Practice and Check-In as full-width rows)
+beside a wide column holding the Moment Coach hero, then the day's check-in
+next to the week's progress.
+
+**The sphere — why Canvas 2D.** `AiSphere.tsx`, no dependency. three.js
+would look marginally richer for ~600KB on the one screen a caregiver opens
+mid-crisis, and this is ornament; the budget belongs to the guidance. ~900
+points on a Fibonacci lattice (even coverage, no pole clustering), spun
+around Y, perspective-divided, sorted back-to-front so depth reads without
+a z-buffer, plus a core glow, a rim light and two orbital arcs. It runs
+only when on screen *and* in a foreground tab (IntersectionObserver +
+`visibilitychange`), and renders a single static frame under
+`prefers-reduced-motion` — a caregiver who asked the OS to stop animations
+should not get a spinning globe. One turn takes ~48s: ambient, not busy.
+
+It also paints one frame immediately at mount. Without that the canvas sits
+empty until those gates open, which is exactly what happens when the page
+loads in a background tab — you'd switch to it and find a blank hole. Found
+by reading back canvas pixels (0 painted) rather than by eye.
+
+**Single screen.** The desktop dashboard is `lg:h-full lg:overflow-hidden`
+and does not scroll, per the design. Sections 8–11 (pattern insights,
+incident log/history, conversations, journey) are `lg:hidden` — they'd have
+forced a scrollbar, and each stays reachable from the nav. Phones keep the
+full scrollable stack: six cards don't fit on a phone and hiding them there
+would lose real function.
+
+**Width.** The dashboard is a grid, not a reading column, so it opts into a
+1280px shell via `html[data-dashboard]` — the same `data-*` technique the
+landing page already uses. `max-w-app` (1040px) stays the default
+everywhere else, for the line-length reason in §25.4.
+
+**Numbers are counted, not invented.** `ProgressCard` derives everything
+from real `DailyCheckinEntry` rows: check-ins this week, calm days, and the
+current streak. The mockup's fourth tile, "Calm practices", has no source —
+nothing in the app records practice completions — so it is replaced by the
+streak rather than faked. The chart's y-axis is the three severities the
+app actually stores, not the mockup's 0–100%, so it can't imply a clinical
+score the product doesn't compute. Same rule as the landing page's refused
+stat wall.
+
+**Also:** `coach_card.title` lost its baked-in `\n` (it was set for the old
+narrow centred card) and gained an `eyebrow` key, across en/es/hi with key
+parity checked. The hero's scrim was written as a real `color-mix()`
+gradient because `via-panelDark/80` is the Tailwind-3.4 opacity-on-variable
+bug again — it compiles to fully transparent.
+
+**Verified:** `tsc` clean, 33 files / 256 tests pass. Confirmed live: no
+scroll at 1440×900 (`scrollHeight === clientHeight`), sphere paints
+(~181k px) and advances across three sampled frames once visible, and
+pauses when the tab is hidden.
+
+### 2026-09-19 — Blend pass: hard edges and unswept colour
+
+Follow-up to the palette pass below, from a screenshot showing a hard-edged
+rectangle of lighter colour on the profile wizard.
+
+**The rectangle was a clipped glow.** `.decor-blob` carries `filter:
+blur(48px)` and was positioned to hang *past* its wrapper (`-top-8 -end-16`),
+while the wrapper was `overflow-hidden`. A blurred shape cut by a hard clip
+doesn't fade — it ends in a straight line. Measured: the blurred glow reached
+1px *past* the clip on both axes, so the cut was guaranteed.
+
+Fixed structurally rather than by tuning insets per blob, which would break
+again the moment anyone resized one: new `.decor-layer` replaces the raw
+`overflow-hidden` on all five wrappers and masks its own edges (two
+linear-gradient masks intersected, since one gradient only fades two sides).
+Any blob, any size, any position now dissolves into the page. Blobs were
+restored to their original off-corner placements, which the mask makes safe.
+Degrades to the previous hard clip where `mask-composite` is unsupported,
+which is acceptable for decoration.
+
+**Unswept colour, found while verifying.** The earlier pass re-hued `rgba()`
+values in `globals.css` and Tailwind token classes but missed arbitrary
+`bg-[#hex]` classes and SVG `stroke="#hex"` attributes in TSX. On the Home
+screen that left a teal gradient on the hero card and a purple/green/amber
+rainbow of icon tiles sitting on the new palette. Swept on both platforms:
+- **Decorative** → the sky family: the three Home icon tiles (glyphs moved to
+  `currentColor` so they follow the token into dark mode), the old dark-teal
+  gradient end `#1F5454` on two hero cards, 28 old-navy dark-mode borders
+  (`#31445f`/`#3a4f6d`), leftover teals, three warm-paper off-whites, and the
+  mobile category taxonomies (labelled in text, so colour was variety).
+- **Semantic** → converted to the real tokens rather than flattened *or* left
+  as hex: incident severity (mild/moderate/severe → `success`/`warning`/
+  `error` backgrounds), dementia stage (early/middle/late), and the success
+  confirmation circles. Same meaning, now theme-aware. Web has **zero**
+  arbitrary hex colours left in `.tsx`.
+
+**One bug caught in dark mode, self-inflicted.** Re-pointing the Home and
+Impact hero cards at `from-primary to-primary-light` made them near-*white*
+in dark mode — their text is white. They're "always dark" panels, so they
+now use `bg-panelDark`, the theme-invariant token added for exactly this on
+the landing page. The existing radial sheen overlay supplies the depth the
+gradient was giving. Verified legible in both themes.
+
+**Verified:** web `tsc` clean, 33 files / 256 tests pass; mobile `tsc` clean,
+6 suites / 28 tests pass. Checked live in both themes: profile wizard (the
+reported screen), check-in, and home.
+
+### 2026-09-19 — Palette applied to every screen, web + mobile
+
+The landing page's near-black/icy-blue system is now the product's palette,
+not a marketing-page exception. Design and colour only — no functional,
+routing, API or persistence changes on either platform.
+
+**The rule the palette encodes**, and the reason it was safe to apply to a
+safety-critical app: near-black is the action colour and nothing that isn't
+tappable uses it; sky blue is informational (icons, links, chips); coral is
+a marker dot only. Everything else is neutral. Status and safety colours —
+`success`/`warning`/`error`/`emergency` and the four Moment Coach section
+tints — were deliberately **not** folded in. Neutralising the general UI is
+precisely what leaves them as the only saturated things on screen, so the
+911 bar and the coach's "what not to do" band read louder than before, not
+quieter.
+
+**Web.** The `[data-landing]` override was deleted and its values promoted
+into `:root`/`.dark` in `globals.css`, so all 34 pages and 53 components
+inherited the palette without being touched individually. Beyond that:
+- **`--color-on-primary`, new.** `--color-primary` has to invert in dark
+  mode (a near-black fill on a near-black ground is not a button), which a
+  hardcoded `text-white` on every button cannot follow. 33 `text-white`
+  occurrences that sat on a primary fill became `text-onPrimary`; ones on
+  `bg-error`/`bg-emergency`/the partner band were left alone.
+- **`--color-panel-dark`, new.** The landing "How it works" band and final
+  CTA are deliberately dark in *both* themes, so they can't ride on
+  `--color-primary` — they'd have flipped to near-white in dark mode with
+  white text on them. Theme-invariant, like the footer band.
+- **~40 hardcoded teal rgba values** in component states (card hover, focus
+  rings, `outline-button`, chips, in-app decor blobs) re-hued to sky by
+  script, with the semantic rows excluded by name.
+- **Inline links** are sky, not near-black: 17 `text-primary hover:underline`
+  occurrences: at near-black they were indistinguishable from body text.
+- **Buttons are pills** at every size (`Button.tsx` plus 29 raw action
+  elements), matching the landing CTAs.
+- `Button.tsx`'s `disabled:bg-primary/45` → `disabled:opacity-45` — another
+  instance of the Tailwind-3.4 opacity-on-CSS-variable bug logged below.
+  `.landing-ghost-button` → `.ghost-button`, now used app-wide.
+
+**Mobile.** Same values, same roles, via `ThemeContext.tsx` (`lightColors`/
+`darkColors`), which every screen already reads through `useTheme()`. The
+old indigo-action/teal-brand split is gone: `palette.indigo`→`palette.ink`,
+`palette.teal`→`palette.sky`, plus a new `onPrimary` mirroring the web's.
+`constants/theme.ts`'s pure black/white Expo-template leftovers were
+re-valued to match. Outside the theme: 8 hardcoded white labels sitting on
+primary fills → `colors.onPrimary` (these would have gone invisible once
+primary inverts), 4 inline links → `colors.accent`, and the old teal/purple
+decorative tints (`#2B7A78`, `#7C4DBA` and their soft fills) → sky. Whites
+on the partner band and on semantic green were left alone, checked
+individually.
+
+**Verified:** web `tsc --noEmit` clean, 33 test files / 256 tests pass (one
+Chip assertion updated — it asserted the literal `text-white` that is now
+`text-onPrimary`). Mobile `tsc --noEmit` clean, 6 suites / 28 tests pass.
+Checked live: landing, `/login` and `/facility/login` in both themes; the
+dark-mode primary inversion confirmed by computed style (near-white fill
+`#EEF2F7`, near-black label `#10141C`, pill radius); both theme-invariant
+dark panels confirmed still dark under `.dark`; the mobile welcome and
+access-code screens confirmed against the running Expo web build.
+
+**Known gap, not a code issue:** the Expo dev server on :8081 had been
+running since 2026-09-13 and its file watcher had gone partially stale — it
+picked up `ThemeContext.tsx` but not same-minute edits to screen files, so
+the per-screen mobile changes (links, `onPrimary` labels) could not be
+visually confirmed in that session. Source, typecheck and tests are correct;
+a Metro restart is all that's needed to see them.
+
+### 2026-09-19 — Scroll motion pass
+
+Third same-day pass: "add scroll animation, make it look premium." Per
+this document's own §13/motion guidance and the frontend-design skill's
+explicit warning that "fade-and-slide-up entrances on each section" is
+the generic AI-page tell, this is deliberately restrained rather than a
+library of scroll effects — one reveal per section, not per card, plus one
+functional (not decorative) nav enhancement.
+
+**Added, `ScrollReveal.tsx`** (new client component, mounted once
+alongside `LandingChromeSync`): every top-level section below the hero
+(`data-reveal` attribute, nine sections) fades and rises in exactly once
+the first time it crosses into view, then is unobserved — no re-trigger on
+scrolling back up, no per-child stagger inside a section. No-JS and
+pre-hydration fallback via a `<noscript>` block that forces full opacity.
+Same component also writes a single rAF-throttled `--landing-scroll` CSS
+variable, which the hero's two glass shapes read for a few pixels of
+parallax drift — layered onto a wrapping `<div>` rather than the `<svg>`
+itself, since a CSS animation already targets that element's `transform`
+(rotation) and a second static `transform` on the same node would just
+override it, not compose.
+
+**Added, `LandingNav.tsx` scroll-spy**: the pill nav now highlights
+whichever section is actually being read (a thin intersection band 30–40%
+down the viewport, not simply "has its top pixel appeared"), via a second
+IntersectionObserver keyed to each nav link's target `id`. This is the
+honest version of the fake bold-vs-gray "current" link style skipped
+during the 2026-09-19 palette pass for being static and therefore
+misleading — now it reflects a real, continuously-updated state.
+
+**Bug found while wiring the above, same root cause as twice already
+today**: `bg-foreground/5`/`/10` (hover/active tint on the hero's outline
+button and, newly, the nav's hover/current-link tint) and three
+`text-foreground-muted/NN` instances (the hero's "/" separator, its
+disclaimer line, the safety-steps arrow) all silently drop their opacity
+modifier under Tailwind 3.4 for the same reason as the header background
+bug — `bg-*` failure mode is fully transparent (invisible hover
+feedback), `text-*`'s is full-opacity-anyway (visible, just not as subtle
+as intended). Fixed with the same `color-mix()` pattern: two new reusable
+classes (`.landing-nav-link`, `.landing-ghost-button`) for the two
+hover/active cases, inline `color-mix()` styles for the three static
+text-opacity cases. Not a full app-wide audit — still flagged as one,
+scoped to what this pass actually touched.
+
+**Verified:** `tsc --noEmit` clean. Confirmed live: `--landing-scroll`
+updates with `window.scrollY` and the glass shape's computed `transform`
+reflects it; scroll-spy's `aria-current` moves correctly between sections;
+reveal sections settle to fully legible (not stuck at partial opacity);
+ghost-button hover now visibly tints. Mobile (375px) and desktop (1440px).
+
+### 2026-09-19 — Nav bar rebuild, dark-mode fix, footer recolor
+
+Same-day follow-up: the user sent a close-up reference of just the nav bar
+and asked to match it exactly, then flagged dark mode as not matching and
+the footer as still off-palette.
+
+**Nav rebuilt** (`LandingNav.tsx`) to the closer reference: transparent
+over the hero (no bar of its own — logo and CTA sit directly on the
+gradient), the link set collected into one white pill, centered. Gains a
+translucent backing only once scrolled past the hero, for legibility over
+whatever's beneath it further down. This replaces the two-tier utility-bar
+version from earlier the same day, built off a different, ambiguous
+screenshot crop that — on this cleaner reference — turned out to just be
+one bar, not two.
+
+**Two real bugs found and fixed while matching the reference, not
+consequences of the color choice itself:**
+- *Seam between the header and hero.* The header sits above `<main>` in
+  the DOM, so a transparent header revealed flat `--color-background`
+  behind it while the hero section's own gradient started only at the
+  header's bottom edge — two different blues meeting at a hard line.
+  Fixed by pulling the hero section up under the header with a
+  `-mt-20`/`pt-20` pair (cancels out for layout, lets the gradient paint
+  from y=0) rather than changing either color.
+- *`position: sticky` silently not sticking.* `LandingNav`'s header never
+  actually stayed pinned while scrolling — confirmed via
+  `getComputedStyle` (`top` tracked `-scrollY` instead of clamping to
+  `0`). Root cause: `html[data-landing]` and `html[data-landing] body`
+  both carried their own `overflow` value, making `body` a second
+  scroll-container ancestor for sticky-positioning purposes even though
+  body itself never actually overflows (it grows to fit content instead).
+  Fixed in `globals.css` by scoping the overflow reset to `html` alone and
+  setting `body`'s to `visible` (overriding the app-shell's unconditional
+  `overflow: hidden` on bare `body`, which `body` was otherwise still
+  inheriting).
+
+**Dark mode fixed.** `html[data-landing]` (an attribute selector on
+`html`) is more specific than `.dark` (a bare class), so the light-mode
+`--color-background` and the four `--color-accent-*` tokens set
+unconditionally in the 2026-09-19 palette pass were winning even under
+`.dark` — pale near-white panels kept showing up down an otherwise-dark
+page (value strip, What Is CalmGuide, the FHIR/tech chips). Added real
+`html.dark[data-landing]` values for all of them plus
+`--color-landing-sky-soft`, instead of leaving them to fall through.
+
+**Footer recolored.** `.landing-gradient-footer` was still the
+2026-09-01 pass's teal-adjacent navy gradient (`#102d4e…#08294b`), left
+over from before today's near-black palette existed. Now
+`#10141c…#05070a` — the same near-black as `--color-primary` and the "How
+It Works"/final-CTA panels, so the page has one consistent dark rather
+than two different ones.
+
+**Verified:** `tsc --noEmit` clean. Checked live — dark mode scrolled
+through every section (the specific thing that was broken), light mode,
+sticky nav confirmed pinned via `getComputedStyle` after the fix.
+
+### 2026-09-19 — Landing-page palette swap to match a supplied reference, exactly
+
+Same-day follow-up to "Real caregiver photography" below — the user
+supplied two more screenshots of the same reference site and asked,
+explicitly and repeatedly, to match its color usage exactly rather than
+adapt it to CalmGuide's teal brand. Landing page only, `[data-landing]`
+scoped as usual; app-wide teal/navy tokens (`globals.css` `:root`) are
+untouched.
+
+**New landing-only tokens** (`globals.css`): `[data-landing] --color-primary`
+now resolves to a near-black (`#10141c`) instead of the app's teal —
+every `bg-primary`/`text-primary`/`border-primary` use on the landing page
+(buttons, checkmarks, the nav) follows automatically. `--color-background`
+becomes a pale icy blue (`#eef5fb`). The four `accent-{mint,aqua,lavender,
+peach}` section-tint tokens all collapse to one near-white
+(`#f3f6f9`) — the reference doesn't use CalmGuide's rainbow of soft
+section tints, just white with one black panel for contrast. Two new
+landing-only accents, not part of the shared app palette: `--color-landing-sky`
+(`#3e8fd0`, illustration/icon/link accent) and `--color-landing-coral`
+(`#e8663d`, small eyebrow-marker dot only).
+
+**Buttons**: every landing CTA changed from `rounded-xl` to `rounded-full`
+(pill) to match the reference exactly, including the mobile menu's.
+
+**Eyebrow labels**: were colored text (`text-primary` or an inline indigo
+hex). Now a small coral dot + plain muted text, matching the reference's
+"● About the Platform" pattern instead of inventing a colored-label
+convention the reference doesn't use.
+
+**Headline**: the hero's per-locale-isolated highlighted word
+(`title_highlight`, kept as its own `<span>` for the same i18n reason as
+before) lost its color and underline — the reference's headline is one
+plain color throughout, no accent word.
+
+**One dark panel**: "How CalmGuide works" and the final CTA are now solid
+near-black (`bg-primary`) with white text, directly echoing the
+reference's own black "How It Works" panel — previously these were a
+mint-tinted card grid and a teal-to-blue gradient respectively. This is
+deliberately the *only* dark section on the page (plus the always-dark
+footer), not a second and third recurrence of it — restraint, not a new
+pattern to repeat further.
+
+**Two-tier nav** (`LandingNav.tsx`): added a slim, desktop-only utility
+bar above the main nav row — small circular "CG" mark on the start, a
+compact theme toggle and a small "Sign In" pill on the end — mirroring the
+thin secondary bar visible above the reference's main nav in the user's
+screenshot. The main row keeps the full logo, link set, and primary CTA,
+i.e. "the whole bar" as the user put it. Mobile is unaffected (utility bar
+is `hidden lg:block`; the hamburger panel already carried the same
+controls).
+
+**Animated shape instead of the sent video**: the user asked to add "the
+video animation" to the hero. Both video files they sent (see the entry
+below) are a screen-recording of the reference site's own custom-rendered
+3D glass shape — another company's specific brand asset, not something to
+reproduce. Built two small SVG shapes with a blue/white gradient behind
+the hero photo, rotating slowly and independently (`.landing-glass-shape`,
+`landing-glass-rotate` keyframe, 22s/28s, opposite directions), inheriting
+the global `prefers-reduced-motion` freeze already in place — same mood
+(a soft, glassy, gently turning form), original geometry.
+
+**Bug found and fixed, not introduced by this pass**: `LandingNav`'s
+header used `bg-surface/90` for its frosted-glass background. Tailwind
+3.4 can't apply an opacity modifier to a color defined as a bare
+`var(--color-surface)` string (`tailwind.config.ts` doesn't use the
+`withOpacityValue`-function pattern for it) — the utility silently
+compiled to fully transparent (`rgba(0,0,0,0)`, confirmed via
+`getComputedStyle`), which just happened to look plausible against light
+page content and was never visibly broken until today's dark hero exposed
+it. Fixed locally in `LandingNav.tsx` with an explicit
+`color-mix(in srgb, var(--color-surface) 90%, transparent)` inline style
+rather than a config-wide fix, since the same `/NN`-on-CSS-variable
+pattern likely appears elsewhere in the app and a full audit is out of
+scope for a landing-page pass — flagged here for whoever picks that up.
+
+**Verified:** `tsc --noEmit` clean. Checked live — light and dark mode
+(dark mode particularly, since the previous "How It Works" and final-CTA
+treatments plus the nav fix all changed there), mobile (375px) and desktop
+(1440px), mobile hamburger menu.
+
+### 2026-09-19 — Real caregiver photography on the landing page
+
+Follow-up to 2026-09-18: swaps the abstract/product-only hero for real
+caregiver-and-parent photography, using four AI-generated reference photos
+the user supplied and asked to be worked in (originals in
+`design/references/landing-page/Care giver /`, copied into
+`frontend/public/brand/caregivers/` as `caregiver-companionship.png`,
+`caregiver-mobility-support.png`, `caregiver-telehealth.png`,
+`caregiver-medication-review.png`). Landing page only; no locale/copy
+changes (every section reuses existing `landing.*` translation keys), no
+backend/route changes.
+
+**Reference materials reviewed, not copied wholesale:** the user shared two
+screenshots and two short video clips of a "Carefinity" healthcare site as
+a style reference (device-framed hero, floating detail cards over a big
+visual, alternating light sections, trust line under the hero CTA). Both
+videos turned out to be the same source — a screen-recording demo of that
+same Carefinity site, its logo visible throughout, showing its custom
+rotating 3D glass-shape render. That render is another company's actual
+brand asset, not a stock/style asset, so it was not reproduced; the
+*structure* (photo/screenshot pairing, floating cards, alternating
+sections) was reused, not the artwork. One of the two video files
+(`large-thumbnail...mp4`) was unrelated — a generic web-design-agency demo
+reel ("Design your vision... Get in Touch") — and was disregarded
+entirely.
+
+**Hero:** replaced the 2026-09-18 dark "3 a.m." navy panel with a bright
+hero again — the four supplied photos are all warm, daylight, in-home
+photography, and forcing them onto a dark panel fought the source material
+more than it suited it. `caregiver-companionship.png` (nurse and older
+woman, hands clasped) is the large hero visual; the real
+`calmguide-home-coach.png` product screenshot floats on top of it at
+smaller scale, in the same "photo proves the human moment, floating
+screenshot proves the product is real" pairing used twice more below.
+`.hero-night` / `.hero-glow` / `.hero-glow-pulse` (2026-09-18) removed as
+dead code now that nothing references them.
+
+**Photo placements**, one photo per section, chosen by theme rather than
+arbitrarily:
+- **What Is CalmGuide** — `caregiver-medication-review.png`, with the
+  existing 6-item checklist as a floating card over it (was a separate
+  plain card with no image before this pass).
+- **Behavioral Context** — `caregiver-mobility-support.png`, with the
+  existing `calmguide-behavior-profile.png` product screenshot now
+  floating on top of it (was a lone product screenshot before this pass).
+- **Technology / For Healthcare** — `caregiver-telehealth.png` (a tablet
+  video call with a clinician), paired with the existing FHIR/HL7/tech
+  content, which had no image at all before this pass; restructured from
+  a single centered column to two columns to fit it.
+
+**Deliberately not done:** no "trusted by" logo wall was added, even
+though the Carefinity reference has one — CalmGuide has exactly one real
+partner (Leap of Faith, already credited under the hero CTA); inventing
+placeholder logos for other companies would be exactly the kind of
+fabricated claim §23/§22 already rule out. No stat-dashboard tiles
+(engagement %, calorie/hydration trackers) were added either, for the same
+reason — the Carefinity reference's "Wellness Programs" section invents
+metrics that don't correspond to anything CalmGuide tracks.
+
+**Verified:** `tsc --noEmit` clean. Checked live in dev server — light and
+dark mode, mobile (375px) and desktop (1440px). One mobile-only layout bug
+was caught and fixed during review: the What Is CalmGuide floating
+checklist card originally overlapped ~90% of its photo on narrow screens,
+leaving only a sliver of faces visible; it now sits in normal flow below
+the photo on mobile (`sm:` and up keeps the floating/overlapping
+treatment, which has room to breathe at that width).
+
+### 2026-09-18 — Landing page visual identity pass
+
+Focused re-design of the landing page's visual execution (layout/copy
+structure from the 2026-09-01 rebuild kept; this pass is about how it
+looks, not what it says). Landing page only — no locale/copy changes, no
+backend/route changes.
+
+**Fixed — off-brand primary color:** removed the `[data-landing]`
+`--color-primary: #E1BFFB` override (added 2026-09-01, §3.7 as originally
+written) that had every CTA, link, and icon on the landing page resolving
+to a low-contrast pale lavender instead of the brand's actual teal
+(`#2B7A78`, used everywhere else in the app and on the real logo, §2.1).
+The override is deleted outright rather than repointed, since with no
+override the landing page now simply inherits the same teal `:root`
+tokens as the rest of the app — one visual identity, not two.
+
+**Redesigned — hero.** Replaced the light hero card + four animated,
+mix-blend-mode, cross-page-fixed decorative bubbles with a single
+full-bleed dark-navy hero panel (`.hero-night`, theme-invariant like the
+footer — §3.6) and one static-then-slow-breathing warm amber glow
+(`.hero-glow`) behind the phone mockups. This is a literal rendering of
+§1's own design anchor — "someone standing in a hallway at 3 a.m.,
+holding a phone" — rather than generic pastel gradient-wash decoration.
+The previously-recolored single headline word ("caregiving") keeps its
+own `<span>` (still needed to isolate it per-locale, §18 point 2) but is
+now marked with a warm underline stroke instead of a plain color swap.
+`LandingNav` no longer has a transparent/scrolled state toggle — it's
+always the same solid, bordered light bar, since the fixed brand logo PNG
+(§2.1, "transparent-safe on light backgrounds" — not dark) can't be
+recolored to stay legible floating over a dark hero.
+
+**Removed — repeated decoration.** Deleted the per-section blurred
+`blur-3xl` corner circles that sat behind What Is / How It Works /
+Behavioral Context / Safety / Technology (six near-identical glow shapes
+down one page) — the soft section-tint backgrounds (mint/aqua/lavender/
+peach) already do the work of differentiating sections; the added blobs
+were decoration without a job, the kind of "gradient wash as decoration"
+this document's own §23 "Don't" list already warns against.
+
+**Restyled — eyebrow labels.** `Eyebrow` no longer renders
+`uppercase tracking-wide text-sm` — now sentence-case at `text-base`.
+Applies site-wide on the landing page (one shared component), not
+section-by-section.
+
+**Restructured — value strip.** The four value-strip items were four
+identical `rounded-2xl` icon-in-circle cards inside an outer card, next to
+near-identical card treatments two sections later (How It Works) and again
+in the Moment Coach showcase — three uses of the same SaaS-card formula in
+one scroll. Value strip is now a plain divided row (icon + text, thin
+rule between items on `sm+`) so the numbered/card treatment is reserved
+for the sections where it's actually meaningful (How It Works and Safety
+are genuine sequences).
+
+**Cleanup:** removed the `bubble-a/b/c/d` keyframes/animations
+(`tailwind.config.ts`) and `.hero-bubble` (`globals.css`), both dead once
+the bubbles they animated were removed; removed `--color-accent-blue`
+(`globals.css` + `tailwind.config.ts`), unused since it existed solely for
+the old bubble gradient.
+
+**Verified:** `tsc --noEmit` clean. Checked live in dev server — light and
+dark mode, mobile (~390px) and desktop (~1440px) viewports, hero/value
+strip/footer specifically re-checked in dark mode since the hero panel is
+now theme-invariant by design (must look intentional, not like a dark-mode
+bug, in both site themes). No automated test suite covers the landing page
+visually; no test run needed since no component logic changed.
+
 ### 2026-09-07 — Extend landing-page decorative language into the app (static, in-app)
 
 Extends the landing page's soft radial-gradient "blob" language (§18) into

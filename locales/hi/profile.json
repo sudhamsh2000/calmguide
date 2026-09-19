@@ -124,6 +124,15 @@
     "title": "{name} की प्रोफ़ाइल",
     "behaviors_tracked": "{count} व्यवहार दर्ज"
   },
+  "avatar": {
+    "title": "चित्र",
+    "description": "इस व्यक्ति के लिए तस्वीर चुनें। यह इसी डिवाइस पर रहती है।",
+    "option": {
+      "monogram": "आद्याक्षर",
+      "male": "पुरुष",
+      "female": "महिला"
+    }
+  },
   "options": {
     "behavioral": {
       "Sundowning": "सूर्यास्त सिंड्रोम (शाम की बेचैनी)",

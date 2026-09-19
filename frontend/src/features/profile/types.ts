@@ -1,8 +1,12 @@
+import type { ProfileAvatar } from '@/lib/storage';
+
 export type DiseaseStage = 'early' | 'middle' | 'late';
 
 export interface WizardFormData {
   inviteCode: string;
   patientName: string;
+  /** Chosen alongside the name; never sent to the server. */
+  avatar: ProfileAvatar;
   diseaseStage: DiseaseStage | null;
   behavioralPatterns: string[];
   calmingStrategies: string[];

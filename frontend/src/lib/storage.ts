@@ -76,19 +76,48 @@ export function setDisclaimerAccepted(): void {
   setItem(KEYS.DISCLAIMER_ACCEPTED, 'true');
 }
 
+/**
+ * Sign out: drop the whole session, not just the legacy keys.
+ *
+ * The stored profile list has to go too. WelcomeGate treats a surviving
+ * `getActiveProfile()` as a session to restore — it rewrites the access
+ * code and name from it and redirects to /home — so leaving the list
+ * behind silently undoes the sign-out on the very next render.
+ */
 export function clearAll(): void {
   removeItem(KEYS.PATIENT_NAME);
   removeItem(KEYS.ACCESS_CODE);
   removeItem(KEYS.PREFERRED_LANGUAGE);
   removeItem(KEYS.DISCLAIMER_ACCEPTED);
+  removeItem(PROFILES_KEY);
+  removeItem(ACTIVE_PROFILE_INDEX_KEY);
 }
 
 // ── Multi-profile support ────────────────────────────────────────────────
+
+/**
+ * Which portrait stands in for the person on the profile card.
+ *
+ * The backend stores no name and no gender — profiles are deliberately
+ * PII-free — so this can't be derived from anything the server knows, and
+ * guessing it from a name would misgender people. It's an explicit choice
+ * the caregiver makes, kept client-side next to the name. `monogram` is
+ * the default and stays a first-class option, not a fallback.
+ */
+export type ProfileAvatar = 'monogram' | 'male' | 'female';
+
+export const PROFILE_AVATARS: readonly ProfileAvatar[] = ['monogram', 'male', 'female'];
+
+export function isProfileAvatar(value: unknown): value is ProfileAvatar {
+  return typeof value === 'string' && (PROFILE_AVATARS as readonly string[]).includes(value);
+}
 
 export interface StoredProfile {
   access_code: string;
   patient_name: string;
   disease_stage: string;
+  /** Absent on profiles created before avatars existed; treated as 'monogram'. */
+  avatar?: ProfileAvatar;
 }
 
 const PROFILES_KEY = 'calmguide_profiles';
@@ -142,6 +171,35 @@ export function addProfile(profile: StoredProfile): void {
   setPatientName(profile.patient_name);
 }
 
+/**
+ * Create or update the stored entry for a profile, and make it the active
+ * one. Matches on access code, so calling it twice for the same profile
+ * updates in place rather than adding a duplicate.
+ *
+ * The wizard used to write only the two legacy keys, which left
+ * `getProfiles()` on its fallback path — and that path invents
+ * `disease_stage: 'unknown'`, which ProfileSwitcher then displays. Writing
+ * the real entry keeps the switcher honest and gives the avatar somewhere
+ * to live.
+ */
+export function saveActiveProfile(profile: StoredProfile): void {
+  const profiles = getProfiles();
+  const idx = profiles.findIndex((p) => p.access_code === profile.access_code);
+
+  if (idx >= 0) {
+    profiles[idx] = { ...profiles[idx], ...profile };
+    setProfiles(profiles);
+    setActiveProfileIndex(idx);
+  } else {
+    profiles.push(profile);
+    setProfiles(profiles);
+    setActiveProfileIndex(profiles.length - 1);
+  }
+
+  setAccessCode(profile.access_code);
+  setPatientName(profile.patient_name);
+}
+
 export function removeProfile(index: number): void {
   const profiles = getProfiles();
   if (index < 0 || index >= profiles.length) return;
@@ -161,6 +219,23 @@ export function removeProfile(index: number): void {
       setPatientName(active.patient_name);
     }
   }
+}
+
+/** The active profile's portrait, or 'monogram' when none was chosen. */
+export function getActiveProfileAvatar(): ProfileAvatar {
+  const avatar = getActiveProfile()?.avatar;
+  return isProfileAvatar(avatar) ? avatar : 'monogram';
+}
+
+/** Set the active profile's portrait. No-op when there is no active profile. */
+export function setActiveProfileAvatar(avatar: ProfileAvatar): void {
+  const profiles = getProfiles();
+  if (profiles.length === 0) return;
+  const idx = Math.min(getActiveProfileIndex(), profiles.length - 1);
+  const profile = profiles[idx];
+  if (!profile) return;
+  profiles[idx] = { ...profile, avatar };
+  setProfiles(profiles);
 }
 
 export function switchProfile(index: number): void {

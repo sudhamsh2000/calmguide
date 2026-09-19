@@ -196,7 +196,7 @@ function AddResidentForm() {
     return (
       <main className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <div className="max-w-lg flex-1 flex flex-col items-center justify-center text-center gap-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#E0F0E7]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success-bg text-success-text">
             <svg
               width="32"
               height="32"
@@ -235,14 +235,14 @@ function AddResidentForm() {
             <button
               type="button"
               onClick={resetForm}
-              className="flex-1 h-12 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-colors"
+              className="flex-1 h-12 rounded-full bg-primary text-onPrimary font-semibold text-sm hover:bg-primary-light transition-colors"
             >
               {t('add_another')}
             </button>
             <button
               type="button"
               onClick={() => router.push(`/${locale}/facility/residents-all`)}
-              className="flex-1 h-12 rounded-xl border border-primary/40 text-primary font-semibold text-sm hover:bg-primary/5 transition-colors dark:border-primary/25"
+              className="flex-1 h-12 rounded-full border border-primary/40 text-primary font-semibold text-sm hover:bg-primary/5 transition-colors dark:border-primary/25"
             >
               {t('view_residents')}
             </button>
@@ -265,7 +265,7 @@ function AddResidentForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-primary hover:underline mb-4"
+          className="flex items-center gap-1 text-sm text-accentSky hover:underline mb-4"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -299,10 +299,10 @@ function AddResidentForm() {
               {stageOptions.map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-center justify-center h-11 rounded-xl border cursor-pointer text-sm font-medium transition-all ${
+                  className={`flex items-center justify-center h-11 rounded-full border cursor-pointer text-sm font-medium transition-all ${
                     stage === opt.value
-                      ? 'border-border bg-primary/[0.06] text-primary dark:border-[#31445f] dark:bg-primary/[0.08] dark:text-primary-light'
-                      : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
+                      ? 'border-border bg-primary/[0.06] text-primary dark:border-theme-soft dark:bg-primary/[0.08] dark:text-primary-light'
+                      : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
                   }`}
                 >
                   <input
@@ -367,10 +367,10 @@ function AddResidentForm() {
                   return (
                     <label
                       key={staff.id}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-full border cursor-pointer transition-all ${
                         checked
-                          ? 'border-border bg-primary/[0.06] dark:border-[#31445f] dark:bg-primary/[0.08]'
-                          : 'border-border dark:border-[#31445f] bg-surface hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
+                          ? 'border-border bg-primary/[0.06] dark:border-theme-soft dark:bg-primary/[0.08]'
+                          : 'border-border dark:border-theme-soft bg-surface hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
                       }`}
                     >
                       <input
@@ -444,7 +444,7 @@ function AddResidentForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
+            className="w-full h-12 rounded-full bg-primary text-onPrimary font-semibold text-base disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
           >
             {submitting ? t('submitting') : t('submit')}
           </button>

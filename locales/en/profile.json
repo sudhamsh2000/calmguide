@@ -125,6 +125,15 @@
     "title": "{name}'s Profile",
     "behaviors_tracked": "{count} behaviors tracked"
   },
+  "avatar": {
+    "title": "Portrait",
+    "description": "Pick the picture that stands in for this person. It stays on this device.",
+    "option": {
+      "monogram": "Initial",
+      "male": "Man",
+      "female": "Woman"
+    }
+  },
   "options": {
     "behavioral": {
       "Sundowning": "Sundowning (evening agitation)",

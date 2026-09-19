@@ -242,7 +242,7 @@ export function FeedbackWidget({
           <button
             type="button"
             onClick={handleDone}
-            className="rounded-xl bg-primary px-5 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors min-h-[44px]"
+            className="rounded-full bg-primary px-5 py-2 text-xs font-semibold text-onPrimary hover:bg-primary-dark transition-colors min-h-[44px]"
           >
             {t('done')}
           </button>

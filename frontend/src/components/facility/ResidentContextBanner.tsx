@@ -13,17 +13,17 @@ interface ResidentContextBannerProps {
 
 const RISK_BANNER: Record<RiskLevel, { bg: string; badgeBg: string; badgeText: string }> = {
   high: {
-    bg: 'bg-[#FFFBFB] dark:bg-red-950/10',
+    bg: 'bg-surface dark:bg-red-950/10',
     badgeBg: 'bg-red-100 dark:bg-red-950/40',
     badgeText: 'text-red-800 dark:text-red-300',
   },
   moderate: {
-    bg: 'bg-[#FFFDF8] dark:bg-orange-950/10',
+    bg: 'bg-surface dark:bg-orange-950/10',
     badgeBg: 'bg-orange-100 dark:bg-orange-950/40',
     badgeText: 'text-orange-800 dark:text-orange-300',
   },
   low: {
-    bg: 'bg-[#FBFFFC] dark:bg-green-950/10',
+    bg: 'bg-surface dark:bg-green-950/10',
     badgeBg: 'bg-green-100 dark:bg-green-950/40',
     badgeText: 'text-green-800 dark:text-green-300',
   },

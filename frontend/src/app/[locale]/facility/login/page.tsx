@@ -345,14 +345,14 @@ export default function FacilityLoginPage() {
           <button
             type="submit"
             disabled={facilityCode.length !== 8 || staffLoading}
-            className="h-12 rounded-xl bg-primary text-white font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
+            className="h-12 rounded-full bg-primary text-onPrimary font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
           >
             {staffLoading ? 'Connecting...' : 'Continue'}
           </button>
           <button
             type="button"
             onClick={handleShowEmailLogin}
-            className="text-sm text-primary hover:underline mt-2"
+            className="text-sm text-accentSky hover:underline mt-2"
           >
             Admin / DON login with email
           </button>
@@ -380,7 +380,7 @@ export default function FacilityLoginPage() {
             <button
               type="button"
               onClick={handleShowEmailLogin}
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-accentSky hover:underline"
             >
               Admin login
             </button>
@@ -458,14 +458,14 @@ export default function FacilityLoginPage() {
           <button
             type="submit"
             disabled={!email || !password || state.loading}
-            className="h-12 rounded-xl bg-primary text-white font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
+            className="h-12 rounded-full bg-primary text-onPrimary font-semibold text-lg disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
           >
             {state.loading ? 'Signing in...' : 'Sign In'}
           </button>
           <button
             type="button"
             onClick={handleBackToStaffLogin}
-            className="text-sm text-primary hover:underline mt-2"
+            className="text-sm text-accentSky hover:underline mt-2"
           >
             Back to staff login
           </button>

@@ -57,7 +57,7 @@ const CATEGORY_LABELS: Record<BehaviorCategory, string> = {
 const CATEGORY_COLORS: Record<BehaviorCategory, string> = {
   aggression_anger: '#DC4E4E',
   confusion_disorientation: '#D4893A',
-  wandering_exit_seeking: '#3A7D5C',
+  wandering_exit_seeking: '#3E8FD0',
   refusing_care: '#8B5E3C',
   sleep_problems: '#5B6ABF',
   hallucinations: '#7B5EA7',
@@ -261,12 +261,12 @@ export function IncidentLogger({ onComplete, profileId }: IncidentLoggerProps) {
               width: 56,
               height: 56,
               borderRadius: 28,
-              backgroundColor: '#E0F0E7',
+              backgroundColor: colors.success + '22',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 28, color: '#3A7D5C' }}>{'✓'}</Text>
+            <Text style={{ fontSize: 28, color: colors.success }}>{'✓'}</Text>
           </View>
           <Text style={{ fontSize: 22, fontWeight: '600', color: colors.foreground }}>
             {t('logger.saved')}

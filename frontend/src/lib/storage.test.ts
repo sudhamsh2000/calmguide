@@ -8,6 +8,12 @@ import {
   clearAccessCode,
   clearAll,
   STORAGE_KEYS,
+  addProfile,
+  saveActiveProfile,
+  getActiveProfile,
+  getActiveProfileAvatar,
+  setActiveProfileAvatar,
+  getProfiles,
 } from './storage';
 
 describe('storage', () => {
@@ -77,6 +83,82 @@ describe('storage', () => {
       clearAll();
 
       expect(window.localStorage.getItem('other_key')).toBe('value');
+    });
+  });
+
+  describe('profile avatar', () => {
+    it('defaults to the monogram when no profile exists', () => {
+      expect(getActiveProfileAvatar()).toBe('monogram');
+    });
+
+    it('defaults to the monogram for profiles saved before avatars existed', () => {
+      addProfile({ access_code: 'ABC123', patient_name: 'Tarun', disease_stage: 'early' });
+      expect(getActiveProfileAvatar()).toBe('monogram');
+    });
+
+    it('stores and retrieves the chosen avatar', () => {
+      addProfile({ access_code: 'ABC123', patient_name: 'Tarun', disease_stage: 'early' });
+      setActiveProfileAvatar('male');
+      expect(getActiveProfileAvatar()).toBe('male');
+      expect(getProfiles()[0].avatar).toBe('male');
+    });
+
+    it('leaves the rest of the profile untouched', () => {
+      addProfile({ access_code: 'ABC123', patient_name: 'Tarun', disease_stage: 'early' });
+      setActiveProfileAvatar('female');
+      expect(getProfiles()[0]).toMatchObject({
+        access_code: 'ABC123',
+        patient_name: 'Tarun',
+        disease_stage: 'early',
+      });
+    });
+
+    it('does nothing when there is no active profile', () => {
+      expect(() => setActiveProfileAvatar('male')).not.toThrow();
+      expect(getProfiles()).toHaveLength(0);
+    });
+
+    it('only changes the active profile in a multi-profile list', () => {
+      addProfile({ access_code: 'AAA', patient_name: 'Tarun', disease_stage: 'early' });
+      addProfile({ access_code: 'BBB', patient_name: 'Asha', disease_stage: 'late' });
+      // addProfile makes the newly added one active.
+      setActiveProfileAvatar('female');
+      expect(getProfiles()[0].avatar).toBeUndefined();
+      expect(getProfiles()[1].avatar).toBe('female');
+    });
+  });
+
+  describe('clearAll', () => {
+    it('leaves no session behind for WelcomeGate to restore', () => {
+      // WelcomeGate rebuilds the access code and name from a surviving
+      // stored profile and redirects to /home, so anything left here
+      // silently undoes the sign-out.
+      saveActiveProfile({
+        access_code: 'ABC123',
+        patient_name: 'Tarun',
+        disease_stage: 'early',
+        avatar: 'male',
+      });
+      expect(getActiveProfile()).not.toBeNull();
+
+      clearAll();
+
+      expect(getActiveProfile()).toBeNull();
+      expect(getProfiles()).toHaveLength(0);
+      expect(getAccessCode()).toBeNull();
+      expect(getPatientName()).toBeNull();
+      expect(window.localStorage.getItem('calmguide_profiles')).toBeNull();
+      expect(window.localStorage.getItem('calmguide_active_profile_index')).toBeNull();
+    });
+
+    it('clears every profile, not just the active one', () => {
+      addProfile({ access_code: 'AAA', patient_name: 'Tarun', disease_stage: 'early' });
+      addProfile({ access_code: 'BBB', patient_name: 'Asha', disease_stage: 'late' });
+
+      clearAll();
+
+      expect(getProfiles()).toHaveLength(0);
+      expect(getActiveProfile()).toBeNull();
     });
   });
 });

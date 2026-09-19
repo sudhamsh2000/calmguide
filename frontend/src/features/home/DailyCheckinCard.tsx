@@ -189,7 +189,7 @@ export function DailyCheckinCard({ onSubmit }: DailyCheckinCardProps) {
           <button
             type="button"
             onClick={handleDone}
-            className="focus-ring min-h-tap w-full rounded-xl bg-primary px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-light active:bg-primary-dark"
+            className="focus-ring min-h-tap w-full rounded-full bg-primary px-5 py-3 text-base font-semibold text-onPrimary transition-colors hover:bg-primary-light active:bg-primary-dark"
           >
             {t('done')}
           </button>

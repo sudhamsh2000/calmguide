@@ -137,7 +137,7 @@ export default function LoginPage() {
 
         <p className="pb-2 text-sm text-foreground-muted text-center leading-relaxed">
           {t('login.no_code')}{' '}
-          <Link href="/profile/setup" className="text-primary hover:underline">
+          <Link href="/profile/setup" className="text-accentSky hover:underline">
             {t('login.setup_new')}
           </Link>
         </p>

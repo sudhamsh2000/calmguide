@@ -223,13 +223,13 @@ export default function AddResidentScreen() {
             width: 64,
             height: 64,
             borderRadius: 32,
-            backgroundColor: '#E0F0E7',
+            backgroundColor: colors.success + '22',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 16,
           }}
         >
-          <Text style={{ fontSize: 28, color: '#3A7D5C' }}>✓</Text>
+          <Text style={{ fontSize: 28, color: colors.success }}>✓</Text>
         </View>
         <Text
           style={{ fontSize: 20, fontWeight: '700', color: colors.foreground, marginBottom: 16 }}
@@ -413,7 +413,7 @@ export default function AddResidentScreen() {
                     }}
                   >
                     {checked && (
-                      <Text style={{ color: '#FFF', fontSize: 13, fontWeight: '700' }}>✓</Text>
+                      <Text style={{ color: colors.onPrimary, fontSize: 13, fontWeight: '700' }}>✓</Text>
                     )}
                   </View>
                   <View style={{ flex: 1 }}>

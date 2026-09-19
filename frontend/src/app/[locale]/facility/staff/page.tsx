@@ -52,7 +52,7 @@ export default function StaffListPage() {
         <h1 className="text-xl font-bold text-foreground">{t('title')}</h1>
         <Link
           href={`/${locale}/facility/staff/new`}
-          className="h-10 px-4 flex items-center rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-light transition-colors"
+          className="h-10 px-4 flex items-center rounded-full bg-primary text-onPrimary text-sm font-medium hover:bg-primary-light transition-colors"
         >
           + {t('add_staff')}
         </Link>
@@ -93,7 +93,7 @@ export default function StaffListPage() {
           </p>
           <Link
             href={`/${locale}/facility/staff/new`}
-            className="h-12 px-6 flex items-center rounded-xl bg-primary text-white font-semibold hover:bg-primary-light transition-colors"
+            className="h-12 px-6 flex items-center rounded-full bg-primary text-onPrimary font-semibold hover:bg-primary-light transition-colors"
           >
             {tEmpty('staff_cta')}
           </Link>
@@ -120,7 +120,7 @@ export default function StaffListPage() {
                     <td className="px-4 py-3">
                       <Link
                         href={`/${locale}/facility/staff/${s.id}/assign`}
-                        className="font-medium text-primary hover:underline"
+                        className="font-medium text-accentSky hover:underline"
                       >
                         {s.name}
                       </Link>

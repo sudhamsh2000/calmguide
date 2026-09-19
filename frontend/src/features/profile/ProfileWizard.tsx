@@ -7,7 +7,13 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { createProfile, updateProfile, validateInviteCode } from '@/lib/api';
-import { setPatientName, setAccessCode, getPatientName, getAccessCode } from '@/lib/storage';
+import {
+  getPatientName,
+  getAccessCode,
+  getActiveProfileAvatar,
+  saveActiveProfile,
+  type ProfileAvatar,
+} from '@/lib/storage';
 import { useProfile } from '@/context/ProfileContext';
 import { StepInviteCode } from './StepInviteCode';
 import { StepPatientName } from './StepPatientName';
@@ -50,6 +56,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
   const [formData, setFormData] = useState<WizardFormData>({
     inviteCode: '',
     patientName: '',
+    avatar: 'monogram',
     diseaseStage: null,
     behavioralPatterns: [],
     calmingStrategies: [],
@@ -83,6 +90,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
       setFormData((prev) => ({
         inviteCode: prev.inviteCode,
         patientName: existingName ?? prev.patientName,
+        avatar: getActiveProfileAvatar(),
         diseaseStage: (profile?.disease_stage as DiseaseStage) ?? prev.diseaseStage,
         behavioralPatterns: profile?.behavioral_patterns ?? prev.behavioralPatterns,
         calmingStrategies: profile?.calming_strategies ?? prev.calmingStrategies,
@@ -166,8 +174,14 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
 
         const response = await updateProfile(existingCode, profileData);
 
-        // Update patient name in localStorage
-        setPatientName(formData.patientName.trim());
+        // Name, portrait and stage all live on the device; the portrait has
+        // nowhere to go server-side by design.
+        saveActiveProfile({
+          access_code: existingCode,
+          patient_name: formData.patientName.trim(),
+          disease_stage: formData.diseaseStage,
+          avatar: formData.avatar,
+        });
 
         // Update profile context
         dispatch({ type: 'UPDATE_SUCCESS', payload: response });
@@ -176,9 +190,12 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
       } else {
         const response = await createProfile(profileData);
 
-        // Store patient name and access code in localStorage
-        setPatientName(formData.patientName.trim());
-        setAccessCode(response.access_code);
+        saveActiveProfile({
+          access_code: response.access_code,
+          patient_name: formData.patientName.trim(),
+          disease_stage: formData.diseaseStage,
+          avatar: formData.avatar,
+        });
 
         // Update profile context
         dispatch({ type: 'FETCH_SUCCESS', payload: response });
@@ -198,7 +215,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
          * single peach blob as ProfileView, this screen's natural
          * counterpart, so the create-profile flow doesn't end on a visibly
          * flatter screen than the profile page it leads into. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
           <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
         </div>
 
@@ -276,7 +293,7 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
        * 2026-09-07 pass left out and was still visibly flatter as a result.
        * Positioned behind the progress bar/header, clear of the step content
        * and the sticky footer buttons below. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
         <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
       </div>
 
@@ -301,7 +318,9 @@ export function ProfileWizard({ className = '' }: ProfileWizardProps) {
       {step === 1 + stepOffset && (
         <StepPatientName
           patientName={formData.patientName}
+          avatar={formData.avatar}
           onChange={(name) => setFormData({ ...formData, patientName: name })}
+          onAvatarChange={(avatar: ProfileAvatar) => setFormData({ ...formData, avatar })}
         />
       )}
 

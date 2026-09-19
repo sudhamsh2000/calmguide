@@ -307,7 +307,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
     return (
       <div className={`flex flex-col gap-6 pt-4 ${className}`}>
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#E0F0E7]">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-success-bg text-success-text">
             <svg
               width="28"
               height="28"
@@ -374,7 +374,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                 type="button"
                 aria-label={t(`logger.category.${cat}`).replace(/\n/g, ' ')}
                 onClick={() => setCategory(cat)}
-                className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border dark:border-[#31445f] bg-surface px-3 py-5 min-h-[100px] text-center transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
+                className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border dark:border-theme-soft bg-surface px-3 py-5 min-h-[100px] text-center transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
               >
                 <CategoryIcon category={cat} />
                 <span className="text-sm font-medium text-foreground leading-tight">
@@ -396,7 +396,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   setTimeChoice(tc);
                   setShowMorePrompt(true);
                 }}
-                className="rounded-xl border border-border dark:border-[#31445f] bg-surface px-4 py-4 min-h-[48px] text-left text-base font-medium text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
+                className="rounded-full border border-border dark:border-theme-soft bg-surface px-4 py-4 min-h-[48px] text-left text-base font-medium text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
               >
                 {t(`logger.${tc}`)}
               </button>
@@ -422,7 +422,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   'rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer',
                   severity === s
                     ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                    : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
                 ].join(' ')}
               >
                 {t(`logger.severity.${s}`)}
@@ -443,7 +443,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   'rounded-xl border py-3 px-2 min-h-[48px] text-center text-base font-medium transition-all focus-ring cursor-pointer',
                   duration === d
                     ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                    : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
                 ].join(' ')}
               >
                 {t(`logger.duration.${d}`)}
@@ -491,7 +491,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   antecedent === a
                     ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                    : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
                 ].join(' ')}
               >
                 {t(`logger.antecedent.${a}`)}
@@ -514,7 +514,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   intervention === i
                     ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                    : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
                 ].join(' ')}
               >
                 {t(`logger.intervention.${i}`)}
@@ -537,7 +537,7 @@ export function IncidentLogger({ className = '', onComplete, profileId }: Incide
                   'rounded-xl border py-3 px-2 min-h-[48px] text-center text-sm font-medium transition-all focus-ring cursor-pointer',
                   outcome === o
                     ? 'border-primary/60 bg-primary/[0.07] text-primary dark:border-primary/45 dark:bg-primary/[0.11] dark:text-primary-light shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
+                    : 'border-border dark:border-theme-soft bg-surface text-foreground hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]',
                 ].join(' ')}
               >
                 {t(`logger.outcome.${o}`)}

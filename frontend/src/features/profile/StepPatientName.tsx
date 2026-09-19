@@ -2,14 +2,33 @@
 
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/Input';
+import { AvatarPicker } from './AvatarPicker';
+import type { ProfileAvatar } from '@/lib/storage';
 
 export interface StepPatientNameProps {
   patientName: string;
+  avatar: ProfileAvatar;
   onChange: (name: string) => void;
+  onAvatarChange: (avatar: ProfileAvatar) => void;
   className?: string;
 }
 
-export function StepPatientName({ patientName, onChange, className = '' }: StepPatientNameProps) {
+/**
+ * Name and portrait, on one step rather than two.
+ *
+ * Both answer "who is this?", and the setup flow is already six steps —
+ * a seventh for a one-tap cosmetic choice would be padding. Keeping them
+ * together also makes the monogram option live: it shows the initial of
+ * whatever has been typed, so the choice is between three things you can
+ * actually see rather than three labels.
+ */
+export function StepPatientName({
+  patientName,
+  avatar,
+  onChange,
+  onAvatarChange,
+  className = '',
+}: StepPatientNameProps) {
   const t = useTranslations('profile');
 
   return (
@@ -33,6 +52,8 @@ export function StepPatientName({ patientName, onChange, className = '' }: StepP
         onChange={(e) => onChange(e.target.value)}
         autoComplete="off"
       />
+
+      <AvatarPicker name={patientName} value={avatar} onChange={onAvatarChange} />
 
       <div className="card-shell p-4">
         <p className="text-sm text-foreground-muted leading-relaxed">{t('setup.name_privacy')}</p>

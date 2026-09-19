@@ -42,7 +42,7 @@ function GreetingCard() {
 function UserMessageBubble({ message }: { message: string }) {
   const t = useTranslations('coach');
   return (
-    <div className="mb-4 max-w-3xl rounded-2xl border border-foreground/10 bg-surface/80 px-4 py-3.5 shadow-[0_1px_2px_rgba(23,37,42,0.05)] dark:border-[#31445f] dark:bg-surface/70 dark:shadow-[0_1px_2px_rgba(0,0,0,0.18)]">
+    <div className="mb-4 max-w-3xl rounded-2xl border border-foreground/10 bg-surface/80 px-4 py-3.5 shadow-[0_1px_2px_rgba(23,37,42,0.05)] dark:border-theme-soft dark:bg-surface/70 dark:shadow-[0_1px_2px_rgba(0,0,0,0.18)]">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground-muted mb-1.5">
         {t('you_asked')}
       </p>
@@ -337,7 +337,7 @@ function CoachPageInner() {
             <button
               type="button"
               onClick={handleRetry}
-              className="rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white hover:bg-primary-dark transition-colors"
+              className="rounded-full bg-primary px-6 py-3 text-base font-semibold text-onPrimary hover:bg-primary-dark transition-colors"
             >
               {tc('actions.try_again')}
             </button>

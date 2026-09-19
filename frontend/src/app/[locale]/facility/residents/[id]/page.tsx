@@ -200,7 +200,7 @@ export default function BehavioralCardPage() {
               if (bed) p.set('bed', bed);
               router.push(`/${locale}/coach?${p.toString()}`);
             }}
-            className="flex-1 h-12 rounded-xl bg-primary text-white font-semibold text-base hover:bg-primary-light transition-colors"
+            className="flex-1 h-12 rounded-full bg-primary text-onPrimary font-semibold text-base hover:bg-primary-light transition-colors"
           >
             {t('ask_coach')}
           </button>

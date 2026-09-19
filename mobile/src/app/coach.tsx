@@ -645,7 +645,7 @@ function CoachScreenInner() {
                   style={{
                     fontSize: 15,
                     fontWeight: '600',
-                    color: !footerText.trim() || isStreaming ? colors.mutedForeground : '#FFF',
+                    color: !footerText.trim() || isStreaming ? colors.mutedForeground : colors.onPrimary,
                   }}
                 >
                   {tc('actions.send')}

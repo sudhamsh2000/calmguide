@@ -61,7 +61,7 @@ export default function MyResidentsPage() {
           <button
             type="button"
             onClick={loadResidents}
-            className="mt-2 text-sm font-medium text-primary hover:underline"
+            className="mt-2 text-sm font-medium text-accentSky hover:underline"
           >
             Try again
           </button>

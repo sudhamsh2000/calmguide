@@ -98,7 +98,7 @@ export default function ExecutivePage() {
               type="button"
               onClick={handleExportReport}
               disabled={exporting}
-              className="h-10 px-4 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="h-10 px-4 rounded-full bg-primary text-onPrimary text-sm font-medium hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {exporting ? `${t('export_report')}…` : t('export_report')}
             </button>

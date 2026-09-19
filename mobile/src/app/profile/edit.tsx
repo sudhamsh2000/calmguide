@@ -53,9 +53,9 @@ const SAFETY_CONCERNS = [
 ];
 
 const STAGE_OPTIONS: { value: DiseaseStage; label: string; color: string; bgColor: string }[] = [
-  { value: 'early', label: 'Early Stage', color: '#2B7A78', bgColor: '#2B7A7818' },
-  { value: 'middle', label: 'Middle Stage', color: '#2B7A78', bgColor: '#2B7A7818' },
-  { value: 'late', label: 'Late Stage', color: '#2B7A78', bgColor: '#2B7A7818' },
+  { value: 'early', label: 'Early Stage', color: '#3E8FD0', bgColor: '#3E8FD01F' },
+  { value: 'middle', label: 'Middle Stage', color: '#3E8FD0', bgColor: '#3E8FD01F' },
+  { value: 'late', label: 'Late Stage', color: '#3E8FD0', bgColor: '#3E8FD01F' },
 ];
 
 function SectionTitle({ title }: { title: string }) {

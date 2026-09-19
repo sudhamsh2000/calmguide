@@ -169,7 +169,7 @@ export function PinPad({
               type="button"
               onClick={() => handleDigit(key)}
               disabled={disabled}
-              className="size-20 flex items-center justify-center rounded-2xl bg-surface border border-slate-300 text-3xl font-semibold text-foreground shadow-[0_1px_2px_rgba(23,37,42,0.05)] hover:border-slate-400 hover:bg-foreground/[0.03] active:bg-foreground/10 disabled:opacity-30 transition-colors select-none dark:border-[#31445f] dark:shadow-[0_1px_2px_rgba(0,0,0,0.18)] dark:hover:border-[#3a4f6d] dark:hover:bg-white/[0.04]"
+              className="size-20 flex items-center justify-center rounded-2xl bg-surface border border-slate-300 text-3xl font-semibold text-foreground shadow-[0_1px_2px_rgba(23,37,42,0.05)] hover:border-slate-400 hover:bg-foreground/[0.03] active:bg-foreground/10 disabled:opacity-30 transition-colors select-none dark:border-theme-soft dark:shadow-[0_1px_2px_rgba(0,0,0,0.18)] dark:hover:border-theme-strong dark:hover:bg-white/[0.04]"
             >
               {key}
             </button>

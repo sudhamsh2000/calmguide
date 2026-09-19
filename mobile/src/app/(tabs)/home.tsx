@@ -404,7 +404,7 @@ export default function HomeScreen() {
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                backgroundColor: '#EDE4F7',
+                backgroundColor: '#E3F0FA',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -412,14 +412,14 @@ export default function HomeScreen() {
               <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
                 <Path
                   d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"
-                  stroke="#7C4DBA"
+                  stroke="#3E8FD0"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <Path
                   d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
-                  stroke="#7C4DBA"
+                  stroke="#3E8FD0"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -472,7 +472,7 @@ export default function HomeScreen() {
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                backgroundColor: '#E0F0E7',
+                backgroundColor: colors.accentSoft,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
@@ -480,7 +480,7 @@ export default function HomeScreen() {
               <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
                 <Path
                   d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                  stroke="#3A7D5C"
+                  stroke={colors.accent}
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -558,12 +558,12 @@ export default function HomeScreen() {
               width: 40,
               height: 40,
               borderRadius: 12,
-              backgroundColor: '#FFF3CD',
+              backgroundColor: colors.accentSoft,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 20, color: '#856404' }}>+</Text>
+            <Text style={{ fontSize: 20, color: colors.accent }}>+</Text>
           </View>
           <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
             {t('log_incident', { defaultValue: 'Log an incident' })}
@@ -596,7 +596,7 @@ export default function HomeScreen() {
                 accessibilityRole="link"
                 accessibilityLabel={t('see_all')}
               >
-                <Text style={{ fontSize: 13, color: colors.primary, fontWeight: '600' }}>
+                <Text style={{ fontSize: 13, color: colors.accent, fontWeight: '600' }}>
                   {t('see_all')}
                 </Text>
               </Pressable>

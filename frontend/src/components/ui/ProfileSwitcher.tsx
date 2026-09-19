@@ -7,6 +7,7 @@ import {
   switchProfile,
   type StoredProfile,
 } from '@/lib/storage';
+import { ProfileAvatar } from './ProfileAvatar';
 
 export interface ProfileSwitcherProps {
   onSwitch: () => void;
@@ -27,14 +28,17 @@ export function ProfileSwitcher({ onSwitch, className = '' }: ProfileSwitcherPro
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 min-h-[44px] transition-colors hover:border-primary/40 focus-ring"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 min-h-[44px] transition-colors hover:border-primary/40 focus-ring"
         aria-expanded={open}
         aria-haspopup="listbox"
         style={{ textAlign: 'start' }}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-          {active?.patient_name?.[0]?.toUpperCase() ?? '?'}
-        </span>
+        <ProfileAvatar
+          name={active?.patient_name ?? '?'}
+          avatar={active?.avatar}
+          diseaseStage={active?.disease_stage}
+          size={32}
+        />
         <span className="flex-1 min-w-0">
           <span className="block text-sm font-medium text-foreground truncate">
             {active?.patient_name ?? 'Unknown'}
@@ -74,13 +78,16 @@ export function ProfileSwitcher({ onSwitch, className = '' }: ProfileSwitcherPro
                 onSwitch();
               }}
               className={`flex w-full cursor-pointer items-center gap-2 px-3 py-3 min-h-[44px] transition-colors first:rounded-t-xl last:rounded-b-xl ${
-                index === activeIndex ? 'bg-primary/5' : 'hover:bg-foreground/5'
+                index === activeIndex ? 'bg-accentSky-soft' : 'hover:bg-primary-soft'
               }`}
               style={{ textAlign: 'start' }}
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {profile.patient_name?.[0]?.toUpperCase() ?? '?'}
-              </span>
+              <ProfileAvatar
+                name={profile.patient_name}
+                avatar={profile.avatar}
+                diseaseStage={profile.disease_stage}
+                size={32}
+              />
               <span className="flex-1 min-w-0">
                 <span className="block text-sm font-medium text-foreground truncate">
                   {profile.patient_name}

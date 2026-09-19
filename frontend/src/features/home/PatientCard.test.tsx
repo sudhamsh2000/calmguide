@@ -60,4 +60,36 @@ describe('PatientCard', () => {
     );
     expect(container.firstChild).toHaveClass('my-custom');
   });
+
+  it('shows the monogram by default, not a portrait', () => {
+    const { container } = render(<PatientCard patientName="Margaret" diseaseStage="early" />);
+    expect(screen.getByText('M')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('replaces the monogram with the chosen portrait', () => {
+    const { container } = render(
+      <PatientCard patientName="Tarun" diseaseStage="early" avatar="male" />,
+    );
+    expect(screen.queryByText('T')).toBeNull();
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img?.getAttribute('src')).toContain('avatar-male');
+  });
+
+  it('uses the female portrait when that is the choice', () => {
+    const { container } = render(
+      <PatientCard patientName="Asha" diseaseStage="late" avatar="female" />,
+    );
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('avatar-female');
+  });
+
+  it('leaves the portrait out of the accessible name, which the heading carries', () => {
+    const { container } = render(
+      <PatientCard patientName="Tarun" diseaseStage="early" avatar="male" />,
+    );
+    // Decorative: the card already says "Tarun's Profile" in text, so an
+    // alt here would just repeat it to a screen reader.
+    expect(container.querySelector('img')).toHaveAttribute('alt', '');
+  });
 });

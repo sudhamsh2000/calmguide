@@ -12,85 +12,95 @@ const THEME_PREF_KEY = 'calmguide_theme';
 export type ThemePreference = 'light' | 'dark' | 'system';
 
 /**
- * Palette taken from design/references/landing-page/product-screens — the
- * approved product screens. Key values (ink, ground, tile fills, muted copy,
- * partner band) were sampled from those images rather than eyeballed.
+ * Palette pass, 2026-09-19 — brought in line with the web app and landing
+ * page so the two platforms are one product. The previous indigo/teal set
+ * is replaced by the same three roles the web uses, with identical hex
+ * values (see frontend/src/app/globals.css):
  *
- * Three roles, kept distinct on purpose:
- *   ink     — deep navy for headings and body. Carries the "premium" weight;
- *             near-black would read as generic, this reads as considered.
- *   indigo  — the interactive accent: buttons, active nav, icons. Everything
- *             tappable is indigo, and nothing that isn't tappable uses it.
- *   teal    — the brand mark's own colour ("Guide" in the wordmark, the app
- *             icon gradient). Used for brand and affirmative moments, never
- *             for primary actions, so the two never compete.
+ *   ink   — near-black. The action colour: buttons, active nav, anything
+ *           tappable. Nothing that isn't tappable uses it.
+ *   sky   — the informational accent: icons, links, chips, tile fills.
+ *   coral — a marker only, never a surface or an action.
+ *
+ * Status colours (success/warning/error) are deliberately left saturated
+ * and unchanged. Neutralising everything else is exactly what makes them
+ * read as signal on a screen someone is using at 3 a.m.
  */
 export const palette = {
-  ink: '#061F60',
-  inkMuted: '#4C588A',
-  indigo: '#5B5BD6',
-  indigoDeep: '#4442B8',
-  indigoSoft: '#F2F0FE',
-  teal: '#2BB3A3',
-  tealSoft: '#E4F9F7',
-  bandFrom: '#0085AA',
-  bandTo: '#12B5A6',
+  ink: '#10141C',
+  inkMuted: '#5D6B7A',
+  sky: '#3E8FD0',
+  skyDeep: '#2E6FA5',
+  skySoft: '#E3F0FA',
+  coral: '#E8663D',
+  bandFrom: '#10141C',
+  bandTo: '#262C38',
   success: '#0FA97E',
   warning: '#F2B441',
 } as const;
 
 export const lightColors = {
-  primary: palette.indigo,
-  primaryText: palette.indigoDeep,
-  primaryLight: '#8B8AE6',
-  primaryDark: palette.indigoDeep,
-  background: '#F9FAFD',
+  primary: palette.ink,
+  /** Label on a primary fill. Inverts in dark, same as the web's
+   *  --color-on-primary, so a button's text follows its fill. */
+  onPrimary: '#FFFFFF',
+  primaryText: palette.ink,
+  primaryLight: '#262C38',
+  primaryDark: '#05070A',
+  background: '#EEF5FB',
   surface: '#FFFFFF',
-  foreground: palette.ink,
+  foreground: '#16202C',
   mutedForeground: palette.inkMuted,
   success: palette.success,
   warning: palette.warning,
   error: '#C4453A',
-  border: '#E6EAF4',
+  border: '#E4EBF2',
   // Extended tokens for the redesign. Screens that predate them keep working;
   // these only add vocabulary the reference layouts need.
-  accent: palette.teal,
-  accentSoft: palette.tealSoft,
-  tileIndigo: palette.indigoSoft,
-  tileTeal: palette.tealSoft,
+  accent: palette.sky,
+  accentSoft: palette.skySoft,
+  /** Tile fills behind list icons — one neutral-blue family now, not two
+   *  competing hues. Names kept because a dozen screens reference them. */
+  tileIndigo: palette.skySoft,
+  tileTeal: palette.skySoft,
   bandFrom: palette.bandFrom,
   bandTo: palette.bandTo,
   // A single, restrained shadow. Cards lift off the ground rather than sitting
   // in outlined boxes, which is most of what separates this from the old look.
-  shadow: 'rgba(6, 31, 96, 0.10)',
+  shadow: 'rgba(16, 20, 28, 0.10)',
   isDark: false,
 } as const;
 
 export const darkColors = {
-  primary: '#8B8AE6',
-  primaryText: '#A5A4F0',
-  primaryLight: '#A5A4F0',
-  primaryDark: palette.indigo,
-  background: '#0A1330',
-  surface: '#131E42',
-  foreground: '#EEF1FA',
-  mutedForeground: '#9AA6CC',
+  // Primary inverts: a near-black fill on a near-black ground is not a
+  // button. Near-white fill, near-black label — matching the web.
+  primary: '#EEF2F7',
+  onPrimary: palette.ink,
+  primaryText: '#EEF2F7',
+  primaryLight: '#FFFFFF',
+  primaryDark: '#D5DDE5',
+  background: '#0F1218',
+  surface: '#171B24',
+  foreground: '#E9EDF2',
+  mutedForeground: '#9AA7B4',
   success: '#3FCB9F',
   warning: palette.warning,
   error: '#F0937F',
   border: 'rgba(255, 255, 255, 0.12)',
-  accent: '#4FD1BE',
-  accentSoft: 'rgba(43, 179, 163, 0.18)',
-  tileIndigo: 'rgba(139, 138, 230, 0.16)',
-  tileTeal: 'rgba(79, 209, 190, 0.16)',
-  bandFrom: '#00647F',
-  bandTo: '#0C8A7F',
+  accent: '#6FB0E6',
+  accentSoft: 'rgba(62, 143, 208, 0.18)',
+  tileIndigo: 'rgba(62, 143, 208, 0.16)',
+  tileTeal: 'rgba(62, 143, 208, 0.16)',
+  bandFrom: '#10141C',
+  bandTo: '#262C38',
   shadow: 'rgba(0, 0, 0, 0.45)',
   isDark: true,
 } as const;
 
 export type AppColors = {
   primary: string;
+  /** Label colour for anything sitting on a `primary` fill. */
+  onPrimary: string;
   primaryText: string;
   primaryLight: string;
   primaryDark: string;
@@ -102,10 +112,10 @@ export type AppColors = {
   warning: string;
   error: string;
   border: string;
-  /** Brand teal — the mark's own colour. Not for primary actions. */
+  /** Sky blue — the informational accent. Not for primary actions. */
   accent: string;
   accentSoft: string;
-  /** Pastel fills behind list icons. */
+  /** Soft fills behind list icons. */
   tileIndigo: string;
   tileTeal: string;
   /** Partner band gradient stops. */

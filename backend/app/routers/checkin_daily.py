@@ -2,9 +2,9 @@
 
 import json
 import logging
-from datetime import date
+from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -82,6 +82,53 @@ async def get_today_status(
 
     return DailyCheckinStatus(
         checked_in=len(entries) > 0,
+        entries=[
+            DailyCheckinEntry(
+                id=e.id,
+                check_date=str(e.check_date),
+                severity=e.severity,
+                time_slot=e.time_slot,
+                tags=json.loads(decrypt(e.tags)) if e.tags else [],
+                created_at=e.created_at.isoformat(),
+            )
+            for e in entries
+        ],
+    )
+
+
+@router.get(
+    "/checkin/daily/{access_code}/history",
+    response_model=DailyCheckinStatus,
+    responses={404: {"model": ErrorResponse}},
+)
+async def get_history(
+    access_code: str,
+    days: int = Query(7, ge=1, le=31),
+    db: AsyncSession = Depends(get_session),
+):
+    """Recent check-ins, for the caregiver's own weekly view.
+
+    The `/today` endpoint above answers a different question — "has she
+    checked in yet today?" — and filters to a single date, so it cannot
+    back a trend over a week. Read-only, scoped to one profile by access
+    code exactly as `/today` is, and capped at a month so it can never be
+    used to pull an unbounded history.
+    """
+    profile = await _get_profile(access_code, db)
+    since = date.today() - timedelta(days=days - 1)
+
+    result = await db.execute(
+        select(DailyCheckin)
+        .where(
+            DailyCheckin.profile_id == profile.id,
+            DailyCheckin.check_date >= since,
+        )
+        .order_by(DailyCheckin.check_date, DailyCheckin.created_at)
+    )
+    entries = result.scalars().all()
+
+    return DailyCheckinStatus(
+        checked_in=any(e.check_date == date.today() for e in entries),
         entries=[
             DailyCheckinEntry(
                 id=e.id,

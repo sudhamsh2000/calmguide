@@ -145,7 +145,7 @@ export default function LoginScreen() {
               accessibilityRole="link"
               accessibilityLabel={t('login.setup_new')}
             >
-              <Text style={{ fontSize: 13, color: colors.primary, fontWeight: '500' }}>
+              <Text style={{ fontSize: 13, color: colors.accent, fontWeight: '500' }}>
                 {t('login.setup_new')}
               </Text>
             </Pressable>

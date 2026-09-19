@@ -120,7 +120,7 @@ export default function ImpactScreen() {
                 alignItems: 'center',
               }}
             >
-              <Text style={{ fontSize: 28, fontWeight: '700', color: '#FFFFFF' }}>
+              <Text style={{ fontSize: 28, fontWeight: '700', color: colors.onPrimary }}>
                 {data.sessions_this_week.toLocaleString()}
               </Text>
               <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>

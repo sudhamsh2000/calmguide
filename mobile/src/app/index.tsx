@@ -153,7 +153,7 @@ export default function WelcomeScreen() {
                 elevation: 6,
               })}
             >
-              <Text style={{ fontSize: 17, fontWeight: '700', color: '#FFFFFF' }}>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.onPrimary }}>
                 {t('welcome.get_started')}
               </Text>
             </Pressable>

@@ -6,8 +6,9 @@
   },
   "hero": "You're not alone.",
   "coach_card": {
-    "title": "Something is\nhappening right now",
-    "subtitle": "Get calm, step-by-step guidance"
+    "title": "Something is happening right now",
+    "subtitle": "Get calm, step-by-step guidance",
+    "eyebrow": "Moment Coach"
   },
   "quick_actions": {
     "practice": "Practice",
@@ -88,5 +89,22 @@
   "log_incident": "Log an incident",
   "recent_incidents": "Recent incidents",
   "see_all": "See all",
-  "server_error": "We can't reach our servers right now. Your emergency contacts are always available above."
+  "server_error": "We can't reach our servers right now. Your emergency contacts are always available above.",
+  "progress": {
+    "title": "Your Progress",
+    "subtitle": "Stay consistent, see growth.",
+    "this_week": "This week",
+    "empty": "Your check-ins will show up here once you start logging days.",
+    "chart_label": "Check-in severity for the last 7 days, {count} days recorded",
+    "level": {
+      "calm": "Calm",
+      "mild": "Mild",
+      "tough": "Tough"
+    },
+    "stat": {
+      "checkins": "Check-ins",
+      "calm_days": "Calm days",
+      "streak": "Day streak"
+    }
+  }
 }

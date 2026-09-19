@@ -7,20 +7,27 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+/**
+ * The Expo-template leftovers, re-valued 2026-09-19 to the shared palette
+ * (see ThemeContext.tsx, which is the real source of truth for app colour).
+ * Kept in sync rather than deleted because a few template-derived components
+ * still read from here, and a pure-black/white pair next to the app's
+ * near-black/icy-blue one is visibly a different product.
+ */
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#16202C',
+    background: '#EEF5FB',
+    backgroundElement: '#F3F6F9',
+    backgroundSelected: '#E3F0FA',
+    textSecondary: '#5D6B7A',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#E9EDF2',
+    background: '#0F1218',
+    backgroundElement: '#171B24',
+    backgroundSelected: '#1F242E',
+    textSecondary: '#9AA7B4',
   },
 } as const;
 

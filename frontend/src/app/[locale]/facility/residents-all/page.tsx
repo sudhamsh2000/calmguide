@@ -109,7 +109,7 @@ export default function AllResidentsPage() {
         <button
           type="button"
           onClick={() => router.push(`/${locale}/facility/residents/new`)}
-          className="h-10 px-4 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors"
+          className="h-10 px-4 rounded-full bg-primary text-onPrimary text-sm font-semibold hover:bg-primary-dark transition-colors"
         >
           {t('add_resident')}
         </button>
@@ -159,7 +159,7 @@ export default function AllResidentsPage() {
                     <td className="px-4 py-3">
                       <Link
                         href={`/${locale}/facility/residents/${r.profile_id}${r.room ? `?room=${encodeURIComponent(r.room)}` : ''}`}
-                        className="font-medium text-primary hover:underline"
+                        className="font-medium text-accentSky hover:underline"
                       >
                         {r.room ?? r.profile_id.slice(0, 6)}
                       </Link>

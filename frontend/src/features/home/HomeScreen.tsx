@@ -2,9 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Link, useRouter } from '@/i18n/navigation';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { SignOutButton } from '@/components/ui/SignOutButton';
 import { useProfile } from '@/context/ProfileContext';
-import { getAccessCode, getPatientName, getProfiles } from '@/lib/storage';
+import {
+  getAccessCode,
+  getActiveProfileAvatar,
+  getPatientName,
+  getProfiles,
+  type ProfileAvatar as ProfileAvatarKind,
+} from '@/lib/storage';
 import {
   getProfile,
   getConversations,
@@ -13,6 +22,7 @@ import {
   submitFeedback,
   skipFeedback,
   getDailyCheckinStatus,
+  getDailyCheckinHistory,
   submitDailyCheckin,
   getCarePatterns as getCarePatternData,
   getIncidents,
@@ -24,6 +34,7 @@ import type {
   InsightsPayload,
   PendingFeedback,
   CarePatternData,
+  DailyCheckinEntry,
   IncidentResponse,
   PatternResponse,
   VerificationPending,
@@ -37,6 +48,8 @@ import type { ConversationSummary } from './ConversationHistory';
 import { PatternInsights } from './PatternInsights';
 import { HomeFeedbackCard } from './HomeFeedbackCard';
 import { DailyCheckinCard } from './DailyCheckinCard';
+import { MomentCoachHero } from './MomentCoachHero';
+import { ProgressCard } from './ProgressCard';
 import { CarePatternCard } from './CarePatternCard';
 
 export interface HomeScreenProps {
@@ -64,6 +77,16 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
   const [visitedCrisis, setVisitedCrisis] = useState(false);
   const [checkedInToday, setCheckedInToday] = useState(true); // default hidden until we know
   const [carePattern, setCarePattern] = useState<CarePatternData | null>(null);
+  const [checkinEntries, setCheckinEntries] = useState<DailyCheckinEntry[]>([]);
+  const [avatar, setAvatar] = useState<ProfileAvatarKind>('monogram');
+  const showCheckin = !checkedInToday && !visitedCrisis;
+
+  // Widens the app shell for this screen only; cleaned up on unmount so
+  // every other route keeps the standard reading width.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-dashboard', '');
+    return () => document.documentElement.removeAttribute('data-dashboard');
+  }, []);
 
   useEffect(() => {
     const visited = sessionStorage.getItem('calmguide_visited_coach');
@@ -87,6 +110,7 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
     setAccessCode(code);
     setPatientName(name);
     setHasMultipleProfiles(getProfiles().length > 1);
+    setAvatar(getActiveProfileAvatar());
 
     // Fetch recent incidents
     getIncidents(code, { limit: 3 })
@@ -139,6 +163,10 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
 
     getDailyCheckinStatus(code)
       .then((data) => setCheckedInToday(data.checked_in))
+      .catch(() => {});
+
+    getDailyCheckinHistory(code, 7)
+      .then((data) => setCheckinEntries(data.entries ?? []))
       .catch(() => {});
 
     getCarePatternData(code)
@@ -232,7 +260,7 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
      * 1-7 already precede 8-11 in the source order, the mobile stacking
      * order is byte-for-byte what it was before this split. */
     <div
-      className={`relative px-5 pt-5 pb-8 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-8 ${className}`}
+      className={`relative px-5 pt-5 pb-8 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-x-6 ${className}`}
     >
       {/* Decorative section glow (design/design.md §19) — the landing page's
        * soft-blob language extended in here, but static and low-opacity:
@@ -241,14 +269,36 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
        * to its own inset-0/overflow-hidden layer so it never affects the
        * real content's layout or the ProfileSwitcher dropdown's ability to
        * escape this container. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
         <div className="decor-blob decor-blob-aqua -top-16 -start-10 h-72 w-72" />
         <div className="decor-blob decor-blob-lavender top-[38%] -end-16 h-72 w-72" />
       </div>
 
-      <div className="flex flex-col gap-5">
+      {/* The rail stays put while the long right-hand column scrolls past
+       * it: who you're caring for, and the two things you might do next,
+       * should not scroll away. `top-5` matches the section's own `pt-5`
+       * so it keeps its breathing room instead of pinning flush to the
+       * edge. */}
+      <div className="flex flex-col gap-5 lg:sticky lg:top-5 lg:self-start">
         {/* Profile Switcher */}
         {hasMultipleProfiles && <ProfileSwitcher onSwitch={() => window.location.reload()} />}
+
+        {/* 0. BRAND ROW — logo and theme control, per the dashboard design.
+         * Desktop only: the mobile app shell already has its own header. */}
+        <div className="hidden items-center justify-between lg:flex">
+          <Image
+            src="/brand/calmguide-logo-transparent.png"
+            alt="CalmGuide"
+            width={2172}
+            height={724}
+            priority
+            className="h-9 w-auto"
+          />
+          <div className="flex items-center gap-1">
+            <ThemeToggle variant="pill" />
+            <SignOutButton variant="icon" />
+          </div>
+        </div>
 
         {/* 1. GREETING — orients the user, confirms right profile */}
         <div>
@@ -271,40 +321,8 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
           patientName={patientName}
           diseaseStage={diseaseStage}
           behaviorCount={behaviorCount}
+          avatar={avatar}
         />
-
-        {/* 4. PRIMARY CTA — Moment Coach, largest card, one tap to action */}
-        <Link href="/coach" className="block group">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-[#1F5454] px-5 py-7 text-center cursor-pointer transition-all duration-200 group-hover:ring-2 group-hover:ring-primary/30 group-hover:ring-offset-2 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.98]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
-            <div className="relative">
-              <div className="mx-auto mb-3.5 flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-              </div>
-              <p
-                className="text-xl font-medium text-white leading-snug whitespace-pre-line"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {t('coach_card.title')}
-              </p>
-              <p className="mt-2 text-sm text-white/90">{t('coach_card.subtitle')}</p>
-            </div>
-          </div>
-        </Link>
 
         {/* 5. NON-URGENT ALERTS — verification card, feedback (important but not blocking) */}
         {verificationPending && accessCode && (
@@ -328,17 +346,17 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
           </div>
         )}
 
-        {/* 6. QUICK ACTIONS — secondary actions in a 2-column grid */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 6. QUICK ACTIONS — full-width rows in the left rail (dashboard design) */}
+        <div className="flex flex-col gap-3">
           <Link href="/learn" className="block group">
-            <div className="flex flex-col items-center gap-2.5 rounded-2xl border border-foreground/10 bg-surface px-3.5 py-5 text-center transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/3 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.97] cursor-pointer">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EDE4F7]">
+            <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-surface px-4 py-4 text-start transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/3 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.97] cursor-pointer">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accentSky-soft text-accentSky">
                 <svg
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#7C4DBA"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -359,14 +377,14 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
             </div>
           </Link>
           <Link href="/check-in" className="block group">
-            <div className="flex flex-col items-center gap-2.5 rounded-2xl border border-foreground/10 bg-surface px-3.5 py-5 text-center transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/3 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.97] cursor-pointer">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E0F0E7]">
+            <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-surface px-4 py-4 text-start transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/3 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.97] cursor-pointer">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accentSky-soft text-accentSky">
                 <svg
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#3A7D5C"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -387,12 +405,31 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
           </Link>
         </div>
 
-        {/* 7. DAILY CHECK-IN — routine action, builds data for insights */}
-        {!checkedInToday && !visitedCrisis && <DailyCheckinCard onSubmit={handleCheckin} />}
       </div>
 
-      {/* ---- Secondary column (lg+): supporting context and history ---- */}
+      {/* ---- Main column (lg+): the dashboard proper ---- */}
       <div className="flex flex-col gap-5 mt-5 lg:mt-0">
+        {/* 4. PRIMARY CTA — Moment Coach. Full width of this column, the only
+         * dark surface and the only motion on the screen. */}
+        <MomentCoachHero />
+
+        {/* 5. TODAY — how the day went, beside the week it rolls up into.
+         * Check-in only renders while it's still actionable; progress is
+         * always there, so the pair collapses to one card once logged. */}
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+          {showCheckin && <DailyCheckinCard onSubmit={handleCheckin} />}
+          <ProgressCard entries={checkinEntries} className={showCheckin ? '' : 'xl:col-span-2'} />
+        </div>
+
+        {/* ---- Supporting context: patterns, incidents, history, journey.
+         *
+         * These were hidden at lg+ for the single-screen dashboard, which
+         * was a mistake — the bottom nav is *also* `lg:hidden`, so hiding
+         * them left /incidents with no route at all on desktop. The
+         * dashboard scrolls again, and these pair up into two columns from
+         * xl where the main column is wide enough (~900px) that a single
+         * stack of full-width cards would just look stretched. ---- */}
+        <div className="flex flex-col gap-5 xl:grid xl:grid-cols-2 xl:items-start">
         {/* 8. PATTERN INSIGHTS — behavioral trends and incident patterns */}
         {insights && <PatternInsights insights={insights} />}
         {incidentPatterns && <IncidentPatternCard patterns={incidentPatterns} />}
@@ -400,13 +437,13 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
         {/* 9. LOG INCIDENT + RECENT INCIDENTS — secondary action + history */}
         <Link href="/incidents/new" className="block group">
           <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-surface px-4 py-4 transition-colors duration-200 group-hover:border-primary/40 group-hover:bg-primary/3 group-focus-visible:outline-none group-focus-visible:ring-3 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 active:scale-[0.98] cursor-pointer">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF3CD]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accentSky-soft text-accentSky">
               <svg
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#856404"
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -427,7 +464,7 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
               <p className="text-sm font-semibold text-foreground">Recent incidents</p>
               <Link
                 href="/incidents"
-                className="focus-ring inline-flex min-h-tap items-center rounded px-2 text-sm font-medium text-primary hover:underline"
+                className="focus-ring inline-flex min-h-tap items-center rounded px-2 text-sm font-medium text-accentSky hover:underline"
               >
                 See all
               </Link>
@@ -498,6 +535,8 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
           >
             {t('impact_link')}
           </Link>
+        </div>
+
         </div>
 
         {state.error && (

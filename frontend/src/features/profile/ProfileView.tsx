@@ -7,11 +7,14 @@ import { useProfile } from '@/context/ProfileContext';
 import {
   getPatientName,
   getAccessCode,
+  getActiveProfileAvatar,
   getAutoSpeakReplies,
   setAutoSpeakReplies,
+  type ProfileAvatar as ProfileAvatarKind,
 } from '@/lib/storage';
 import { getProfile } from '@/lib/api';
 import { BackButton } from '@/components/ui/BackButton';
+import { ProfileAvatar } from '@/components/ui/ProfileAvatar';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Switch } from '@/components/ui/Switch';
 import { SignOutButton } from '@/components/ui/SignOutButton';
@@ -20,12 +23,6 @@ import { SUPPORTED_LOCALES, LOCALE_NAMES, type SupportedLocale } from '@/lib/loc
 export interface ProfileViewProps {
   className?: string;
 }
-
-const avatarColors: Record<string, string> = {
-  early: 'bg-success/20 text-success',
-  middle: 'bg-[#F5E0D4] text-[#C4724E]',
-  late: 'bg-[#E2E8F0] text-[#475569]',
-};
 
 export function ProfileView({ className = '' }: ProfileViewProps) {
   const router = useRouter();
@@ -40,6 +37,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   // so this starts false and is corrected on the client immediately after —
   // same pattern the rest of this component already uses for patientName.
   const [autoSpeak, setAutoSpeakState] = useState(false);
+  const [avatar, setAvatar] = useState<ProfileAvatarKind>('monogram');
   useEffect(() => {
     setAutoSpeakState(getAutoSpeakReplies());
   }, []);
@@ -77,6 +75,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
 
     setPatientNameState(name);
     setAccessCodeState(code);
+    setAvatar(getActiveProfileAvatar());
 
     if (!state.profile && !state.loading) {
       dispatch({ type: 'FETCH_START' });
@@ -96,8 +95,6 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
 
   const profile = state.profile;
   const diseaseStage = profile?.disease_stage ?? 'middle';
-  const avatarStyle = avatarColors[diseaseStage] ?? 'bg-foreground/10 text-foreground';
-  const initial = patientName.charAt(0).toUpperCase();
 
   const formattedCode =
     accessCode.length === 8 ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}` : accessCode;
@@ -123,7 +120,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       {/* Decorative section glow (design/design.md §19) — static, confined to
        * its own inset-0/overflow-hidden layer near the name card, well clear
        * of the settings/language menu further down the page. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
         <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
       </div>
 
@@ -140,12 +137,12 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
 
       {/* Name Card */}
       <div className="mt-3 flex items-center gap-4 rounded-2xl border border-foreground/10 bg-surface px-4 py-4">
-        <div
-          className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl text-xl font-bold ${avatarStyle}`}
-          aria-hidden="true"
-        >
-          {initial}
-        </div>
+        <ProfileAvatar
+          name={patientName}
+          avatar={avatar}
+          diseaseStage={diseaseStage}
+          size={56}
+        />
         <div>
           <p className="text-lg font-semibold text-foreground">{patientName}</p>
           <p className="text-[13px] text-foreground-muted mt-0.5">{t('view.name_hint')}</p>
@@ -244,7 +241,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
       {/* Edit Profile Button */}
       <Link
         href="/profile/edit"
-        className="mt-5 flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-[#31445f] bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring"
+        className="mt-5 flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-theme-soft bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring"
       >
         {t('actions.edit')}
       </Link>
@@ -304,7 +301,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
           aria-haspopup="menu"
           aria-expanded={langOpen}
           aria-controls={langMenuId}
-          className="w-full flex items-center justify-between rounded-xl border border-border dark:border-[#31445f] bg-surface px-4 py-3 min-h-[48px] text-base text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
+          className="w-full flex items-center justify-between rounded-full border border-border dark:border-theme-soft bg-surface px-4 py-3 min-h-[48px] text-base text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
         >
           <span dir="auto">{LOCALE_NAMES[locale as SupportedLocale] ?? locale}</span>
           <span className="text-foreground-muted">{langOpen ? '▲' : '▼'}</span>

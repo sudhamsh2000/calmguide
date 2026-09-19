@@ -5,9 +5,16 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useProfile } from '@/context/ProfileContext';
 import { getProfile, updateProfile } from '@/lib/api';
-import { getAccessCode, getPatientName } from '@/lib/storage';
+import {
+  getAccessCode,
+  getActiveProfileAvatar,
+  getPatientName,
+  setActiveProfileAvatar,
+  type ProfileAvatar as ProfileAvatarKind,
+} from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
 import { BackButton } from '@/components/ui/BackButton';
+import { AvatarPicker } from './AvatarPicker';
 import { StepDiseaseStage } from './StepDiseaseStage';
 import { StepChipSelector } from './StepChipSelector';
 import {
@@ -35,6 +42,8 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
   const [behavioralPatterns, setBehavioralPatterns] = useState<string[]>([]);
   const [calmingStrategies, setCalmingStrategies] = useState<string[]>([]);
   const [safetyConcerns, setSafetyConcerns] = useState<string[]>([]);
+  const [patientName, setPatientNameState] = useState('');
+  const [avatar, setAvatar] = useState<ProfileAvatarKind>('monogram');
 
   // Load existing profile data
   useEffect(() => {
@@ -45,6 +54,9 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
       router.push('/profile/setup');
       return;
     }
+
+    setPatientNameState(name);
+    setAvatar(getActiveProfileAvatar());
 
     // If profile is already in context, populate from it
     if (state.profile) {
@@ -88,6 +100,11 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
         safety_concerns: safetyConcerns,
       });
 
+      // The portrait never leaves the device — the profile endpoint has
+      // nowhere to put it, by design — so it is saved locally alongside
+      // the name, in the same action as the clinical fields.
+      setActiveProfileAvatar(avatar);
+
       dispatch({ type: 'UPDATE_SUCCESS', payload: response });
       router.push('/profile');
     } catch (err) {
@@ -124,8 +141,19 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
         </h1>
       </div>
 
-      {/* Disease Stage */}
+      {/* Portrait — the one choice here that is about the person rather
+       * than the condition, so it leads. */}
       <div className="mt-6">
+        <AvatarPicker
+          name={patientName}
+          value={avatar}
+          diseaseStage={diseaseStage ?? undefined}
+          onChange={setAvatar}
+        />
+      </div>
+
+      {/* Disease Stage */}
+      <div className="mt-10">
         <StepDiseaseStage selectedStage={diseaseStage} onSelect={setDiseaseStage} />
       </div>
 

@@ -40,7 +40,9 @@ describe('Chip', () => {
     render(<Chip label="Selected" selected={true} onToggle={() => {}} />);
     const chip = screen.getByRole('radio');
     expect(chip.className).toContain('bg-primary');
-    expect(chip.className).toContain('text-white');
+    // `text-onPrimary`, not a literal white: the primary pair inverts in
+    // dark mode, so the label colour has to follow the fill.
+    expect(chip.className).toContain('text-onPrimary');
   });
 
   it('applies unselected styles when not selected', () => {

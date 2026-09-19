@@ -66,7 +66,7 @@ export default function TrendsPage() {
               onClick={() => setPeriod(p)}
               className={`px-3 h-9 text-sm font-medium transition-colors ${
                 period === p
-                  ? 'rounded-md bg-primary text-white'
+                  ? 'rounded-md bg-primary text-onPrimary'
                   : 'rounded-md text-foreground hover:bg-primary/[0.05] dark:hover:bg-primary/[0.08]'
               }`}
             >

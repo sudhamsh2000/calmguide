@@ -124,6 +124,15 @@
     "title": "Perfil de {name}",
     "behaviors_tracked": "{count} comportamientos registrados"
   },
+  "avatar": {
+    "title": "Retrato",
+    "description": "Elige la imagen que representa a esta persona. Se queda en este dispositivo.",
+    "option": {
+      "monogram": "Inicial",
+      "male": "Hombre",
+      "female": "Mujer"
+    }
+  },
   "options": {
     "behavioral": {
       "Sundowning": "Síndrome del ocaso (agitación vespertina)",

@@ -57,7 +57,7 @@ export default function FacilityProfilePage() {
         {state.staff.role === 'staff' && (
           <Link
             href="/facility/residents"
-            className="flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-[#31445f] bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] focus-ring"
+            className="flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-theme-soft bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] focus-ring"
           >
             {t('nav.my_residents')}
           </Link>
@@ -66,7 +66,7 @@ export default function FacilityProfilePage() {
         {(state.staff.role === 'admin' || state.staff.role === 'owner') && (
           <Link
             href="/facility/settings"
-            className="flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-[#31445f] bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] focus-ring"
+            className="flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-theme-soft bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] focus-ring"
           >
             {t('nav.settings')}
           </Link>

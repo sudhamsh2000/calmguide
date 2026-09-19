@@ -168,7 +168,7 @@ export default function FacilitySettingsScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>{'✓'}</Text>
+                <Text style={{ color: colors.onPrimary, fontSize: 12, fontWeight: '700' }}>{'✓'}</Text>
               </View>
               <Text style={{ fontSize: 14, color: colors.foreground, flex: 1 }}>{label}</Text>
             </View>

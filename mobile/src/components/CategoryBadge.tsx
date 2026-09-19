@@ -11,11 +11,11 @@ interface CategoryConfig {
 }
 
 const categoryConfig: Record<ScenarioCategory, CategoryConfig> = {
-  behavioral: { color: '#7C4DBA', bg: '#EDE4F7' },
-  daily_care: { color: '#2B7A78', bg: '#D6F0EF' },
+  behavioral: { color: '#3E8FD0', bg: '#E3F0FA' },
+  daily_care: { color: '#3E8FD0', bg: '#E3F0FA' },
   safety: { color: '#B84C36', bg: '#F8E0DA' },
   communication: { color: '#3B82F6', bg: '#DBEAFE' },
-  self_care: { color: '#3A7D5C', bg: '#E0F0E7' },
+  self_care: { color: '#3E8FD0', bg: '#E3F0FA' },
 };
 
 function isKnown(cat: string): cat is ScenarioCategory {

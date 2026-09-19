@@ -92,11 +92,11 @@ export function StaffSelector({
                 className={`flex flex-col items-center gap-2.5 p-4 min-w-[88px] rounded-2xl border transition-all cursor-pointer ${
                   isActive
                     ? 'border-primary/60 bg-primary/[0.07] dark:border-primary/45 dark:bg-primary/[0.11] shadow-[inset_0_0_0_1px_rgba(58,175,169,0.22)]'
-                    : 'border-border dark:border-[#31445f] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
+                    : 'border-border dark:border-theme-soft dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05]'
                 }`}
               >
                 <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold text-white transition-colors bg-primary"
+                  className="w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold text-onPrimary transition-colors bg-primary"
                   style={{ opacity: isActive ? 1 : 0.85 }}
                 >
                   {getInitials(s.name)}
@@ -115,7 +115,7 @@ export function StaffSelector({
         <button
           type="button"
           onClick={() => onSelect(localSelected)}
-          className="focus-ring w-full h-12 rounded-xl bg-primary text-white font-semibold text-base transition-all hover:bg-primary-light dark:hover:bg-primary-light active:scale-[0.98]"
+          className="focus-ring w-full h-12 rounded-full bg-primary text-onPrimary font-semibold text-base transition-all hover:bg-primary-light dark:hover:bg-primary-light active:scale-[0.98]"
         >
           Continue as <bdi>{localSelected.name.split(/\s+/)[0]}</bdi>
         </button>

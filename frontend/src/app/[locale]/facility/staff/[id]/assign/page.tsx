@@ -104,7 +104,7 @@ export default function AssignPatientsPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-primary hover:underline mb-4"
+          className="flex items-center gap-1 text-sm text-accentSky hover:underline mb-4"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +166,7 @@ export default function AssignPatientsPage() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
+              className="w-full h-12 rounded-full bg-primary text-onPrimary font-semibold text-base disabled:opacity-40 hover:bg-primary-light active:bg-primary-dark transition-colors"
             >
               {saving ? 'Saving...' : t('save_assignments')}
             </button>

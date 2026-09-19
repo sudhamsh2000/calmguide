@@ -152,7 +152,7 @@ export function CheckInScreen() {
        * blob behind the header only, well clear of the textarea and the
        * streamed-response card (both sit on opaque surfaces), so nothing
        * reduces legibility of a caregiver's own words or the coach's reply. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
         <div className="decor-blob decor-blob-mint -top-10 -end-16 h-56 w-56" />
       </div>
 
@@ -263,7 +263,7 @@ export function CheckInScreen() {
       {isDone && (
         <Link
           href="/home"
-          className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-6 h-12 text-lg font-semibold text-white transition-colors hover:bg-primary-light active:bg-primary-dark focus-ring"
+          className="inline-flex w-full items-center justify-center rounded-full bg-primary px-6 h-12 text-lg font-semibold text-onPrimary transition-colors hover:bg-primary-light active:bg-primary-dark focus-ring"
         >
           {tc('nav.back_to_home')}
         </Link>

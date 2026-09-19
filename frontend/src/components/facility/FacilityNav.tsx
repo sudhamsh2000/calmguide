@@ -84,7 +84,7 @@ export function FacilityNav() {
                   href={item.href}
                   className={`flex min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-primary text-white shadow-sm'
+                      ? 'bg-primary text-onPrimary shadow-sm'
                       : 'bg-surface text-foreground hover:bg-foreground/5'
                   }`}
                 >

@@ -511,6 +511,17 @@ export interface DailyCheckinStatus {
   entries: DailyCheckinEntry[];
 }
 
+/** Recent check-ins for the weekly view. `/today` deliberately returns only
+ *  the current date, so it cannot back a trend. */
+export async function getDailyCheckinHistory(
+  accessCode: string,
+  days = 7,
+): Promise<DailyCheckinStatus> {
+  return request<DailyCheckinStatus>(
+    `/api/checkin/daily/${encodeURIComponent(accessCode)}/history?days=${days}`,
+  );
+}
+
 export async function submitDailyCheckin(
   accessCode: string,
   severity: 'calm' | 'mild' | 'tough',

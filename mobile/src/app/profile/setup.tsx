@@ -67,9 +67,9 @@ const SAFETY_CONCERNS = [
 ];
 
 const STAGE_KEYS: { value: DiseaseStage; color: string; bgColor: string }[] = [
-  { value: 'early', color: '#2B7A78', bgColor: '#2B7A7818' },
-  { value: 'middle', color: '#2B7A78', bgColor: '#2B7A7818' },
-  { value: 'late', color: '#2B7A78', bgColor: '#2B7A7818' },
+  { value: 'early', color: '#3E8FD0', bgColor: '#3E8FD01F' },
+  { value: 'middle', color: '#3E8FD0', bgColor: '#3E8FD01F' },
+  { value: 'late', color: '#3E8FD0', bgColor: '#3E8FD01F' },
 ];
 
 function MultiSelectChips({

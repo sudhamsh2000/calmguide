@@ -147,7 +147,7 @@ export default function AssignPatientsScreen() {
                 }}
               >
                 {assigned && (
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>{'✓'}</Text>
+                  <Text style={{ color: colors.onPrimary, fontSize: 14, fontWeight: '700' }}>{'✓'}</Text>
                 )}
               </View>
               <View style={{ flex: 1 }}>
