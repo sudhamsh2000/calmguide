@@ -6,7 +6,6 @@ import { cookies } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { ProfileProvider } from '@/context/ProfileContext';
-import { PrimaryNav } from '@/components/ui/PrimaryNav';
 import { PageBrand } from '@/components/ui/PageBrand';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { EmergencyBar } from '@/components/ui/EmergencyBar';
@@ -148,12 +147,6 @@ export default async function LocaleLayout({
                 className="mx-auto w-full max-w-lg lg:max-w-app flex items-center justify-between px-5 py-3 shrink-0"
               >
                 <PageBrand />
-                {/* Desktop navigation. Below lg the bottom bar covers this; at
-                 * lg+ the bottom bar is hidden and, until now, nothing
-                 * replaced it. Centred between the brand and the controls
-                 * so it reads as the shell's spine rather than an
-                 * afterthought bolted to one side. */}
-                <PrimaryNav placement="header" className="mx-auto" />
                 <div className="flex items-center gap-1">
                   <ThemeToggle className="h-12 w-12" />
                   {/* Sign out is also the only route back to the landing page —

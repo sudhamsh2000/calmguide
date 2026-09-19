@@ -977,7 +977,24 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
-### 2026-09-19 — Desktop navigation (`PrimaryNav`)
+### 2026-09-19 — Desktop navigation removed (same day)
+
+`PrimaryNav`, added earlier today, is reverted. It leaked app navigation
+onto pre-auth screens: on `/profile/setup` — the invite gate, before a
+visitor has any access at all — it rendered Coach / Insights / Resources
+with **More** lit, because `/profile/setup` starts with `/profile`.
+Someone who cannot get into the app was being offered its sections.
+
+`shouldShowBottomNav` only excludes the landing page and facility routes.
+It was never an authentication check, and I reused it as if it were. The
+bottom bar has the same hole at phone width, but it is long-standing and
+was not part of this change.
+
+Desktop is back to having no global nav — the state described in the
+entry below, still true, still a real gap. Any future attempt needs a
+signed-in check, not a route-prefix check.
+
+### 2026-09-19 — Desktop navigation (`PrimaryNav`) — REVERTED, see above
 
 At `lg:` and up the app had **no navigation at all**. `BottomNav` is
 `lg:hidden`, and its own comment said it was hidden "where the desktop
