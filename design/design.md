@@ -977,6 +977,20 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-19 — Global navigation removed entirely
+
+At the client's request, `BottomNav` is deleted too. The web app now has
+no global navigation at any width; sections are reached through in-page
+links.
+
+What survives in `#root-chrome-footer` is the emergency bar, and only
+that. It is the one thing that has to be reachable from every screen, and
+removing navigation does not change that.
+
+The `bottom_nav.*` translation keys are deliberately left in `common.json`
+across all three locales — they are now unused, but keeping them means
+restoring the bar is a revert rather than a re-translation.
+
 ### 2026-09-19 — Desktop navigation removed (same day)
 
 `PrimaryNav`, added earlier today, is reverted. It leaked app navigation

@@ -9,7 +9,6 @@ import { ProfileProvider } from '@/context/ProfileContext';
 import { PageBrand } from '@/components/ui/PageBrand';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { EmergencyBar } from '@/components/ui/EmergencyBar';
-import { BottomNav } from '@/components/ui/BottomNav';
 import { SignOutButton } from '@/components/ui/SignOutButton';
 import { LocaleDocumentSync } from '@/components/ui/LocaleDocumentSync';
 import { THEME_COOKIE } from '@/lib/theme';
@@ -162,9 +161,12 @@ export default async function LocaleLayout({
               >
                 {children}
               </div>
+              {/* Global navigation was removed on 2026-09-19 at the client's
+               * request. The emergency bar stays: it is the one thing that
+               * must be reachable from every screen. Sections are reached
+               * through in-page links. */}
               <div id="root-chrome-footer">
                 <EmergencyBar />
-                <BottomNav />
               </div>
             </div>
           </ProfileProvider>
