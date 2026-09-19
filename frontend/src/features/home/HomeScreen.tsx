@@ -39,6 +39,7 @@ import type {
   PatternResponse,
   VerificationPending,
 } from '@/lib/api';
+import { PrimaryNav } from '@/components/ui/PrimaryNav';
 import { PatientCard } from './PatientCard';
 import { IncidentPatternCard } from './IncidentPatternCard';
 import { ProfileSwitcher } from '@/components/ui/ProfileSwitcher';
@@ -405,6 +406,14 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
           </Link>
         </div>
 
+        {/* Desktop navigation, at the foot of the rail — after the things a
+         * caregiver might actually tap at 3am, which must not be pushed
+         * down by wayfinding. This is where the column's job changes from
+         * "do this now" to "go somewhere else".
+         *
+         * Below lg the bottom bar covers this; the dashboard hides the
+         * shell header at lg+, so without this the screen had no nav. */}
+        <PrimaryNav placement="rail" className="mt-1" />
       </div>
 
       {/* ---- Main column (lg+): the dashboard proper ---- */}

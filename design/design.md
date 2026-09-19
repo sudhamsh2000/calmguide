@@ -977,6 +977,44 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-19 — Desktop navigation (`PrimaryNav`)
+
+At `lg:` and up the app had **no navigation at all**. `BottomNav` is
+`lg:hidden`, and its own comment said it was hidden "where the desktop
+layout uses its own wider navigation" — that navigation was never built.
+The comment described an intention, not the code. On desktop, `/learn`,
+`/incidents` and `/profile` were reachable only by URL or by whatever
+in-page link happened to point at them.
+
+`PrimaryNav` imports `NAV_ITEMS` and `shouldShowBottomNav` from
+`BottomNav` rather than restating them. Two nav definitions drift, and the
+whole value of naming a place "Resources" is that it is called that
+everywhere.
+
+Two placements, because the desktop layout has two shapes:
+- **header** — horizontal, centred in the shell header, on every screen
+  that has one.
+- **rail** — vertical, at the foot of the dashboard's left rail. The
+  dashboard hides the shell header at `lg+`, so it needs its own. It sits
+  *below* the profile card and the Practice / Check-In actions: wayfinding
+  must not push down the things a caregiver taps at 3am. (First attempt
+  put it above them — caught on screenshot.)
+
+A bottom bar is a phone idiom; repeating it at 1440px would put the
+primary navigation as far from the content as it can physically get.
+
+The active fill is `bg-accentSky-soft`, not `bg-primary/10` — the
+bare-`var()` opacity bug again, which would have made the indicator
+invisible.
+
+Verified: exactly one nav visible at every width tested — rail on the
+dashboard at 1280, header on `/learn` (with Resources correctly active),
+bottom bar only at 375, and none on the landing page or facility routes.
+`PrimaryNav.test.tsx` pins the destination list to `BottomNav`'s, the
+nested-route active rule (`/incidents/new` keeps Insights lit), the
+landing/facility exclusion, and that this nav is the exact `lg` complement
+of the bottom bar so the two can never both be on screen.
+
 ### 2026-09-19 — Sign out actually signs out
 
 Signing out bounced straight back into the same profile.

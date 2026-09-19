@@ -18,18 +18,21 @@ import { Link, usePathname } from '@/i18n/navigation';
  * nav bar that changes shape between screens is exactly the kind of
  * cognitive load the 3am brief argues against.
  *
- * Hidden on `lg:` and up, where the desktop layout uses its own wider
- * navigation. Also hidden on the landing page and facility (B2B) routes,
- * which have their own chrome — see `shouldShowBottomNav`.
+ * Hidden on `lg:` and up, where `PrimaryNav` takes over — in the shell
+ * header on most screens, and down the dashboard's own rail. That desktop
+ * navigation was missing until 2026-09-19: this comment promised it, but
+ * nothing rendered it, so at desktop width the app had no nav at all.
+ * Also hidden on the landing page and facility (B2B) routes, which have
+ * their own chrome — see `shouldShowBottomNav`.
  */
 
-interface NavItem {
+export interface NavItem {
   href: '/coach' | '/incidents' | '/learn' | '/profile';
   labelKey: string;
   icon: React.ReactNode;
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   {
     href: '/coach',
     labelKey: 'bottom_nav.coach',
