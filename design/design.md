@@ -977,6 +977,41 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-20 — Sign-out dialog rendered behind the page
+
+Tapping sign-out on the dashboard produced a dialog with its heading
+covered, the Moment Coach and Progress panels painted on top of it, and
+only the left rail dimmed by the scrim.
+
+**Cause, and it was self-inflicted.** `ConfirmDialog` relies on
+`fixed inset-0 z-50` escaping to the root stacking context. Earlier the
+same day the dashboard rail gained `lg:sticky` — and `position: sticky`
+creates a stacking context. The dialog is a DOM child of the rail, so its
+`z-50` was confined there; the main column, a later sibling, painted over
+it. The glass panels compound it, because `backdrop-filter` creates
+stacking contexts too.
+
+**Fix.** `ConfirmDialog` now renders through `createPortal` into
+`document.body`. That makes it independent of everything above it in the
+tree, so the next `transform`, `filter` or `sticky` someone adds cannot
+break it again. Fixing the symptom instead — dropping `lg:sticky` — would
+have left the same trap for the next stacking context.
+
+**Missed once already.** This exact dialog appeared broken in a
+screenshot earlier in the session and was dismissed as a stale click left
+over from a previous step. It was the bug, visible, and explained away.
+
+Measured before: overlay rect `0,0,0,0`, trapped. After: `0,0,1280,820`
+matching the viewport, `parentElement === document.body`, dialog centred,
+and the topmost element at the dialog's top edge is its own header rather
+than a card. Verified at 375 and 1280.
+
+`LocaleSwitcher` also has a `fixed inset-0` but is left alone: it is a
+click-catcher for a dropdown anchored `absolute` to its trigger, used
+only on the landing page, where no ancestor creates a stacking context.
+Portalling it would break the anchoring.
+
+
 ### 2026-09-20 — Coach prompt: answer first, check the body
 
 Prompted by a side-by-side against a ChatGPT answer to the same scenario

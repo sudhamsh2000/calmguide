@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -23,6 +24,21 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  /* Rendered into document.body rather than in place.
+   *
+   * A modal's `fixed inset-0 z-50` only escapes the page if no ancestor
+   * has created a stacking context. On 2026-09-20 the dashboard's left
+   * rail became `lg:sticky`, and sticky creates one — which trapped this
+   * overlay inside the rail, so the main column painted over the dialog
+   * and only the rail was dimmed. `backdrop-filter` on the glass panels
+   * creates stacking contexts too.
+   *
+   * Portalling to the body makes the dialog independent of whatever the
+   * tree above it does, so the next transform or filter someone adds
+   * cannot break it again. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
 
@@ -42,9 +58,9 @@ export function ConfirmDialog({
     };
   }, [open, onCancel]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.34)] p-4 backdrop-blur-[3px] dark:bg-[rgba(8,12,20,0.56)]"
       onClick={onCancel}
@@ -86,6 +102,7 @@ export function ConfirmDialog({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
