@@ -18,6 +18,22 @@ CalmGuide helps family caregivers (typically 55-70 years old) navigate difficult
 | Database | Railway PostgreSQL + pgvector |
 | Mobile | Android APK, distributed for testing outside the Play Store; EAS Update pushes JS/UI changes to installed builds without a new APK |
 
+> **Deploys are attributed to the commit author.** Vercel refuses a
+> deployment when the GitHub account that authored the commit does not hold
+> a seat on the Vercel team (`TEAM_ACCESS_REQUIRED`) — the build is skipped
+> entirely, and the dashboard shows "Failed to deploy to Production" with no
+> build log. This silently broke every push for 12 days after the team moved
+> to Pro. If you clone this repo, set your commit identity to a GitHub
+> account with a seat:
+>
+> ```bash
+> git config --local user.email "<id>+<username>@users.noreply.github.com"
+> ```
+>
+> Symptom to watch for: the site keeps serving an old build while `main`
+> moves on, and nothing in the dashboard distinguishes that from a healthy
+> deploy.
+
 The web app is currently gated behind a private invite code (`INVITE_CODE_REQUIRED=true` on the backend) --- it's in private testing, not open signup. This does not affect local development; see [Quick Start](#quick-start).
 
 ## Architecture
