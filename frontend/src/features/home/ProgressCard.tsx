@@ -98,7 +98,7 @@ export function ProgressCard({ entries, className = '' }: ProgressCardProps) {
       : '';
 
   return (
-    <div className={`card-shell p-5 ${className}`}>
+    <div className={`glass-panel p-5 sm:p-6 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">{t('progress.title')}</h2>

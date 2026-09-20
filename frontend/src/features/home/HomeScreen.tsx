@@ -292,7 +292,7 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
             width={2172}
             height={724}
             priority
-            className="h-9 w-auto"
+            className="brand-mark h-9 w-auto"
           />
           <div className="flex items-center gap-1">
             <ThemeToggle variant="pill" />

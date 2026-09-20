@@ -34,7 +34,7 @@ export function PatientCard({
 
   return (
     <div
-      className={`flex items-start gap-3 rounded-2xl border border-foreground/10 bg-surface px-4 py-3.5 sm:items-center ${className}`}
+      className={`glass-panel flex items-start gap-3 px-5 py-4 sm:items-center ${className}`}
     >
       <ProfileAvatar
         name={patientName}

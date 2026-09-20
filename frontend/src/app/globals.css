@@ -35,6 +35,31 @@
     --color-accent-sky-soft: #e3f0fa;
     --color-accent-coral: #e8663d;
 
+    /* --- Luminous optical glass (design/design.md §26) --------------------
+     * A material layer, not a new palette: every colour below is either an
+     * existing token or one of the two additions the spec introduced.
+     *
+     * `--color-sky-light` is the spec's "light sky". It is deliberately the
+     * same value the dark theme already uses for --color-accent-sky, so the
+     * two themes share one lifted-blue rather than inventing a second.
+     * `--color-pearl` is the spec's pearl white: the page's lightest
+     * surface, faintly blue so it never reads as a hole punched in the
+     * background the way pure #fff does. */
+    --color-pearl: #f8fbfe;
+    --color-sky-light: #6fb0e6;
+
+    /* The glass itself, driven by tokens so the dark theme can restate the
+     * material instead of inheriting white seams on a dark ground. */
+    --glass-bg: rgba(255, 255, 255, 0.12);
+    --glass-blur: blur(28px) saturate(115%);
+    --glass-border: rgba(255, 255, 255, 0.68);
+    --glass-inner-top: rgba(255, 255, 255, 0.85);
+    --glass-inner-bottom: rgba(195, 206, 218, 0.18);
+    --glass-drop: 0 28px 70px rgba(37, 111, 169, 0.12);
+    /* What the glass falls back to when transparency is unavailable or
+     * unwanted. Solid, same footprint, no layout shift. */
+    --glass-solid: var(--color-pearl);
+
     /* --- Design-system extensions (design/design.md §3) -------------------
      * These were additive when introduced; as of the 2026-09-19 palette pass
      * several were re-valued along with the core tokens above, so this block
@@ -107,6 +132,21 @@
     --color-accent-sky-soft: rgba(62, 143, 208, 0.16);
     --color-accent-coral: #f08059;
 
+    /* Glass, restated for dark. The light spec's 12% white fill and 0.85
+     * white inner edge would read as milky grey with bright seams on a
+     * #0f1218 ground, so the material is rebuilt rather than inherited:
+     * a much fainter lift, a cool low-alpha edge, and a black drop shadow
+     * in place of the blue one. Same language, correct on this ground. */
+    --color-pearl: #1b212b;
+    --color-sky-light: #6fb0e6;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-blur: blur(28px) saturate(120%);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --glass-inner-top: rgba(255, 255, 255, 0.12);
+    --glass-inner-bottom: rgba(0, 0, 0, 0.22);
+    --glass-drop: 0 28px 70px rgba(0, 0, 0, 0.45);
+    --glass-solid: var(--color-surface);
+
     /* Section tints re-derived for dark: low-alpha washes of the same hues so
      * they read as the same four categories without glowing on a dark ground. */
     --color-coach-now-bg: rgba(58, 175, 169, 0.14);
@@ -157,6 +197,26 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    /* The light the glass refracts. Two off-centre radial washes over a
+     * diagonal ramp, so the blur has something with structure behind it —
+     * a flat fill would make the panels read as grey rectangles. Fixed
+     * attachment keeps the light still while content scrolls past it. */
+    background-image:
+      radial-gradient(circle at 69% 36%, rgba(220, 235, 250, 0.95), transparent 38%),
+      radial-gradient(circle at 35% 45%, rgba(255, 252, 246, 0.88), transparent 32%),
+      linear-gradient(145deg, #f8fbfe 0%, #eef5fb 52%, #dcebfa 100%);
+    background-attachment: fixed;
+  }
+
+  /* The same two-wash structure, rebuilt for a dark ground. The light
+   * gradient would wash #0f1218 out to grey, so these are low-alpha blue
+   * lifts on the dark base — enough for the glass to have something to
+   * refract, not enough to stop the screen being dark. */
+  .dark body {
+    background-image:
+      radial-gradient(circle at 69% 36%, rgba(62, 143, 208, 0.10), transparent 38%),
+      radial-gradient(circle at 35% 45%, rgba(111, 176, 230, 0.06), transparent 32%),
+      linear-gradient(145deg, #12161e 0%, #0f1218 52%, #0c1017 100%);
     height: 100%;
     overflow: hidden;
   }
@@ -324,6 +384,63 @@
   .card-shell {
     @apply rounded-2xl border bg-surface;
     border-color: var(--color-border);
+  }
+
+  /* The brand mark is dark ink on transparency, so on a dark ground it
+   * disappears — measured at 52% dark pixels against #0f1218. `invert`
+   * alone would flip the blue swirl to orange, so the hue is rotated back
+   * 180deg: the wordmark lifts to light, the mark stays blue. */
+  .dark .brand-mark {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  /* --- Luminous optical glass -------------------------------------------
+   * One material, used sparingly. The spec asks for "large transparent
+   * architectural surfaces", so this is for panels that hold content, not
+   * for buttons, chips or anything small — a 28px backdrop blur on a 40px
+   * control costs the same GPU work and reads as mud.
+   *
+   * Radius is 32px per the spec's 24–32 range, which also does structural
+   * work: glass panels are the only things on screen at that radius, so
+   * "large, held, transparent" is legible at a glance against the 16px
+   * (rounded-2xl) used by everything interactive. */
+  .glass-panel {
+    position: relative;
+    border-radius: 32px;
+    background: var(--glass-bg);
+    /* Prefixed first, standard last. The CSS minifier de-duplicates this
+     * pair and keeps whichever comes last; with the standard property
+     * first it was dropping it and shipping only the -webkit- alias, which
+     * left the panels with a 12% white fill and no blur at all. */
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      inset 0 1px 0 var(--glass-inner-top),
+      inset 0 -1px 0 var(--glass-inner-bottom),
+      var(--glass-drop);
+  }
+
+  /* `backdrop-filter` silently does nothing in a few real situations — no
+   * support, a compositing ancestor, a screenshot/print path — and the 12%
+   * fill alone would leave text on bare background. Painting the solid
+   * first and letting the blur win where it works means the panel is never
+   * less than readable. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-panel {
+      background: var(--glass-solid);
+    }
+  }
+
+  /* Transparency is a comfort setting, not decoration. Someone who has
+   * asked their OS to reduce it — a real preference among the older users
+   * this app is built for — gets the same panel, solid. */
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-panel {
+      background: var(--glass-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
   }
 
   /* Moment Coach section surfaces. Colour only — no layout — so the response

@@ -977,6 +977,67 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-20 — Luminous optical glass
+
+A material layer over the existing palette, not a repalette. Five of the
+spec's seven colours were already live tokens at the exact hex
+(`#10141C`, `#3E8FD0`, `#E3F0FA`, `#EEF5FB`, `#E8663D`), so the work was
+surfaces and light, not colour.
+
+**Two additions.** `--color-pearl: #f8fbfe` — faintly blue, so the
+lightest surface never reads as a hole punched in the background the way
+pure `#fff` does. `--color-sky-light: #6fb0e6` — deliberately the same
+value the dark theme already used for `--color-accent-sky`, so the two
+themes share one lifted blue instead of inventing a second.
+
+**`.glass-panel`.** The spec's material, driven by tokens
+(`--glass-bg`, `--glass-blur`, `--glass-border`, inner edges, drop) so
+dark mode can *restate* it rather than inherit it. Used on exactly two
+surfaces — the profile panel and Your Progress — because the spec asks
+for "large architectural surfaces" and a 28px backdrop blur on a 40px
+control costs the same GPU work while reading as mud.
+
+**Radius does structural work.** Glass panels are 32px and are the only
+things on screen at that radius; everything tappable stays at 16px. The
+material and the geometry say the same thing, so "large, held,
+transparent" is legible without reading the content.
+
+**Dark mode is a rebuild, not an inherit.** The light spec's 12% white
+fill and `0.85` white inner edge would read as milky grey with bright
+seams on `#0f1218`. Dark glass is a 5% lift, a 10% cool edge and a black
+drop shadow. The background gradient is likewise restated as low-alpha
+blue lifts rather than the pale wash.
+
+**Two degradations, both deliberate.** `@supports not (backdrop-filter)`
+falls back to a solid pearl panel — without it the 12% fill alone would
+leave text floating on bare background. And
+`prefers-reduced-transparency: reduce` goes solid too: transparency is a
+comfort setting, and reduced transparency is a real preference among the
+older users this app serves.
+
+**Bugs found while building.**
+
+- *The blur never shipped.* Lightning CSS de-duplicates the
+  `backdrop-filter` / `-webkit-backdrop-filter` pair and keeps whichever
+  is **last**. Written standard-first, the standard property was dropped
+  and only the `-webkit-` alias survived, leaving the panels as a flat
+  12% white fill with no blur. Measured `backdrop-filter: none` on a
+  browser where `CSS.supports` returned true, then found the compiled CSS
+  missing the declaration entirely. Prefix now comes first.
+- *The hero lost its edge in dark mode.* `bg-panelDark` (`#10141c`) on
+  the new `#12161e → #0c1017` gradient left the primary CTA with no
+  visible boundary. Given a `dark:border-white/[0.08]` hairline and the
+  32px radius.
+- *The brand mark was invisible in dark mode* — measured 52% dark pixels
+  with `filter: none` on `#0f1218`. Pre-existing, surfaced by this pass.
+  `.brand-mark` now inverts and rotates hue 180deg in dark, so the
+  wordmark lifts to light and the swirl stays blue rather than flipping
+  to orange.
+
+Verified in both themes at 375 / 1280, with computed
+`backdrop-filter: blur(28px) saturate(1.15)` on both panels.
+
+
 ### 2026-09-19 — Global navigation removed entirely
 
 At the client's request, `BottomNav` is deleted too. The web app now has
