@@ -15,7 +15,23 @@ def _estimate_tokens(text: str) -> int:
 
 
 def test_coach_prompt_token_budget_minimal():
-    """Coach prompt without dossier stays under 5000 tokens."""
+    """Coach prompt without dossier stays under 5150 tokens.
+
+    Raised from 5000 on 2026-09-20 (measured 4913 -> 5082, +3.4%) for
+    three additions to RIGHT NOW: answer a repeated question before
+    redirecting, name one unmet physical need to check, and avoid
+    television as a redirect.
+
+    An earlier version of this change also mandated emergency signs in
+    every escalation section. It was reverted: two live generations
+    ignored it at both mid-prompt and end-of-prompt placement, and the
+    app already surfaces 911 and the crisis lines persistently in the
+    EmergencyBar, so inlining them on routine responses adds alarm
+    without adding reach.
+
+    The point of this test is to make prompt growth a decision rather
+    than a drift, so raise it deliberately or not at all.
+    """
     prompt = render_coach_prompt(
         patient_name="Mom",
         disease_stage="middle",
@@ -24,7 +40,7 @@ def test_coach_prompt_token_budget_minimal():
         safety_concerns=["fall risk", "elopement"],
     )
     tokens = _estimate_tokens(prompt)
-    assert tokens < 5000, f"Minimal prompt is {tokens} tokens, expected < 5000"
+    assert tokens < 5150, f"Minimal prompt is {tokens} tokens, expected < 5150"
 
 
 def test_coach_prompt_token_budget_full():

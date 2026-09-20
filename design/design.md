@@ -977,6 +977,61 @@ one column below `lg` reproduces the previous mobile order exactly.
 
 ## 24. Change Log
 
+### 2026-09-20 — Coach prompt: answer first, check the body
+
+Prompted by a side-by-side against a ChatGPT answer to the same scenario
+(Frank repeating "when are we leaving?"). Three defects were traceable to
+specific prompt lines, not to the model being vague.
+
+**It scripted the thing the prompt forbids.** The response opened with
+"let me explain" — which `coach_system.jinja2` lists under WHAT NOT TO DO
+as *Trying to explain or teach during a crisis*. The prohibition was
+written as advice about the caregiver's instincts, so it never applied to
+the assistant's own scripted lines. It does now, along with a ban on
+describing a repeated question as curiosity: the drive is worry, which
+the response's own WHY section said correctly while its RIGHT NOW section
+contradicted.
+
+**It never answered the question.** The response deflected, suggested a
+notepad, then distracted. The answer is most of the reassurance. RIGHT
+NOW now requires answering a repeated question plainly before
+redirecting, treating each asking as the first.
+
+**It never checked the body.** Repetitive questioning is a common proxy
+for toilet, thirst, hunger, pain, temperature or fatigue — someone in
+middle-stage dementia often cannot name discomfort, so the behaviour is
+the signal. The prompt had this, but gated behind `pain_flags.suspected`,
+which needs incident data and did not fire. RIGHT NOW now names the
+checks unconditionally.
+
+Also: redirects must prefer low stimulation. The response had suggested
+television, which commonly worsens evening restlessness.
+
+**What was tried and reverted.** An earlier version mandated emergency
+signs (stroke presentation, call emergency services) in every escalation
+section, on the grounds that ChatGPT included them and CalmGuide did not.
+Two live generations ignored the instruction — once mid-prompt at line
+199 of 374, once as an end-of-prompt final check, which is the placement
+instructions are normally *most* obeyed at. That failure prompted a
+rethink, and the mandate was wrong anyway: the app keeps 911 and the
+crisis lines permanently on screen in the EmergencyBar, so a caregiver is
+always one tap from them. ChatGPT had to inline that content because it
+has no UI. Inlining stroke warnings on a routine question adds alarm
+without adding reach, and dilutes the signal for when it matters.
+
+**Cost.** 4913 → 5082 tokens per coach request (+3.4%). The budget test
+in `test_cost_monitoring.py` caught this at the 5000 threshold and is
+raised to 5150, with the reasoning recorded in its docstring. The test
+exists to make prompt growth a decision instead of a drift; it worked.
+
+**Verified by live generation, not by reading the prompt.** Rendering
+proves the instruction is present; only a real call proves the model
+follows it. Three runs against `gpt-4o-mini`: the answer-first and
+unmet-needs behaviours now appear ("We will leave soon, Frank" / "Check
+if Frank is thirsty or hungry… physical needs can drive repetitive
+questioning"), and "let me explain", "curious" and television are gone.
+
+
 ### 2026-09-20 — Luminous optical glass
 
 A material layer over the existing palette, not a repalette. Five of the
