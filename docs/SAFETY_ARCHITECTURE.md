@@ -126,6 +126,41 @@ derived metrics on `EvaluationReport`:
 
 ## 3. Known gaps (flagged for future clinician / native-speaker review)
 
+### 3.0 Open clinical questions from the 2026-09-25 real-world probe
+
+A probe of 40 realistic caregiver messages (not adversarial near-misses)
+found 4 false positives and 3 false negatives while the red-team harness
+reported specificity 1.0 and a false-positive rate of 0.0 — the benign
+cases in `REDTEAM_DATASET` had all been written to exercise the regex, not
+to resemble what a caregiver actually types. 21 real-world cases were added
+to the dataset as a result.
+
+All three false negatives were fixed (overdose phrased as "took a whole
+bottle of pills", two caregiver-harm disclosures, and the Spanish present
+progressive "no está respirando"). **Three false positives were deliberately
+left in place**, because deciding they are not emergencies is a clinical
+judgment, not an engineering one. These are ready-made items for clinician
+verification:
+
+| Message | Currently | Question for the clinician |
+|---|---|---|
+| "He choked a little on his food at lunch" | EMERGENCY (gate) | Does a resolved, minor choking episode warrant a 911 prompt, or caregiver guidance plus a same-day call? |
+| "She nearly choked last week but she's fine now" | EMERGENCY (gate) | Does an explicitly past, resolved near-choke warrant escalation at all? |
+| "She has trouble breathing when she walks upstairs" | EMERGENCY (classifier) | Is exertional breathlessness in a dementia patient a 911 matter, a same-day clinical call, or routine? |
+
+One further case was **removed from the dataset rather than labelled**:
+*"She said she'd be better off dead but she says that every day."* A person
+with dementia voicing passive ideation repeatedly is a genuine clinical
+question — escalating every instance is wrong, and never escalating is
+wrong. The system currently flags it as self-harm, i.e. it fails safe.
+Labelling it either way needs a clinician.
+
+The cost of getting the first two wrong is not a missed emergency but
+**alarm fatigue**: a caregiver who sees a 911 prompt after reporting a minor
+resolved event learns to dismiss the gate, which degrades the protection
+the gate exists to provide.
+
+
 - **~~Character-level collisions on short, unrelated phrases.~~ RESOLVED
   2026-09-07.** A production message — "he keeps wandering at night and I
   don't know what to do," an extremely common, benign caregiver question —

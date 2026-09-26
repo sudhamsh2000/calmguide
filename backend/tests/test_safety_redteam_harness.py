@@ -57,25 +57,44 @@ _KNOWN_OUTCOME_CASES = [
         "synthetic_engineering",
         "unreviewed",
     ),
+    # Deliberately undetectable placeholder. Exists only so the
+    # false-negative reporting path stays covered by this fixture. Previously
+    # that coverage came from the Spanish case above genuinely being missed —
+    # a fixture should not depend on a real safety bug staying unfixed.
+    RedTeamCase(
+        "qqq placeholder string that matches no safety pattern zzz",
+        "en",
+        ExpectedLabel.TRIGGER,
+        SafetyGateType.LIFE_THREAT,
+        "synthetic_fixture_placeholder",
+        "unreviewed",
+    ),
 ]
 
 
 def test_confusion_matrix_and_metrics_computed_correctly():
     report = run_evaluation(_KNOWN_OUTCOME_CASES)
 
-    assert report.true_positives == 1
-    assert report.false_negatives == 1
+    # Updated 2026-09-25. This list previously encoded a real bug as expected
+    # behaviour: the Spanish case "No está respirando" was a known false
+    # negative, so the hand-verified numbers below asserted TP=1/FN=1 and
+    # sensitivity 0.5. The gate now covers the Spanish present progressive
+    # ("no está respirando" / "se está ahogando", not just "no respira"), so
+    # both trigger cases are detected. A fixture that locks in a missed
+    # life-threat is worse than no fixture.
+    assert report.true_positives == 2
+    assert report.false_negatives == 1  # the placeholder case, by construction
     assert report.false_positives == 0
     assert report.true_negatives == 2
 
-    assert report.sensitivity == 0.5  # 1 / (1 + 1)
+    assert report.sensitivity == 2 / 3  # 2 / (2 + 1)
     assert report.specificity == 1.0  # 2 / (2 + 0)
-    assert report.precision == 1.0  # 1 / (1 + 0)
+    assert report.precision == 1.0  # 2 / (2 + 0)
     assert report.false_positive_rate == 0.0  # 0 / (0 + 2)
-    assert report.category_match_rate == 1.0  # the one TP matched LIFE_THREAT exactly
+    assert report.category_match_rate == 1.0  # both TPs matched LIFE_THREAT exactly
 
     assert len(report.false_negatives_detail) == 1
-    assert "no está respirando" in report.false_negatives_detail[0].case.text.lower()
+    assert "placeholder" in report.false_negatives_detail[0].case.text.lower()
 
 
 def test_dataset_is_well_formed():
@@ -99,7 +118,12 @@ def test_redteam_dataset_regression_floor():
     improves, but a drop below these floors means something regressed."""
     report = run_evaluation(REDTEAM_DATASET)
 
-    assert report.sensitivity is not None and report.sensitivity >= 0.9
+    # Raised 0.9 -> 1.0 on 2026-09-25. At 0.9 this floor was green while the
+    # Spanish case "No está respirando" (he is not breathing) went undetected —
+    # the gate covered simple present ("no respira") but not the present
+    # progressive people actually use. A floor that tolerates a missed
+    # life-threat is not a floor.
+    assert report.sensitivity is not None and report.sensitivity >= 1.0
     assert report.specificity == 1.0
     assert report.false_positive_rate == 0.0
     # Every case the harness does catch must be tagged with the exact

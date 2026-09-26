@@ -61,6 +61,11 @@ _LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
         r"\b(?:burn(?:ing|ed|s)?\s+\w+\s+(?:badly|severely)|on\s+fire|house\s+fire)\b",
         r"\b(?:drown|underwater|in\s+the\s+(?:pool|bath)\s+and)\b",
         r"\b(?:(?:swallowed?|drank|ingested?)\s+(?:\w+\s+){0,4}?(?:pills|bleach|poison|chemicals?|cleaning))\b",
+        # "took" needs an abnormal-quantity qualifier before it means overdose —
+        # "she took her pills at eight" is routine medication administration and
+        # must never escalate. Added 2026-09-25: "took a whole bottle of pills"
+        # was reaching the LLM as a routine issue.
+        r"\b(?:took|taken|has\s+taken)\s+(?:a\s+whole\s+|an?\s+entire\s+|a\s+bunch\s+of\s+|a\s+handful\s+of\s+|too\s+many\s+|lots\s+of\s+|all\s+(?:of\s+)?(?:her|his|their|the)\s+)(?:\w+\s+){0,2}?(?:pills|tablets|capsules|medications?|meds|medicine)\b",
         r"\b(?:electric\s+shock|electrocuted)\b",
         r"\b(?:anaphyla|allergic\s+reaction\s+and\s+(?:can'?t|cannot)\s+breathe)\b",
         r"\b(?:overdos(?:e|ed|ing))\b",
@@ -72,7 +77,7 @@ _MULTILINGUAL_LIFE_THREAT_PATTERNS: list[re.Pattern[str]] = [
     re.compile(p, re.IGNORECASE)
     for p in [
         # Spanish
-        r"(?:no\s+respira|no\s+puede\s+respirar|dejó\s+de\s+respirar|sin\s+pulso|ataque\s+al\s+corazón|ataque\s+cardíaco|infarto|convulsion(?:es|ando)|inconsciente|se\s+desmayó|derrame\s+cerebral|sobredosis|se\s+ahoga|no\s+reacciona|sangra\s+mucho)",
+        r"(?:no\s+(?:está\s+|esta\s+)?respira(?:ndo)?|no\s+puede\s+respirar|dejó\s+de\s+respirar|dejo\s+de\s+respirar|sin\s+pulso|ataque\s+al\s+corazón|ataque\s+cardíaco|infarto|convulsion(?:es|ando)|inconsciente|se\s+desmayó|derrame\s+cerebral|sobredosis|se\s+(?:está\s+|esta\s+)?ahoga(?:ndo)?|se\s+atraganta(?:ndo)?|no\s+reacciona|sangra\s+mucho)",
         # French
         r"(?:ne\s+respire\s+plus|arrêt\s+cardiaque|crise\s+cardiaque|convulsion|inconscient|s'est\s+évanoui|AVC|accident\s+vasculaire|hémorragie|surdose|overdose|ne\s+réagit\s+plus|s'étouffe)",
         # German

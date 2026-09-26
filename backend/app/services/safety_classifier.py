@@ -92,6 +92,10 @@ _CONCEPT_PHRASES: dict[SafetyRiskCategory, list[str]] = {
         "no point in living",
         "no reason to live",
         "thinking about suicide",
+        # Added 2026-09-25: surfaced while probing the classifier — neither
+        # phrasing cleared threshold against the phrases above.
+        "thinking about killing myself",
+        "better off dead",
     ],
     SafetyRiskCategory.CAREGIVER_HARM_RISK: [
         "scared I might hurt him",
@@ -102,6 +106,14 @@ _CONCEPT_PHRASES: dict[SafetyRiskCategory, list[str]] = {
         "can't control my temper",
         "afraid of what I'll do",
         "going to lose it",
+        # Added 2026-09-25: the phrasings below were reaching the LLM as
+        # routine issues. The word-level gate blocks "hit"/"hurt" from
+        # matching each other, so each verb needs its own phrase.
+        "afraid I'm going to hit him",
+        "scared I'm going to hit her",
+        "scared I'll do something to her",
+        "afraid I'll do something to him",
+        "might do something I regret",
     ],
     SafetyRiskCategory.ELDER_ABUSE_NEGLECT: [
         "leaves her alone for days",
@@ -121,6 +133,34 @@ _CONCEPT_PHRASES: dict[SafetyRiskCategory, list[str]] = {
 # dataset. See docs/SAFETY_ARCHITECTURE.md for the red-team evaluation harness
 # that should be used to tune this value before relying on it in production.
 _SIMILARITY_THRESHOLD = 0.72
+
+# Advance-care-planning vocabulary. "End of life" is a normal, important thing
+# for a dementia caregiver to be discussing, and it sits one word away from the
+# self-harm concept phrase "end my life" — close enough that the character-level
+# ratio clears threshold. Added 2026-09-25 after "we talked about end of life
+# planning with the doctor" was classified as self-harm.
+#
+# This suppresses a FUZZY match only. It can never suppress the deterministic
+# gate (see the module docstring), and it does not apply when the message also
+# carries explicit first-person self-harm language — "we discussed hospice and
+# honestly I want to end my life" must still flag.
+_CARE_PLANNING_RE = re.compile(
+    r"\b(?:end[\s-]of[\s-]life|hospice|palliative|comfort\s+care|"
+    r"advance\s+(?:directive|care\s+plan\w*)|living\s+will|"
+    r"do\s+not\s+resuscitate|DNR)\b",
+    re.IGNORECASE,
+)
+
+_EXPLICIT_SELF_HARM_RE = re.compile(
+    r"\b(?:kill(?:ing)?\s+myself|end(?:ing)?\s+my\s+(?:own\s+)?life|"
+    r"end(?:ing)?\s+it\s+all|hurt(?:ing)?\s+myself|harm(?:ing)?\s+myself|"
+    r"cut(?:ting)?\s+myself|tak(?:e|ing)\s+my\s+own\s+life|"
+    r"(?:want|wish|going|thinking\s+about)\s+to?\s*die|"
+    r"better\s+off\s+dead|suicid\w*|"
+    r"don'?t\s+want\s+to\s+(?:be\s+alive|live)|no\s+(?:point|reason)\s+in\s+living)\b",
+    re.IGNORECASE,
+)
+
 
 # A window of this many words is compared against each concept phrase so that
 # a phrase embedded in a longer sentence can still match.
@@ -330,7 +370,16 @@ def classify_message(message: str) -> ClassifierResult:
     best_score = 0.0
     best_matches: list[str] = []
 
+    # A self-harm reading of care-planning vocabulary is a terminology
+    # collision, not a near-miss worth escalating. Explicit first-person
+    # self-harm language in the same message overrides the suppression.
+    suppress_self_harm = bool(_CARE_PLANNING_RE.search(message)) and not bool(
+        _EXPLICIT_SELF_HARM_RE.search(message)
+    )
+
     for category in category_priority:
+        if category is SafetyRiskCategory.SELF_HARM and suppress_self_harm:
+            continue
         matches: list[str] = []
         category_best = 0.0
         for phrase in _CONCEPT_PHRASES[category]:
