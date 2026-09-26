@@ -1,6 +1,12 @@
 fastapi>=0.128.0
 uvicorn[standard]>=0.34.0
-sqlalchemy[asyncio]>=2.0.36
+# Upper bound added 2026-09-26 after a production outage. This was
+# unbounded, so a container rebuild pulled SQLAlchemy 2.1.1, which made
+# `default` + `insert_default` on the same mapped_column an error and
+# crash-looped the backend at `alembic upgrade head`. The models are
+# fixed, but production should run the version the test suite actually
+# runs against. Lift this deliberately, with the suite green on 2.1.
+sqlalchemy[asyncio]>=2.0.36,<2.1
 asyncpg>=0.30.0
 pgvector>=0.3.0
 pydantic>=2.10.0

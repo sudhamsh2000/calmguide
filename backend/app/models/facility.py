@@ -21,7 +21,7 @@ class Facility(Base):
     )
     settings: Mapped[dict | None] = mapped_column(_JSON, default=dict)
     is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, insert_default=True, server_default="true"
+        Boolean, nullable=False, default=True, server_default="true"
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

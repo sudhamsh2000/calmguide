@@ -42,12 +42,12 @@ class Incident(Base):
     is_recurring: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     caregiver_role: Mapped[str | None] = mapped_column(String(20), nullable=True)
     recall_confidence: Mapped[str] = mapped_column(
-        String(10), nullable=False, default="high", insert_default="high"
+        String(10), nullable=False, default="high"
     )
 
     extraction_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     verified_by_caregiver: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, insert_default=False
+        Boolean, nullable=False, default=False
     )
     verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

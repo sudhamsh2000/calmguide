@@ -32,7 +32,7 @@ class AuditLog(Base):
     resource_type: Mapped[str] = mapped_column(String(30), nullable=False)
     resource_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     outcome: Mapped[str] = mapped_column(
-        String(10), nullable=False, default="SUCCESS", insert_default="SUCCESS"
+        String(10), nullable=False, default="SUCCESS"
     )
     facility_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("facilities.id"), nullable=False, index=True

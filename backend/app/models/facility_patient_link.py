@@ -20,7 +20,7 @@ class FacilityPatientLink(Base):
     room: Mapped[str | None] = mapped_column(String(20), nullable=True)
     bed: Mapped[str | None] = mapped_column(String(20), nullable=True)
     is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, insert_default=True
+        Boolean, nullable=False, default=True
     )
     linked_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

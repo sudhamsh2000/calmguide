@@ -21,11 +21,11 @@ class Staff(Base):
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     language_preference: Mapped[str] = mapped_column(String(10), nullable=False, default="en-US")
     is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, insert_default=True, server_default="true"
+        Boolean, nullable=False, default=True, server_default="true"
     )
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     failed_login_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0, insert_default=0, server_default="0"
+        Integer, nullable=False, default=0, server_default="0"
     )
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(

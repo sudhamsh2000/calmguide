@@ -18,7 +18,7 @@ class StaffPatientAssignment(Base):
     )
     shift_pattern: Mapped[str | None] = mapped_column(String(10), nullable=True)
     is_primary: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, insert_default=False
+        Boolean, nullable=False, default=False
     )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
