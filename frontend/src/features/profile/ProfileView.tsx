@@ -11,6 +11,7 @@ import {
   getAutoSpeakReplies,
   setAutoSpeakReplies,
   type ProfileAvatar as ProfileAvatarKind,
+  noSessionRedirectPath,
 } from '@/lib/storage';
 import { getProfile } from '@/lib/api';
 import { BackButton } from '@/components/ui/BackButton';
@@ -69,7 +70,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
     const name = getPatientName();
 
     if (!code || !name) {
-      router.push('/profile/setup');
+      router.push(noSessionRedirectPath());
       return;
     }
 

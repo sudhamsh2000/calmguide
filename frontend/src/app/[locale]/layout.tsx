@@ -10,6 +10,7 @@ import { PageBrand } from '@/components/ui/PageBrand';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { EmergencyBar } from '@/components/ui/EmergencyBar';
 import { SignOutButton } from '@/components/ui/SignOutButton';
+import { SessionExpiryGuard } from '@/components/auth/SessionExpiryGuard';
 import { LocaleDocumentSync } from '@/components/ui/LocaleDocumentSync';
 import { THEME_COOKIE } from '@/lib/theme';
 import { isRtl, SUPPORTED_LOCALES } from '@/lib/locale';
@@ -134,6 +135,7 @@ export default async function LocaleLayout({
       <body className="min-h-dvh bg-background text-foreground font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <LocaleDocumentSync />
+          <SessionExpiryGuard />
           <ProfileProvider>
             <div id="root-shell" className="h-dvh flex flex-col overflow-hidden">
               {/* The shell stays a single narrow column on phones (correct for

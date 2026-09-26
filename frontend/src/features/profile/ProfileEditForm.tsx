@@ -11,6 +11,7 @@ import {
   getPatientName,
   setActiveProfileAvatar,
   type ProfileAvatar as ProfileAvatarKind,
+  noSessionRedirectPath,
 } from '@/lib/storage';
 import { Button } from '@/components/ui/Button';
 import { BackButton } from '@/components/ui/BackButton';
@@ -51,7 +52,7 @@ export function ProfileEditForm({ className = '' }: ProfileEditFormProps) {
     const name = getPatientName();
 
     if (!code || !name) {
-      router.push('/profile/setup');
+      router.push(noSessionRedirectPath());
       return;
     }
 

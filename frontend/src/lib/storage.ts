@@ -4,7 +4,15 @@ const KEYS = {
   PREFERRED_LANGUAGE: 'calmguide_preferred_language',
   DISCLAIMER_ACCEPTED: 'calmguide_disclaimer_accepted',
   AUTO_SPEAK_REPLIES: 'calmguide_auto_speak_replies',
+  SESSION_STARTED_AT: 'calmguide_session_started_at',
+  SESSION_LAST_ACTIVE_AT: 'calmguide_session_last_active_at',
+  SESSION_EXPIRED: 'calmguide_session_expired',
 } as const;
+
+/** Sign out after this long with no interaction. */
+export const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+/** Sign out this long after sign-in, however active the session has been. */
+export const SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 function isLocalStorageAvailable(): boolean {
   try {
@@ -32,7 +40,104 @@ function removeItem(key: string): void {
   window.localStorage.removeItem(key);
 }
 
+// ── Session expiry ───────────────────────────────────────────────────────
+
+/*
+ * The access code is the only credential in B2C mode, and it lives in
+ * localStorage — which never expires on its own. Without these timestamps,
+ * anyone who picks up the device later (a shared family tablet, a phone
+ * left unlocked) walks straight into the care profile.
+ *
+ * Expiry is enforced lazily on read, the same way getFacilityToken() drops
+ * a stale staff token: every getter that could hand out a session goes
+ * through enforceSessionExpiry() first, so no page can read a stale code
+ * before SessionExpiryGuard has had a chance to run.
+ */
+
+let sessionJustExpired = false;
+
+function hasStoredSession(): boolean {
+  return getItem(KEYS.ACCESS_CODE) !== null || getItem(PROFILES_KEY) !== null;
+}
+
+function readTimestamp(key: string): number | null {
+  const raw = getItem(key);
+  if (raw === null) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Whether the stored session is past its idle or absolute limit. A session
+ * with no timestamps (stored before expiry existed) counts as expired: there
+ * is no evidence it was used recently, so it gets one fresh sign-in.
+ */
+export function isSessionExpired(now: number = Date.now()): boolean {
+  const startedAt = readTimestamp(KEYS.SESSION_STARTED_AT);
+  const lastActiveAt = readTimestamp(KEYS.SESSION_LAST_ACTIVE_AT);
+  if (startedAt === null || lastActiveAt === null) return true;
+  return now - lastActiveAt > SESSION_IDLE_TIMEOUT_MS || now - startedAt > SESSION_MAX_AGE_MS;
+}
+
+function enforceSessionExpiry(): void {
+  if (!hasStoredSession() || !isSessionExpired()) return;
+  clearSession();
+  sessionJustExpired = true;
+  setItem(KEYS.SESSION_EXPIRED, 'true');
+}
+
+/** Record activity so the idle timer restarts. No-op without a live session. */
+export function touchSession(now: number = Date.now()): void {
+  enforceSessionExpiry();
+  if (!hasStoredSession()) return;
+  setItem(KEYS.SESSION_LAST_ACTIVE_AT, String(now));
+}
+
+/**
+ * True once after a stale session was cleared, so the UI can send the
+ * caregiver to the access-code screen instead of profile setup.
+ */
+export function consumeSessionExpired(): boolean {
+  enforceSessionExpiry();
+  const expired = sessionJustExpired;
+  sessionJustExpired = false;
+  return expired;
+}
+
+/**
+ * Where a page with no session should send the caregiver: back to the
+ * access-code screen if their session timed out, otherwise to profile
+ * setup. Pages redirect before SessionExpiryGuard's effect runs (child
+ * effects fire first), so they pick the target themselves — from a stored
+ * marker rather than the one-shot flag, which the guard may already have
+ * consumed (e.g. when Strict Mode re-runs effects).
+ */
+export function noSessionRedirectPath(): '/login' | '/profile/setup' {
+  enforceSessionExpiry();
+  return getItem(KEYS.SESSION_EXPIRED) === 'true' ? '/login' : '/profile/setup';
+}
+
+function markSessionActive(): void {
+  const now = String(Date.now());
+  if (getItem(KEYS.SESSION_STARTED_AT) === null) setItem(KEYS.SESSION_STARTED_AT, now);
+  setItem(KEYS.SESSION_LAST_ACTIVE_AT, now);
+}
+
+/**
+ * Drop the signed-in session but keep device preferences (language,
+ * disclaimer, read-aloud) — those aren't the caregiver's credentials.
+ */
+function clearSession(): void {
+  removeItem(KEYS.PATIENT_NAME);
+  removeItem(KEYS.ACCESS_CODE);
+  removeItem(PROFILES_KEY);
+  removeItem(ACTIVE_PROFILE_INDEX_KEY);
+  removeItem(KEYS.SESSION_STARTED_AT);
+  removeItem(KEYS.SESSION_LAST_ACTIVE_AT);
+}
+
 export function getPatientName(): string | null {
+  enforceSessionExpiry();
   return getItem(KEYS.PATIENT_NAME);
 }
 
@@ -45,11 +150,15 @@ export function clearPatientName(): void {
 }
 
 export function getAccessCode(): string | null {
+  enforceSessionExpiry();
   return getItem(KEYS.ACCESS_CODE);
 }
 
+/** Every sign-in path (login, setup wizard, profile switch) goes through here. */
 export function setAccessCode(code: string): void {
   setItem(KEYS.ACCESS_CODE, code);
+  removeItem(KEYS.SESSION_EXPIRED);
+  markSessionActive();
 }
 
 export function clearAccessCode(): void {
@@ -85,12 +194,10 @@ export function setDisclaimerAccepted(): void {
  * behind silently undoes the sign-out on the very next render.
  */
 export function clearAll(): void {
-  removeItem(KEYS.PATIENT_NAME);
-  removeItem(KEYS.ACCESS_CODE);
+  clearSession();
+  removeItem(KEYS.SESSION_EXPIRED);
   removeItem(KEYS.PREFERRED_LANGUAGE);
   removeItem(KEYS.DISCLAIMER_ACCEPTED);
-  removeItem(PROFILES_KEY);
-  removeItem(ACTIVE_PROFILE_INDEX_KEY);
 }
 
 // ── Multi-profile support ────────────────────────────────────────────────
@@ -124,6 +231,7 @@ const PROFILES_KEY = 'calmguide_profiles';
 const ACTIVE_PROFILE_INDEX_KEY = 'calmguide_active_profile_index';
 
 export function getProfiles(): StoredProfile[] {
+  enforceSessionExpiry();
   const raw = getItem(PROFILES_KEY);
   if (!raw) {
     const legacyCode = getAccessCode();

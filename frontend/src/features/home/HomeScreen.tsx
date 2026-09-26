@@ -13,6 +13,7 @@ import {
   getPatientName,
   getProfiles,
   type ProfileAvatar as ProfileAvatarKind,
+  noSessionRedirectPath,
 } from '@/lib/storage';
 import {
   getProfile,
@@ -103,7 +104,7 @@ export function HomeScreen({ className = '' }: HomeScreenProps) {
     const name = getPatientName();
 
     if (!code || !name) {
-      router.push('/profile/setup');
+      router.push(noSessionRedirectPath());
       return;
     }
 
