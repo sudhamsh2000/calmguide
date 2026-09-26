@@ -36,5 +36,13 @@
     "safety_emergency_instruction": "En emergencias llame al {number}.",
     "safety_helpline": "Para apoyo humano capacitado llame al {phone} ({name})."
   },
-  "finding_guidance": "Buscando orientación para ti..."
+  "finding_guidance": "Buscando orientación para ti...",
+  "emergency_alert": {
+    "title": "Llame a emergencias ahora",
+    "body": "Lo que describió puede ser una emergencia médica. Llame ahora; puede volver a CalmGuide después.",
+    "call": "Llamar al {number}",
+    "dismiss": "Cerrar",
+    "sound_on": "Sonido activado",
+    "sound_off": "Sonido desactivado"
+  }
 }

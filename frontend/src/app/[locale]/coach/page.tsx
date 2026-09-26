@@ -10,6 +10,7 @@ import { parseCoachResponse } from '@/features/coach/parseResponse';
 import { useStreamingChat } from '@/features/coach/useStreamingChat';
 import { formatResidentLocation } from '@/lib/facility-utils';
 import { BreathingIndicator } from '@/components/ui/BreathingIndicator';
+import { EmergencyAlert } from '@/components/ui/EmergencyAlert';
 import { BackButton } from '@/components/ui/BackButton';
 import { SafetyDisclosure } from '@/components/ui/SafetyDisclosure';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
@@ -64,11 +65,12 @@ function CoachPageInner() {
   const isFacilityMode = !!profileId;
   const residentName = isFacilityMode ? formatResidentLocation(unit, room, bed) : undefined;
 
-  const { response, isStreaming, error, sendMessage, clearError } = useStreamingChat(
-    initialSessionId,
-    profileId ?? undefined,
-    residentName,
-  );
+  const { response, isStreaming, error, emergency, sendMessage, clearError, clearEmergency } =
+    useStreamingChat(
+      initialSessionId,
+      profileId ?? undefined,
+      residentName,
+    );
   const locale = useLocale();
   const { speak } = useSpeechSynthesis({ locale });
   const [history, setHistory] = useState<ChatExchange[]>([]);
@@ -259,6 +261,10 @@ function CoachPageInner() {
   // ── Phase 2: Chat layout ──────────────────────────────────────────────────
   return (
     <main className="flex flex-col h-full">
+      {/* Portalled to document.body, so it sits above this screen's own
+       * stacking contexts rather than inside them. */}
+      <EmergencyAlert open={emergency} onDismiss={clearEmergency} />
+
       {/* Header — compact in Phase 2 to maximize chat space */}
       <header className="shrink-0 border-b border-foreground/10 px-5 py-2 space-y-2">
         <div className="flex items-center gap-3">

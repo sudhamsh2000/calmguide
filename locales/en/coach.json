@@ -36,5 +36,13 @@
     "safety_talking_to_ai": "You're talking to AI, not a human.",
     "safety_emergency_instruction": "In emergencies call {number}.",
     "safety_helpline": "For trained human support call {phone} ({name})."
+  },
+  "emergency_alert": {
+    "title": "Call emergency services now",
+    "body": "What you described may be a medical emergency. Call now — you can come back to CalmGuide afterwards.",
+    "call": "Call {number}",
+    "dismiss": "Close",
+    "sound_on": "Sound on",
+    "sound_off": "Sound off"
   }
 }

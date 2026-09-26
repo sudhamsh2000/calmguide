@@ -15,6 +15,14 @@ export interface StreamingChatState {
   sessionId: string | null;
   /** Error message if the last request failed */
   error: string | null;
+  /**
+   * Set when the safety gate short-circuited this turn with an EMERGENCY
+   * decision. The gate path used to stream the same `{text}` shape as an
+   * ordinary answer, so the UI had no way to escalate its presentation.
+   * HIGH (acute change) deliberately does not set this — urgent, but not a
+   * 911 prompt.
+   */
+  emergency: boolean;
 }
 
 export interface UseStreamingChatReturn extends StreamingChatState {
@@ -22,6 +30,8 @@ export interface UseStreamingChatReturn extends StreamingChatState {
   sendMessage: (message: string) => void;
   /** Clear the current error */
   clearError: () => void;
+  /** Dismiss the emergency alert without clearing the response text */
+  clearEmergency: () => void;
 }
 
 /**
@@ -41,6 +51,7 @@ export function useStreamingChat(
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [error, setError] = useState<string | null>(null);
+  const [emergency, setEmergency] = useState(false);
   const { isOnline } = useNetworkStatus();
 
   // Use a ref to hold the session ID so the callback always sees the latest value
@@ -59,6 +70,7 @@ export function useStreamingChat(
   isOnlineRef.current = isOnline;
 
   const clearError = useCallback(() => setError(null), []);
+  const clearEmergency = useCallback(() => setEmergency(false), []);
 
   const sendMessage = useCallback((message: string) => {
     const accessCode = profileId ? null : getAccessCode();
@@ -72,6 +84,7 @@ export function useStreamingChat(
 
     // Reset state for new message
     setResponse('');
+    setEmergency(false);
     setIsStreaming(true);
     setError(null);
 
@@ -123,7 +136,12 @@ export function useStreamingChat(
                 session_id?: string;
                 text?: string;
                 replace?: string;
+                safety?: { triggered?: boolean; emergency?: boolean; category?: string };
               };
+
+              if (parsed.safety?.emergency) {
+                setEmergency(true);
+              }
 
               if (parsed.session_id) {
                 sessionIdRef.current = parsed.session_id;
@@ -171,7 +189,9 @@ export function useStreamingChat(
     isStreaming,
     sessionId,
     error,
+    emergency,
     sendMessage,
     clearError,
+    clearEmergency,
   };
 }

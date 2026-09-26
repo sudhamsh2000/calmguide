@@ -394,6 +394,20 @@
     filter: invert(1) hue-rotate(180deg);
   }
 
+  /* The emergency alert's pulsing icon. One slow pulse, not a strobe — this
+   * appears in a house where someone has dementia, often at night. Removed
+   * entirely when the OS asks for reduced motion. */
+  .emergency-alert-pulse {
+    animation: emergency-pulse 1.9s ease-in-out infinite;
+  }
+  @keyframes emergency-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.09); opacity: 0.82; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .emergency-alert-pulse { animation: none; }
+  }
+
   /* --- Luminous optical glass -------------------------------------------
    * One material, used sparingly. The spec asks for "large transparent
    * architectural surfaces", so this is for panels that hold content, not

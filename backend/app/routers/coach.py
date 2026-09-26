@@ -217,7 +217,26 @@ def _short_circuit_safety_response(
         # closes the app right after reading it.
         _spawn_background(_save_safety_turn(), label=f"safety:{session_id}")
         _spawn_background(_log_safety_gate_event(), label=f"safety-log:{session_id}")
-        yield f"data: {json.dumps({'session_id': session_id})}\n\n"
+        # The client previously had no way to tell a safety short-circuit from
+        # an ordinary answer — both arrived as {'text': ...}. Without this the
+        # UI cannot escalate its presentation, so emit the decision alongside
+        # the session id. `emergency` is deliberately the narrow signal the UI
+        # keys off: HIGH (acute change) is urgent but is not a 911 prompt.
+        yield (
+            "data: "
+            + json.dumps(
+                {
+                    "session_id": session_id,
+                    "safety": {
+                        "triggered": True,
+                        "risk_level": decision.risk_level.value,
+                        "category": decision.category.value,
+                        "emergency": decision.risk_level is RiskLevel.EMERGENCY,
+                    },
+                }
+            )
+            + "\n\n"
+        )
         yield f"data: {json.dumps({'text': response_text})}\n\n"
         yield "data: [DONE]\n\n"
 
