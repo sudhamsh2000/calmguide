@@ -64,7 +64,7 @@ Browser (Next.js)          Backend (FastAPI)          External Services
 
 **Privacy:** Patient names are stored only in the browser (localStorage). The server never persists PII --- it stores clinical profiles (disease stage, behavioral patterns, calming strategies) linked by hashed access codes. All conversations and profile data are encrypted at rest with AES-256-GCM. A caregiver can permanently erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, etc.) via `DELETE /api/profiles/{code}` --- see [Access Codes](#access-codes).
 
-**Safety:** Every message reaching the LLM first passes a deterministic regex safety gate (`backend/app/services/safety_gate.py`) covering life-threat, self-harm, caregiver-harm-risk, and elder-abuse/neglect signals across all supported languages, with a heuristic fallback classifier behind it to catch paraphrases the gate misses. See [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for the full two-layer design, the red-team evaluation harness used to regression-test it, and its explicit non-clinical-validation caveats and known gaps.
+**Safety:** Every message reaching the LLM first passes a deterministic regex safety gate (`backend/app/services/safety_gate.py`) covering life-threat, self-harm, caregiver-harm-risk, and elder-abuse/neglect signals across all supported languages, with a heuristic fallback classifier behind it to catch paraphrases the gate misses. **Safety Gate v2** turns both layers' output into a single structured decision (`RiskLevel` + `SafetyAction`, `backend/app/services/safety_decision.py`) with fine-grained categories (breathing, consciousness, fall, acute change, medication risk), and runs it immediately after profile/locale resolution --- so an EMERGENCY or HIGH message is answered before any RAG retrieval, DB-context read, or LLM call. A 911-level decision is streamed to the client as a distinct event and shown as a full-screen red emergency alert. See [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for the full two-layer design, the red-team evaluation harness used to regression-test it, and its explicit non-clinical-validation caveats and known gaps.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 
@@ -76,14 +76,16 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Patient Profiles** | Personalized LLM responses using disease stage, behavioral patterns, calming strategies |
 | **RAG Pipeline** | 41 pages (231 chunks) from Alzheimer's Association, Mayo Clinic, and other trusted sources ground every response. Live on the Railway database — see [docs/AUDIT.md](docs/AUDIT.md) for the reconnection history |
 | **Learn Mode** | Interactive scenario practice between tough moments |
-| **Daily Check-In** | Caregiver wellness check + behavioral journal for pattern tracking |
+| **Daily Check-In** | Caregiver wellness check + behavioral journal for pattern tracking, with a progress chart backed by the check-in history endpoint |
 | **Behavioral Patterns** | Episode cycle detection, peak time tracking, recurring trigger analysis |
 | **Tonight's Outlook** | Risk card when episode patterns suggest elevated likelihood, based on cycle position |
 | **Caregiver Feedback** | Post-session feedback (thumbs + strategy tags) that upgrades the pattern engine |
 | **Cross-Patient Learning** | Anonymized strategy effectiveness across similar patient profiles, injected into LLM prompts |
 | **Impact Showcase** | Public page with real aggregate stats (families helped, sessions, languages) |
 | **Encryption** | AES-256-GCM for all conversations, profile data, and feedback at rest |
-| **Safety Gate + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier ahead of every LLM call; regression-tested via an engineering-authored red-team dataset (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)). The heuristic classifier gates its typo-tolerant character similarity behind a word-level content match, so common caregiver phrasing like "I don't know what to do" is no longer misclassified as self-harm language purely from shared letters |
+| **Safety Gate v2 + Red-Team Harness** | Deterministic regex gate + heuristic fallback classifier, combined into a structured risk decision with safety-first routing ahead of every LLM call. Regression-tested by the red-team harness (see [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md)) and by a fixed 117-case regression corpus that is read, never regenerated, by the test suite (see [docs/SAFETY_REGRESSION_DATASET.md](docs/SAFETY_REGRESSION_DATASET.md)). The heuristic classifier gates its typo-tolerant character similarity behind a word-level content match, so common caregiver phrasing like "I don't know what to do" is not misclassified as self-harm language purely from shared letters. A 2026-09-25 probe of realistic caregiver messages closed three false negatives ("she took a whole bottle of pills", caregiver-harm disclosures like "I'm afraid I'm going to hit him", Spanish "no está respirando") and one false positive (end-of-life planning), and raised the sensitivity floor to 1.0 |
+| **Emergency Alert** | When the gate decides a message warrants 911, the web coach shows a full-screen red alert with the local emergency number as a 60px call target (112 and the ARDSI helpline for Hindi, 911 and the Alzheimer's Association helpline otherwise), and a short two-pulse attention tone (mutable, no siren --- it plays in a home with a person with dementia). It can't be dismissed by tapping outside it. HIGH (acute change) is urgent but not a 911 prompt, so it does not trigger the alert |
+| **Session Timeout (web)** | The web app signs a caregiver out after 30 minutes idle or 12 hours after sign-in, so someone who picks up the device later cannot land in the care profile. Device preferences are kept. `SessionExpiryGuard` + `frontend/src/lib/storage.ts` |
 | **Acute-Change Screening** | Structured onset/context screening prompt for new or sudden behavior changes, run before a Moment Coach session starts |
 | **Three Languages** | English, Spanish, Hindi --- fully translated UI, AI responses, and safety copy. Scope is deliberately three rather than a long list: the registry in `backend/app/services/language_support.py`, the files under `locales/`, and `SUPPORTED_LOCALES` in both clients all agree, so nothing is advertised that the product cannot actually render. Per-language native-review status is tracked in [locales/REVIEW_STATUS.md](locales/REVIEW_STATUS.md) |
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
@@ -97,13 +99,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 |-------|-----------|
 | Frontend | Next.js 16, React 19, TypeScript (strict), Tailwind CSS |
 | Mobile | React Native (Expo), expo-router, react-i18next |
-| Backend | Python 3.11+, FastAPI 0.128+, async SQLAlchemy 2.0, Pydantic v2 |
+| Backend | Python 3.11+, FastAPI 0.128+, async SQLAlchemy 2.0 (pinned `<2.1`, see below), Pydantic v2 |
 | Database | PostgreSQL 16 + pgvector (via asyncpg) |
 | Encryption | AES-256-GCM (cryptography package), key in env var |
 | LLM | OpenAI gpt-4o-mini (default) or Anthropic Claude (switchable via env var) |
 | RAG | OpenAI text-embedding-3-large, pgvector hybrid search (semantic + full-text) |
 | Scheduling | APScheduler (in-process async, nightly insights + cross-patient aggregation) |
-| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 1500+ tests), Jest + @testing-library/react-native (mobile) |
+| Testing | Vitest + React Testing Library (frontend), pytest-asyncio (backend, 1837 tests), Jest + @testing-library/react-native (mobile) |
 | Infrastructure | Docker Compose, Alembic migrations |
 
 ## Quick Start
@@ -139,6 +141,12 @@ alembic upgrade head
 # Use 0.0.0.0 for physical-device testing so phones on your LAN can reach it.
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+> **SQLAlchemy is pinned to `>=2.0.36,<2.1`.** The unbounded pin resolved to
+> 2.1.1 on a container rebuild, and 2.1 rejects passing both `default` and
+> `insert_default` to a column. That crash-looped production at
+> `alembic upgrade head` with no code change. The models are fixed as well,
+> but moving to 2.1 should be a deliberate upgrade with the test suite green on it.
 
 ### 3. Set up the frontend
 
@@ -311,7 +319,7 @@ calmguide/
 │   ├── src/
 │   │   ├── app/[locale]/       # Pages (welcome, profile, home, coach, learn, check-in,
 │   │   │                       #   incidents, journey, facility, login, impact)
-│   │   ├── components/         # Shared UI (ui/, landing/, facility/) with tests
+│   │   ├── components/         # Shared UI (ui/, landing/, facility/, auth/) with tests
 │   │   ├── features/           # Feature-specific components — checkin, coach, home,
 │   │   │                       #   incidents, learn, profile, welcome
 │   │   ├── lib/                # API client (with fetch-timeout handling), storage, theme
@@ -321,7 +329,7 @@ calmguide/
 │   │   ├── types/              # Shared TypeScript types
 │   │   └── middleware.ts       # Locale negotiation / redirects
 │   ├── locales/                # ⚙ generated — copied from ../locales, gitignored
-│   ├── vitest.config.ts        # 32 test files
+│   ├── vitest.config.ts        # 34 test files, 276 tests
 │   └── tailwind.config.ts      # CalmGuide design tokens
 │
 ├── backend/                    # FastAPI (Python 3.11+)
@@ -331,12 +339,13 @@ calmguide/
 │   │   ├── routers/            # API endpoints (coach, speech, feedback, care_patterns,
 │   │   │                       #   impact, incidents, languages, facility_*, …)
 │   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
-│   │   │                       #   detector, safety_gate, safety_classifier, safety_redteam,
+│   │   │                       #   detector, safety_gate, safety_classifier, safety_decision,
+│   │   │                       #   safety_categories, safety_observability, safety_redteam,
 │   │   │                       #   speech (TTS), token_usage, availability, response_timing
 │   │   ├── prompts/            # Jinja2 system prompt templates
 │   │   ├── config.py           # Pydantic settings — NOTE: @lru_cache'd, restart on .env change
 │   │   └── db.py               # Async engine / session factory
-│   ├── tests/                  # pytest-asyncio — 1601 tests
+│   ├── tests/                  # pytest-asyncio — 1837 tests
 │   └── alembic/                # Database migrations
 │
 ├── mobile/                     # React Native (Expo SDK 55)
@@ -384,7 +393,7 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/health` | Health check --- DB connectivity (gates HTTP 503) plus a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) and a rolling p50/p95 response-timing block (LLM time-to-first-chunk/total, RAG retrieval); both informational only |
+| GET | `/health` | Health check --- DB connectivity (gates HTTP 503) plus a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`), a rolling p50/p95 response-timing block (LLM time-to-first-chunk/total, RAG retrieval), and a `safety` block of Safety Gate v2 counters (risk level, category, action, RAG requested vs. skipped, provider failover). All three are informational only. RAG availability does not yet affect overall status |
 | POST | `/api/profiles` | Create profile, returns 8-char access code |
 | GET | `/api/profiles/{code}` | Lookup profile by access code |
 | PUT | `/api/profiles/{code}` | Update profile |
@@ -398,6 +407,7 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 | POST | `/api/checkin` | Caregiver emotional check-in (streaming) |
 | POST | `/api/checkin/daily` | Daily behavioral log entry |
 | GET | `/api/checkin/daily/{code}/today` | Check if today's log exists |
+| GET | `/api/checkin/daily/{code}/history` | Bounded read-only history of daily logs (feeds the progress chart) |
 | POST | `/api/feedback` | Submit Moment Coach response feedback (thumbs + tags) |
 | POST | `/api/feedback/skip` | Record dismissed feedback card |
 | GET | `/api/feedback/pending/{code}` | Get most recent unfeedback'd session |
@@ -418,7 +428,9 @@ Moment Coach is the core feature. It provides structured, AI-generated guidance 
 
 **Phase 1 --- Input:** The caregiver sees a calm greeting card ("Take a breath. Tell me what's happening...") and a large text input. They describe the situation and tap "Get Guidance".
 
-**Phase 2 --- Chat:** The screen transitions to a chat layout. Past exchanges appear as a scrollable thread. A sticky footer input remains always visible. The backend retrieves relevant RAG context, injects it into the system prompt alongside the patient's profile, and streams the response.
+**Phase 2 --- Chat:** The screen transitions to a chat layout. Past exchanges appear as a scrollable thread. A sticky footer input remains always visible. The backend runs the safety gate first. If the message is an emergency, it returns the static safety response (and, for 911-level decisions, the emergency alert) without calling the LLM. Otherwise it retrieves relevant RAG context, injects it into the system prompt alongside the patient's profile, and streams the response.
+
+The coach prompt tells the model to **answer the caregiver's question first**. For example, a repeated question is answered plainly, as if asked for the first time, before any redirect. It also names common unmet needs (toilet, thirst, hunger, pain, temperature, fatigue) as likely causes, and prefers low-stimulation redirects (no television in the evening). This came from a side-by-side comparison and was checked with live generations, not just by reading the prompt.
 
 ### Response Card Hierarchy
 
@@ -437,7 +449,9 @@ If the response cannot be parsed into sections, it falls back to full markdown r
 
 CalmGuide is designed for stressed, elderly caregivers using the app at 3am:
 
-- **Colors:** Calming teal palette (#2B7A78), warm off-white backgrounds, soft coral for errors
+- **Colors:** Near-black ink primary (`#10141c`), sky (`#3e8fd0`) and coral (`#e8663d`) accents on a pale sky background, shared by web (`globals.css`) and mobile (`ThemeContext`). Semantic colours (911/emergency, success/warning/error, the four Moment Coach section tints) are kept separate so they stand out
+- **Material:** A "luminous glass" `.glass-panel` (backdrop blur, 32px radius) used on only two large surfaces, the profile panel and Your Progress. It falls back to a solid panel without `backdrop-filter` or under `prefers-reduced-transparency`
+- **Navigation:** The web app has no global nav bar at any width. Sections are reached through in-page links. A nav that leaked onto the pre-auth invite gate was withdrawn. The EmergencyBar is the one element on every screen
 - **Typography:** Nunito (body, 16px min), Nunito Sans (labels). Moment Coach content: 18px min
 - **Touch targets:** 48x48px minimum for all interactive elements
 - **Dark mode:** Auto-activates 8pm-6am, follows system preference, manual toggle
@@ -445,12 +459,16 @@ CalmGuide is designed for stressed, elderly caregivers using the app at 3am:
 
 ## Access Codes
 
-Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, excluding ambiguous characters: 0, O, 1, I, L). Codes are stored as SHA-256 hashes --- the plaintext code is only shown once at profile creation.
+Profiles are accessed via 8-character alphanumeric codes (uppercase + digits, excluding ambiguous characters: 0, O, 1, I, L). Codes are stored as SHA-256 hashes --- the plaintext code is only shown once at profile creation. On web, the signed-in session expires after 30 minutes idle or 12 hours total (see Session Timeout under [Features](#features)).
 
 ## Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) --- Detailed data flow diagrams and system design
-- [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) --- Deterministic safety gate + heuristic classifier design, the red-team evaluation harness, and known gaps pending clinical/native-speaker review
+- [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) --- Deterministic safety gate + heuristic classifier design, the red-team evaluation harness, and known gaps pending clinical/native-speaker review (including §3.0, open clinical questions from the 2026-09-25 probe)
+- [docs/SAFETY_GATE_V2_PLAN.md](docs/SAFETY_GATE_V2_PLAN.md) --- Safety Gate v2 design: structured decisions, fine categories, safety-first routing
+- [docs/SAFETY_REGRESSION_DATASET.md](docs/SAFETY_REGRESSION_DATASET.md) --- The fixed 117-case engineering regression corpus and why it must never be auto-regenerated
+- [docs/CALMGUIDE_E2E_AUDIT_2026_09.md](docs/CALMGUIDE_E2E_AUDIT_2026_09.md) --- Independent end-to-end audit of the Safety Gate v2 sprint
+- [docs/WEEKLY_REPORT_2026-09-24.md](docs/WEEKLY_REPORT_2026-09-24.md) --- Latest weekly report (PDF alongside)
 - [docs/memory-graph-design.md](docs/memory-graph-design.md) --- Behavioral memory graph, cascading profile deletion, and retention configuration
 - [docs/DEFERRED.md](docs/DEFERRED.md) --- Deferred features and future roadmap (push notifications, key rotation, care team sharing, etc.)
 - [docs/AUDIT.md](docs/AUDIT.md) --- Running audit log: test/type/lint/build results, dependency CVEs, open findings and incidents, each stamped with the date and commit it was measured against
@@ -471,17 +489,26 @@ CalmGuide is going through an ongoing hardening pass driven by an external facul
   - `SafetyEvent` audit logging wired into Moment Coach and check-in flows
   - Acute-change / delirium screening endpoint (`POST /api/coach/acute-change-screen`), run before a Moment Coach session for a new or sudden behavior change
   - EmergencyBar 911/988 fix on web
+  - **Safety Gate v2** --- structured `SafetyDecision` (risk level + action), fine-grained categories, and safety-first routing so emergencies skip RAG and the LLM entirely; fixed a window-dilution bug in the classifier's fuzzy matcher
+  - Full-screen emergency alert with an attention tone on 911-level escalation (web)
+  - Real-world probe fixes (2026-09-25): overdose, caregiver-harm and Spanish breathing false negatives closed; end-of-life-planning false positive removed; sensitivity floor raised from 0.9 to 1.0
 - **P1 --- clinical/architecture**
   - DICE (Describe-Investigate-Create-Evaluate) workflow mapping for Moment Coach intake
   - Behavioral-memory retrieval refactor + design documentation ([docs/memory-graph-design.md](docs/memory-graph-design.md))
   - Privacy/PHI hardening: cascading profile deletion (`DELETE /api/profiles/{code}`), `.gitignore` hardening against accidental PHI/venv/env commits, demo-seed passwords overridable via env vars instead of hardcoded
   - Validated-vs-experimental language configuration (`GET /api/languages`, per-language native-review-pending status)
+  - Web session timeout (30 min idle / 12 h absolute) so a shared or unattended device does not stay signed in to a care profile
 - **P2 --- validation / real-world use**
   - Safety red-team evaluation harness with regression-tested sensitivity/specificity/false-positive-rate floors ([docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md))
   - **P2-12** --- Offline/degraded-mode support scaffolding: in-process LLM availability tracker feeding a degraded `/health` status (backend/app/services/availability.py); connectivity detection (`useNetworkStatus`) + offline banners on both mobile (NetInfo) and web (`navigator.onLine`); localized offline error copy across every shipped locale that distinguishes "you're offline" from a generic server error; AbortController-based fetch timeouts on the web frontend (parity with mobile's existing `fetchWithTimeout`). Deliberately does not include request queueing, background sync, or offline read caching --- and does not run the safety gate client-side while offline --- see [docs/DEFERRED.md](docs/DEFERRED.md) and the "Known gaps" section of [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for why those are deliberate, documented gaps rather than oversights.
   - **P2-13** --- Response-timing instrumentation: in-process rolling p50/p95 latency tracker (`backend/app/services/response_timing.py`), same per-process/informational-only scope as P2-12's availability tracker. Records LLM time-to-first-chunk and total stream duration around both Moment Coach's and check-in's `stream_completion()` calls (successful streams only --- a failed call's duration isn't a meaningful latency sample, and `availability.py` already tracks failure rate separately), plus RAG retrieval duration in `_fetch_rag_context`. Surfaced as a `timing` block on `GET /health` alongside the existing `llm` field; never gates the HTTP status code. No new DB table --- this is a lightweight visibility layer, not a metrics store; back it with a real backend (Prometheus, Datadog, etc.) before relying on it for SLOs across instances.
+  - Safety Gate v2 regression corpus (117 cases, 8 flagged for clinical review) and `/health` safety observability counters
 
 **In progress / planned:**
+
+- Clinician verification of the open questions in [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) §3.0 (resolved choking, exertional breathlessness) and of `MEDICATION_RISK` routing, which currently still generates a response (`TODO(LOF-APPROVAL)`)
+- Known follow-ups from the regression corpus: an ambiguous-breathing false-positive candidate and French self-harm coverage ("je veux mourir")
+- Fold RAG availability into `/health` overall status (flagged HIGH in the September E2E audit)
 
 - **P2-14** --- Dependency/license manifest + license-mismatch report
 - **P3-15** --- Facility handoff data model + FHIR mapping
