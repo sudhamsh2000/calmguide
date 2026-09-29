@@ -238,18 +238,49 @@ async def get_verification_pending(
         decrypt(incident.intervention_description) if incident.intervention_description else None
     )
 
+    def _sentence(text: str) -> str:
+        """Terminate a fragment so joining doesn't produce a run-on.
+
+        These come from LLM extraction and rarely end in punctuation, so
+        `" ".join(...)` used to render as "...confirmed okay You tried:".
+        """
+        text = text.strip()
+        if not text:
+            return ""
+        return text if text[-1] in ".!?" else f"{text}."
+
     parts = []
     if antecedent:
-        parts.append(antecedent)
-    parts.append(desc)
+        parts.append(_sentence(antecedent))
+    parts.append(_sentence(desc))
     if intervention:
-        outcome_text = incident.intervention_outcome or ""
-        parts.append(f"You tried: {intervention}. Outcome: {outcome_text}.")
+        tried = _sentence(f"You tried: {intervention.strip().rstrip('.')}")
+        # Only state an outcome when one was actually recorded — this used to
+        # emit a bare "Outcome: ." whenever extraction left it unset.
+        outcome = (incident.intervention_outcome or "").strip()
+        if outcome:
+            tried = f"{tried} Outcome: {_OUTCOME_LABELS.get(outcome, outcome)}."
+        parts.append(tried)
 
     return {
         "incident_id": incident.id,
-        "summary_text": " ".join(parts),
+        "summary_text": " ".join(p for p in parts if p),
     }
+
+
+# Human-readable outcome wording for the verification summary. The stored
+# values are enum-ish ("partially_resolved") and were being shown raw.
+#
+# TODO(i18n): this summary is composed server-side in English, so a Spanish
+# or Hindi caregiver sees English "You tried:"/"Outcome:" wording. The fix is
+# to return the parts structured and let the client compose them with its own
+# translations; that is an API-shape change, not a string change.
+_OUTCOME_LABELS = {
+    "resolved": "resolved",
+    "partially_resolved": "partly resolved",
+    "unresolved": "not resolved",
+    "escalated": "it got worse",
+}
 
 
 @router.post("/by-profile/{profile_id}", status_code=201)
