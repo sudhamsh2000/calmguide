@@ -336,14 +336,28 @@ def test_prompt_renders_clinical_block_for_ok_and_partial():
     assert "Urinary tract infection (Recurrent)" in prompt
     assert "Never suggest starting, stopping" in prompt
     assert "**Notable right now**: Fever: 38.1 °C yesterday" in prompt
-    assert (
-        "FIRST bullet of WHEN TO CALL FOR HELP must tell the caregiver to contact Frank's doctor"
-        in prompt
-    )
+    # The referral rule lives inside the WHEN TO CALL FOR HELP instructions and
+    # is repeated at the very end, where gpt-4o-mini reliably follows it.
+    section = prompt[prompt.index("### 4. WHEN TO CALL FOR HELP") :]
+    assert 'MUST begin "Call Frank\'s doctor today"' in section
+    assert prompt.rstrip().endswith("together with any relevant history from the record.")
     partial = build_summary(
         conditions=None, medications=[], allergies=[], observations=[], now=SEED_NOW
     )
     assert "## Clinical Record" in _prompt(partial)
+
+
+def test_last_check_only_appears_with_a_notable_finding():
+    no_alerts = build_summary(
+        conditions=_resources("frank_conditions.json"),
+        medications=[],
+        allergies=[],
+        observations=[],
+        now=SEED_NOW,
+    )
+    prompt = _prompt(no_alerts)
+    assert "## Clinical Record" in prompt
+    assert "Last Check" not in prompt
 
 
 def test_prompt_without_link_is_unchanged():
