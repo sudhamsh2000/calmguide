@@ -26,7 +26,11 @@ function normalizeApiBase(baseUrl: string): string {
   }
 }
 
-const PRODUCTION_API_URL = 'https://cgapi.trybabble.io';
+// Used when a release bundle is built without EXPO_PUBLIC_API_URL. This was
+// https://cgapi.trybabble.io, which doesn't resolve — a 2026-09-29 EAS Update
+// exported from a stale Metro cache silently fell back to it and would have
+// cut every installed app off from the backend. Keep this the live API.
+const PRODUCTION_API_URL = 'https://calmguide-production.up.railway.app';
 
 function resolveApiBase(): string {
   const configured = process.env.EXPO_PUBLIC_API_URL;

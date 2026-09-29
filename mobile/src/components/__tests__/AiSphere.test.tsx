@@ -12,9 +12,13 @@ jest.mock('expo-router', () => ({
 
 import { AiSphere } from '../AiSphere';
 
+/** The bits of a rendered node these tests read. */
+type SvgNode = { props: Record<string, unknown> };
+
 function outline(tree: ReturnType<typeof render>): string {
   // The first <Path> is the shell; its `d` is the deformed outline.
-  return tree.UNSAFE_root.findAll((n) => n.props?.d && n.props?.fill === 'url(#shell)')[0].props.d;
+  return tree.UNSAFE_root.findAll((n: SvgNode) => n.props?.d && n.props?.fill === 'url(#shell)')[0]
+    .props.d;
 }
 
 describe('AiSphere', () => {
@@ -25,11 +29,11 @@ describe('AiSphere', () => {
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(false);
     const tree = render(<AiSphere size={150} />);
     const paths = tree.UNSAFE_root.findAll(
-      (n) => typeof n.props?.d === 'string' && n.props.d.startsWith('M'),
+      (n: SvgNode) => typeof n.props?.d === 'string' && n.props.d.startsWith('M'),
     );
     // react-native-svg renders each Path through a couple of host layers;
     // count distinct outlines instead of nodes.
-    expect(new Set(paths.map((p) => p.props.d)).size).toBe(3);
+    expect(new Set(paths.map((p: SvgNode) => p.props.d)).size).toBe(3);
     expect(outline(tree)).toMatch(/Z$/);
   });
 

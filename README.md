@@ -195,6 +195,17 @@ This scrapes content from 6 trusted sources, embeds it, and stores it in Postgre
 
 See [mobile/README.md](mobile/README.md) for the full Expo/EAS setup, including the local Android build path and its JDK 17 requirement.
 
+
+**Publishing a mobile update (EAS Update).** Installed APKs are preview builds on the `preview` channel (runtime `1.0.0`), so JS-only changes ship without a new APK. Always clear the Metro cache and set the API URL explicitly — a cached transform from `expo start` can drop `EXPO_PUBLIC_API_URL` from the bundle:
+
+```bash
+cd mobile
+npm run prestart   # sync locales/ into mobile/locales
+EXPO_PUBLIC_API_URL=https://calmguide-production.up.railway.app npx eas-cli update --branch preview --environment preview --clear-cache --message "<what changed>"
+```
+
+Anything that adds a native module (a new Expo/React Native package with native code) needs a new APK build instead.
+
 ## RAG Pipeline
 
 CalmGuide uses Retrieval-Augmented Generation to ground Moment Coach responses in authoritative caregiving guidance. The pipeline scrapes, chunks, embeds, and stores content from trusted nonprofit and government sources.
