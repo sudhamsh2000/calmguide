@@ -61,11 +61,11 @@ export function VerificationCard({
       <Card variant="default" padding="md">
         <p className="text-sm font-semibold text-foreground mb-3">{t('verification.title')}</p>
         <p className="text-base text-foreground leading-relaxed mb-4">{pending.summary_text}</p>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button
             variant="primary"
             size="md"
-            className="flex-1"
+            className="flex-auto"
             onClick={handleApprove}
             aria-label={t('verification.looks_right')}
           >
@@ -74,7 +74,7 @@ export function VerificationCard({
           <Button
             variant="secondary"
             size="md"
-            className="flex-1"
+            className="flex-auto"
             onClick={handleFix}
             aria-label={t('verification.let_me_fix')}
           >
