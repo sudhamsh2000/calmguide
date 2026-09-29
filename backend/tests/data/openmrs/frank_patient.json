@@ -1,0 +1,117 @@
+{
+  "active": true,
+  "address": [
+    {
+      "city": "Springfield",
+      "extension": [
+        {
+          "extension": [
+            {
+              "url": "http://fhir.openmrs.org/ext/address#address1",
+              "valueString": "Maple Grove Memory Care, 1200 Birchwood Lane"
+            }
+          ],
+          "url": "http://fhir.openmrs.org/ext/address"
+        }
+      ],
+      "id": "2852e98a-001d-4209-99c6-16ac46270aa1",
+      "use": "home"
+    }
+  ],
+  "birthDate": "1932-03-14",
+  "deceasedBoolean": false,
+  "extension": [
+    {
+      "extension": [
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-type",
+          "valueString": "Telephone Number"
+        },
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-value",
+          "valueString": "555-0142"
+        }
+      ],
+      "url": "http://fhir.openmrs.org/ext/person-attribute"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-type",
+          "valueString": "Next of kin"
+        },
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-value",
+          "valueString": "Anna Kowalski (daughter)"
+        }
+      ],
+      "url": "http://fhir.openmrs.org/ext/person-attribute"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-type",
+          "valueString": "Military veteran"
+        },
+        {
+          "url": "http://fhir.openmrs.org/ext/person-attribute-value",
+          "valueBoolean": true
+        }
+      ],
+      "url": "http://fhir.openmrs.org/ext/person-attribute"
+    }
+  ],
+  "gender": "male",
+  "id": "fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+  "identifier": [
+    {
+      "extension": [
+        {
+          "url": "http://fhir.openmrs.org/ext/patient/identifier#location",
+          "valueReference": {
+            "display": "Ubuntu Hospital",
+            "reference": "Location/f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "type": "Location"
+          }
+        }
+      ],
+      "id": "759911fc-6b29-491a-b93d-b41d94ace771",
+      "type": {
+        "coding": [
+          {
+            "code": "05a29f94-c0ed-11e2-94be-8c13b969e334"
+          }
+        ],
+        "text": "OpenMRS ID"
+      },
+      "use": "official",
+      "value": "10001MJ"
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2026-09-29T12:53:11.000+00:00",
+    "versionId": "1790686391000"
+  },
+  "name": [
+    {
+      "family": "Kowalski",
+      "given": [
+        "Frank",
+        "Joseph"
+      ],
+      "id": "0a1c2fc6-e055-46fc-a0cd-0c0cc7c5a133",
+      "text": "Frank Joseph Kowalski"
+    }
+  ],
+  "resourceType": "Patient",
+  "telecom": [
+    {
+      "id": "b733c837-7fb8-44c7-a262-abe887c93e63",
+      "value": "555-0142"
+    }
+  ],
+  "text": {
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63</td></tr><tr><td>Identifier:</td><td><div>10001MJ</div></td></tr><tr><td>Active:</td><td>true</td></tr><tr><td>Name:</td><td> Frank Joseph <b>KOWALSKI </b></td></tr><tr><td>Telecom:</td><td> 555-0142 </td></tr><tr><td>Gender:</td><td>MALE</td></tr><tr><td>Birth Date:</td><td>14/03/1932</td></tr><tr><td>Deceased:</td><td>false</td></tr><tr><td>Address:</td><td><span>Springfield </span></td></tr></tbody></table></div>",
+    "status": "generated"
+  }
+}

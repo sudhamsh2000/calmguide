@@ -1,0 +1,1046 @@
+{
+  "entry": [
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/a22f256d-9e90-4dcd-9b1c-cb60fb653288",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:38+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2021-07-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 10.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "text": "At bedtime",
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/a148fed2-dd0c-48c0-a842-2ca7c6c06712",
+          "type": "Encounter"
+        },
+        "id": "a22f256d-9e90-4dcd-9b1c-cb60fb653288",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Donepezil 10mg",
+          "reference": "Medication/d7fb62f3-c9c1-4b39-9c8f-591c3fdeba05",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:38.000+00:00",
+          "versionId": "1790686478000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>a22f256d-9e90-4dcd-9b1c-cb60fb653288</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/d7fb62f3-c9c1-4b39-9c8f-591c3fdeba05\">Donepezil 10mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/a148fed2-dd0c-48c0-a842-2ca7c6c06712\">Encounter/a148fed2-dd0c-48c0-a842-2ca7c6c06712</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div>At bedtime</div></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2021-07-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/46eff2f8-bdba-4e63-83b3-34bac7c16d59",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:40+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2023-03-15T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 10.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Twice daily"
+                  },
+                  {
+                    "code": "160858",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229799001",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Twice daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/ccaa14f1-8537-4290-b090-62222deab5d1",
+          "type": "Encounter"
+        },
+        "id": "46eff2f8-bdba-4e63-83b3-34bac7c16d59",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Memantine 10mg",
+          "reference": "Medication/a7efeab7-e4cc-43b9-a305-4a05316caa2a",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:40.000+00:00",
+          "versionId": "1790686480000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>46eff2f8-bdba-4e63-83b3-34bac7c16d59</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/a7efeab7-e4cc-43b9-a305-4a05316caa2a\">Memantine 10mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/ccaa14f1-8537-4290-b090-62222deab5d1\">Encounter/ccaa14f1-8537-4290-b090-62222deab5d1</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div/></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2023-03-15 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/9238d124-81ab-4adc-bfcc-dd3b942f6fc9",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:41+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2022-01-10T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 50.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/1bc7a26a-bdd9-44bd-a2b0-8a6121579275",
+          "type": "Encounter"
+        },
+        "id": "9238d124-81ab-4adc-bfcc-dd3b942f6fc9",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Sertraline 50mg",
+          "reference": "Medication/ebd468e7-ec2a-4b3c-bd09-0324e465e7b1",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:41.000+00:00",
+          "versionId": "1790686481000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>9238d124-81ab-4adc-bfcc-dd3b942f6fc9</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/ebd468e7-ec2a-4b3c-bd09-0324e465e7b1\">Sertraline 50mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/1bc7a26a-bdd9-44bd-a2b0-8a6121579275\">Encounter/1bc7a26a-bdd9-44bd-a2b0-8a6121579275</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div/></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2022-01-10 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/da302b8d-0e35-4314-8207-4274c60dcf69",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:43+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2008-05-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 5.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/42feb43b-15d9-49c4-9a8f-d8345d732a74",
+          "type": "Encounter"
+        },
+        "id": "da302b8d-0e35-4314-8207-4274c60dcf69",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Amlodipine 5mg",
+          "reference": "Medication/00a789ff-da44-42b9-b929-3a069d98d3e1",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:43.000+00:00",
+          "versionId": "1790686483000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>da302b8d-0e35-4314-8207-4274c60dcf69</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/00a789ff-da44-42b9-b929-3a069d98d3e1\">Amlodipine 5mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/42feb43b-15d9-49c4-9a8f-d8345d732a74\">Encounter/42feb43b-15d9-49c4-9a8f-d8345d732a74</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div/></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2008-05-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/ebb97102-ab2b-41be-8f96-b037a0e9a819",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:45+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2015-09-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 0.4
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "text": "At bedtime",
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/11a281c8-2f6f-49b7-8249-5a74cf31325f",
+          "type": "Encounter"
+        },
+        "id": "ebb97102-ab2b-41be-8f96-b037a0e9a819",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Tamsulosin 0.4mg",
+          "reference": "Medication/066117df-85b6-4c2b-90c6-98f6b0d0e2ba",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:45.000+00:00",
+          "versionId": "1790686485000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>ebb97102-ab2b-41be-8f96-b037a0e9a819</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/066117df-85b6-4c2b-90c6-98f6b0d0e2ba\">Tamsulosin 0.4mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/11a281c8-2f6f-49b7-8249-5a74cf31325f\">Encounter/11a281c8-2f6f-49b7-8249-5a74cf31325f</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div>At bedtime</div></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2015-09-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/e16e1274-999b-4f82-8528-581805c29cd0",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:47+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2012-04-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 500.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "text": "With meals",
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Twice daily"
+                  },
+                  {
+                    "code": "160858",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229799001",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Twice daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/64148a38-76ae-4be2-80d8-125a5febfc46",
+          "type": "Encounter"
+        },
+        "id": "e16e1274-999b-4f82-8528-581805c29cd0",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Metformin 500mg",
+          "reference": "Medication/93ca30e3-de69-4ae5-bac7-adb434357b9e",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:47.000+00:00",
+          "versionId": "1790686487000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>e16e1274-999b-4f82-8528-581805c29cd0</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/93ca30e3-de69-4ae5-bac7-adb434357b9e\">Metformin 500mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/64148a38-76ae-4be2-80d8-125a5febfc46\">Encounter/64148a38-76ae-4be2-80d8-125a5febfc46</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div>With meals</div></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2012-04-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/c7e5ac29-0ff2-4be2-927c-ca8d36272769",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:49+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2016-06-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": true,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 650.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "text": "For knee pain",
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "162249AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Every six hours"
+                  },
+                  {
+                    "code": "162249",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "307468000",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Every six hours"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/dfcbbb44-1478-4447-8b27-2820980f7bb4",
+          "type": "Encounter"
+        },
+        "id": "c7e5ac29-0ff2-4be2-927c-ca8d36272769",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Acetaminophen 650mg",
+          "reference": "Medication/ffd22497-5400-492e-9909-28f00c226e25",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:49.000+00:00",
+          "versionId": "1790686489000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "active",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>c7e5ac29-0ff2-4be2-927c-ca8d36272769</td></tr><tr><td>Status:</td><td>ACTIVE</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/ffd22497-5400-492e-9909-28f00c226e25\">Acetaminophen 650mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/dfcbbb44-1478-4447-8b27-2820980f7bb4\">Encounter/dfcbbb44-1478-4447-8b27-2820980f7bb4</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div>For knee pain</div></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2016-06-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/3bc2857f-ef47-49a8-8ef4-57d827e765d1",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:51+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2025-10-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 25.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "text": "At bedtime",
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/167bc797-9172-42e5-96f0-a7fddc312e27",
+          "type": "Encounter"
+        },
+        "id": "3bc2857f-ef47-49a8-8ef4-57d827e765d1",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Quetiapine 25mg",
+          "reference": "Medication/dda20232-8609-4864-80cb-6c7b5cbe1006",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:51.000+00:00",
+          "versionId": "1790686491000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "cancelled",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>3bc2857f-ef47-49a8-8ef4-57d827e765d1</td></tr><tr><td>Status:</td><td>CANCELLED</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/dda20232-8609-4864-80cb-6c7b5cbe1006\">Quetiapine 25mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/167bc797-9172-42e5-96f0-a7fddc312e27\">Encounter/167bc797-9172-42e5-96f0-a7fddc312e27</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div>At bedtime</div></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2025-10-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/890eacac-c398-4449-b749-aee08f5977b8",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:54+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2025-06-01T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 5.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Once daily"
+                  },
+                  {
+                    "code": "160862",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229797004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Once daily"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/11afae36-8bb6-4512-998d-886b04ad0d65",
+          "type": "Encounter"
+        },
+        "id": "890eacac-c398-4449-b749-aee08f5977b8",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Oxybutynin 5mg",
+          "reference": "Medication/ada52c3a-ab2c-4d77-bdaa-bc378ab68777",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:54.000+00:00",
+          "versionId": "1790686494000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "cancelled",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>890eacac-c398-4449-b749-aee08f5977b8</td></tr><tr><td>Status:</td><td>CANCELLED</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/ada52c3a-ab2c-4d77-bdaa-bc378ab68777\">Oxybutynin 5mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/11afae36-8bb6-4512-998d-886b04ad0d65\">Encounter/11afae36-8bb6-4512-998d-886b04ad0d65</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div/></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2025-06-01 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest/1ad3cda3-a0aa-421b-9ba6-b66cc2ab1a77",
+      "resource": {
+        "authoredOn": "2026-09-29T12:54:58+00:00",
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 0,
+          "quantity": {
+            "code": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "unit": "Tablet",
+            "value": 30.0
+          },
+          "validityPeriod": {
+            "start": "2026-08-04T12:00:00+00:00"
+          }
+        },
+        "dosageInstruction": [
+          {
+            "asNeededBoolean": false,
+            "doseAndRate": [
+              {
+                "doseQuantity": {
+                  "code": "161553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "unit": "Milligram",
+                  "value": 100.0
+                }
+              }
+            ],
+            "route": {
+              "coding": [
+                {
+                  "code": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Oral"
+                },
+                {
+                  "code": "160240",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "26643006",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Oral"
+            },
+            "timing": {
+              "code": {
+                "coding": [
+                  {
+                    "code": "160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Twice daily"
+                  },
+                  {
+                    "code": "160858",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "229799001",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Twice daily"
+              },
+              "repeat": {
+                "duration": 5,
+                "durationUnit": "d"
+              }
+            }
+          }
+        ],
+        "encounter": {
+          "reference": "Encounter/0607c50a-5963-4eab-adba-88f2414a96b7",
+          "type": "Encounter"
+        },
+        "id": "1ad3cda3-a0aa-421b-9ba6-b66cc2ab1a77",
+        "intent": "order",
+        "medicationReference": {
+          "display": "Nitrofurantoin 100mg",
+          "reference": "Medication/ebcd4bb9-0439-43cd-96f5-6e5ee7c1f426",
+          "type": "Medication"
+        },
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:58.000+00:00",
+          "versionId": "1790686498000"
+        },
+        "priority": "routine",
+        "requester": {
+          "display": "Super User",
+          "identifier": {
+            "value": "admin"
+          },
+          "reference": "Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89",
+          "type": "Practitioner"
+        },
+        "resourceType": "MedicationRequest",
+        "status": "stopped",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>1ad3cda3-a0aa-421b-9ba6-b66cc2ab1a77</td></tr><tr><td>Status:</td><td>STOPPED</td></tr><tr><td>Intent:</td><td>ORDER</td></tr><tr><td>Priority:</td><td>ROUTINE</td></tr><tr><td>Medication:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Medication/ebcd4bb9-0439-43cd-96f5-6e5ee7c1f426\">Nitrofurantoin 100mg</a></td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Encounter:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Encounter/0607c50a-5963-4eab-adba-88f2414a96b7\">Encounter/0607c50a-5963-4eab-adba-88f2414a96b7</a></td></tr><tr><td>Authored On:</td><td>29/09/2026</td></tr><tr><td>Requester:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/3a5caa04-cc7b-434b-ab92-830c74ee3d89\">Super User</a></td></tr><tr><td>Note:</td><td><div/></td></tr><tr><td>Dosage Instruction:</td><td><div/></td></tr><tr><td>Dispense Requests:</td><td><table class=\"subPropertyTable\"><tbody><tr><th>-</th><th>Initial Fill</th><th>Dispense Interval</th><th>Validity Period</th><th>Number of Repeats Allowed</th><th>Quantity</th><th>Expected Supply Duration</th><th>Performer</th></tr><tr><td>*</td><td><div> Quantity: </div><div> Duration: </div></td><td/><td> 2026-08-04 12:00:00.0 - ? </td><td> 0 </td><td> 30.0 Tablet </td><td/><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/null\"/></td></tr></tbody></table></td></tr></tbody></table></div>",
+          "status": "generated"
+        }
+      }
+    }
+  ],
+  "id": "601d74db-a585-4ccf-9254-4c95c4d9ad98",
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/MedicationRequest?_count=100&patient=fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63"
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2026-09-29T12:57:01.603+00:00"
+  },
+  "resourceType": "Bundle",
+  "total": 10,
+  "type": "searchset"
+}

@@ -13,6 +13,7 @@ from app.config import get_settings
 from app.db import get_session
 from app.models.behavioral_dossier import BehavioralDossier
 from app.models.care_change_event import CareChangeEvent
+from app.models.clinical_link import ClinicalLink
 from app.models.conversation import Conversation
 from app.models.daily_checkin import DailyCheckin
 from app.models.facility_patient_link import FacilityPatientLink
@@ -32,6 +33,7 @@ from app.schemas.profile import (
     ProfileResponse,
     ProfileUpdate,
 )
+from app.services import clinical_context
 from app.services.auth import hash_access_code
 from app.services.crypto import decrypt, encrypt
 
@@ -234,11 +236,13 @@ async def delete_profile(
         ProfileInsights,
         DailyCheckin,
         StaffPatientAssignment,
+        ClinicalLink,
     ):
         await session.execute(delete(model).where(model.profile_id == profile.id))
 
     await session.execute(delete(Profile).where(Profile.id == profile.id))
     await session.commit()
+    clinical_context.evict(profile.id)
 
 
 @router.put(

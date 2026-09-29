@@ -62,6 +62,34 @@ A care change was recorded {{ care_change.days_ago }} day(s) ago. {{ patient_nam
 **CRITICAL: The strategies and concerns above are from {{ patient_name }}'s real care history. Your RIGHT NOW section MUST include at least 2 of these specific strategies by name. Do NOT give generic dementia advice when you have {{ patient_name }}'s proven strategies available. If a safety concern mentions a specific language (e.g., Spanish), instruct the caregiver to use that language.**
 {% endif %}
 
+{% if clinical and clinical.status in ("ok", "partial") %}
+## Clinical Record (from {{ patient_name }}'s care team)
+{% if clinical.conditions %}
+- **Conditions**: {{ clinical.conditions | join("; ") }}
+{% endif %}
+{% if clinical.medications %}
+- **Current medications**: {{ clinical.medications | join("; ") }}
+{% endif %}
+{% if clinical.allergies %}
+- **Allergies**: {{ clinical.allergies | join("; ") }}
+{% endif %}
+{% if clinical.observations %}
+- **Recent readings (last 14 days)**:
+{% for item in clinical.observations %}
+  - {{ item.label }}: {{ item.latest }} ({{ item.when }}){% if item.range %}; 14-day range {{ item.range }}{% endif %}
+
+{% endfor %}
+{% endif %}
+
+How to use this record:
+- It is background. Do not recite it back to the caregiver or list {{ patient_name }}'s diagnoses or medications.
+- If the situation could plausibly relate to a listed condition or a recent reading (for example sudden confusion with a history of urinary tract infections, a new fever, or pain with arthritis), say in WHEN TO CALL FOR HELP that the caregiver should contact {{ patient_name }}'s doctor, and name the specific reason in plain words.
+- Never suggest starting, stopping, skipping, changing, or timing a medication, and never mention a dose. Medication questions go to {{ patient_name }}'s doctor or pharmacist.
+- Never interpret readings as a diagnosis.
+{% elif clinical and clinical.status == "unavailable" %}
+The clinical record couldn't be reached for this message; don't mention it unless the caregiver asks.
+{% endif %}
+
 {% if effective_interventions %}
 ## What Has Worked for This Patient
 

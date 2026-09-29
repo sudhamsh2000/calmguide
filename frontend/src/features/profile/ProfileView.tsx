@@ -19,6 +19,7 @@ import { ProfileAvatar } from '@/components/ui/ProfileAvatar';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Switch } from '@/components/ui/Switch';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, type SupportedLocale } from '@/lib/locale';
+import { OpenMRSConnection } from './OpenMRSConnection';
 
 const CONNECTED_SERVICES = [
   {
@@ -391,40 +392,53 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
             </div>
           </section>
 
-          {/* Connected services — no integrations exist yet, so Connect
-           * says so in place rather than pretending to start a flow. */}
+          {/* Connected services — OpenMRS links the person's health record
+           * when the server has it enabled (and says "Coming soon" when not);
+           * Fitbit isn't built yet, so its Connect says so in place. */}
           <section aria-labelledby="services-heading" className="card-shell px-6 py-5">
             <h2 id="services-heading" className="text-xl font-semibold text-foreground">
               {t('services.title')}
             </h2>
             <p className="mt-1 text-sm text-foreground-muted">{t('services.description')}</p>
             <ul className="mt-2">
-              {CONNECTED_SERVICES.map((service, index) => (
-                <li
-                  key={service.id}
-                  className={`flex items-center gap-4 py-2.5 ${
-                    index > 0 ? 'border-t border-theme-soft' : ''
-                  }`}
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
-                    {service.icon}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-base font-semibold text-foreground">{service.name}</p>
-                    <p className="text-[13px] text-foreground-muted">{t(service.hintKey)}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setPendingService(service.id)}
-                    disabled={pendingService === service.id}
-                    className="min-h-[44px] shrink-0 rounded-xl border border-border dark:border-theme-soft bg-surface px-5 text-sm font-semibold text-accentSky transition-colors hover:bg-accentSky-soft disabled:cursor-default disabled:text-foreground-muted disabled:hover:bg-surface focus-ring"
+              {CONNECTED_SERVICES.map((service, index) =>
+                service.id === 'openmrs' ? (
+                  <li key={service.id} className={index > 0 ? 'border-t border-theme-soft' : ''}>
+                    <OpenMRSConnection
+                      accessCode={accessCode}
+                      patientName={patientName}
+                      name={service.name}
+                      hint={t(service.hintKey)}
+                      icon={service.icon}
+                    />
+                  </li>
+                ) : (
+                  <li
+                    key={service.id}
+                    className={`flex items-center gap-4 py-2.5 ${
+                      index > 0 ? 'border-t border-theme-soft' : ''
+                    }`}
                   >
-                    {pendingService === service.id
-                      ? t('services.coming_soon')
-                      : t('services.connect')}
-                  </button>
-                </li>
-              ))}
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                      {service.icon}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base font-semibold text-foreground">{service.name}</p>
+                      <p className="text-[13px] text-foreground-muted">{t(service.hintKey)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPendingService(service.id)}
+                      disabled={pendingService === service.id}
+                      className="min-h-[44px] shrink-0 rounded-xl border border-border dark:border-theme-soft bg-surface px-5 text-sm font-semibold text-accentSky transition-colors hover:bg-accentSky-soft disabled:cursor-default disabled:text-foreground-muted disabled:hover:bg-surface focus-ring"
+                    >
+                      {pendingService === service.id
+                        ? t('services.coming_soon')
+                        : t('services.connect')}
+                    </button>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         </div>

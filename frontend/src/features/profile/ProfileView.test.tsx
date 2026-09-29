@@ -44,9 +44,17 @@ const mockProfile = {
   safety_concerns: [],
 };
 
-vi.mock('@/lib/api', () => ({
-  getProfile: vi.fn(() => Promise.resolve(mockProfile)),
-}));
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/api')>();
+  return {
+    ApiError: actual.ApiError,
+    getProfile: vi.fn(() => Promise.resolve(mockProfile)),
+    // Health record linking switched off on the server — the default today.
+    getClinicalLink: vi.fn(() =>
+      Promise.reject(new actual.ApiError('disabled', 404, { code: 'FEATURE_DISABLED' })),
+    ),
+  };
+});
 
 // ProfileView renders a real <ThemeToggle>, whose effect calls
 // window.matchMedia() (via @/lib/theme's initTheme/resolveTheme) — not

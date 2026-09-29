@@ -96,6 +96,25 @@ async def lifespan(app: FastAPI):
     else:
         app.state.llm_provider = primary_provider
 
+    # OpenMRS clinical context (optional). One shared client for the process;
+    # routes and the coach treat a missing client as "feature unavailable".
+    app.state.openmrs = None
+    if settings.OPENMRS_ENABLED:
+        if settings.OPENMRS_BASE_URL and settings.OPENMRS_USERNAME:
+            from app.services.openmrs_client import OpenMRSClient
+
+            app.state.openmrs = OpenMRSClient(
+                settings.OPENMRS_BASE_URL,
+                settings.OPENMRS_USERNAME,
+                settings.OPENMRS_PASSWORD,
+            )
+            logging.getLogger(__name__).info("OpenMRS clinical context enabled")
+        else:
+            logging.getLogger(__name__).warning(
+                "OPENMRS_ENABLED is set but OPENMRS_BASE_URL/OPENMRS_USERNAME are missing — "
+                "health record linking is unavailable."
+            )
+
     # Warm up RAG vector store (creates table/indexes if needed).
     # Non-fatal: app works without RAG if not configured.
     try:
@@ -229,6 +248,9 @@ async def lifespan(app: FastAPI):
 
     await drain_background_tasks()
 
+    if app.state.openmrs is not None:
+        await app.state.openmrs.aclose()
+
     await dispose_engine()
 
 
@@ -314,6 +336,7 @@ def create_app() -> FastAPI:
     from app.routers.care_changes import router as care_changes_router
     from app.routers.checkin import router as checkin_router
     from app.routers.checkin_daily import router as checkin_daily_router
+    from app.routers.clinical_link import router as clinical_link_router
     from app.routers.coach import router as coach_router
     from app.routers.facility import router as facility_router
     from app.routers.facility_audit import router as facility_audit_router
@@ -336,6 +359,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(profile_router, prefix="/api")
+    app.include_router(clinical_link_router, prefix="/api")
     app.include_router(coach_router, prefix="/api")
     app.include_router(learn_router, prefix="/api")
     app.include_router(checkin_router, prefix="/api")

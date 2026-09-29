@@ -15,7 +15,9 @@ from sqlalchemy import func as sa_func
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.db import get_session
+from app.models.clinical_link import ClinicalLink
 from app.models.conversation import Conversation
 from app.models.profile import Profile
 from app.models.staff import Staff
@@ -36,6 +38,7 @@ from app.services.acute_change_screen import (
 )
 from app.services.auth import hash_access_code
 from app.services.availability import record_llm_failure, record_llm_success
+from app.services.clinical_context import ClinicalSummary, get_clinical_summary
 from app.services.crypto import decrypt, encrypt
 from app.services.prompt import (
     get_request_locale_header,
@@ -132,6 +135,27 @@ def _spawn_background(coro, label: str) -> None:
     task = asyncio.create_task(_guarded())
     _BACKGROUND_TASKS.add(task)
     task.add_done_callback(_BACKGROUND_TASKS.discard)
+
+
+async def _record_clinical_sync(profile_id: str, status: str) -> None:
+    """Note the latest OpenMRS fetch outcome on the link row (shown on the
+    Care Profile card). Runs detached so it never delays the response."""
+    from app.db import get_session_factory
+
+    factory = get_session_factory()
+    async with factory() as bg_session:
+        result = await bg_session.execute(
+            select(ClinicalLink).where(
+                ClinicalLink.profile_id == profile_id, ClinicalLink.source == "openmrs"
+            )
+        )
+        link = result.scalar_one_or_none()
+        if link is None:
+            return
+        link.last_status = status
+        if status in ("ok", "partial"):
+            link.last_synced_at = datetime.now(UTC)
+        await bg_session.commit()
 
 
 def _short_circuit_safety_response(
@@ -703,6 +727,26 @@ async def coach_chat(
             session_id,
         )
 
+    # OpenMRS clinical context — only reached once the safety gate has allowed
+    # the LLM, so EMERGENCY/HIGH turns never wait on it. The link row is read
+    # here, before the gather, because _db_context already owns the request
+    # session and an AsyncSession can't run statements concurrently.
+    settings = get_settings()
+    openmrs_client = getattr(request.app.state, "openmrs", None)
+    clinical_link_ref: str | None = None
+    if settings.OPENMRS_ENABLED and openmrs_client is not None:
+        try:
+            link_result = await session.execute(
+                select(ClinicalLink).where(
+                    ClinicalLink.profile_id == profile.id, ClinicalLink.source == "openmrs"
+                )
+            )
+            link = link_result.scalar_one_or_none()
+            if link is not None:
+                clinical_link_ref = decrypt(link.external_ref)
+        except Exception as link_exc:
+            logger.warning("Clinical link lookup failed for %s: %s", profile.id, link_exc)
+
     # Build system prompt with profile context + transient patient name
     llm = request.app.state.llm_provider
     model_override = resolve_model_for_locale(locale_code)
@@ -835,10 +879,34 @@ async def coach_chat(
 
         return ctx
 
-    # Overlap the RAG pipeline (LLM + vector store) with the DB context reads so
-    # a 3am caregiver waits for max(rag, db) instead of their sum before the
-    # first token streams.
-    rag_context, _db_ctx = await asyncio.gather(_rag_pipeline(), _db_context())
+    async def _clinical_context() -> ClinicalSummary:
+        """The patient's OpenMRS summary, if a record is linked. Uses only the
+        HTTP client (never the request session), so it runs alongside the DB
+        reads. Bounded by OPENMRS_TIMEOUT_SECONDS and never raises."""
+        if clinical_link_ref is None or openmrs_client is None:
+            return ClinicalSummary.not_linked()
+        return await get_clinical_summary(
+            profile.id,
+            clinical_link_ref,
+            openmrs_client,
+            timeout_seconds=settings.OPENMRS_TIMEOUT_SECONDS,
+            cache_ttl_seconds=settings.OPENMRS_CACHE_TTL_SECONDS,
+        )
+
+    # Overlap the RAG pipeline (LLM + vector store), the DB context reads and
+    # the OpenMRS fetch so a 3am caregiver waits for the slowest of them
+    # instead of their sum before the first token streams.
+    rag_context, _db_ctx, clinical = await asyncio.gather(
+        _rag_pipeline(), _db_context(), _clinical_context()
+    )
+    # Names only ("Donepezil — once daily" → "Donepezil"), for the output check.
+    medication_names = [m.split(" — ", 1)[0] for m in clinical.medications]
+    if clinical.status != "not_linked":
+        logger.info("Clinical context: status=%s session=%s", clinical.status, session_id)
+        _spawn_background(
+            _record_clinical_sync(profile.id, clinical.status),
+            label=f"clinical-sync:{session_id}",
+        )
     cross_patient_strategies = _db_ctx["cross_patient_strategies"]
     dossier_text = _db_ctx["dossier_text"]
     contraindicated_list = _db_ctx["contraindicated_list"]
@@ -868,6 +936,7 @@ async def coach_chat(
         effective_interventions=effective_list,
         frequency_trends=frequency_trends,
         care_change=_db_ctx["care_change"],
+        clinical=clinical,
     )
 
     # Get conversation history for context
@@ -967,7 +1036,9 @@ async def coach_chat(
             else:
                 # Post-stream validation
                 assistant_text = "".join(full_response)
-                validation = validate_response_quality(assistant_text, locale_code)
+                validation = validate_response_quality(
+                    assistant_text, locale_code, medication_names
+                )
                 if not validation.is_valid:
                     logger.warning(
                         "Coach response failed validation (%s), repairing", validation.reason
@@ -980,6 +1051,7 @@ async def coach_chat(
                             locale_code=locale_code,
                             language=language,
                             text=assistant_text,
+                            medication_names=medication_names,
                         )
                     except Exception as exc:
                         logger.error("Response repair failed for session %s: %s", session_id, exc)

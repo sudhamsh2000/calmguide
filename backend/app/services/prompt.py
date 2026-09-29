@@ -4,6 +4,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from app.services.clinical_context import ClinicalSummary
+
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
 _env = Environment(
@@ -137,6 +139,7 @@ def render_coach_prompt(
     effective_interventions: list[dict] | None = None,
     frequency_trends: dict | None = None,
     care_change: dict | None = None,
+    clinical: ClinicalSummary | None = None,
 ) -> str:
     template = _env.get_template("coach_system.jinja2")
     return template.render(
@@ -157,6 +160,7 @@ def render_coach_prompt(
         effective_interventions=effective_interventions or [],
         frequency_trends=frequency_trends or {},
         care_change=care_change or None,
+        clinical=clinical,
     )
 
 

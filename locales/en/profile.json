@@ -183,6 +183,36 @@
     "openmrs_hint": "Sync clinical information",
     "fitbit_hint": "Sync activity and health data",
     "connect": "Connect",
-    "coming_soon": "Coming soon"
+    "coming_soon": "Coming soon",
+    "openmrs": {
+      "loading": "Checking connection…",
+      "explain": "Link {name}'s record so Moment Coach can take their conditions, medications and recent readings into account. It's only used on everyday questions, never in an emergency.",
+      "patient_id_label": "OpenMRS patient ID",
+      "patient_id_hint": "The long ID from the patient's OpenMRS record. Ask their care team if you don't have it.",
+      "looking_up": "Looking up…",
+      "confirm_title": "Link to {name}?",
+      "confirm_title_unnamed": "Link this record?",
+      "confirm_body": "Check this is the right person before linking.",
+      "link": "Link",
+      "linking": "Linking…",
+      "cancel": "Cancel",
+      "connected_badge": "Connected",
+      "synced": "Connected · synced {when}",
+      "never": "not yet",
+      "test": "Test connection",
+      "testing": "Testing…",
+      "try_again": "Try again",
+      "test_ok": "Record found: {conditions} conditions, {medications} medications, {allergies} allergies.",
+      "unreachable_short": "Can't reach record",
+      "unreachable": "CalmGuide couldn't reach the health record. Moment Coach will keep working without it.",
+      "disconnect": "Disconnect",
+      "disconnect_confirm": "Disconnect the health record? Moment Coach will stop using it. You can link it again at any time.",
+      "errors": {
+        "invalid_id": "That doesn't look like an OpenMRS patient ID. Check it and try again.",
+        "not_found": "No patient with that ID was found in OpenMRS.",
+        "unreachable": "CalmGuide couldn't reach the health record right now. Try again in a moment.",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
   }
 }

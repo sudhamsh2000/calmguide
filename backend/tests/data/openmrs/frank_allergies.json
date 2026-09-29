@@ -1,0 +1,359 @@
+{
+  "entry": [
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/AllergyIntolerance/5ab92ab0-363e-4b36-bd7d-86a9a27cee2a",
+      "resource": {
+        "category": [
+          "medication"
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "display": "Active",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "81725AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Penicillin G"
+            },
+            {
+              "code": "81725",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "774826003",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Penicillin G"
+        },
+        "criticality": "unable-to-assess",
+        "id": "5ab92ab0-363e-4b36-bd7d-86a9a27cee2a",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:35.000+00:00",
+          "versionId": "1790686475000"
+        },
+        "note": [
+          {
+            "text": "Hives"
+          }
+        ],
+        "patient": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "code": "111061AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Hives"
+                  },
+                  {
+                    "code": "111061",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "247472004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Hives"
+              }
+            ],
+            "severity": "moderate",
+            "substance": {
+              "coding": [
+                {
+                  "code": "81725AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Penicillin G"
+                },
+                {
+                  "code": "81725",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "774826003",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Penicillin G"
+            }
+          }
+        ],
+        "recordedDate": "2026-09-29T12:54:35+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "AllergyIntolerance",
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>5ab92ab0-363e-4b36-bd7d-86a9a27cee2a</td></tr><tr><td>Clinical Status:</td><td>Active</td></tr><tr><td>Verification Status:</td><td>Confirmed</td></tr><tr><td>Type:</td><td>ALLERGY</td></tr><tr><td>Category:</td><td> Enumeration[medication] </td></tr><tr><td>Criticality:</td><td>UNABLETOASSESS</td></tr><tr><td>Code:</td><td>Penicillin G</td></tr><tr><td>Patient:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Hives</div></td></tr><tr><td>Reaction:</td><td/></tr><tr><td>Substance:</td><td>Penicillin G</td></tr><tr><td>Manifestation:</td><td><div>Hives</div></td></tr><tr><td>Severity:</td><td>MODERATE</td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "type": "allergy",
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "Confirmed",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+            }
+          ],
+          "text": "Confirmed"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/AllergyIntolerance/16cc6d52-d59f-44c0-9580-4051568da56a",
+      "resource": {
+        "category": [
+          "medication"
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "display": "Active",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "73667AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Codeine"
+            },
+            {
+              "code": "73667",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "85990009",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Codeine"
+        },
+        "criticality": "high",
+        "id": "16cc6d52-d59f-44c0-9580-4051568da56a",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:35.000+00:00",
+          "versionId": "1790686475000"
+        },
+        "note": [
+          {
+            "text": "Severe confusion and agitation"
+          }
+        ],
+        "patient": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "code": "121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Mental status change"
+                  },
+                  {
+                    "code": "121677",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "419284004",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Mental status change"
+              }
+            ],
+            "severity": "severe",
+            "substance": {
+              "coding": [
+                {
+                  "code": "73667AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Codeine"
+                },
+                {
+                  "code": "73667",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "85990009",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Codeine"
+            }
+          }
+        ],
+        "recordedDate": "2026-09-29T12:54:35+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "AllergyIntolerance",
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>16cc6d52-d59f-44c0-9580-4051568da56a</td></tr><tr><td>Clinical Status:</td><td>Active</td></tr><tr><td>Verification Status:</td><td>Confirmed</td></tr><tr><td>Type:</td><td>ALLERGY</td></tr><tr><td>Category:</td><td> Enumeration[medication] </td></tr><tr><td>Criticality:</td><td>HIGH</td></tr><tr><td>Code:</td><td>Codeine</td></tr><tr><td>Patient:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Severe confusion and agitation</div></td></tr><tr><td>Reaction:</td><td/></tr><tr><td>Substance:</td><td>Codeine</td></tr><tr><td>Manifestation:</td><td><div>Mental status change</div></td></tr><tr><td>Severity:</td><td>SEVERE</td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "type": "allergy",
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "Confirmed",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+            }
+          ],
+          "text": "Confirmed"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/AllergyIntolerance/1362c10f-9c58-4caf-a36f-3fbc44b6559d",
+      "resource": {
+        "category": [
+          "medication"
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "display": "Active",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+            }
+          ],
+          "text": "Active"
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "105281AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Sulfamethoxazole / trimethoprim"
+            },
+            {
+              "code": "105281",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "777642002",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Sulfamethoxazole / trimethoprim"
+        },
+        "criticality": "low",
+        "id": "1362c10f-9c58-4caf-a36f-3fbc44b6559d",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:36.000+00:00",
+          "versionId": "1790686476000"
+        },
+        "note": [
+          {
+            "text": "Rash"
+          }
+        ],
+        "patient": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "code": "512AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "display": "Rash"
+                  },
+                  {
+                    "code": "512",
+                    "system": "https://cielterminology.org"
+                  },
+                  {
+                    "code": "271807003",
+                    "system": "http://snomed.info/sct/"
+                  }
+                ],
+                "text": "Rash"
+              }
+            ],
+            "severity": "mild",
+            "substance": {
+              "coding": [
+                {
+                  "code": "105281AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "Sulfamethoxazole / trimethoprim"
+                },
+                {
+                  "code": "105281",
+                  "system": "https://cielterminology.org"
+                },
+                {
+                  "code": "777642002",
+                  "system": "http://snomed.info/sct/"
+                }
+              ],
+              "text": "Sulfamethoxazole / trimethoprim"
+            }
+          }
+        ],
+        "recordedDate": "2026-09-29T12:54:36+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "AllergyIntolerance",
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>1362c10f-9c58-4caf-a36f-3fbc44b6559d</td></tr><tr><td>Clinical Status:</td><td>Active</td></tr><tr><td>Verification Status:</td><td>Confirmed</td></tr><tr><td>Type:</td><td>ALLERGY</td></tr><tr><td>Category:</td><td> Enumeration[medication] </td></tr><tr><td>Criticality:</td><td>LOW</td></tr><tr><td>Code:</td><td>Sulfamethoxazole / trimethoprim</td></tr><tr><td>Patient:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Rash</div></td></tr><tr><td>Reaction:</td><td/></tr><tr><td>Substance:</td><td>Sulfamethoxazole / trimethoprim</td></tr><tr><td>Manifestation:</td><td><div>Rash</div></td></tr><tr><td>Severity:</td><td>MILD</td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "type": "allergy",
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "Confirmed",
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+            }
+          ],
+          "text": "Confirmed"
+        }
+      }
+    }
+  ],
+  "id": "cc54649e-da05-43da-bfc6-ad101fb5dd44",
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/AllergyIntolerance?_count=100&patient=fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63"
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2026-09-29T12:57:00.719+00:00"
+  },
+  "resourceType": "Bundle",
+  "total": 3,
+  "type": "searchset"
+}

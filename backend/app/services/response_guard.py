@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from app.services.llm_provider import LLMProvider
@@ -205,7 +206,52 @@ def validate_response_respect(text: str, locale_code: str = "en") -> ValidationR
     return ValidationResult(True)
 
 
-def validate_response_quality(text: str, locale_code: str) -> ValidationResult:
+# Dosing language that must never sit next to one of the patient's own
+# medications (from the linked OpenMRS record). English-only for now; the
+# prompt's no-medication-advice rule remains the primary control.
+_DOSING_ACTION = re.compile(
+    r"\b(increase|increasing|reduce|reducing|lower|raise|stop|stopping|skip|skipping|"
+    r"double|halve|cut back|discontinue|hold off|extra dose|another dose|extra one|"
+    r"another one|more of|less of|give (?:him|her|them|\w+) (?:an? )?(?:extra|another|more)|"
+    r"take (?:an? )?(?:extra|another|more))\b",
+    re.IGNORECASE,
+)
+_DOSING_UNIT = re.compile(
+    r"\b(?:\d+(?:\.\d+)?\s*(?:mg|mcg|ml)|milligrams?|tablets?|pills?|capsules?)\b", re.IGNORECASE
+)
+_CLINICIAN_REFERRAL = re.compile(
+    r"\b(doctor|pharmacist|nurse|clinician|prescriber|care team)\b", re.I
+)
+_NEGATED = re.compile(r"\b(don't|do not|never|shouldn't|should not|without)\b", re.IGNORECASE)
+
+
+def validate_medication_safety(text: str, medication_names: Sequence[str]) -> ValidationResult:
+    """Flag a sentence that pairs a listed medication with dosing language.
+
+    "Give Frank an extra 5 mg of donepezil" fails. "Ask Frank's doctor about
+    his donepezil" passes, as does a negated referral like "don't stop his
+    donepezil without asking his doctor".
+    """
+    names = [n.strip() for n in medication_names if n and len(n.strip()) >= 3]
+    if not names:
+        return ValidationResult(True)
+    name_pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in names) + r")\b", re.I)
+    for sentence in re.split(r"(?<=[.!?])\s+|\n+", _strip_machine_markers(text)):
+        medication = name_pattern.search(sentence)
+        if not medication:
+            continue
+        if _DOSING_UNIT.search(sentence):
+            return ValidationResult(False, f"medication_dosing:{medication.group()}")
+        if _DOSING_ACTION.search(sentence) and not (
+            _NEGATED.search(sentence) and _CLINICIAN_REFERRAL.search(sentence)
+        ):
+            return ValidationResult(False, f"medication_dosing:{medication.group()}")
+    return ValidationResult(True)
+
+
+def validate_response_quality(
+    text: str, locale_code: str, medication_names: Sequence[str] = ()
+) -> ValidationResult:
     language_validation = validate_response_language(text, locale_code)
     if not language_validation.is_valid:
         return language_validation
@@ -214,14 +260,30 @@ def validate_response_quality(text: str, locale_code: str) -> ValidationResult:
     if not respect_validation.is_valid:
         return respect_validation
 
+    medication_validation = validate_medication_safety(text, medication_names)
+    if not medication_validation.is_valid:
+        return medication_validation
+
     return ValidationResult(True)
 
 
-def build_repair_prompt(language: str, locale_code: str, mode: str, original_text: str) -> str:
+def build_repair_prompt(
+    language: str,
+    locale_code: str,
+    mode: str,
+    original_text: str,
+    medication_names: Sequence[str] = (),
+) -> str:
     from app.services.prompt import LOCALE_TO_LANGUAGE_CONSTRAINT
 
     constraint = LOCALE_TO_LANGUAGE_CONSTRAINT.get(locale_code.lower(), "")
     constraint_block = f"\n\nLanguage-specific rules:\n{constraint}\n" if constraint else ""
+    medication_block = (
+        "Remove any suggestion to start, stop, skip, change, or time a medication, and any "
+        "dose or amount. Replace it with advice to contact the doctor or pharmacist.\n"
+        if medication_names
+        else ""
+    )
 
     return (
         f"You are repairing a CalmGuide {mode} response.\n"
@@ -232,6 +294,7 @@ def build_repair_prompt(language: str, locale_code: str, mode: str, original_tex
         "Do NOT invent words. If unsure of a word, rephrase the sentence simply.\n"
         "Use respectful, dignity-preserving language for both the caregiver and the person receiving care.\n"
         "Do not use insulting, coercive, belittling, or blameful wording.\n"
+        f"{medication_block}"
         f"{constraint_block}\n"
         f"Original response:\n{original_text}"
     )
@@ -244,16 +307,18 @@ async def guard_response_text(
     locale_code: str,
     language: str,
     text: str,
+    medication_names: Sequence[str] = (),
 ) -> str:
-    validation = validate_response_quality(text, locale_code)
+    validation = validate_response_quality(text, locale_code, medication_names)
     if validation.is_valid:
         return text
 
+    repair_prompt = build_repair_prompt(language, locale_code, mode, text, medication_names)
     repaired_text = await llm.completion(
         "You fix multilingual output quality issues for CalmGuide.",
-        [{"role": "user", "content": build_repair_prompt(language, locale_code, mode, text)}],
+        [{"role": "user", "content": repair_prompt}],
     )
-    repaired_validation = validate_response_quality(repaired_text, locale_code)
+    repaired_validation = validate_response_quality(repaired_text, locale_code, medication_names)
     if repaired_validation.is_valid:
         return repaired_text
 

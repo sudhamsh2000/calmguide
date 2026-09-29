@@ -186,6 +186,66 @@ export async function updateProfile(
   });
 }
 
+// ── Health record (OpenMRS) link ────────────────────────────────────────────
+// Every route 404s with code FEATURE_DISABLED when the server has OpenMRS
+// switched off; the Care Profile then keeps showing "Coming soon".
+
+export interface ClinicalLinkStatus {
+  linked: boolean;
+  source: string;
+  linked_at: string | null;
+  last_synced_at: string | null;
+  last_status: 'ok' | 'partial' | 'unavailable' | 'not_found' | null;
+  patient_ref_hint: string | null;
+}
+
+export interface ClinicalLinkTestResult {
+  status: 'ok' | 'partial' | 'unavailable';
+  conditions: number;
+  medications: number;
+  allergies: number;
+  observations: number;
+}
+
+const clinicalLinkPath = (accessCode: string) =>
+  `/api/profiles/${encodeURIComponent(accessCode)}/clinical-link`;
+
+export async function getClinicalLink(accessCode: string): Promise<ClinicalLinkStatus> {
+  return request<ClinicalLinkStatus>(clinicalLinkPath(accessCode));
+}
+
+/** Looks the patient up without linking, so the caregiver can confirm it's the
+ * right person. The name is returned once and never stored. */
+export async function previewClinicalLink(
+  accessCode: string,
+  patientUuid: string,
+): Promise<{ display_name: string }> {
+  return request<{ display_name: string }>(`${clinicalLinkPath(accessCode)}/preview`, {
+    method: 'POST',
+    body: JSON.stringify({ patient_uuid: patientUuid }),
+  });
+}
+
+export async function linkClinicalRecord(
+  accessCode: string,
+  patientUuid: string,
+): Promise<ClinicalLinkStatus> {
+  return request<ClinicalLinkStatus>(clinicalLinkPath(accessCode), {
+    method: 'PUT',
+    body: JSON.stringify({ patient_uuid: patientUuid }),
+  });
+}
+
+export async function testClinicalLink(accessCode: string): Promise<ClinicalLinkTestResult> {
+  return request<ClinicalLinkTestResult>(`${clinicalLinkPath(accessCode)}/test`, {
+    method: 'POST',
+  });
+}
+
+export async function unlinkClinicalRecord(accessCode: string): Promise<ClinicalLinkStatus> {
+  return request<ClinicalLinkStatus>(clinicalLinkPath(accessCode), { method: 'DELETE' });
+}
+
 export async function coachChat(
   accessCode: string | null,
   patientName: string,

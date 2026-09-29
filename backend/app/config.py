@@ -55,6 +55,18 @@ class Settings(BaseSettings):
     # profiles inactive past this window. None (default) means no retention
     # limit is enforced.
     DATA_RETENTION_DAYS: int | None = None
+    # OpenMRS clinical context for the Moment Coach (app.services.openmrs_client,
+    # app.services.clinical_context). Off by default: when disabled, or when a
+    # profile has no linked patient, the coach behaves exactly as without it.
+    # Use a dedicated read-only OpenMRS account, never admin.
+    OPENMRS_ENABLED: bool = False
+    OPENMRS_BASE_URL: str = ""  # e.g. https://openmrs.example.org/openmrs
+    OPENMRS_USERNAME: str = ""
+    OPENMRS_PASSWORD: str = ""
+    # Whole-fetch budget on the chat path. The fetch runs alongside RAG and the
+    # DB reads, so a slow OpenMRS costs at most this much before the first token.
+    OPENMRS_TIMEOUT_SECONDS: float = 1.5
+    OPENMRS_CACHE_TTL_SECONDS: int = 300
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

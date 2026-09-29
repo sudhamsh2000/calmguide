@@ -1,0 +1,770 @@
+{
+  "entry": [
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/55998c83-9820-4f89-b07e-1ce13ccf36d7",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "149019AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Alzheimer's disease"
+            },
+            {
+              "code": "149019",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "26929004",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Alzheimer's disease"
+        },
+        "id": "55998c83-9820-4f89-b07e-1ce13ccf36d7",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:12.000+00:00",
+          "versionId": "1790686392000"
+        },
+        "note": [
+          {
+            "text": "Moderate"
+          }
+        ],
+        "onsetDateTime": "2021-06-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:12+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>55998c83-9820-4f89-b07e-1ce13ccf36d7</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Alzheimer's disease</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 June 2021 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Moderate</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/6fcdb37b-42d4-438b-a8b5-dc1e42976df3",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "113881AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Post-traumatic stress disorder"
+            },
+            {
+              "code": "113881",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "47505003",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Post-traumatic stress disorder"
+        },
+        "id": "6fcdb37b-42d4-438b-a8b5-dc1e42976df3",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:12.000+00:00",
+          "versionId": "1790686392000"
+        },
+        "note": [
+          {
+            "text": "Combat-related"
+          }
+        ],
+        "onsetDateTime": "1954-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:12+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>6fcdb37b-42d4-438b-a8b5-dc1e42976df3</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Post-traumatic stress disorder</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 1954 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Combat-related</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/9cc1b9dd-c9d0-4038-b3c4-f244145d6e97",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "140987AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Essential hypertension"
+            },
+            {
+              "code": "140987",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "59621000",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Essential hypertension"
+        },
+        "id": "9cc1b9dd-c9d0-4038-b3c4-f244145d6e97",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:13.000+00:00",
+          "versionId": "1790686393000"
+        },
+        "onsetDateTime": "2008-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:13+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>9cc1b9dd-c9d0-4038-b3c4-f244145d6e97</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Essential hypertension</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 2008 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/012e1c72-abce-439c-9811-854b9f69c2b1",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "730a1627-1355-44d6-94bf-301a30df5976",
+              "display": "Benign prostatic hyperplasia"
+            }
+          ],
+          "text": "Benign prostatic hyperplasia"
+        },
+        "id": "012e1c72-abce-439c-9811-854b9f69c2b1",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:13.000+00:00",
+          "versionId": "1790686393000"
+        },
+        "onsetDateTime": "2015-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:13+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>012e1c72-abce-439c-9811-854b9f69c2b1</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Benign prostatic hyperplasia</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 2015 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/d40e749c-3689-47a0-97ad-14d1f08debe9",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "111633AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Urinary tract infection"
+            },
+            {
+              "code": "111633",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "68566005",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Urinary tract infection"
+        },
+        "id": "d40e749c-3689-47a0-97ad-14d1f08debe9",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:13.000+00:00",
+          "versionId": "1790686393000"
+        },
+        "note": [
+          {
+            "text": "Recurrent"
+          }
+        ],
+        "onsetDateTime": "2025-11-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:13+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>d40e749c-3689-47a0-97ad-14d1f08debe9</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Urinary tract infection</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 November 2025 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Recurrent</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/00c43f14-f7e1-42bb-9894-2eb05ce59873",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "142473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Diabetes mellitus, type 2"
+            },
+            {
+              "code": "142473",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "44054006",
+              "system": "http://snomed.info/sct/"
+            },
+            {
+              "code": "ANC.B6.DE93",
+              "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+            }
+          ],
+          "text": "Diabetes mellitus, type 2"
+        },
+        "id": "00c43f14-f7e1-42bb-9894-2eb05ce59873",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:13.000+00:00",
+          "versionId": "1790686393000"
+        },
+        "onsetDateTime": "2012-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:13+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>00c43f14-f7e1-42bb-9894-2eb05ce59873</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Diabetes mellitus, type 2</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 2012 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/3ccffdbb-668a-4bf4-b0e6-da646c3da048",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "131651AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Osteoarthritis of knee"
+            },
+            {
+              "code": "131651",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "239873007",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Osteoarthritis of knee"
+        },
+        "id": "3ccffdbb-668a-4bf4-b0e6-da646c3da048",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:14.000+00:00",
+          "versionId": "1790686394000"
+        },
+        "note": [
+          {
+            "text": "Both knees"
+          }
+        ],
+        "onsetDateTime": "2016-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:14+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>3ccffdbb-668a-4bf4-b0e6-da646c3da048</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Osteoarthritis of knee</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 2016 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Both knees</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/d069c5e5-ff33-496a-a087-3e0ee7e7d91d",
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "active",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "117698AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Hearing Loss"
+            },
+            {
+              "code": "117698",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "15188001",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Hearing Loss"
+        },
+        "id": "d069c5e5-ff33-496a-a087-3e0ee7e7d91d",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:53:14.000+00:00",
+          "versionId": "1790686394000"
+        },
+        "note": [
+          {
+            "text": "Bilateral; wears hearing aids"
+          }
+        ],
+        "onsetDateTime": "2019-01-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:53:14+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>d069c5e5-ff33-496a-a087-3e0ee7e7d91d</td></tr><tr><td>Clinical Status:</td><td> active </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Hearing Loss</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 January 2019 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Bilateral; wears hearing aids</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/c3d13d1c-bf7c-47f7-b96b-b7e94f581012",
+      "resource": {
+        "abatementDateTime": "2026-08-09T00:00:00+00:00",
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "inactive",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "119685AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Cystitis"
+            },
+            {
+              "code": "119685",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "38822007",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Cystitis"
+        },
+        "id": "c3d13d1c-bf7c-47f7-b96b-b7e94f581012",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:34.000+00:00",
+          "versionId": "1790686474000"
+        },
+        "note": [
+          {
+            "text": "Acute cystitis, resolved"
+          }
+        ],
+        "onsetDateTime": "2026-08-04T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:54:34+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>c3d13d1c-bf7c-47f7-b96b-b7e94f581012</td></tr><tr><td>Clinical Status:</td><td> inactive </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Cystitis</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 04 August 2026 00:00:00 </td></tr><tr><td>Abatement:</td><td> 09 August 2026 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Acute cystitis, resolved</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition/46fe1b50-e9bb-41f1-a07a-71d497378d6a",
+      "resource": {
+        "abatementDateTime": "2024-02-20T00:00:00+00:00",
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "problem-list-item",
+                "display": "Problem List Item",
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category"
+              }
+            ]
+          }
+        ],
+        "clinicalStatus": {
+          "coding": [
+            {
+              "code": "inactive",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "code": "114100AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "display": "Pneumonia"
+            },
+            {
+              "code": "114100",
+              "system": "https://cielterminology.org"
+            },
+            {
+              "code": "233604007",
+              "system": "http://snomed.info/sct/"
+            }
+          ],
+          "text": "Pneumonia"
+        },
+        "id": "46fe1b50-e9bb-41f1-a07a-71d497378d6a",
+        "meta": {
+          "lastUpdated": "2026-09-29T12:54:34.000+00:00",
+          "versionId": "1790686474000"
+        },
+        "note": [
+          {
+            "text": "Community-acquired, resolved"
+          }
+        ],
+        "onsetDateTime": "2024-02-01T00:00:00+00:00",
+        "recordedDate": "2026-09-29T12:54:34+00:00",
+        "recorder": {
+          "display": "Super User",
+          "reference": "Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f",
+          "type": "Practitioner"
+        },
+        "resourceType": "Condition",
+        "subject": {
+          "display": "Frank Joseph Kowalski (OpenMRS ID: 10001MJ)",
+          "reference": "Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63",
+          "type": "Patient"
+        },
+        "text": {
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><table class=\"hapiPropertyTable\"><tbody><tr><td>Id:</td><td>46fe1b50-e9bb-41f1-a07a-71d497378d6a</td></tr><tr><td>Clinical Status:</td><td> inactive </td></tr><tr><td>Verification Status:</td><td> CONFIRMED </td></tr><tr><td>Category:</td><td> Problem List Item </td></tr><tr><td>Code:</td><td>Pneumonia</td></tr><tr><td>Subject:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Patient/fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63\">Frank Joseph Kowalski (OpenMRS ID: 10001MJ)</a></td></tr><tr><td>Onset:</td><td> 01 February 2024 00:00:00 </td></tr><tr><td>Abatement:</td><td> 20 February 2024 00:00:00 </td></tr><tr><td>Recorded Date:</td><td>29/09/2026</td></tr><tr><td>Recorder:</td><td><a href=\"http://localhost:8080/openmrs/ws/fhir2/R4/Practitioner/82f18b44-6814-11e8-923f-e9a88dcb533f\">Super User</a></td></tr><tr><td>Note:</td><td><div>Community-acquired, resolved</div></td></tr></tbody></table></div>",
+          "status": "generated"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "code": "confirmed",
+              "display": "CONFIRMED",
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "id": "1cb83a0e-e1e6-4a87-8585-c8c0afb70cd5",
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://openmrs-production-5ae8.up.railway.app/openmrs/ws/fhir2/R4/Condition?_count=100&patient=fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63"
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2026-09-29T12:56:58.975+00:00"
+  },
+  "resourceType": "Bundle",
+  "total": 10,
+  "type": "searchset"
+}

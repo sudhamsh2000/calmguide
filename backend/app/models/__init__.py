@@ -2,6 +2,7 @@ from app.models.audit_log import AuditLog
 from app.models.base import Base
 from app.models.behavioral_dossier import BehavioralDossier
 from app.models.care_change_event import CareChangeEvent
+from app.models.clinical_link import ClinicalLink
 from app.models.conversation import Conversation
 from app.models.cross_patient_strategies import CrossPatientStrategies
 from app.models.daily_checkin import DailyCheckin
@@ -34,4 +35,5 @@ __all__ = [
     "AuditLog",
     "SafetyEvent",
     "InviteCode",
+    "ClinicalLink",
 ]

@@ -182,6 +182,36 @@
     "openmrs_hint": "Sincroniza la información clínica",
     "fitbit_hint": "Sincroniza la actividad y los datos de salud",
     "connect": "Conectar",
-    "coming_soon": "Próximamente"
+    "coming_soon": "Próximamente",
+    "openmrs": {
+      "loading": "Comprobando la conexión…",
+      "explain": "Vincula el expediente de {name} para que Moment Coach tenga en cuenta sus afecciones, medicamentos y mediciones recientes. Solo se usa en preguntas cotidianas, nunca en una emergencia.",
+      "patient_id_label": "ID de paciente de OpenMRS",
+      "patient_id_hint": "El ID largo del expediente de OpenMRS del paciente. Pídeselo a su equipo de atención si no lo tienes.",
+      "looking_up": "Buscando…",
+      "confirm_title": "¿Vincular a {name}?",
+      "confirm_title_unnamed": "¿Vincular este expediente?",
+      "confirm_body": "Comprueba que sea la persona correcta antes de vincular.",
+      "link": "Vincular",
+      "linking": "Vinculando…",
+      "cancel": "Cancelar",
+      "connected_badge": "Conectado",
+      "synced": "Conectado · sincronizado {when}",
+      "never": "todavía no",
+      "test": "Probar conexión",
+      "testing": "Probando…",
+      "try_again": "Reintentar",
+      "test_ok": "Expediente encontrado: {conditions} afecciones, {medications} medicamentos, {allergies} alergias.",
+      "unreachable_short": "No se puede acceder al expediente",
+      "unreachable": "CalmGuide no pudo acceder al expediente de salud. Moment Coach seguirá funcionando sin él.",
+      "disconnect": "Desconectar",
+      "disconnect_confirm": "¿Desconectar el expediente de salud? Moment Coach dejará de usarlo. Puedes volver a vincularlo cuando quieras.",
+      "errors": {
+        "invalid_id": "Eso no parece un ID de paciente de OpenMRS. Revísalo e inténtalo de nuevo.",
+        "not_found": "No se encontró ningún paciente con ese ID en OpenMRS.",
+        "unreachable": "CalmGuide no pudo acceder al expediente de salud en este momento. Inténtalo de nuevo en un momento.",
+        "generic": "Algo salió mal. Inténtalo de nuevo."
+      }
+    }
   }
 }
