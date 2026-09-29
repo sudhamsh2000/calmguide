@@ -143,3 +143,14 @@ Features that were designed but intentionally deferred from the current implemen
 **Why deferred:** Mixing user-generated strategy data with authoritative medical guidance requires careful quality gates.
 
 **When to build:** When cross-patient data reaches statistical significance (100+ profiles, 1000+ feedback entries).
+
+---
+
+## Health Record Link on Mobile, and Fitbit
+
+**What:** The OpenMRS "Health record" link on the Care Profile exists on web only. The mobile (Expo) Care Profile has no equivalent yet, and Fitbit is still a "Coming soon" row.
+
+**Why deferred:** Built for the October demos against a single test OpenMRS instance; mobile parity and a second source weren't needed to show the flow.
+
+**When to build:** After clinicians have reviewed coach replies that use the clinical summary. Fitbit plugs in as another `clinical_links.source` value and another branch in the coach's context gather.
+

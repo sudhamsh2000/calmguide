@@ -16,6 +16,7 @@ CalmGuide helps family caregivers (typically 55-70 years old) navigate difficult
 | Web app | [calmguide.vercel.app](https://calmguide.vercel.app) --- Vercel, auto-deploys from `main` |
 | Backend API | Railway (Docker) |
 | Database | Railway PostgreSQL + pgvector |
+| Test EHR | OpenMRS 3.7.1 backend + MariaDB on Railway (same project as the API), reached over Railway's private network. Holds only fictional demo patients (e.g. Frank Kowalski, seeded by `backend/scripts/seed_openmrs_frank.py`). See [OpenMRS test instance](#openmrs-test-instance) |
 | Mobile | Android APK, distributed for testing outside the Play Store; EAS Update pushes JS/UI changes to installed builds without a new APK |
 
 > **Deploys are attributed to the commit author.** Vercel refuses a
@@ -49,7 +50,11 @@ Browser (Next.js)          Backend (FastAPI)          External Services
                            │  │ RAG Retrieve │ │──────►│  OpenAI     │
                            │  │ (hybrid)     │ │◄──────│  Embeddings │
                            │  └─────────────┘ │       └─────────────┘
-                           └────────┬─────────┘
+                           │  ┌─────────────┐ │ FHIR  ┌─────────────┐
+                           │  │ Clinical    │ │──────►│  OpenMRS    │
+                           │  │ context     │ │◄──────│  (optional, │
+                           │  └─────────────┘ │  R4   │  read-only) │
+                           └────────┬─────────┘       └─────────────┘
                                     │
                            ┌────────▼─────────┐
                            │   PostgreSQL 16   │
@@ -63,6 +68,8 @@ Browser (Next.js)          Backend (FastAPI)          External Services
 ```
 
 **Privacy:** Patient names are stored only in the browser (localStorage). The server never persists PII --- it stores clinical profiles (disease stage, behavioral patterns, calming strategies) linked by hashed access codes. All conversations and profile data are encrypted at rest with AES-256-GCM. A caregiver can permanently erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, etc.) via `DELETE /api/profiles/{code}` --- see [Access Codes](#access-codes).
+
+**Health record (optional):** A Care Profile can be linked to the patient's OpenMRS record. On normal-risk messages the coach then also reads a capped, PII-free clinical summary (active conditions, medication names + frequency, allergies, 14-day vitals), fetched in parallel with RAG and the DB reads under a 1.5 s budget and cached for 5 minutes. EMERGENCY/HIGH messages never call OpenMRS. Off unless `OPENMRS_ENABLED=true`; without a link the coach is unchanged. See [ARCHITECTURE.md](ARCHITECTURE.md#openmrs-clinical-context).
 
 **Safety:** Every message reaching the LLM first passes a deterministic regex safety gate (`backend/app/services/safety_gate.py`) covering life-threat, self-harm, caregiver-harm-risk, and elder-abuse/neglect signals across all supported languages, with a heuristic fallback classifier behind it to catch paraphrases the gate misses. **Safety Gate v2** turns both layers' output into a single structured decision (`RiskLevel` + `SafetyAction`, `backend/app/services/safety_decision.py`) with fine-grained categories (breathing, consciousness, fall, acute change, medication risk), and runs it immediately after profile/locale resolution --- so an EMERGENCY or HIGH message is answered before any RAG retrieval, DB-context read, or LLM call. A 911-level decision is streamed to the client as a distinct event and shown as a full-screen red emergency alert. See [docs/SAFETY_ARCHITECTURE.md](docs/SAFETY_ARCHITECTURE.md) for the full two-layer design, the red-team evaluation harness used to regression-test it, and its explicit non-clinical-validation caveats and known gaps.
 
@@ -91,6 +98,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed data flow diagrams.
 | **Facility Portal (B2B)** | Separate staff-facing surface for care facilities --- staff accounts, resident assignment, incident tracking, care-change events, and admin dashboards/reports, under `/api/facilities/*` |
 | **Mobile App** | React Native (Expo) with full feature parity |
 | **Offline/Degraded-Mode Awareness** | Mobile and web both detect connectivity loss (NetInfo / `navigator.onLine`) and show a localized offline banner + distinct "you're offline" error copy instead of a generic server error; `/health` also reports a passively-tracked LLM-availability signal (`available`/`degraded`/`unknown`) alongside DB status. Detection only --- no request queueing or background sync yet, see [docs/DEFERRED.md](docs/DEFERRED.md) |
+| **Health Record Link (OpenMRS)** | A caregiver can link a Care Profile to the patient's OpenMRS record (Care Profile → Connected services → OpenMRS: paste the patient ID, confirm "Link to <name>?"). On normal-risk messages the Moment Coach then sees a short, capped clinical summary — active conditions, current medications (name + frequency, never doses), allergies and whitelisted vitals from the last 14 days — alongside RAG and CalmGuide's own history. Emergency/high-risk messages never call OpenMRS, a slow or down record never blocks a reply, and no patient name or identifier is stored (the patient UUID is encrypted). Off unless `OPENMRS_ENABLED` is set; with it off, or with no linked record, the coach behaves exactly as before. Test data: `backend/scripts/seed_openmrs_frank.py`. |
 | **Neural Read-Aloud + Voice Input** | AI responses can be read aloud in a natural neural voice (OpenAI `gpt-4o-mini-tts`, gated by `TTS_ENABLED` + `OPENAI_API_KEY`), with an automatic fallback to the browser's/device's own speech synthesis if neural TTS is unavailable. An "auto-speak replies" setting (Profile → Voice) reads every response aloud without tapping the speaker button. Voice *input* (mic dictation) auto-submits once the caregiver finishes speaking, instead of requiring a separate tap. |
 
 ## Tech Stack
@@ -334,14 +342,16 @@ calmguide/
 │
 ├── backend/                    # FastAPI (Python 3.11+)
 │   ├── app/
-│   │   ├── models/             # SQLAlchemy models (Profile, Conversation, DailyCheckin, …)
+│   │   ├── models/             # SQLAlchemy models (Profile, Conversation, DailyCheckin,
+│   │   │                       #   ClinicalLink, …)
 │   │   ├── schemas/            # Pydantic v2 request/response schemas
 │   │   ├── routers/            # API endpoints (coach, speech, feedback, care_patterns,
-│   │   │                       #   impact, incidents, languages, facility_*, …)
+│   │   │                       #   impact, incidents, languages, clinical_link, facility_*, …)
 │   │   ├── services/           # LLM provider, prompt builder, crypto, insights, pattern
 │   │   │                       #   detector, safety_gate, safety_classifier, safety_decision,
 │   │   │                       #   safety_categories, safety_observability, safety_redteam,
-│   │   │                       #   speech (TTS), token_usage, availability, response_timing
+│   │   │                       #   speech (TTS), token_usage, availability, response_timing,
+│   │   │                       #   openmrs_client, clinical_context (health-record summary)
 │   │   ├── prompts/            # Jinja2 system prompt templates
 │   │   ├── config.py           # Pydantic settings — NOTE: @lru_cache'd, restart on .env change
 │   │   └── db.py               # Async engine / session factory
@@ -397,7 +407,12 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 | POST | `/api/profiles` | Create profile, returns 8-char access code |
 | GET | `/api/profiles/{code}` | Lookup profile by access code |
 | PUT | `/api/profiles/{code}` | Update profile |
-| DELETE | `/api/profiles/{code}` | Erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, etc.) |
+| DELETE | `/api/profiles/{code}` | Erase a profile and every record linked to it (conversations, incidents, check-ins, feedback, health-record link, etc.) |
+| GET | `/api/profiles/{code}/clinical-link` | Health-record link status (never the full patient ID). 404 `FEATURE_DISABLED` when `OPENMRS_ENABLED` is off |
+| POST | `/api/profiles/{code}/clinical-link/preview` | Look up an OpenMRS patient ID and return the given name once, for the "Link to <name>?" confirmation. Stores nothing |
+| PUT | `/api/profiles/{code}/clinical-link` | Link the profile to an OpenMRS patient (UUID stored encrypted) |
+| POST | `/api/profiles/{code}/clinical-link/test` | Fetch the clinical summary live and return section counts only |
+| DELETE | `/api/profiles/{code}/clinical-link` | Unlink the health record |
 | POST | `/api/coach/chat` | Moment Coach --- streaming SSE response |
 | POST | `/api/coach/acute-change-screen` | Structured screening prompt for new/sudden behavior changes, run before a coach session |
 | GET | `/api/conversations/{code}` | List recent conversation sessions |
@@ -419,6 +434,35 @@ Caregiver-facing endpoints (all under `/api` unless noted):
 | GET | `/api/impact` | Public aggregate impact metrics (no auth) |
 
 CalmGuide also ships a separate facility (B2B) staff-portal API under `/api/facilities/*` --- covering facility/staff registration, PIN/JWT auth, resident assignment, incidents, and admin dashboards/reports. See the `facility*` routers in `backend/app/routers/` for the current, authoritative list; it isn't fully enumerated here to avoid this table drifting out of sync with that surface.
+
+## OpenMRS Test Instance
+
+A test OpenMRS runs on Railway for the health-record demo. It holds only fictional patients: the 50 standard OpenMRS demo patients, plus Frank Kowalski (`FRNKKOWL`), whose record is designed around the Moment Coach demo beats.
+
+| | |
+|---|---|
+| Services | `openmrs` (image `openmrs/openmrs-reference-application-3-backend:3.7.1`, FHIR R4 + legacy admin UI) and `openmrs-db` (MariaDB 10.11, `utf8mb4`), both with volumes |
+| Public URL | `https://openmrs-production-5ae8.up.railway.app/openmrs` (admin UI and FHIR, login required) |
+| From the API | `OPENMRS_BASE_URL=http://openmrs.railway.internal:8080/openmrs` (private network) |
+| CalmGuide login | OpenMRS user `calmguide` with only the read-only `CalmGuide Integration` role. Its password lives only in Railway's `OPENMRS_PASSWORD` |
+| Demo patient | Frank Kowalski, OpenMRS patient ID `fba2fc07-8bbd-447b-8aaa-c4b8dfcfec63` |
+
+**Linking Frank (web):** open Frank's Care Profile → Connected services → OpenMRS → **Connect** → paste the patient ID → confirm **Link to Frank?** → **Link**. **Test connection** shows what was found; **Disconnect** removes the link.
+
+**Seeding or refreshing Frank** (run on demo morning; vitals are dated relative to the run day, so the fever lands the day before the demo). It needs an OpenMRS account with write access, prompts for the password, and is safe to re-run:
+
+```bash
+cd backend
+python scripts/seed_openmrs_frank.py --base-url https://openmrs-production-5ae8.up.railway.app/openmrs --username admin
+```
+
+**Railway gotchas this instance needed** (all already applied):
+
+- `RAILWAY_RUN_UID=0` on `openmrs`: the image runs as a non-root user and can't otherwise write to its volume.
+- The `openmrs` start command keeps the Lucene search index on local disk (`/openmrs/data/lucene` → `/tmp/lucene`). On the Railway volume, Lucene's per-commit `fsync` hung and stalled first-boot concept import indefinitely. The index is rebuilt automatically after a redeploy.
+- The JDBC URL in `/openmrs/data/openmrs-runtime.properties` carries `tcpKeepAlive`, `connectTimeout` and `socketTimeout`, so a silently dropped private-network connection errors out instead of hanging forever. `OMRS_CONFIG_*` variables don't override that file once OpenMRS is installed.
+- Demo-patient generation is switched off (`referencedemodata.createDemoPatientsOnNextStartup=0`), so restarts don't add patients.
+- First boot takes ~30–45 minutes (concept import). Railway's CPU graph can read 0 while it's working. Don't restart mid-import: the current package restarts from zero.
 
 ## Moment Coach
 

@@ -168,6 +168,27 @@ Step 6: FRONTEND - Rendering
 
 ---
 
+## OpenMRS Clinical Context
+
+Optional, off unless `OPENMRS_ENABLED` is set. A caregiver links a Care Profile to an OpenMRS patient (`clinical_links` table; the patient UUID is AES-256-GCM encrypted; no name or identity field is stored). Linking is two-step: `POST /api/profiles/{code}/clinical-link/preview` returns the patient's given name once for a "Link to <name>?" confirmation, then `PUT` stores the link. `GET` returns status (last 4 UUID characters at most), `POST …/test` returns section counts, `DELETE` unlinks. All four 404 with `FEATURE_DISABLED` when the feature is off. Profile erasure deletes the link.
+
+In `coach_chat`, the link row is read only **after** Safety Gate v2 has allowed the LLM, and the OpenMRS fetch is a third branch of the existing `asyncio.gather(_rag_pipeline(), _db_context(), …)`. EMERGENCY/HIGH turns never touch OpenMRS (enforced by `tests/test_openmrs_integration.py` against every short-circuited regression case).
+
+```
+message → Safety Gate v2 ──EMERGENCY/HIGH──▶ escalation (no OpenMRS, RAG or LLM)
+                │ allow_llm
+                ▼
+         read clinical link row
+                ▼
+   gather( RAG │ CalmGuide DB │ OpenMRS FHIR R4 summary )
+                ▼
+   render_coach_prompt → LLM stream → response guard (+ medication dosing check)
+```
+
+`app/services/openmrs_client.py` reads FHIR R4 (`Condition`, `MedicationRequest`, `AllergyIntolerance`, `Observation`) with a shared `httpx.AsyncClient` on `app.state.openmrs`; response bodies are never logged. `app/services/clinical_context.py` turns them into a capped `ClinicalSummary` (active conditions ≤8, active medications ≤10 as name + frequency with doses stripped, allergies ≤6, whitelisted vitals from the last 14 days keyed by CIEL code ≤8). The four fetches share one `OPENMRS_TIMEOUT_SECONDS` budget; failures give `partial`/`unavailable` and the coach carries on. Complete summaries are cached in-process per profile for `OPENMRS_CACHE_TTL_SECONDS` (per instance — move to Redis if the backend scales out). The prompt block tells the model to use the record as background, route plausibly related changes to "contact the doctor", and never advise on medications; `validate_medication_safety` in the response guard flags replies that pair a listed medication with dosing language and sends them through the existing repair path.
+
+---
+
 ## RAG Pipeline Architecture
 
 ```
@@ -335,6 +356,21 @@ Caregiver query: "Dad is screaming at midnight, doesn't know who I am"
 │ source_domain TEXT            │
 │ embedding    vector(3072)     │
 │ search_vector tsvector (GEN)  │
+└──────────────────────────────┘
+```
+
+```
+┌──────────────────────────────┐
+│ clinical_links               │   Optional link to an external clinical
+│──────────────────────────────│   record (OpenMRS). See "OpenMRS Clinical
+│ id           VARCHAR(36) PK  │   Context" below.
+│ profile_id   VARCHAR(36) FK  │
+│ source       VARCHAR(20)     │   "openmrs" (Fitbit later)
+│ external_ref TEXT ENC        │   patient UUID — no name/DOB/identifiers
+│ linked_at    TIMESTAMPTZ     │
+│ last_synced_at TIMESTAMPTZ   │
+│ last_status  VARCHAR(20)     │   ok / partial / unavailable
+│ UQ(profile_id, source)       │
 └──────────────────────────────┘
 ```
 
@@ -990,6 +1026,11 @@ services:
 | `CORS_ORIGINS` | Yes | Comma-separated allowed origins |
 | `RAG_VECTOR_STORE` | No | `pgvector` (enables RAG) |
 | `RAG_PGVECTOR_DSN` | If RAG | PostgreSQL sync connection for pgvector |
+| `OPENMRS_ENABLED` | No | `true` enables linking a Care Profile to an OpenMRS record (default off) |
+| `OPENMRS_BASE_URL` | If OpenMRS | OpenMRS web app root, ending in `/openmrs` |
+| `OPENMRS_USERNAME` / `OPENMRS_PASSWORD` | If OpenMRS | Dedicated read-only OpenMRS account (never admin) |
+| `OPENMRS_TIMEOUT_SECONDS` | No | Whole-fetch budget on the chat path (default 1.5) |
+| `OPENMRS_CACHE_TTL_SECONDS` | No | Per-profile summary cache lifetime (default 300) |
 
 ### Startup Sequence
 
