@@ -10,6 +10,16 @@ interface UseSpeechSynthesisOptions {
 
 interface UseSpeechSynthesisReturn {
   speak: (text: string) => void;
+  /**
+   * Streamed read-aloud: start an empty reading, then append text as it
+   * arrives. Each appended piece is synthesized straight away and played in
+   * order, so reading starts on the first sentence and runs to the end of
+   * the reply (or until stopped). Ends once `endStream` is called and the
+   * queue has played out.
+   */
+  startStream: () => void;
+  appendToStream: (text: string) => void;
+  endStream: () => void;
   stop: () => void;
   pause: () => void;
   resume: () => void;
@@ -203,8 +213,89 @@ function stopNeural() {
   neuralPlayback = null;
 }
 
+/**
+ * Streamed read-aloud (see `startStream` in the hook's return type). The
+ * next few pieces are synthesized while the current one plays, so each is
+ * ready by the time the one before it finishes. Only a few at a time:
+ * sending every sentence at once slows down the one needed first.
+ */
+const STREAM_LOOKAHEAD = 3;
+
+/**
+ * A streamed piece is a sentence or two, which normally synthesizes in 1-3s.
+ * In testing roughly one request in five hung upstream instead, and a hung
+ * request for the first sentence is exactly the silence this is meant to
+ * remove. So a piece not back after STREAM_HEDGE_MS gets a second, identical
+ * request and whichever answers first is played. Past the timeout the piece
+ * is read with the local voice and the reading carries on.
+ */
+const STREAM_HEDGE_MS = 3500;
+const STREAM_PIECE_TIMEOUT_MS = 8000;
+
+function synthesizePiece(text: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let pending = 0;
+    const attempt = () => {
+      pending += 1;
+      void synthesizeSpeech(text, STREAM_PIECE_TIMEOUT_MS).then((url) => {
+        pending -= 1;
+        if (settled) {
+          if (url) URL.revokeObjectURL(url);
+          return;
+        }
+        // A failure only counts once no other attempt could still succeed.
+        if (url || pending === 0) {
+          settled = true;
+          clearTimeout(hedgeTimer);
+          resolve(url);
+        }
+      });
+    };
+    const hedgeTimer = setTimeout(() => {
+      if (!settled) attempt();
+    }, STREAM_HEDGE_MS);
+    attempt();
+  });
+}
+
+interface StreamPiece {
+  text: string;
+  /** Neural audio object URL once requested; null means not requested yet. */
+  audio: Promise<string | null> | null;
+}
+
+interface SpeechStream {
+  requestId: number;
+  locale?: string;
+  neural: boolean;
+  queue: StreamPiece[];
+  /** A piece is being synthesized-then-played, or spoken locally. */
+  busy: boolean;
+  /** No more pieces are coming. */
+  ended: boolean;
+}
+
+let speechStream: SpeechStream | null = null;
+
+function isCurrentStream(stream: SpeechStream): boolean {
+  return speechStream === stream && stream.requestId === activeRequestId;
+}
+
+function dropStream() {
+  const stream = speechStream;
+  if (!stream) return;
+  speechStream = null;
+  for (const piece of stream.queue) {
+    void piece.audio?.then((url) => {
+      if (url) URL.revokeObjectURL(url);
+    });
+  }
+}
+
 function stopAll() {
   activeRequestId += 1; // invalidate any synthesis still in flight
+  dropStream();
   clearKeepAlive();
   userPaused = false;
   stopNeural();
@@ -214,8 +305,12 @@ function stopAll() {
   setSharedState({ isSpeaking: false, isPaused: false });
 }
 
-/** Browser-local speech. Always available as the fallback path. */
-function speakLocal(text: string, locale?: string) {
+/**
+ * Browser-local speech. Always available as the fallback path. With
+ * `onDone`, finishing hands control back to the caller (the stream queue)
+ * instead of marking read-aloud as finished.
+ */
+function speakLocal(text: string, locale?: string, onDone?: () => void) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 
@@ -244,12 +339,14 @@ function speakLocal(text: string, locale?: string) {
   utterance.onend = () => {
     clearKeepAlive();
     userPaused = false;
-    setSharedState({ isSpeaking: false, isPaused: false });
+    if (onDone) onDone();
+    else setSharedState({ isSpeaking: false, isPaused: false });
   };
   utterance.onerror = () => {
     clearKeepAlive();
     userPaused = false;
-    setSharedState({ isSpeaking: false, isPaused: false });
+    if (onDone) onDone();
+    else setSharedState({ isSpeaking: false, isPaused: false });
   };
   utterance.onpause = () => setSharedState({ isPaused: true });
   utterance.onresume = () => setSharedState({ isPaused: false });
@@ -312,12 +409,114 @@ function speak(text: string, locale: string | undefined, neuralAvailable: boolea
     });
 }
 
+function startStream(locale: string | undefined, neuralAvailable: boolean) {
+  stopAll();
+  speechStream = {
+    requestId: activeRequestId,
+    locale,
+    neural: neuralAvailable,
+    queue: [],
+    busy: false,
+    ended: false,
+  };
+  // Speaking from the moment the caregiver sends, so the stop control is
+  // there before the first sentence has even arrived.
+  setSharedState({ isSpeaking: true, isPaused: false });
+}
+
+function appendToStream(text: string) {
+  const stream = speechStream;
+  if (!stream || !isCurrentStream(stream) || stream.ended || !text.trim()) return;
+  stream.queue.push({ text, audio: null });
+  playNextInStream();
+}
+
+function prefetchStream(stream: SpeechStream) {
+  if (!stream.neural) return;
+  for (const piece of stream.queue.slice(0, STREAM_LOOKAHEAD)) {
+    piece.audio ??= synthesizePiece(piece.text);
+  }
+}
+
+function endStream() {
+  const stream = speechStream;
+  if (!stream || !isCurrentStream(stream)) return;
+  stream.ended = true;
+  playNextInStream();
+}
+
+function playNextInStream() {
+  const stream = speechStream;
+  if (!stream || !isCurrentStream(stream)) return;
+  prefetchStream(stream);
+  if (stream.busy || userPaused) return;
+
+  const piece = stream.queue.shift();
+  if (!piece) {
+    if (stream.ended) {
+      speechStream = null;
+      setSharedState({ isSpeaking: false, isPaused: false });
+    }
+    return;
+  }
+
+  stream.busy = true;
+  const done = () => {
+    if (!isCurrentStream(stream)) return;
+    stream.busy = false;
+    playNextInStream();
+  };
+  const speakPieceLocally = () => speakLocal(piece.text, stream.locale, done);
+
+  if (!stream.neural) {
+    speakPieceLocally();
+    return;
+  }
+  const pieceAudio = piece.audio ?? synthesizePiece(piece.text);
+  prefetchStream(stream);
+  pieceAudio
+    .then((url) => {
+      if (!isCurrentStream(stream)) {
+        if (url) URL.revokeObjectURL(url);
+        return;
+      }
+      if (!url) {
+        speakPieceLocally();
+        return;
+      }
+      const audio = new Audio(url);
+      neuralPlayback = { audio, url };
+      audio.onended = () => {
+        stopNeural();
+        done();
+      };
+      audio.onerror = () => {
+        stopNeural();
+        speakPieceLocally();
+      };
+      // Paused while this piece was synthesizing: resumeAll plays it.
+      if (userPaused) return;
+      audio.play().catch(() => {
+        stopNeural();
+        speakPieceLocally();
+      });
+    })
+    .catch(() => {
+      if (isCurrentStream(stream)) speakPieceLocally();
+    });
+}
+
 function pauseAll() {
   userPaused = true;
   if (neuralPlayback) {
     neuralPlayback.audio.pause();
     setSharedState({ isPaused: true });
     return;
+  }
+  if (speechStream) {
+    // Between two streamed pieces nothing is playing yet; the flag holds
+    // back the next one.
+    setSharedState({ isPaused: true });
   }
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.pause();
@@ -330,6 +529,13 @@ function resumeAll() {
     void neuralPlayback.audio.play();
     setSharedState({ isPaused: false });
     return;
+  }
+  if (speechStream) {
+    setSharedState({ isPaused: false });
+    if (!speechStream.busy) {
+      playNextInStream();
+      return;
+    }
   }
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.resume();
@@ -389,6 +595,12 @@ export function useSpeechSynthesis(
     (text: string) => speak(text, locale, neuralAvailable),
     [locale, neuralAvailable],
   );
+  const startStreamFn = useCallback(
+    () => startStream(locale, neuralAvailable),
+    [locale, neuralAvailable],
+  );
+  const appendToStreamFn = useCallback((text: string) => appendToStream(text), []);
+  const endStreamFn = useCallback(() => endStream(), []);
   const stopFn = useCallback(() => stopAll(), []);
   const pauseFn = useCallback(() => pauseAll(), []);
   const resumeFn = useCallback(() => resumeAll(), []);
@@ -410,6 +622,9 @@ export function useSpeechSynthesis(
 
   return {
     speak: speakFn,
+    startStream: startStreamFn,
+    appendToStream: appendToStreamFn,
+    endStream: endStreamFn,
     stop: stopFn,
     pause: pauseFn,
     resume: resumeFn,

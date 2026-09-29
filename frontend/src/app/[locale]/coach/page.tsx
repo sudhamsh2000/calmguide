@@ -22,6 +22,7 @@ import type { FeedbackEntry } from '@/lib/api';
 import { getAccessCode, getAutoSpeakReplies } from '@/lib/storage';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import type { CoachSection } from '@/features/coach/parseResponse';
+import { buildSpeakableText, nextSpeakableChunk } from '@/features/coach/speakableText';
 
 interface ChatExchange {
   userMessage: string;
@@ -66,13 +67,11 @@ function CoachPageInner() {
   const residentName = isFacilityMode ? formatResidentLocation(unit, room, bed) : undefined;
 
   const { response, isStreaming, error, emergency, sendMessage, clearError, clearEmergency } =
-    useStreamingChat(
-      initialSessionId,
-      profileId ?? undefined,
-      residentName,
-    );
+    useStreamingChat(initialSessionId, profileId ?? undefined, residentName);
   const locale = useLocale();
-  const { speak } = useSpeechSynthesis({ locale });
+  const { startStream, appendToStream, endStream, stop, isSpeaking } = useSpeechSynthesis({
+    locale,
+  });
   const [history, setHistory] = useState<ChatExchange[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [showInitial, setShowInitial] = useState(!initialSessionId);
@@ -164,52 +163,71 @@ function CoachPageInner() {
     prevStreamingRef.current = isStreaming;
   }, [isStreaming, response, currentMessage]);
 
-  // Auto-speak (Profile settings toggle): read "Right Now" — the first,
-  // most urgent section — aloud as soon as ITS text is done streaming,
-  // rather than waiting for the full multi-section response to finish and
-  // then synthesizing the whole thing in one request. That old approach
-  // meant LLM generation time (several seconds) plus TTS synthesis of the
-  // entire response (measured ~11.7ms/char, so 10s+ for a realistic
-  // multi-section reply) both had to finish before any audio started — a
-  // caregiver could wait 20-30+ seconds in silence. "Right Now" is
-  // typically the shortest section and available earliest in the stream,
-  // so speaking just it gets audio guidance started in a few seconds. The
-  // rest of the response keeps streaming in visually and stays readable —
-  // and separately speakable — via each section's own speak button
-  // (CoachResponseRenderer), same as before.
-  const spokenFirstSectionRef = useRef(false);
+  // Auto-speak (Profile settings toggle): read the reply aloud while it
+  // streams in, sentence by sentence, through to the end or until stopped.
+  // Waiting for a whole section (or the whole reply) and synthesizing it in
+  // one request left several seconds to 30+ seconds of silence first —
+  // neural TTS runs ~11.7ms/char. The first sentence of "Right Now" is sent
+  // for synthesis the moment it is complete, and each later piece is
+  // synthesized while the one before it plays.
+  const sectionTitles = useMemo(
+    () => ({
+      'right-now': t('sections.right_now'),
+      why: t('sections.why'),
+      'what-not-to-do': t('sections.what_not_to_do'),
+      escalation: t('sections.escalation'),
+    }),
+    [t],
+  );
+  const readAloud = useRef({ active: false, sawStreaming: false, spokenUpTo: 0 });
   useEffect(() => {
-    spokenFirstSectionRef.current = false;
-  }, [currentMessage]);
-  useEffect(() => {
-    if (spokenFirstSectionRef.current || !currentMessage || !getAutoSpeakReplies()) return;
-    const first = currentSections[0];
-    if (!first || !first.content.trim()) return;
-    // "Right Now" is done streaming once a second section's marker has
-    // appeared (proof the backend moved on), or the whole response ended
-    // with only one section total.
-    const firstSectionComplete = currentSections.length > 1 || !isStreaming;
-    if (!firstSectionComplete) return;
-    spokenFirstSectionRef.current = true;
-    speak(first.content);
-  }, [currentSections, isStreaming, currentMessage, speak]);
+    const state = readAloud.current;
+    if (!state.active) return;
+    if (isStreaming) state.sawStreaming = true;
+    // Before the request has started, "not streaming" doesn't mean done.
+    if (!state.sawStreaming) return;
+
+    const final = !isStreaming;
+    const text = buildSpeakableText(currentSections, sectionTitles);
+    for (;;) {
+      // Short first piece so audio starts on the first sentence; longer
+      // pieces after that read more naturally and mean fewer requests.
+      const minChars = state.spokenUpTo === 0 ? 1 : 80;
+      const chunk = nextSpeakableChunk(text, state.spokenUpTo, { final, minChars });
+      if (!chunk) break;
+      appendToStream(chunk.speech);
+      state.spokenUpTo = chunk.end;
+    }
+    if (final) {
+      state.active = false;
+      endStream();
+    }
+  }, [currentSections, isStreaming, sectionTitles, appendToStream, endStream]);
 
   const handleSendMessage = useCallback(
     (message: string) => {
       clearError();
       setCurrentMessage(message);
       setShowInitial(false);
+      if (getAutoSpeakReplies()) {
+        readAloud.current = { active: true, sawStreaming: false, spokenUpTo: 0 };
+        startStream();
+      }
       sendMessage(message);
     },
-    [sendMessage, clearError],
+    [sendMessage, clearError, startStream],
   );
 
   const handleRetry = useCallback(() => {
     if (currentMessage) {
       clearError();
+      if (getAutoSpeakReplies()) {
+        readAloud.current = { active: true, sawStreaming: false, spokenUpTo: 0 };
+        startStream();
+      }
       sendMessage(currentMessage);
     }
-  }, [currentMessage, sendMessage, clearError]);
+  }, [currentMessage, sendMessage, clearError, startStream]);
 
   // ── Loading history ───────────────────────────────────────────────────────
   if (loadingHistory) {
@@ -280,6 +298,24 @@ function CoachPageInner() {
               className="ms-1 h-2 w-2 rounded-full bg-primary animate-pulse"
               aria-label={tc('loading')}
             />
+          )}
+          {isSpeaking && (
+            <button
+              type="button"
+              onClick={stop}
+              className="ms-auto inline-flex items-center gap-2 rounded-full border border-foreground/15 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/5 transition-colors"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <rect x="5" y="5" width="14" height="14" rx="2" />
+              </svg>
+              {tc('accessibility.stop_reading')}
+            </button>
           )}
         </div>
         <SafetyDisclosure />
