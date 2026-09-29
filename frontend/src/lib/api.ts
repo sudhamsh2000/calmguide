@@ -119,7 +119,11 @@ async function fetchWithTimeout(
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+  timeoutMs: number = DEFAULT_FETCH_TIMEOUT_MS,
+): Promise<T> {
   const url = `${BASE_URL}${path}`;
   const resolvedLanguage = getActiveLocale();
   const headers: HeadersInit = {
@@ -128,10 +132,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options.headers,
   };
 
-  const response = await fetchWithTimeout(url, {
-    ...options,
-    headers,
-  });
+  const response = await fetchWithTimeout(
+    url,
+    {
+      ...options,
+      headers,
+    },
+    timeoutMs,
+  );
 
   if (!response.ok) {
     let body: unknown;
@@ -236,10 +244,13 @@ export async function linkClinicalRecord(
   });
 }
 
+/** The server allows OpenMRS up to 30 s here (its FHIR search is slow). */
 export async function testClinicalLink(accessCode: string): Promise<ClinicalLinkTestResult> {
-  return request<ClinicalLinkTestResult>(`${clinicalLinkPath(accessCode)}/test`, {
-    method: 'POST',
-  });
+  return request<ClinicalLinkTestResult>(
+    `${clinicalLinkPath(accessCode)}/test`,
+    { method: 'POST' },
+    45_000,
+  );
 }
 
 export async function unlinkClinicalRecord(accessCode: string): Promise<ClinicalLinkStatus> {

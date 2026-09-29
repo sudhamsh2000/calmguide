@@ -6,8 +6,9 @@
   },
   "hero": "No estás solo/a.",
   "coach_card": {
-    "title": "Algo está\npasando ahora mismo",
-    "subtitle": "Recibe orientación tranquila, paso a paso"
+    "title": "Algo está pasando ahora mismo",
+    "subtitle": "Recibe orientación tranquila, paso a paso",
+    "eyebrow": "Guía del momento"
   },
   "quick_actions": {
     "practice": "Practicar",
@@ -88,5 +89,22 @@
   "log_incident": "Registrar un incidente",
   "recent_incidents": "Incidentes recientes",
   "see_all": "Ver todo",
-  "server_error": "No podemos conectar con nuestros servidores. Los contactos de emergencia siempre están disponibles arriba."
+  "server_error": "No podemos conectar con nuestros servidores. Los contactos de emergencia siempre están disponibles arriba.",
+  "progress": {
+    "title": "Tu progreso",
+    "subtitle": "Mantén la constancia y observa tu avance.",
+    "this_week": "Esta semana",
+    "empty": "Tus registros aparecerán aquí cuando empieces a registrar días.",
+    "chart_label": "Nivel de los registros de los últimos 7 días, {count} días registrados",
+    "level": {
+      "calm": "Tranquilo",
+      "mild": "Leve",
+      "tough": "Difícil"
+    },
+    "stat": {
+      "checkins": "Registros",
+      "calm_days": "Días tranquilos",
+      "streak": "Días seguidos"
+    }
+  }
 }

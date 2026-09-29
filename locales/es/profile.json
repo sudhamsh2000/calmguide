@@ -211,7 +211,11 @@
         "not_found": "No se encontró ningún paciente con ese ID en OpenMRS.",
         "unreachable": "CalmGuide no pudo acceder al expediente de salud en este momento. Inténtalo de nuevo en un momento.",
         "generic": "Algo salió mal. Inténtalo de nuevo."
-      }
+      },
+      "just_now": "ahora mismo",
+      "minutes_ago": "hace {count} min",
+      "hours_ago": "hace {count} h",
+      "days_ago": "hace {count} d"
     }
   }
 }

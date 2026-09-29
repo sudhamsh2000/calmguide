@@ -1,4 +1,5 @@
 import { Button } from '@/components/Button';
+import { HealthRecordLink } from '@/components/HealthRecordLink';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/components/ThemeContext';
 import {
@@ -541,6 +542,14 @@ export default function ProfileScreen() {
               })}
             </View>
           ) : null}
+
+          {/* Connected services — the OpenMRS health-record link. The link is
+              stored on the server, so linking here or on the web applies to
+              both. */}
+          <View style={{ marginTop: 14 }}>
+            <SectionLabel title={t('services.title', 'Connected services')} />
+          </View>
+          <HealthRecordLink accessCode={accessCode} patientName={patientName} />
 
           <Button variant="ghost" size="md" onPress={handleSignOut}>
             {t('sign_out.title', 'Sign Out')}

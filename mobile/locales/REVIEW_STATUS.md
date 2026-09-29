@@ -37,7 +37,7 @@ current filename.
 | home.json | done | done |
 | checkin.json | done | done |
 | learn.json | done | done |
-| profile.json | done | done |
+| profile.json | done (except `services.openmrs.*`: pending) | done (except `services.openmrs.*`: pending) |
 | facility.json | not tracked | not tracked |
 | impact.json | not tracked | not tracked |
 | journey.json | not tracked | not tracked |

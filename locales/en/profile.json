@@ -212,7 +212,11 @@
         "not_found": "No patient with that ID was found in OpenMRS.",
         "unreachable": "CalmGuide couldn't reach the health record right now. Try again in a moment.",
         "generic": "Something went wrong. Please try again."
-      }
+      },
+      "just_now": "just now",
+      "minutes_ago": "{count} min ago",
+      "hours_ago": "{count} h ago",
+      "days_ago": "{count} d ago"
     }
   }
 }

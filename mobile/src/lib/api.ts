@@ -265,6 +265,102 @@ export async function updateProfile(
   return res.json() as Promise<ProfileResponse>;
 }
 
+// ─── Health record (OpenMRS) link ────────────────────────────────────────────
+// Every route 404s with code FEATURE_DISABLED when the server has OpenMRS
+// switched off; the Care Profile then shows the row as "Coming soon".
+
+export interface ClinicalLinkStatus {
+  linked: boolean;
+  source: string;
+  linked_at: string | null;
+  last_synced_at: string | null;
+  last_status: 'ok' | 'partial' | 'unavailable' | 'not_found' | null;
+  patient_ref_hint: string | null;
+}
+
+export interface ClinicalLinkTestResult {
+  status: 'ok' | 'partial' | 'unavailable';
+  conditions: number;
+  medications: number;
+  allergies: number;
+  observations: number;
+}
+
+/** Non-2xx from a clinical-link route, keeping the server's error code
+ * (FEATURE_DISABLED, PATIENT_NOT_FOUND, INVALID_PATIENT_ID, OPENMRS_UNAVAILABLE). */
+export class ClinicalLinkError extends Error {
+  status: number;
+  code: string | null;
+  constructor(status: number, code: string | null) {
+    super(`Health record request failed: ${status}${code ? ` ${code}` : ''}`);
+    this.name = 'ClinicalLinkError';
+    this.status = status;
+    this.code = code;
+  }
+}
+
+async function clinicalLinkRequest<T>(
+  accessCode: string,
+  suffix: string,
+  init: RequestInit = {},
+  timeoutMs?: number,
+): Promise<T> {
+  const url = `${API_BASE}/api/profiles/${encodeURIComponent(accessCode)}/clinical-link${suffix}`;
+  const res = await fetchWithTimeout(
+    url,
+    {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...getLocaleHeaders() },
+    },
+    timeoutMs,
+  );
+  if (!res.ok) {
+    let code: string | null = null;
+    try {
+      code = ((await res.json()) as { code?: string }).code ?? null;
+    } catch {
+      // Non-JSON error body — keep the status only.
+    }
+    throw new ClinicalLinkError(res.status, code);
+  }
+  return res.json() as Promise<T>;
+}
+
+export function getClinicalLink(accessCode: string): Promise<ClinicalLinkStatus> {
+  return clinicalLinkRequest<ClinicalLinkStatus>(accessCode, '');
+}
+
+/** Looks the patient up without linking, so the caregiver can confirm it's the
+ * right person. The name is returned once and never stored. */
+export function previewClinicalLink(
+  accessCode: string,
+  patientUuid: string,
+): Promise<{ display_name: string }> {
+  return clinicalLinkRequest(accessCode, '/preview', {
+    method: 'POST',
+    body: JSON.stringify({ patient_uuid: patientUuid }),
+  });
+}
+
+export function linkClinicalRecord(
+  accessCode: string,
+  patientUuid: string,
+): Promise<ClinicalLinkStatus> {
+  return clinicalLinkRequest(accessCode, '', {
+    method: 'PUT',
+    body: JSON.stringify({ patient_uuid: patientUuid }),
+  });
+}
+
+/** The server allows OpenMRS up to 30 s here (its FHIR search is slow). */
+export function testClinicalLink(accessCode: string): Promise<ClinicalLinkTestResult> {
+  return clinicalLinkRequest(accessCode, '/test', { method: 'POST' }, 45_000);
+}
+
+export function unlinkClinicalRecord(accessCode: string): Promise<ClinicalLinkStatus> {
+  return clinicalLinkRequest(accessCode, '', { method: 'DELETE' });
+}
+
 // ─── Conversations ────────────────────────────────────────────────────────────
 
 export async function getConversations(accessCode: string): Promise<ConversationSummary[]> {
