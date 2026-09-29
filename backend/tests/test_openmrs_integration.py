@@ -202,6 +202,23 @@ def test_summary_filters_identity_doses_and_inactive_items():
     assert "36.8" not in (temperature["range"] or "")
 
 
+def test_recent_fever_is_surfaced_as_an_alert():
+    assert _frank_summary().alerts == ["Fever: 38.1 °C yesterday (latest 37.9 °C today)"]
+
+
+def test_no_alert_without_a_recent_fever():
+    normal = [
+        o
+        for o in _resources("frank_observations.json")
+        if (o.get("valueQuantity") or {}).get("value", 0) < 37.8
+        or "5088" not in json.dumps(o["code"])
+    ]
+    summary = build_summary(
+        conditions=[], medications=[], allergies=[], observations=normal, now=SEED_NOW
+    )
+    assert summary.alerts == []
+
+
 def test_summary_is_partial_or_unavailable_when_sections_fail():
     partial = build_summary(
         conditions=None,
@@ -318,6 +335,11 @@ def test_prompt_renders_clinical_block_for_ok_and_partial():
     assert "## Clinical Record (from Frank's care team)" in prompt
     assert "Urinary tract infection (Recurrent)" in prompt
     assert "Never suggest starting, stopping" in prompt
+    assert "**Notable right now**: Fever: 38.1 °C yesterday" in prompt
+    assert (
+        "FIRST bullet of WHEN TO CALL FOR HELP must tell the caregiver to contact Frank's doctor"
+        in prompt
+    )
     partial = build_summary(
         conditions=None, medications=[], allergies=[], observations=[], now=SEED_NOW
     )

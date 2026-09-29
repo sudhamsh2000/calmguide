@@ -64,6 +64,9 @@ A care change was recorded {{ care_change.days_ago }} day(s) ago. {{ patient_nam
 
 {% if clinical and clinical.status in ("ok", "partial") %}
 ## Clinical Record (from {{ patient_name }}'s care team)
+{% if clinical.alerts %}
+- **Notable right now**: {{ clinical.alerts | join("; ") }}
+{% endif %}
 {% if clinical.conditions %}
 - **Conditions**: {{ clinical.conditions | join("; ") }}
 {% endif %}
@@ -83,7 +86,8 @@ A care change was recorded {{ care_change.days_ago }} day(s) ago. {{ patient_nam
 
 How to use this record:
 - It is background. Do not recite it back to the caregiver or list {{ patient_name }}'s diagnoses or medications.
-- If the situation could plausibly relate to a listed condition or a recent reading (for example sudden confusion with a history of urinary tract infections, a new fever, or pain with arthritis), say in WHEN TO CALL FOR HELP that the caregiver should contact {{ patient_name }}'s doctor, and name the specific reason in plain words.
+- REQUIRED: If the caregiver describes a new or sudden change (more confused, more agitated, more bathroom trips, a fall, not eating or drinking, unusually sleepy) and this record contains something that could explain it — a recent fever, a history of urinary tract infections, a condition that causes pain — the FIRST bullet of WHEN TO CALL FOR HELP must tell the caregiver to contact {{ patient_name }}'s doctor today, and name the reason in plain words (for example: "he had a fever yesterday and has had urine infections before — sudden confusion like this can be a sign of an infection"). Do not state a diagnosis; say it could be a sign and the doctor should check.
+- Otherwise, if the situation could plausibly relate to a listed condition or recent reading (for example pain with arthritis), mention it in WHEN TO CALL FOR HELP as a reason to contact {{ patient_name }}'s doctor.
 - Never suggest starting, stopping, skipping, changing, or timing a medication, and never mention a dose. Medication questions go to {{ patient_name }}'s doctor or pharmacist.
 - Never interpret readings as a diagnosis.
 {% elif clinical and clinical.status == "unavailable" %}

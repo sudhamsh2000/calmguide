@@ -78,6 +78,8 @@ class ClinicalSummary:
     medications: list[str] = field(default_factory=list)
     allergies: list[str] = field(default_factory=list)
     observations: list[dict] = field(default_factory=list)
+    # Plain-language findings the coach must weigh, e.g. a recent fever.
+    alerts: list[str] = field(default_factory=list)
     fetched_at: datetime | None = None
 
     @classmethod
@@ -206,13 +208,10 @@ def _fmt(value: float) -> str:
     return f"{value:g}"
 
 
-def summarize_observations(observations: list[dict], now: datetime) -> list[dict]:
-    """Latest reading per whitelisted vital in the last 14 days, with its range.
-
-    Blood pressure is combined into one line. Each item:
-    ``{"label", "latest", "when", "range"}`` — ``range`` is ``None`` when
-    there is only one reading.
-    """
+def _vital_readings(
+    observations: list[dict], now: datetime
+) -> dict[str, list[tuple[datetime, float]]]:
+    """Whitelisted vitals from the last 14 days, keyed by vital, oldest first."""
     cutoff = now - timedelta(days=OBSERVATION_WINDOW_DAYS)
     readings: dict[str, list[tuple[datetime, float]]] = {}
     for o in observations:
@@ -232,7 +231,17 @@ def summarize_observations(observations: list[dict], now: datetime) -> list[dict
         if taken < cutoff or taken > now + timedelta(hours=1):
             continue
         readings.setdefault(VITALS[code][0], []).append((taken, float(value)))
+    return {key: sorted(series) for key, series in readings.items()}
 
+
+def summarize_observations(observations: list[dict], now: datetime) -> list[dict]:
+    """Latest reading per whitelisted vital in the last 14 days, with its range.
+
+    Blood pressure is combined into one line. Each item:
+    ``{"label", "latest", "when", "range"}`` — ``range`` is ``None`` when
+    there is only one reading.
+    """
+    readings = _vital_readings(observations, now)
     today = now.date()
     items: list[dict] = []
 
@@ -272,6 +281,38 @@ def summarize_observations(observations: list[dict], now: datetime) -> list[dict
     return items[:MAX_OBSERVATIONS]
 
 
+# A temperature at or above this in the last few days is surfaced as a fever.
+# 37.8 °C is a commonly used fever threshold for older adults (whose fevers
+# often run lower). TODO(LOF-APPROVAL): clinician sign-off on which signals
+# feed the "contact the doctor" nudge, and at what thresholds.
+FEVER_THRESHOLD_C = 37.8
+FEVER_LOOKBACK_DAYS = 3
+
+
+def summarize_alerts(observations: list[dict], now: datetime) -> list[str]:
+    """Plain-language findings the coach should connect to a sudden change.
+
+    Kept deliberately narrow and factual — it states a reading, never a
+    diagnosis. Today only a recent fever.
+    """
+    alerts = []
+    today = now.date()
+    temps = [
+        (taken, value)
+        for taken, value in _vital_readings(observations, now).get("temperature", [])
+        if (today - taken.date()).days <= FEVER_LOOKBACK_DAYS
+    ]
+    if temps:
+        peak_taken, peak = max(temps, key=lambda tv: tv[1])
+        if peak >= FEVER_THRESHOLD_C:
+            latest_taken, latest = temps[-1]
+            alert = f"Fever: {_fmt(peak)} °C {_relative_day(peak_taken.date(), today)}"
+            if latest_taken != peak_taken:
+                alert += f" (latest {_fmt(latest)} °C {_relative_day(latest_taken.date(), today)})"
+            alerts.append(alert)
+    return alerts
+
+
 def build_summary(
     *,
     conditions: list[dict] | None,
@@ -291,6 +332,7 @@ def build_summary(
         medications=summarize_medications(medications or []),
         allergies=summarize_allergies(allergies or []),
         observations=summarize_observations(observations or [], now),
+        alerts=summarize_alerts(observations or [], now),
         fetched_at=now,
     )
 
