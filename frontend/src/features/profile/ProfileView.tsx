@@ -18,8 +18,51 @@ import { BackButton } from '@/components/ui/BackButton';
 import { ProfileAvatar } from '@/components/ui/ProfileAvatar';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Switch } from '@/components/ui/Switch';
-import { SignOutButton } from '@/components/ui/SignOutButton';
 import { SUPPORTED_LOCALES, LOCALE_NAMES, type SupportedLocale } from '@/lib/locale';
+
+const CONNECTED_SERVICES = [
+  {
+    id: 'openmrs',
+    name: 'OpenMRS',
+    hintKey: 'services.openmrs_hint',
+    icon: (
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <g fill="none" strokeWidth="5" strokeLinecap="butt">
+          <path d="M16 4a12 12 0 0 1 12 12" stroke="#E8543E" />
+          <path d="M28 16a12 12 0 0 1-12 12" stroke="#F2A93B" />
+          <path d="M16 28A12 12 0 0 1 4 16" stroke="#4CAF6A" />
+          <path d="M4 16A12 12 0 0 1 16 4" stroke="#3E7FD0" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    id: 'fitbit',
+    name: 'Google Fitbit',
+    hintKey: 'services.fitbit_hint',
+    icon: (
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" fill="#2CB5B5">
+        {[
+          [16, 3, 2.6],
+          [16, 9.5, 3],
+          [9.5, 9.5, 2.4],
+          [22.5, 9.5, 2.4],
+          [3, 16, 2.4],
+          [9.5, 16, 3],
+          [16, 16, 3.4],
+          [22.5, 16, 3],
+          [29, 16, 2.4],
+          [9.5, 22.5, 2.4],
+          [16, 22.5, 3],
+          [22.5, 22.5, 2.4],
+          [16, 29, 2.6],
+        ].map(([cx, cy, r]) => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} />
+        ))}
+      </svg>
+    ),
+  },
+] as const;
 
 export interface ProfileViewProps {
   className?: string;
@@ -47,6 +90,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
     setAutoSpeakReplies(checked);
   };
   const [langOpen, setLangOpen] = useState(false);
+  const [pendingService, setPendingService] = useState<string | null>(null);
   const langMenuId = useId();
   const langButtonRef = useRef<HTMLButtonElement>(null);
   const langOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -98,7 +142,7 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
   const diseaseStage = profile?.disease_stage ?? 'middle';
 
   const formattedCode =
-    accessCode.length === 8 ? `${accessCode.slice(0, 4)}  ·  ${accessCode.slice(4)}` : accessCode;
+    accessCode.length === 8 ? `${accessCode.slice(0, 4)} · ${accessCode.slice(4)}` : accessCode;
 
   const handleLanguageChange = (newLocale: SupportedLocale) => {
     setLangOpen(false);
@@ -116,273 +160,288 @@ export function ProfileView({ className = '' }: ProfileViewProps) {
     });
   };
 
-  return (
-    <div className={`relative flex flex-col gap-0 ${className}`}>
-      {/* Decorative section glow (design/design.md §19) — static, confined to
-       * its own inset-0/overflow-hidden layer near the name card, well clear
-       * of the settings/language menu further down the page. */}
-      <div aria-hidden="true" className="decor-layer pointer-events-none absolute inset-0 -z-10">
-        <div className="decor-blob decor-blob-peach -top-8 -end-16 h-56 w-56" />
-      </div>
+  const sectionLabel =
+    'text-xs font-semibold uppercase tracking-[0.12em] text-foreground-muted mb-2.5';
+  const chip = 'inline-flex items-center rounded-full px-4 py-2 text-[15px] font-medium';
 
+  const renderChips = (
+    items: string[],
+    group: 'behavioral' | 'calming' | 'safety',
+    tone: string,
+  ) =>
+    items.length > 0 ? (
+      <div className="flex flex-wrap gap-2.5">
+        {items.map((item) => (
+          <span key={item} className={`${chip} ${tone}`}>
+            {translateProfileOption(group, item)}
+          </span>
+        ))}
+      </div>
+    ) : (
+      <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
+    );
+
+  return (
+    <div className={`flex flex-col ${className}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 py-3">
+      <div className="flex items-center gap-4 pb-3">
         <BackButton href="/home" label={tc('nav.back_to_home')} />
         <h1
-          className="text-xl font-medium text-foreground"
+          className="text-2xl font-medium text-foreground"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {t('view.title')}
         </h1>
       </div>
 
-      {/* Name Card */}
-      <div className="mt-3 flex items-center gap-4 rounded-2xl border border-foreground/10 bg-surface px-4 py-4">
-        <ProfileAvatar
-          name={patientName}
-          avatar={avatar}
-          diseaseStage={diseaseStage}
-          size={56}
-        />
-        <div>
-          <p className="text-lg font-semibold text-foreground">{patientName}</p>
-          <p className="text-[13px] text-foreground-muted mt-0.5">{t('view.name_hint')}</p>
-        </div>
-      </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-stretch">
+        {/* Care details — everything Moment Coach knows about the person,
+         * in one card so it reads as a single record rather than a stack. */}
+        <section aria-labelledby="care-details-heading" className="card-shell px-6 py-5">
+          <h2 id="care-details-heading" className="text-xl font-semibold text-foreground">
+            {t('view.care_details')}
+          </h2>
 
-      {/* Dementia Stage */}
-      <div className="card-shell mt-5 p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-2">
-          {t('view.dementia_stage')}
-        </p>
-        <p className="text-base font-medium text-foreground">
-          {stageLabels[diseaseStage] ?? diseaseStage}
-        </p>
-      </div>
-
-      {/* Behavioral Patterns */}
-      <div className="card-shell mt-4 p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
-          {t('view.behavioral_patterns')}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {(profile?.behavioral_patterns ?? []).length > 0 ? (
-            (profile?.behavioral_patterns ?? []).map((pattern) => (
-              <span
-                key={pattern}
-                className="inline-flex items-center px-3.5 py-1.5 rounded-full text-sm font-medium bg-primary/10 text-primary"
-              >
-                {translateProfileOption('behavioral', pattern)}
-              </span>
-            ))
-          ) : (
-            <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Calming Strategies — the reference's "What Works Best" card. Rendered
-       * as teal chips rather than a comma-joined sentence so each strategy is
-       * individually scannable, matching how the reference presents them. */}
-      <div className="card-shell mt-4 p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
-          {t('view.calming_strategies')}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {(profile?.calming_strategies ?? []).length > 0 ? (
-            (profile?.calming_strategies ?? []).map((s) => (
-              <span
-                key={s}
-                className="inline-flex items-center rounded-full bg-success-bg px-3.5 py-1.5 text-sm font-medium text-success-text"
-              >
-                {translateProfileOption('calming', s)}
-              </span>
-            ))
-          ) : (
-            <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Safety Concerns — the reference's "What to Avoid" card, in the app's
-       * safety-coral family so it reads as caution without alarming. */}
-      <div className="card-shell mt-4 p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-3">
-          {t('view.safety_concerns')}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {(profile?.safety_concerns ?? []).length > 0 ? (
-            (profile?.safety_concerns ?? []).map((s) => (
-              <span
-                key={s}
-                className="inline-flex items-center rounded-full bg-error-bg px-3.5 py-1.5 text-sm font-medium text-error"
-              >
-                {translateProfileOption('safety', s)}
-              </span>
-            ))
-          ) : (
-            <p className="text-sm text-foreground-muted">{t('view.none_recorded')}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Access Code Card */}
-      <div className="mt-6 rounded-2xl bg-foreground/[0.04] dark:bg-foreground/[0.06] px-5 py-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-foreground-muted mb-3">
-          {t('view.access_code')}
-        </p>
-        <p className="text-2xl font-mono font-bold tracking-[0.15em] text-primary-dark dark:text-primary-light">
-          {formattedCode}
-        </p>
-        <p className="mt-3 text-[13px] text-foreground-muted leading-relaxed">
-          {t('view.access_code_hint')}
-        </p>
-      </div>
-
-      {/* Edit Profile Button */}
-      <Link
-        href="/profile/edit"
-        className="mt-5 flex min-h-tap items-center justify-center rounded-2xl border border-border dark:border-theme-soft bg-surface px-6 py-3.5 text-base font-semibold text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] hover:text-primary dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring"
-      >
-        {t('actions.edit')}
-      </Link>
-
-      {/* Voice Section — first settings section, per product decision that
-          auto-read is a caregiver-visibility feature worth surfacing before
-          appearance/language. */}
-      <div className="mt-8 pb-4 border-b border-foreground/10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-4">
-          {t('voice.label')}
-        </p>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <span className="text-base text-foreground">{t('voice.auto_speak_replies')}</span>
-            <p className="mt-1 text-sm text-foreground-muted leading-relaxed">
-              {t('voice.auto_speak_replies_hint')}
-            </p>
+          <div className="mt-4 flex items-center gap-4 pb-5">
+            <ProfileAvatar
+              name={patientName}
+              avatar={avatar}
+              diseaseStage={diseaseStage}
+              size={76}
+            />
+            <div>
+              <p className="text-lg font-semibold text-foreground">{patientName}</p>
+              <p className="mt-0.5 text-sm text-foreground-muted">{t('view.name_hint')}</p>
+            </div>
           </div>
-          <Switch
-            checked={autoSpeak}
-            onChange={handleAutoSpeakChange}
-            label={t('voice.auto_speak_replies')}
-          />
-        </div>
-      </div>
 
-      {/* Settings Section */}
-      <div className="mt-5 pb-4 border-b border-foreground/10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-4">
-          {t('appearance')}
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="text-base text-foreground">{t('appearance')}</span>
-          <ThemeToggle />
-        </div>
-      </div>
+          <div className="border-t border-theme-soft py-5">
+            <p className={sectionLabel}>{t('view.dementia_stage')}</p>
+            <p className="text-lg text-foreground">{stageLabels[diseaseStage] ?? diseaseStage}</p>
+          </div>
 
-      {/* Language Selector */}
-      <div className="mt-5 pb-4 border-b border-foreground/10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70 mb-4">
-          {tc('language.label')}
-        </p>
-        <button
-          ref={langButtonRef}
-          type="button"
-          onClick={() => setLangOpen(!langOpen)}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              openLanguageMenu(0);
-            }
-            if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              openLanguageMenu(SUPPORTED_LOCALES.length - 1);
-            }
-          }}
-          aria-haspopup="menu"
-          aria-expanded={langOpen}
-          aria-controls={langMenuId}
-          className="w-full flex items-center justify-between rounded-full border border-border dark:border-theme-soft bg-surface px-4 py-3 min-h-[48px] text-base text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_0_0_1px_rgba(26,35,50,0.14)] focus-ring cursor-pointer"
-        >
-          <span dir="auto">{LOCALE_NAMES[locale as SupportedLocale] ?? locale}</span>
-          <span className="text-foreground-muted">{langOpen ? '▲' : '▼'}</span>
-        </button>
-        {langOpen && (
-          <div
-            id={langMenuId}
-            role="menu"
-            aria-label={tc('language.label')}
-            className="mt-2 rounded-xl border border-foreground/10 bg-surface overflow-hidden"
-          >
-            {SUPPORTED_LOCALES.map((loc, index) => (
+          <div className="border-t border-theme-soft py-5">
+            <p className={sectionLabel}>{t('view.behavioral_patterns')}</p>
+            {renderChips(
+              profile?.behavioral_patterns ?? [],
+              'behavioral',
+              'bg-primary-soft text-foreground',
+            )}
+          </div>
+
+          <div className="border-t border-theme-soft py-5">
+            <p className={sectionLabel}>{t('view.calming_strategies')}</p>
+            {renderChips(
+              profile?.calming_strategies ?? [],
+              'calming',
+              'bg-success-bg text-success-text',
+            )}
+          </div>
+
+          <div className="border-t border-theme-soft pt-5">
+            <p className={sectionLabel}>{t('view.safety_concerns')}</p>
+            {renderChips(profile?.safety_concerns ?? [], 'safety', 'bg-error-bg text-error')}
+          </div>
+        </section>
+
+        <div className="flex flex-col gap-4">
+          {/* Profile access */}
+          <section aria-labelledby="profile-access-heading" className="card-shell px-6 py-5">
+            <h2 id="profile-access-heading" className="text-xl font-semibold text-foreground">
+              {t('view.profile_access')}
+            </h2>
+            <div className="mt-3 text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground-muted">
+                {t('view.access_code')}
+              </p>
+              <p className="mt-1.5 whitespace-pre text-3xl font-bold tracking-[0.08em] text-foreground">
+                {formattedCode}
+              </p>
+              <p className="mt-1.5 text-sm text-foreground-muted">{t('view.access_code_hint')}</p>
+            </div>
+            <Link
+              href="/profile/edit"
+              className="mt-4 flex min-h-tap items-center justify-center rounded-xl bg-primary px-6 py-3 text-base font-semibold text-onPrimary transition-opacity hover:opacity-90 focus-ring"
+            >
+              {t('actions.edit')}
+            </Link>
+          </section>
+
+          {/* Preferences */}
+          <section aria-labelledby="preferences-heading" className="card-shell px-6 py-5">
+            <h2 id="preferences-heading" className="text-xl font-semibold text-foreground">
+              {t('view.preferences')}
+            </h2>
+
+            <div className="mt-3 pb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground-muted">
+                {t('voice.label')}
+              </p>
+              <div className="mt-1 flex items-start justify-between gap-4">
+                <span className="text-base text-foreground">{t('voice.auto_speak_replies')}</span>
+                <Switch
+                  checked={autoSpeak}
+                  onChange={handleAutoSpeakChange}
+                  label={t('voice.auto_speak_replies')}
+                />
+              </div>
+              <p className="mt-1 text-[13px] leading-relaxed text-foreground-muted">
+                {t('voice.auto_speak_replies_hint')}
+              </p>
+            </div>
+
+            <div className="border-t border-theme-soft py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground-muted">
+                {t('appearance')}
+              </p>
+              <div className="mt-1 flex items-center justify-between">
+                <span className="text-base text-foreground">{t('appearance')}</span>
+                <ThemeToggle />
+              </div>
+            </div>
+
+            <div className="border-t border-theme-soft pt-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground-muted mb-2">
+                {tc('language.label')}
+              </p>
               <button
-                key={loc}
-                ref={(node) => {
-                  langOptionRefs.current[index] = node;
-                }}
+                ref={langButtonRef}
                 type="button"
-                onClick={() => handleLanguageChange(loc)}
+                onClick={() => setLangOpen(!langOpen)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    e.preventDefault();
-                    setLangOpen(false);
-                    langButtonRef.current?.focus();
-                    return;
-                  }
-
                   if (e.key === 'ArrowDown') {
                     e.preventDefault();
-                    focusLanguageOption((index + 1) % SUPPORTED_LOCALES.length);
-                    return;
+                    openLanguageMenu(0);
                   }
-
                   if (e.key === 'ArrowUp') {
                     e.preventDefault();
-                    focusLanguageOption(
-                      (index - 1 + SUPPORTED_LOCALES.length) % SUPPORTED_LOCALES.length,
-                    );
-                    return;
-                  }
-
-                  if (e.key === 'Home') {
-                    e.preventDefault();
-                    focusLanguageOption(0);
-                    return;
-                  }
-
-                  if (e.key === 'End') {
-                    e.preventDefault();
-                    focusLanguageOption(SUPPORTED_LOCALES.length - 1);
+                    openLanguageMenu(SUPPORTED_LOCALES.length - 1);
                   }
                 }}
-                role="menuitemradio"
-                aria-checked={loc === locale}
-                className={`w-full flex items-center justify-between px-4 py-3 min-h-[44px] text-base transition-colors hover:bg-primary/5 cursor-pointer ${
-                  loc === locale ? 'text-primary font-semibold' : 'text-foreground'
-                }`}
+                aria-haspopup="menu"
+                aria-expanded={langOpen}
+                aria-controls={langMenuId}
+                className="w-full flex items-center justify-between rounded-xl border border-border dark:border-theme-soft bg-surface px-4 py-2.5 min-h-tap text-base text-foreground transition-all hover:border-primary/20 hover:bg-primary/[0.025] dark:hover:border-primary/25 dark:hover:bg-primary/[0.05] focus-ring cursor-pointer"
               >
-                <span dir="auto">{LOCALE_NAMES[loc]}</span>
-                {loc === locale && <span className="text-primary">✓</span>}
+                <span dir="auto">{LOCALE_NAMES[locale as SupportedLocale] ?? locale}</span>
+                <span aria-hidden="true" className="text-sm text-foreground-muted">
+                  {langOpen ? '▲' : '▼'}
+                </span>
               </button>
-            ))}
-          </div>
-        )}
+              {langOpen && (
+                <div
+                  id={langMenuId}
+                  role="menu"
+                  aria-label={tc('language.label')}
+                  className="mt-2 rounded-xl border border-theme-soft bg-surface overflow-hidden"
+                >
+                  {SUPPORTED_LOCALES.map((loc, index) => (
+                    <button
+                      key={loc}
+                      ref={(node) => {
+                        langOptionRefs.current[index] = node;
+                      }}
+                      type="button"
+                      onClick={() => handleLanguageChange(loc)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          setLangOpen(false);
+                          langButtonRef.current?.focus();
+                          return;
+                        }
+
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          focusLanguageOption((index + 1) % SUPPORTED_LOCALES.length);
+                          return;
+                        }
+
+                        if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          focusLanguageOption(
+                            (index - 1 + SUPPORTED_LOCALES.length) % SUPPORTED_LOCALES.length,
+                          );
+                          return;
+                        }
+
+                        if (e.key === 'Home') {
+                          e.preventDefault();
+                          focusLanguageOption(0);
+                          return;
+                        }
+
+                        if (e.key === 'End') {
+                          e.preventDefault();
+                          focusLanguageOption(SUPPORTED_LOCALES.length - 1);
+                        }
+                      }}
+                      role="menuitemradio"
+                      aria-checked={loc === locale}
+                      className={`w-full flex items-center justify-between px-4 py-3 min-h-[44px] text-base transition-colors hover:bg-primary/5 cursor-pointer ${
+                        loc === locale ? 'text-primary font-semibold' : 'text-foreground'
+                      }`}
+                    >
+                      <span dir="auto">{LOCALE_NAMES[loc]}</span>
+                      {loc === locale && <span className="text-primary">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Connected services — no integrations exist yet, so Connect
+           * says so in place rather than pretending to start a flow. */}
+          <section aria-labelledby="services-heading" className="card-shell px-6 py-5">
+            <h2 id="services-heading" className="text-xl font-semibold text-foreground">
+              {t('services.title')}
+            </h2>
+            <p className="mt-1 text-sm text-foreground-muted">{t('services.description')}</p>
+            <ul className="mt-2">
+              {CONNECTED_SERVICES.map((service, index) => (
+                <li
+                  key={service.id}
+                  className={`flex items-center gap-4 py-2.5 ${
+                    index > 0 ? 'border-t border-theme-soft' : ''
+                  }`}
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                    {service.icon}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold text-foreground">{service.name}</p>
+                    <p className="text-[13px] text-foreground-muted">{t(service.hintKey)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPendingService(service.id)}
+                    disabled={pendingService === service.id}
+                    className="min-h-[44px] shrink-0 rounded-xl border border-border dark:border-theme-soft bg-surface px-5 text-sm font-semibold text-accentSky transition-colors hover:bg-accentSky-soft disabled:cursor-default disabled:text-foreground-muted disabled:hover:bg-surface focus-ring"
+                  >
+                    {pendingService === service.id
+                      ? t('services.coming_soon')
+                      : t('services.connect')}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </div>
 
-      {/* Sign Out */}
-      {/* Sign out also returns to the landing page — WelcomeGate redirects any
-       * stored session away from it, so this is the only route back. */}
-      <SignOutButton className="mt-5 w-full" />
-
-      {/* Legal Links */}
-      <div className="mt-6 flex items-center justify-center gap-4 pb-4">
+      {/* Legal links — signed-in caregivers are redirected away from the
+       * landing page, so this is their route to the terms and privacy notice. */}
+      <div className="mt-5 flex items-center justify-center gap-4">
         <Link
           href="/terms"
           className="text-sm text-foreground-muted hover:text-primary transition-colors"
         >
           {tc('nav.terms')}
         </Link>
-        <span className="text-foreground-muted">·</span>
+        <span aria-hidden="true" className="text-foreground-muted">
+          ·
+        </span>
         <Link
           href="/privacy"
           className="text-sm text-foreground-muted hover:text-primary transition-colors"

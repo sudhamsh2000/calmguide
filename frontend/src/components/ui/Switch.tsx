@@ -30,12 +30,12 @@ export function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus-ring disabled:opacity-50 disabled:cursor-not-allowed ${
-        checked ? 'bg-primary' : 'bg-foreground/20'
+        checked ? 'bg-primary' : 'bg-[var(--color-border-strong)]'
       } ${className}`}
     >
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-1'
+        className={`inline-block h-5 w-5 transform rounded-full shadow transition-transform ${
+          checked ? 'translate-x-6 bg-onPrimary' : 'translate-x-1 bg-white'
         }`}
       />
     </button>

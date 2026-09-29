@@ -103,7 +103,10 @@
     "safety_concerns": "Safety Concerns",
     "none_recorded": "None recorded",
     "access_code": "Your Access Code",
-    "access_code_hint": "Save this code to access your profile from another device"
+    "access_code_hint": "Save this code to access your profile from another device",
+    "care_details": "Care details",
+    "profile_access": "Profile access",
+    "preferences": "Preferences"
   },
   "actions": {
     "next": "Next",
@@ -173,5 +176,13 @@
     "label": "Voice",
     "auto_speak_replies": "Read replies aloud automatically",
     "auto_speak_replies_hint": "Moment Coach and Check-In responses will be read aloud as soon as they arrive, without needing to tap the speaker icon."
+  },
+  "services": {
+    "title": "Connected services",
+    "description": "Connect outside services to bring more of their care into one place.",
+    "openmrs_hint": "Sync clinical information",
+    "fitbit_hint": "Sync activity and health data",
+    "connect": "Connect",
+    "coming_soon": "Coming soon"
   }
 }
