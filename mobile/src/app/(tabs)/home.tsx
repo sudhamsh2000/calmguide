@@ -1,8 +1,9 @@
+import { AiSphere } from '@/components/AiSphere';
 import { Card } from '@/components/Card';
 import { PatientCard } from '@/components/PatientCard';
 import { PatternInsights } from '@/components/PatternInsights';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useTheme } from '@/components/ThemeContext';
+import { palette, useTheme } from '@/components/ThemeContext';
 import {
   getConversations,
   getInsights,
@@ -44,7 +45,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Line, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 
 function formatTimestamp(
@@ -276,7 +277,9 @@ export default function HomeScreen() {
         >
           <View
             style={{
-              backgroundColor: colors.primary,
+              // Always dark, like the web's bg-panelDark: primary inverts to
+              // near-white in dark mode, where the lit orb would disappear.
+              backgroundColor: palette.ink,
               paddingHorizontal: 20,
               paddingVertical: 28,
               alignItems: 'center',
@@ -295,37 +298,9 @@ export default function HomeScreen() {
                 backgroundColor: 'rgba(255,255,255,0.05)',
               }}
             />
-            <View
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 26,
-                backgroundColor: 'rgba(255,255,255,0.18)',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-                <Circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" />
-                <Line
-                  x1="12"
-                  y1="8"
-                  x2="12"
-                  y2="12"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <Line
-                  x1="12"
-                  y1="16"
-                  x2="12.01"
-                  y2="16"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </Svg>
+            {/* The Moment Coach orb — same animation as the web home hero. */}
+            <View style={{ marginVertical: -18 }}>
+              <AiSphere size={150} />
             </View>
             <View style={{ alignItems: 'center', gap: 6 }}>
               <Text
