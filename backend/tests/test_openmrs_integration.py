@@ -129,6 +129,13 @@ async def _link_frank(client, code: str) -> None:
     assert resp.status_code == 200, resp.text
 
 
+async def _drop_warm_cache() -> None:
+    """Linking pre-fetches the summary; start from a cold cache instead."""
+    for task in list(clinical_context._INFLIGHT.values()):
+        await task
+    clinical_context.clear_cache()
+
+
 async def _coach(client, code: str, message: str, locale: str = "en") -> str:
     resp = await client.post(
         "/api/coach/chat",
@@ -253,6 +260,43 @@ async def test_one_failing_resource_gives_partial(openmrs_client, fake_openmrs):
         "profile-1", FRANK_UUID, openmrs_client, timeout_seconds=2, cache_ttl_seconds=300
     )
     assert again.status == "ok"
+
+
+async def test_stale_summary_is_served_while_refreshing(openmrs_client, fake_openmrs):
+    kwargs = dict(timeout_seconds=2, cache_ttl_seconds=0)  # everything is "stale"
+    first = await clinical_context.get_clinical_summary(
+        "profile-1", FRANK_UUID, openmrs_client, **kwargs
+    )
+    assert first.status == "ok"
+    fake_openmrs.mode = "slow"
+    # A slow OpenMRS doesn't matter: the stale summary comes back at once...
+    second = await asyncio.wait_for(
+        clinical_context.get_clinical_summary("profile-1", FRANK_UUID, openmrs_client, **kwargs),
+        timeout=0.5,
+    )
+    assert second is first
+    # ...while one refresh runs in the background.
+    assert "profile-1" in clinical_context._INFLIGHT
+
+
+async def test_overrun_fetch_fills_the_cache_for_the_next_message(openmrs_client, fake_openmrs):
+    original = fake_openmrs.handler
+
+    async def slowish(request):
+        await asyncio.sleep(0.3)
+        return await original(request)
+
+    openmrs_client._http._transport = httpx.MockTransport(slowish)
+    kwargs = dict(timeout_seconds=0.05, cache_ttl_seconds=300)
+    first = await clinical_context.get_clinical_summary(
+        "profile-1", FRANK_UUID, openmrs_client, **kwargs
+    )
+    assert first.status == "unavailable"
+    await clinical_context._INFLIGHT["profile-1"]
+    second = await clinical_context.get_clinical_summary(
+        "profile-1", FRANK_UUID, openmrs_client, **kwargs
+    )
+    assert second.status == "ok"
 
 
 # ── Prompt ───────────────────────────────────────────────────────────────────
@@ -402,6 +446,7 @@ async def test_profile_erasure_deletes_link(client, wired_app, openmrs_enabled, 
 async def test_coach_uses_linked_record(client, wired_app, openmrs_enabled, mock_llm, fake_openmrs):
     code = await _create_profile(client)
     await _link_frank(client, code)
+    await _drop_warm_cache()
     fake_openmrs.requests.clear()
 
     await _coach(client, code, "Frank has been more confused since this afternoon")
@@ -411,6 +456,17 @@ async def test_coach_uses_linked_record(client, wired_app, openmrs_enabled, mock
     for forbidden in ("Kowalski", "1932", "10mg", "Quetiapine"):
         assert forbidden not in prompt
     assert len(fake_openmrs.requests) == 4
+
+
+async def test_linking_warms_the_cache(client, wired_app, openmrs_enabled, mock_llm, fake_openmrs):
+    code = await _create_profile(client)
+    await _link_frank(client, code)
+    for task in list(clinical_context._INFLIGHT.values()):
+        await task
+    fake_openmrs.requests.clear()
+    await _coach(client, code, "Frank has been more confused since this afternoon")
+    assert "## Clinical Record" in mock_llm.last_stream_system_prompt
+    assert fake_openmrs.requests == []
 
 
 async def test_coach_without_link_makes_no_openmrs_calls(
@@ -440,6 +496,7 @@ async def test_coach_still_answers_when_openmrs_is_down(
 ):
     code = await _create_profile(client)
     await _link_frank(client, code)
+    await _drop_warm_cache()
     fake_openmrs.mode = "down"
     body = await _coach(client, code, "Frank refuses to walk to lunch")
     assert '"text"' in body  # the mock LLM's answer still streamed

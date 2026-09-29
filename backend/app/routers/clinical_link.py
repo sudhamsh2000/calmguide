@@ -182,6 +182,9 @@ async def put_clinical_link(
     await session.commit()
     await session.refresh(link)
     clinical_context.evict(profile.id)
+    # Warm the cache now so the first coach message after linking already has
+    # the record instead of waiting on a slow OpenMRS.
+    clinical_context.refresh(profile.id, patient_uuid, client)
     logger.info("Clinical link: linked profile=%s source=%s", profile.id, SOURCE)
     return _status(link)
 
@@ -207,8 +210,9 @@ async def test_clinical_link(
         profile.id,
         decrypt(link.external_ref),
         client,
-        # A caregiver pressing a button can wait longer than the chat path.
-        timeout_seconds=max(settings.OPENMRS_TIMEOUT_SECONDS, 10.0),
+        # A caregiver pressing a button can wait longer than the chat path;
+        # the result also refreshes the cache the coach reads from.
+        timeout_seconds=clinical_context.BACKGROUND_FETCH_SECONDS,
         cache_ttl_seconds=settings.OPENMRS_CACHE_TTL_SECONDS,
         use_cache=False,
     )

@@ -9,8 +9,9 @@ patient names live only in the browser.
 ``get_clinical_summary`` never raises. OpenMRS being slow or down yields
 ``status="unavailable"`` (or ``"partial"``) and the coach carries on without it.
 
-The cache is in-process and per instance. If the backend ever runs more than
-one instance, move it to Redis.
+The cache is in-process and per instance, stale-while-revalidate (see
+"Fetch + cache" below). If the backend ever runs more than one instance, move
+it to Redis.
 """
 
 import asyncio
@@ -295,37 +296,41 @@ def build_summary(
 
 
 # ── Fetch + cache ────────────────────────────────────────────────────────────
+#
+# OpenMRS FHIR is slow — a warm Observation search takes ~9 s on the test
+# instance — while the chat path waits at most OPENMRS_TIMEOUT_SECONDS. So the
+# cache is stale-while-revalidate: a summary younger than the TTL is served
+# as-is; an older one (up to MAX_STALE_SECONDS) is served immediately while a
+# refresh runs in the background. A fetch that overruns the chat budget is not
+# cancelled: it keeps running (bounded by BACKGROUND_FETCH_SECONDS) and fills
+# the cache for the next message. Linking, "Test connection" and app startup
+# warm the cache, so a linked profile rarely waits on OpenMRS at all.
+
+MAX_STALE_SECONDS = 24 * 60 * 60
+BACKGROUND_FETCH_SECONDS = 30.0
 
 # profile_id -> (patient_uuid, stored_at_monotonic, summary)
 _CACHE: dict[str, tuple[str, float, ClinicalSummary]] = {}
+# profile_id -> in-flight refresh, so concurrent messages share one fetch.
+_INFLIGHT: dict[str, asyncio.Task] = {}
 
 
 def evict(profile_id: str) -> None:
     _CACHE.pop(profile_id, None)
+    task = _INFLIGHT.pop(profile_id, None)
+    if task is not None and not task.done():
+        task.cancel()
 
 
 def clear_cache() -> None:
+    for profile_id in list(_INFLIGHT):
+        evict(profile_id)
     _CACHE.clear()
 
 
-async def get_clinical_summary(
-    profile_id: str,
-    patient_uuid: str,
-    client: OpenMRSClient,
-    *,
-    timeout_seconds: float,
-    cache_ttl_seconds: int,
-    use_cache: bool = True,
+async def _fetch(
+    client: OpenMRSClient, patient_uuid: str, timeout_seconds: float
 ) -> ClinicalSummary:
-    if use_cache:
-        cached = _CACHE.get(profile_id)
-        if (
-            cached
-            and cached[0] == patient_uuid
-            and time.monotonic() - cached[1] < cache_ttl_seconds
-        ):
-            return cached[2]
-
     now = datetime.now(UTC)
     since = (now - timedelta(days=OBSERVATION_WINDOW_DAYS)).date()
     tasks = {
@@ -335,9 +340,12 @@ async def get_clinical_summary(
         "observations": asyncio.create_task(client.get_observations(patient_uuid, since)),
     }
     start = time.monotonic()
-    _done, pending = await asyncio.wait(tasks.values(), timeout=timeout_seconds)
-    for task in pending:
-        task.cancel()
+    try:
+        _done, pending = await asyncio.wait(tasks.values(), timeout=timeout_seconds)
+    finally:
+        for task in tasks.values():
+            if not task.done():
+                task.cancel()
 
     results: dict[str, list[dict] | None] = {}
     for name, task in tasks.items():
@@ -359,9 +367,67 @@ async def get_clinical_summary(
         len(pending),
         (time.monotonic() - start) * 1000,
     )
-    if summary.status == "ok":
-        _CACHE[profile_id] = (patient_uuid, time.monotonic(), summary)
     return summary
+
+
+def refresh(profile_id: str, patient_uuid: str, client: OpenMRSClient) -> asyncio.Task:
+    """Start (or join) a background fetch that stores a complete summary in the cache."""
+    existing = _INFLIGHT.get(profile_id)
+    if existing is not None and not existing.done():
+        return existing
+
+    async def _run() -> ClinicalSummary:
+        summary = await _fetch(client, patient_uuid, BACKGROUND_FETCH_SECONDS)
+        if summary.status == "ok":
+            _CACHE[profile_id] = (patient_uuid, time.monotonic(), summary)
+        return summary
+
+    task = asyncio.create_task(_run())
+    _INFLIGHT[profile_id] = task
+
+    def _done(t: asyncio.Task) -> None:
+        if _INFLIGHT.get(profile_id) is t:
+            del _INFLIGHT[profile_id]
+        if not t.cancelled() and t.exception() is not None:
+            logger.warning("Clinical summary refresh failed: %s", type(t.exception()).__name__)
+
+    task.add_done_callback(_done)
+    return task
+
+
+async def get_clinical_summary(
+    profile_id: str,
+    patient_uuid: str,
+    client: OpenMRSClient,
+    *,
+    timeout_seconds: float,
+    cache_ttl_seconds: int,
+    use_cache: bool = True,
+) -> ClinicalSummary:
+    """Never raises. Returns within ~timeout_seconds."""
+    if use_cache:
+        cached = _CACHE.get(profile_id)
+        if cached and cached[0] == patient_uuid:
+            age = time.monotonic() - cached[1]
+            if age < cache_ttl_seconds:
+                return cached[2]
+            if age < MAX_STALE_SECONDS:
+                refresh(profile_id, patient_uuid, client)
+                return cached[2]
+
+    task = refresh(profile_id, patient_uuid, client)
+    try:
+        # shield: overrunning the budget must not cancel the fetch — it keeps
+        # going and fills the cache for the next message.
+        return await asyncio.wait_for(asyncio.shield(task), timeout_seconds)
+    except TimeoutError:
+        logger.info(
+            "Clinical summary not ready within %.1fs; continuing in background", timeout_seconds
+        )
+        return ClinicalSummary.unavailable()
+    except Exception as exc:
+        logger.warning("Clinical summary fetch failed: %s", type(exc).__name__)
+        return ClinicalSummary.unavailable()
 
 
 def patient_display_name(patient: dict) -> str:

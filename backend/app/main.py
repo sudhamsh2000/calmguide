@@ -1,5 +1,6 @@
 """FastAPI application factory with lifespan, CORS, and router registration."""
 
+import asyncio
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -26,6 +27,34 @@ from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.db import dispose_engine, get_engine
 from app.services.llm import get_llm_provider
+
+
+async def _warm_clinical_summaries(client) -> None:
+    """Pre-fetch every linked profile's OpenMRS summary after a deploy, so the
+    first coach message doesn't meet a cold cache. Best-effort."""
+    from sqlalchemy import select
+
+    from app.db import get_session_factory
+    from app.models.clinical_link import ClinicalLink
+    from app.services import clinical_context
+    from app.services.crypto import decrypt
+
+    try:
+        async with get_session_factory()() as session:
+            links = (
+                (
+                    await session.execute(
+                        select(ClinicalLink).where(ClinicalLink.source == "openmrs")
+                    )
+                )
+                .scalars()
+                .all()
+            )
+        for link in links:
+            clinical_context.refresh(link.profile_id, decrypt(link.external_ref), client)
+        logging.getLogger(__name__).info("Warming %d clinical summaries", len(links))
+    except Exception as exc:
+        logging.getLogger(__name__).warning("Clinical summary warm-up skipped: %s", exc)
 
 
 @asynccontextmanager
@@ -109,6 +138,9 @@ async def lifespan(app: FastAPI):
                 settings.OPENMRS_PASSWORD,
             )
             logging.getLogger(__name__).info("OpenMRS clinical context enabled")
+            app.state.clinical_warmup = asyncio.create_task(
+                _warm_clinical_summaries(app.state.openmrs)
+            )
         else:
             logging.getLogger(__name__).warning(
                 "OPENMRS_ENABLED is set but OPENMRS_BASE_URL/OPENMRS_USERNAME are missing — "
