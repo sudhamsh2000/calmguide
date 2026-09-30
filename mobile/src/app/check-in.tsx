@@ -96,6 +96,11 @@ function CheckInScreenInner() {
           isOnlineRef.current === false ? tc('network.offline_detail') : tc('error.connection'),
         );
       },
+      // The server's response guard repaired the reply: show its text instead.
+      (replacement) => {
+        responseRef.current = replacement;
+        setResponse(replacement);
+      },
     );
   }, [message, accessCode, patientName, tc, speak]);
 

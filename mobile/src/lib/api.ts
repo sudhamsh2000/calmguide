@@ -953,12 +953,15 @@ export async function getCareChanges(
 
 /**
  * Parse a buffer of SSE text, calling onChunk for each text token found.
- * Returns `true` if [DONE] was encountered.
+ * Returns `done: true` if [DONE] was encountered, and `remaining` — a
+ * trailing event not yet terminated by a blank line, which the caller must
+ * prepend to the next buffer (an XHR progress event can end mid-event).
  */
-function processSSEBuffer(
+export function processSSEBuffer(
   buffer: string,
   onChunk: (text: string) => void,
   onReplace?: (text: string) => void,
+  onEmergency?: () => void,
 ): { remaining: string; done: boolean } {
   const parts = buffer.split('\n\n');
   const remaining = parts.pop() ?? '';
@@ -971,7 +974,12 @@ function processSSEBuffer(
       const data = line.slice(6).trim();
       if (data === '[DONE]') return { remaining: '', done: true };
       try {
-        const parsed = JSON.parse(data) as { text?: string; replace?: string };
+        const parsed = JSON.parse(data) as {
+          text?: string;
+          replace?: string;
+          safety?: { emergency?: boolean };
+        };
+        if (parsed.safety?.emergency) onEmergency?.();
         if (parsed.replace && onReplace) {
           onReplace(parsed.replace);
         } else if (parsed.text) {
@@ -998,10 +1006,12 @@ function streamSSE(
   onError: (err: Error) => void,
   onReplace?: (text: string) => void,
   extraHeaders?: Record<string, string>,
+  onEmergency?: () => void,
 ): () => void {
   const xhr = new XMLHttpRequest();
   xhr.timeout = 60000;
   let processedLength = 0;
+  let pending = '';
   let finished = false;
 
   xhr.open('POST', url, true);
@@ -1022,7 +1032,13 @@ function streamSSE(
     const newText = xhr.responseText.slice(processedLength);
     processedLength = xhr.responseText.length;
     if (!newText) return;
-    const { done } = processSSEBuffer(newText, onChunk, onReplace);
+    const { remaining, done } = processSSEBuffer(
+      pending + newText,
+      onChunk,
+      onReplace,
+      onEmergency,
+    );
+    pending = remaining;
     if (done) {
       finished = true;
       onDone();
@@ -1031,9 +1047,10 @@ function streamSSE(
 
   xhr.onload = () => {
     if (finished) return;
-    // Process any remaining buffered text
-    const newText = xhr.responseText.slice(processedLength);
-    if (newText) processSSEBuffer(newText, onChunk, onReplace);
+    // Process any remaining buffered text, terminating a final unterminated event
+    const newText = pending + xhr.responseText.slice(processedLength);
+    pending = '';
+    if (newText) processSSEBuffer(`${newText}\n\n`, onChunk, onReplace, onEmergency);
     if (!finished) {
       finished = true;
       onDone();
@@ -1077,6 +1094,7 @@ export function streamCoachChat(
   onDone: () => void,
   onError: (err: Error) => void,
   onReplace?: (text: string) => void,
+  onEmergency?: () => void,
 ): () => void {
   const url = `${API_BASE}/api/coach/chat`;
   // B2B (facility) mode requires a staff JWT — the backend rejects a raw
@@ -1092,9 +1110,16 @@ export function streamCoachChat(
           onError(new Error('HTTP 401'));
           return;
         }
-        cancel = streamSSE(url, params, onChunk, onDone, onError, onReplace, {
-          Authorization: `Bearer ${token}`,
-        });
+        cancel = streamSSE(
+          url,
+          params,
+          onChunk,
+          onDone,
+          onError,
+          onReplace,
+          { Authorization: `Bearer ${token}` },
+          onEmergency,
+        );
       })
       .catch((err) => onError(err instanceof Error ? err : new Error(String(err))));
     return () => {
@@ -1102,7 +1127,7 @@ export function streamCoachChat(
       cancel?.();
     };
   }
-  return streamSSE(url, params, onChunk, onDone, onError, onReplace);
+  return streamSSE(url, params, onChunk, onDone, onError, onReplace, undefined, onEmergency);
 }
 
 /** @deprecated Use streamCoachChat instead */

@@ -35,7 +35,7 @@ const EMERGENCY_NUMBERS: Record<
 };
 
 /** Resolve numbers for a full locale tag, falling back to English. */
-function localeNumbers(locale: string | undefined) {
+export function localeNumbers(locale: string | undefined) {
   const base = (locale ?? 'en').toLowerCase().split('-', 1)[0];
   return EMERGENCY_NUMBERS[base] ?? EMERGENCY_NUMBERS.en;
 }

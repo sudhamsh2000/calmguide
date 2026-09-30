@@ -1,4 +1,5 @@
 import { SafetyDisclosure } from '@/components/SafetyDisclosure';
+import { EmergencyAlert } from '@/components/EmergencyAlert';
 import { BreathingIndicator } from '@/components/BreathingIndicator';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -246,6 +247,7 @@ function CoachScreenInner() {
   const [rawResponse, setRawResponse] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState('');
+  const [emergency, setEmergency] = useState(false);
   const [history, setHistory] = useState<ChatExchange[]>([]);
   const [accessCode, setAccessCodeState] = useState('');
   const [patientName, setPatientNameState] = useState('Patient');
@@ -373,6 +375,14 @@ function CoachScreenInner() {
                 : t('error.server_error'),
           );
         },
+        // The server's response guard repaired the reply (wrong language,
+        // medication dosing, or a mid-stream provider failure): show its text
+        // in place of everything streamed so far.
+        (replacement) => {
+          rawRef.current = replacement;
+          scheduleFlush();
+        },
+        () => setEmergency(true),
       );
     },
     [accessCode, isFacilityMode, profile_id, patientName, t, cancelPendingFlush, speak],
@@ -398,6 +408,7 @@ function CoachScreenInner() {
   return (
     <>
       <Stack.Screen options={{ title: t('title') }} />
+      <EmergencyAlert open={emergency} onDismiss={() => setEmergency(false)} />
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: colors.background }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
