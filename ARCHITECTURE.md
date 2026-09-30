@@ -57,114 +57,101 @@ Detailed architecture, data flows, and system design for CalmGuide.
 
 ## Moment Coach Data Flow
 
-The most important flow in CalmGuide. This is what happens when a caregiver types "Dad woke up screaming at midnight" and taps "Get Guidance".
+The most important flow in CalmGuide. This is what happens when a caregiver types "Dad woke up screaming at midnight" and taps "Get Guidance". Updated 2026-09-30 to show the safety-first ordering, the parallel context fetch (including OpenMRS), the response guard, and the background memory pass.
 
 ```
-Step 1: FRONTEND
+Step 1: CLIENT (web CoachPage / mobile coach.tsx)
 +------------------------------------------------------------------+
-|  Caregiver types message                                          |
-|  CoachPage -> useStreamingChat -> POST /api/coach/chat            |
-|  Body: { access_code, patient_name, message, session_id? }       |
+|  useStreamingChat -> POST /api/coach/chat  (SSE response)         |
+|  Body: { access_code, patient_name, message, session_id? }        |
+|  Header: X-App-Locale                                             |
 +--------------------------------+---------------------------------+
                                  |
                                  v
-
-Step 2: BACKEND - Profile Lookup
+Step 2: PROFILE + LOCALE
 +------------------------------------------------------------------+
-|  coach_chat()                                                    |
-|  1. Hash access_code (SHA-256)                                    |
-|  2. SELECT profile WHERE access_code_hash = hash                  |
-|  3. Load: disease_stage, behavioral_patterns, calming_strategies  |
+|  coach_chat(): hash access code -> load profile; resolve locale,  |
+|  response language and model (gpt-4o for es/hi, else default)     |
 +--------------------------------+---------------------------------+
                                  |
                                  v
-
-Step 3: BACKEND - RAG Context Retrieval
+Step 3: SAFETY GATE v2  (before any RAG, DB context, OpenMRS or LLM)
 +------------------------------------------------------------------+
-|  _fetch_rag_context(message)                                      |
+|  evaluate_safety_v2(message):                                     |
+|    deterministic regex gate (authoritative) -> fuzzy classifier   |
+|    -> category refinement                                         |
 |                                                                   |
-|  a) Embed query text via OpenAI text-embedding-3-large            |
-|  b) Hybrid search against rag_chunks:                             |
-|     - Cosine similarity (semantic)                                |
-|     - tsvector keyword match (+0.15 boost)                        |
-|  c) Fetch top-9 candidates, rerank by title overlap               |
-|  d) Return top-3 chunks above min_score (0.20)                    |
-|                                                                   |
-|  Result: 3 chunks (~5000 chars) from alz.org, Mayo Clinic, etc.   |
+|  EMERGENCY / HIGH ──► fixed, locale-aware escalation text          |
+|                       SSE {"safety": {"emergency": true}} -> red   |
+|                       alert on web and mobile. No LLM, no RAG,     |
+|                       no OpenMRS. Turn logged as is_safety_gate.   |
+|  MODERATE (medication risk) / LOW ──► continue                     |
 +--------------------------------+---------------------------------+
                                  |
                                  v
-
-Step 4: BACKEND - Prompt Assembly
+Step 4: CONTEXT, fetched in parallel (asyncio.gather)
++---------------------+----------------------+---------------------+
+| RAG                 | CalmGuide DB (DICE   | OpenMRS (optional)  |
+|                     | "Investigate")       |                     |
+| English retrieval   | dossier, relevant    | only if enabled AND |
+| query (translated   | past incidents,      | profile is linked.  |
+| for non-English)    | contraindicated +    | FHIR R4 summary from|
+| -> embed (text-     | effective            | warm SWR cache;     |
+| embedding-3-large)  | interventions,       | 1.5 s budget, else  |
+| -> pgvector hybrid  | frequency trends,    | coach continues     |
+| search -> rerank -> | delirium/pain flags, | without it          |
+| top 3 >= 0.20       | cross-patient, care  |                     |
+|                     | change               |                     |
++---------------------+----------------------+---------------------+
+                                 |
+                                 v
+Step 5: PROMPT ASSEMBLY  (render_coach_prompt, coach_system.jinja2)
 +------------------------------------------------------------------+
-|  render_coach_prompt() via Jinja2:                               |
-|                                                                   |
-|  coach_system.jinja2 template:                                   |
-|  +------------------------------------------------------------+  |
-|  | You are CalmGuide...                                        |  |
-|  |                                                             |  |
-|  | ## Patient Context                                          |  |
-|  | Name: {{ patient_name }}                                    |  |
-|  | Stage: {{ disease_stage }}                                  |  |
-|  | Behaviors: {{ behavioral_patterns }}                        |  |
-|  | Calming strategies: {{ calming_strategies }}                |  |
-|  |                                                             |  |
-|  | {% if rag_context %}                                        |  |
-|  | ## Relevant Caregiving Guidance                             |  |
-|  | {{ rag_context }}    <-- RAG chunks injected here           |  |
-|  | {% endif %}                                                 |  |
-|  |                                                             |  |
-|  | ## Response Format                                          |  |
-|  | 1. RIGHT NOW (60 seconds)                                   |  |
-|  | 2. WHY THIS IS HAPPENING                                    |  |
-|  | 3. WHAT NOT TO DO                                           |  |
-|  | 4. WHEN TO CALL FOR HELP                                    |  |
-|  |                                                             |  |
-|  | ## Absolute Rules                                           |  |
-|  | - Never contradict patient's reality                        |  |
-|  | - Never provide medical diagnosis                           |  |
-|  | - Never suggest physical restraint                          |  |
-|  +------------------------------------------------------------+  |
+|  Safety principles -> domain knowledge -> contraindicated list    |
+|  -> patient context -> clinical record block (if linked) ->        |
+|  memory/trend/delirium/pain blocks -> RAG guidance ->              |
+|  four-section response format with [[SECTION:...]] markers ->      |
+|  tone, distress, abuse and injection rules -> few-shot examples    |
 +--------------------------------+---------------------------------+
                                  |
                                  v
-
-Step 5: BACKEND - LLM Streaming
+Step 6: LLM STREAM  (OpenAI / Anthropic via LLMProvider)
 +------------------------------------------------------------------+
-|  LLM Provider (OpenAI / Anthropic)                                |
-|  1. Send system_prompt + conversation history + new message       |
-|  2. Stream response chunks via SSE                                |
-|  3. Each chunk: data: {"text": "Take a breath..."}\n\n           |
-|  4. Final: data: [DONE]\n\n                                      |
-|  5. Save user message + assistant response to conversations table |
+|  system prompt + conversation history + new message               |
+|  chunks -> SSE data: {"text": ...}                                |
+|  provider failure -> localized static fallback                    |
 +--------------------------------+---------------------------------+
                                  |
                                  v
-
-Step 6: FRONTEND - Rendering
+Step 7: RESPONSE GUARD  (post-stream)
 +------------------------------------------------------------------+
-|  useStreamingChat accumulates text chunks                         |
-|  parseCoachResponse() extracts 4 sections                        |
-|  CoachResponseRenderer renders with visual hierarchy:            |
-|                                                                   |
-|  ┌─────────────────────────────────────┐                          |
-|  │ RIGHT NOW          (primary bg,     │                          |
-|  │ 1. Approach slowly  elevated shadow)│                          |
-|  │ 2. Play music                       │                          |
-|  └─────────────────────────────────────┘                          |
-|  ┌─────────────────────────────────────┐                          |
-|  │ WHY THIS IS HAPPENING              │                          |
-|  │ (neutral surface card)              │                          |
-|  └─────────────────────────────────────┘                          |
-|  ┌─────────────────────────────────────┐                          |
-|  │▌WHAT NOT TO DO     (red left border,│                          |
-|  │▌                    red title)       │                          |
-|  └─────────────────────────────────────┘                          |
-|  ┌─────────────────────────────────────┐                          |
-|  │ WHEN TO ESCALATE   (muted title)    │                          |
-|  └─────────────────────────────────────┘                          |
+|  validate_response_quality: language/script, respect, medication  |
+|  dosing next to a linked record's medication                      |
+|  fail -> one LLM repair pass -> still failing -> static fallback   |
+|  SSE data: {"replace": ...} swaps the text on web and mobile       |
++--------------------------------+---------------------------------+
+                                 |
+                                 v
+Step 8: DONE + BACKGROUND MEMORY PASS  (DICE "Evaluate", off the
+        critical path, runs even if the caregiver closes the app)
++------------------------------------------------------------------+
+|  save encrypted assistant turn -> tags -> incident extraction ->   |
+|  insights -> dossier refresh                                       |
++--------------------------------+---------------------------------+
+                                 |
+                                 v
+Step 9: CLIENT RENDERING
++------------------------------------------------------------------+
+|  parseCoachResponse() splits on [[SECTION:...]] markers            |
+|  CoachResponseRenderer: RIGHT NOW (primary) · WHY · WHAT NOT TO DO |
+|  (red border) · WHEN TO CALL FOR HELP                             |
+|  Read-aloud: web speaks sentence by sentence as text streams;      |
+|  mobile speaks once the reply is complete                         |
 +------------------------------------------------------------------+
 ```
+
+Evaluation of this flow's output is described in
+[`docs/clinical-evaluation/EVALUATION_FRAMEWORK.md`](docs/clinical-evaluation/EVALUATION_FRAMEWORK.md).
 
 ---
 
