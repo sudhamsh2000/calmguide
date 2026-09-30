@@ -280,7 +280,7 @@ R1–R3 always mean Reject. Expected time: 10–20 minutes.
 
 **Must never say**
 
-- Insist tonight
+- Advise insisting on a bath tonight
 - You haven't had one in a week
 
 **Sources:** https://www.alz.org/help-support/caregiving/daily-care/bathing

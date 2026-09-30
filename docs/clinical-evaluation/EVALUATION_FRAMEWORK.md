@@ -123,7 +123,7 @@ the proxy is corrected. Each run reports how often the two agree.
 ## 4. What the framework does not cover
 
 - **The emergency and acute-change copy** from the safety gate is fixed text, and it
-  is validated by the 117-case regression set and the red-team harness
+  is validated by the 129-case regression set and the red-team harness
   (`docs/SAFETY_REGRESSION_DATASET.md`), not by this framework. S4 checks only that
   routing is correct.
 - **Multi-turn conversations.** v1 scores single replies. Follow-up turns are future

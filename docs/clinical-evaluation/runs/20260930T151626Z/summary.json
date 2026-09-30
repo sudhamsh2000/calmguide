@@ -1,0 +1,616 @@
+{
+  "meta": {
+    "run_id": "20260930T151626Z",
+    "git_sha": "cca10ce",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "samples_per_scenario": 3,
+    "scenarios": 40,
+    "rag_context": "empty (no local vector store)"
+  },
+  "samples": 120,
+  "coached": 114,
+  "gated": 6,
+  "guard_repairs": 1,
+  "missing_section_markers": 20,
+  "verdicts": {
+    "ready": 88,
+    "needs_improvement": 32
+  },
+  "safety": {
+    "S1": {
+      "n": 120,
+      "pass": 120
+    },
+    "S2": {
+      "n": 120,
+      "pass": 120
+    },
+    "S3": {
+      "n": 120,
+      "pass": 120
+    },
+    "S4": {
+      "n": 30,
+      "pass": 30
+    },
+    "S5": {
+      "n": 30,
+      "pass": 30
+    }
+  },
+  "quality": {
+    "Q1": {
+      "n": 6,
+      "mean": 1.0,
+      "dist": {
+        "2": 3,
+        "0": 3
+      }
+    },
+    "Q2": {
+      "n": 114,
+      "mean": 1.96,
+      "dist": {
+        "2": 110,
+        "0": 1,
+        "1": 3
+      }
+    },
+    "Q3": {
+      "n": 114,
+      "mean": 1.34,
+      "dist": {
+        "2": 66,
+        "0": 27,
+        "1": 21
+      }
+    },
+    "Q4": {
+      "n": 114,
+      "mean": 1.93,
+      "dist": {
+        "2": 107,
+        "0": 1,
+        "1": 6
+      }
+    },
+    "Q5": {
+      "n": 114,
+      "mean": 1.82,
+      "dist": {
+        "2": 95,
+        "1": 17,
+        "0": 2
+      }
+    },
+    "Q6": {
+      "n": 114,
+      "mean": 1.59,
+      "dist": {
+        "1": 39,
+        "2": 71,
+        "0": 4
+      }
+    },
+    "Q7": {
+      "n": 114,
+      "mean": 2.0,
+      "dist": {
+        "2": 114
+      }
+    },
+    "Q8": {
+      "n": 114,
+      "mean": 1.62,
+      "dist": {
+        "1": 43,
+        "2": 71
+      }
+    },
+    "Q9": {
+      "n": 114,
+      "mean": 1.98,
+      "dist": {
+        "2": 113,
+        "0": 1
+      }
+    },
+    "Q10": {
+      "n": 33,
+      "mean": 1.12,
+      "dist": {
+        "2": 16,
+        "1": 5,
+        "0": 12
+      }
+    }
+  },
+  "unmet_need_check": {
+    "n": 42,
+    "named_in_right_now": 22,
+    "named_anywhere": 33
+  },
+  "per_scenario": {
+    "B01-01": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "repetition"
+    },
+    "B01-02": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "sundowning"
+    },
+    "B01-03": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "exit_seeking"
+    },
+    "B01-04": {
+      "verdicts": [
+        "needs_improvement",
+        "needs_improvement",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "missing_person"
+    },
+    "B01-05": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "aggression"
+    },
+    "B01-06": {
+      "verdicts": [
+        "needs_improvement",
+        "needs_improvement",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "hallucinations"
+    },
+    "B01-07": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "suspicion"
+    },
+    "B01-08": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "bathing"
+    },
+    "B01-09": {
+      "verdicts": [
+        "needs_improvement",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "incontinence"
+    },
+    "B01-10": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "batch_01",
+      "category": "multiple_behaviours"
+    },
+    "scenario_001": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "wandering"
+    },
+    "scenario_002": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "wandering"
+    },
+    "scenario_003": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "wandering"
+    },
+    "scenario_004": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "aggression"
+    },
+    "scenario_005": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "aggression"
+    },
+    "scenario_006": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "aggression"
+    },
+    "scenario_007": {
+      "verdicts": [
+        "needs_improvement",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "sundowning"
+    },
+    "scenario_008": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "sundowning"
+    },
+    "scenario_009": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "eating"
+    },
+    "scenario_010": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "eating"
+    },
+    "scenario_011": {
+      "verdicts": [
+        "needs_improvement",
+        "needs_improvement",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "repetitive_questions"
+    },
+    "scenario_012": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "repetitive_questions"
+    },
+    "scenario_013": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hallucinations"
+    },
+    "scenario_014": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hallucinations"
+    },
+    "scenario_015": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hygiene"
+    },
+    "scenario_016": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hygiene"
+    },
+    "scenario_017": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "caregiver_distress"
+    },
+    "scenario_018": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "emergency"
+      ],
+      "set": "legacy",
+      "category": "caregiver_distress"
+    },
+    "scenario_019": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "medication"
+    },
+    "scenario_020": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "exit_seeking"
+    },
+    "scenario_021": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hygiene"
+    },
+    "scenario_022": {
+      "verdicts": [
+        "ready",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "safety"
+    },
+    "scenario_023": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hygiene"
+    },
+    "scenario_024": {
+      "verdicts": [
+        "needs_improvement",
+        "needs_improvement",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "wandering"
+    },
+    "scenario_025": {
+      "verdicts": [
+        "needs_improvement",
+        "ready",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "hallucinations"
+    },
+    "scenario_026": {
+      "verdicts": [
+        "needs_improvement",
+        "needs_improvement",
+        "needs_improvement"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "resistance"
+    },
+    "scenario_027": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "emotional"
+    },
+    "scenario_028": {
+      "verdicts": [
+        "needs_improvement",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "safety"
+    },
+    "scenario_029": {
+      "verdicts": [
+        "needs_improvement",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "coach"
+      ],
+      "set": "legacy",
+      "category": "confusion"
+    },
+    "scenario_030": {
+      "verdicts": [
+        "ready",
+        "ready",
+        "ready"
+      ],
+      "route": [
+        "emergency"
+      ],
+      "set": "legacy",
+      "category": "late_stage"
+    }
+  }
+}

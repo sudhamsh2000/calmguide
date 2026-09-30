@@ -829,10 +829,11 @@
       "must_not_say": [
         {
           "id": "insist",
-          "text": "Insist tonight",
+          "text": "Advise insisting on a bath tonight",
           "any_of": [
-            "insist",
-            "must have a bath tonight"
+            "(keep|try|you should|you need to|be firm and) insist",
+            "insist (that )?(he|arthur) (take|has|have|get)",
+            "must (have|take) a bath tonight"
           ]
         },
         {

@@ -35,7 +35,7 @@ _SECTION_MARKER = re.compile(r"\[\[SECTION:([a-z-]+)\]\]")
 _CAUSE_TERMS = re.compile(
     r"(?i)\b(toilet|bathroom|restroom|bladder|thirst\w*|drink\w*|dehydrat\w*|hungry|hunger|"
     r"snack|pain\w*|hurt\w*|sore|too (hot|cold)|temperature|chilly|tired|fatigue\w*|exhaust\w*|"
-    r"constipat\w*|overstimulat\w*|infection|uti\b|fever)"
+    r"constipat\w*|overstimulat\w*|sensory overload|infection|uti\b|fever)"
 )
 
 # Scripted lines the 24 Sep review found backfire, plus prompt bans (Q7).

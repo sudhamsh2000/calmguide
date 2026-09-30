@@ -73,11 +73,16 @@ def load_scenarios(which: str) -> list[dict]:
 
 def _git_sha() -> str:
     try:
-        return (
+        sha = (
             subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=REPO)
             .decode()
             .strip()
         )
+        # Uncommitted app code means the run doesn't reflect HEAD; say so.
+        dirty = subprocess.check_output(
+            ["git", "status", "--porcelain", "--", "backend/app"], cwd=REPO
+        ).strip()
+        return f"{sha}-dirty" if dirty else sha
     except Exception:  # pragma: no cover
         return "unknown"
 
