@@ -62,30 +62,30 @@ The most important flow in CalmGuide. This is what happens when a caregiver type
 ```
 Step 1: CLIENT (web CoachPage / mobile coach.tsx)
 +------------------------------------------------------------------+
-|  useStreamingChat -> POST /api/coach/chat  (SSE response)         |
-|  Body: { access_code, patient_name, message, session_id? }        |
-|  Header: X-App-Locale                                             |
+|  useStreamingChat -> POST /api/coach/chat  (SSE response)        |
+|  Body: { access_code, patient_name, message, session_id? }       |
+|  Header: X-App-Locale                                            |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 2: PROFILE + LOCALE
 +------------------------------------------------------------------+
-|  coach_chat(): hash access code -> load profile; resolve locale,  |
-|  response language and model (gpt-4o for es/hi, else default)     |
+|  coach_chat(): hash access code -> load profile; resolve locale, |
+|  response language and model (gpt-4o for es/hi, else default)    |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 3: SAFETY GATE v2  (before any RAG, DB context, OpenMRS or LLM)
 +------------------------------------------------------------------+
-|  evaluate_safety_v2(message):                                     |
-|    deterministic regex gate (authoritative) -> fuzzy classifier   |
-|    -> category refinement                                         |
-|                                                                   |
-|  EMERGENCY / HIGH ──► fixed, locale-aware escalation text          |
-|                       SSE {"safety": {"emergency": true}} -> red   |
-|                       alert on web and mobile. No LLM, no RAG,     |
-|                       no OpenMRS. Turn logged as is_safety_gate.   |
-|  MODERATE (medication risk) / LOW ──► continue                     |
+|  evaluate_safety_v2(message):                                    |
+|    deterministic regex gate (authoritative) -> fuzzy classifier  |
+|    -> category refinement                                        |
+|                                                                  |
+|  EMERGENCY / HIGH ──► fixed, locale-aware escalation text        |
+|                       SSE {"safety": {"emergency": true}} -> red |
+|                       alert on web and mobile. No LLM, no RAG,   |
+|                       no OpenMRS. Turn logged as is_safety_gate. |
+|  MODERATE (medication risk) / LOW ──► continue                   |
 +--------------------------------+---------------------------------+
                                  |
                                  v
@@ -107,46 +107,46 @@ Step 4: CONTEXT, fetched in parallel (asyncio.gather)
                                  v
 Step 5: PROMPT ASSEMBLY  (render_coach_prompt, coach_system.jinja2)
 +------------------------------------------------------------------+
-|  Safety principles -> domain knowledge -> contraindicated list    |
-|  -> patient context -> clinical record block (if linked) ->        |
-|  memory/trend/delirium/pain blocks -> RAG guidance ->              |
-|  four-section response format with [[SECTION:...]] markers ->      |
-|  tone, distress, abuse and injection rules -> few-shot examples    |
+|  Safety principles -> domain knowledge -> contraindicated list   |
+|  -> patient context -> clinical record block (if linked) ->      |
+|  memory/trend/delirium/pain blocks -> RAG guidance ->            |
+|  four-section response format with [[SECTION:...]] markers ->    |
+|  tone, distress, abuse and injection rules -> few-shot examples  |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 6: LLM STREAM  (OpenAI / Anthropic via LLMProvider)
 +------------------------------------------------------------------+
-|  system prompt + conversation history + new message               |
-|  chunks -> SSE data: {"text": ...}                                |
-|  provider failure -> localized static fallback                    |
+|  system prompt + conversation history + new message              |
+|  chunks -> SSE data: {"text": ...}                               |
+|  provider failure -> localized static fallback                   |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 7: RESPONSE GUARD  (post-stream)
 +------------------------------------------------------------------+
-|  validate_response_quality: language/script, respect, medication  |
-|  dosing next to a linked record's medication                      |
-|  fail -> one LLM repair pass -> still failing -> static fallback   |
-|  SSE data: {"replace": ...} swaps the text on web and mobile       |
+|  validate_response_quality: language/script, respect, medication |
+|  dosing next to a linked record's medication                     |
+|  fail -> one LLM repair pass -> still failing -> static fallback |
+|  SSE data: {"replace": ...} swaps the text on web and mobile     |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 8: DONE + BACKGROUND MEMORY PASS  (DICE "Evaluate", off the
         critical path, runs even if the caregiver closes the app)
 +------------------------------------------------------------------+
-|  save encrypted assistant turn -> tags -> incident extraction ->   |
-|  insights -> dossier refresh                                       |
+|  save encrypted assistant turn -> tags -> incident extraction -> |
+|  insights -> dossier refresh                                     |
 +--------------------------------+---------------------------------+
                                  |
                                  v
 Step 9: CLIENT RENDERING
 +------------------------------------------------------------------+
-|  parseCoachResponse() splits on [[SECTION:...]] markers            |
-|  CoachResponseRenderer: RIGHT NOW (primary) · WHY · WHAT NOT TO DO |
-|  (red border) · WHEN TO CALL FOR HELP                             |
-|  Read-aloud: web speaks sentence by sentence as text streams;      |
-|  mobile speaks once the reply is complete                         |
+|  parseCoachResponse() splits on [[SECTION:...]] markers          |
+|  CoachResponseRenderer: RIGHT NOW (primary) · WHY ·              |
+|  WHAT NOT TO DO (red border) · WHEN TO CALL FOR HELP             |
+|  Read-aloud: web speaks sentence by sentence as text streams;    |
+|  mobile speaks once the reply is complete                        |
 +------------------------------------------------------------------+
 ```
 
