@@ -8,7 +8,7 @@ never silently forgotten) but never turned into a routing assertion, per
 Phase 8's explicit instruction not to guess medically-correct routing.
 
 This file intentionally does not hand-write a test function per case
-(117 of them) — one parametrized test loads the whole dataset.
+(129 of them) — one parametrized test loads the whole dataset.
 """
 
 import json

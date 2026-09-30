@@ -209,7 +209,7 @@ adds a test automatically.
 
 - **Not clinically validated**, as stated repeatedly above — this is the
   single most important limitation and the reason this document exists.
-- **English-majority.** Only 12 of 117 cases are non-English, covering one
+- **English-majority.** Only 12 of 129 cases are non-English, covering one
   representative phrase per language per category the deterministic gate
   already supports — this is a coverage *sample*, not exhaustive
   multilingual regression testing.

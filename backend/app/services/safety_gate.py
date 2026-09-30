@@ -110,6 +110,13 @@ _SELF_HARM_PATTERNS: list[re.Pattern[str]] = [
         r"\b(?:plan(?:ning)?\s+to\s+(?:kill|end|harm)\s+myself)\b",
         r"\b(?:no\s+(?:reason|point)\s+(?:to|in)\s+(?:go(?:ing)?\s+on\b(?!\s+(?:a\s+|that\s+|the\s+|his\s+|her\s+|any\s+|this\s+))|live|living|being\s+alive))\b",
         r"\b(?:thought(?:s)?\s+(?:of|about)\s+(?:suicide|killing\s+myself|ending\s+(?:it|my\s+life)|dying))\b",
+        # Passive ideation. Anchored on "me"/"I" so "the kids are better off
+        # without screens" doesn't match. Added 2026-09-30: "everyone would be
+        # better off without me" was reaching the LLM as a routine issue.
+        r"\bbetter\s+off\s+without\s+me\b",
+        r"\b(?:I'?d|I\s+would)\s+be\s+better\s+off\s+dead\b",
+        r"\bbetter\s+off\s+if\s+I\s+(?:was|were)(?:n'?t|\s+not)\s+(?:here|around|alive)\b",
+        r"\bbetter\s+off\s+if\s+I\s+(?:was|were)\s+(?:gone|dead)\b",
     ]
 ]
 

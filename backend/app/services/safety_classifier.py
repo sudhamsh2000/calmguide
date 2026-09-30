@@ -171,6 +171,22 @@ _WINDOW_SLACK_WORDS = 3
 # for "heart attack") without requiring exact spelling.
 _WORD_MATCH_THRESHOLD = 0.72
 
+# Words that clear _WORD_MATCH_THRESHOLD against a content word but are a
+# different, common caregiving word, so they must never stand in for it.
+# "hasn't bathed" scored 0.769 against "can't breathe" and sent a bath-refusal
+# question to the emergency screen (found 2026-09-30 by the Moment Coach
+# validation run, backend/tests/scenarios/scenario_015.json).
+_FALSE_FRIENDS: dict[str, frozenset[str]] = {
+    "breathe": frozenset({"bath", "baths", "bathe", "bathed", "bathes", "bathing"}),
+}
+
+# Phrases whose meaning lives in a stopword. With "up" stripped, "can't get up"
+# gated on "can't get" alone, so "I can't get him to eat" and "can't get her in
+# the tub" were sent to the emergency screen as falls (found 2026-09-30).
+_PHRASE_CONTENT_OVERRIDES: dict[str, list[str]] = {
+    "can't get up": ["can't", "get", "up"],
+}
+
 # Function words excluded when picking out a phrase's "content" words for the
 # gate. Deliberately short list of near-universal stopwords, not a full NLP
 # stopword corpus — the intent is only to strip words with essentially no
@@ -302,7 +318,7 @@ def _best_similarity(message: str, phrase: str) -> float:
 
     message_words = message.lower().split()
     phrase_words = phrase.lower().split()
-    phrase_content = _content_words(phrase_words)
+    phrase_content = _PHRASE_CONTENT_OVERRIDES.get(phrase.lower()) or _content_words(phrase_words)
     min_span = len(phrase_words)
     max_span = min_span + _WINDOW_SLACK_WORDS
     n = len(message_words)
@@ -323,6 +339,7 @@ def _best_similarity(message: str, phrase: str) -> float:
             has_support = all(
                 any(
                     SequenceMatcher(None, content_word, w).ratio() >= _WORD_MATCH_THRESHOLD
+                    and w.strip(".,!?;:'\"") not in _FALSE_FRIENDS.get(content_word, ())
                     for w in window
                 )
                 for content_word in phrase_content
