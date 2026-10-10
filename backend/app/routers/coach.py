@@ -158,6 +158,17 @@ async def _record_clinical_sync(profile_id: str, status: str) -> None:
         await bg_session.commit()
 
 
+def short_circuit_response_text(decision: SafetyDecision, emergency_locale: str) -> str:
+    """The fixed text for a decision with `allow_llm=False`. Shared with the
+    voice path so a spoken emergency gets exactly the same copy as typed chat."""
+    if decision.risk_level is RiskLevel.HIGH:
+        # Only ACUTE_CHANGE produces HIGH today (safety_decision.py). Its
+        # advisory text is the acute-change screen's own existing message,
+        # not new copy — see acute_change_screen.get_acute_change_advisory_message.
+        return get_acute_change_advisory_message()
+    return build_gate_response_text(response_category_for_text(decision.category), emergency_locale)
+
+
 def _short_circuit_safety_response(
     *,
     decision: SafetyDecision,
@@ -185,15 +196,7 @@ def _short_circuit_safety_response(
     also reachable for HIGH, which didn't exist as a routing outcome
     before this phase.
     """
-    if decision.risk_level is RiskLevel.HIGH:
-        # Only ACUTE_CHANGE produces HIGH today (safety_decision.py). Its
-        # advisory text is the acute-change screen's own existing message,
-        # not new copy — see acute_change_screen.get_acute_change_advisory_message.
-        response_text = get_acute_change_advisory_message()
-    else:
-        response_text = build_gate_response_text(
-            response_category_for_text(decision.category), emergency_locale
-        )
+    response_text = short_circuit_response_text(decision, emergency_locale)
 
     async def _save_safety_turn() -> None:
         from app.db import get_session_factory

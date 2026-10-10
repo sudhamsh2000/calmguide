@@ -38,6 +38,21 @@ class Settings(BaseSettings):
     # switched on silently by deploying. When disabled the client falls back
     # to the browser's built-in speech, so read-aloud still works either way.
     TTS_ENABLED: bool = False
+    # Voice-only conversations through an ElevenLabs agent (app.routers.voice).
+    # ElevenLabs does speech-to-text and text-to-speech; its "Custom LLM" is
+    # pointed at /api/voice/llm, so every spoken turn goes through the safety
+    # gate before any model sees it. Off by default, like TTS.
+    VOICE_ENABLED: bool = False
+    # Shared secret ElevenLabs sends as `Authorization: Bearer ...` on each
+    # Custom LLM call. Store the same value as the agent's Custom LLM API key.
+    VOICE_LLM_SECRET: str = ""
+    # Used only to mint signed URLs for a private agent. Leave empty for a
+    # public agent, where the client connects with ELEVENLABS_AGENT_ID alone.
+    ELEVENLABS_API_KEY: str = ""
+    ELEVENLABS_AGENT_ID: str = ""
+    # Lifetime of the per-call voice token. Long enough for one call, short
+    # enough that a leaked token is quickly useless.
+    VOICE_TOKEN_TTL_SECONDS: int = 1800
     # HMAC key for access/facility code hashing. Defeats offline dictionary
     # attacks on the stored hashes. Falls back to CONVERSATION_ENCRYPTION_KEY
     # when unset so existing deployments keep working.

@@ -388,6 +388,7 @@ def create_app() -> FastAPI:
     from app.routers.prediction import router as care_patterns_router
     from app.routers.profile import router as profile_router
     from app.routers.speech import router as speech_router
+    from app.routers.voice import router as voice_router
 
     app.include_router(health_router)
     app.include_router(profile_router, prefix="/api")
@@ -401,6 +402,7 @@ def create_app() -> FastAPI:
     app.include_router(checkin_daily_router, prefix="/api")
     app.include_router(care_patterns_router, prefix="/api")
     app.include_router(speech_router, prefix="/api")
+    app.include_router(voice_router, prefix="/api")
     app.include_router(incidents_router, prefix="/api")
     app.include_router(care_changes_router, prefix="/api")
     app.include_router(facility_router, prefix="/api")
