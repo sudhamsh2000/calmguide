@@ -947,3 +947,50 @@ export async function synthesizeSpeech(
 
 // Re-export ProfileResponse as Profile for backward compatibility with ProfileContext
 export type { ProfileResponse as Profile };
+
+// ── Voice calls (ElevenLabs agent, CalmGuide as its Custom LLM) ──────────────
+
+export interface VoiceSessionResponse {
+  session_id: string;
+  /** Passed to ElevenLabs as customLlmExtraBody; relayed back on every turn. */
+  voice_token: string;
+  expires_in: number;
+  agent_id: string;
+  /** Set for a private agent; connect with this instead of agent_id. */
+  signed_url: string | null;
+}
+
+export interface VoiceSafetyStatus {
+  triggered: boolean;
+  emergency: boolean;
+  latest_risk_level: string | null;
+  emergency_count: number;
+}
+
+/** Same identity rules as coachChat: access code for families, staff JWT +
+ * profile id in facility mode. */
+export async function startVoiceSession(
+  accessCode: string | null,
+  patientName: string,
+  profileId?: string,
+): Promise<VoiceSessionResponse> {
+  const facilityToken = profileId ? getFacilityToken() : null;
+  return request<VoiceSessionResponse>('/api/voice/sessions', {
+    method: 'POST',
+    headers: facilityToken ? { Authorization: `Bearer ${facilityToken}` } : {},
+    body: JSON.stringify({
+      ...(profileId ? { profile_id: profileId } : { access_code: accessCode }),
+      patient_name: patientName,
+    }),
+  });
+}
+
+/** Whether any spoken turn in this call tripped the safety gate. */
+export async function getVoiceSafety(
+  sessionId: string,
+  voiceToken: string,
+): Promise<VoiceSafetyStatus> {
+  return request<VoiceSafetyStatus>(`/api/voice/sessions/${encodeURIComponent(sessionId)}/safety`, {
+    headers: { Authorization: `Bearer ${voiceToken}` },
+  });
+}

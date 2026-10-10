@@ -23,6 +23,7 @@ import { getAccessCode, getAutoSpeakReplies } from '@/lib/storage';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import type { CoachSection } from '@/features/coach/parseResponse';
 import { buildSpeakableText, nextSpeakableChunk } from '@/features/coach/speakableText';
+import { Link } from '@/i18n/navigation';
 
 interface ChatExchange {
   userMessage: string;
@@ -38,6 +39,55 @@ function GreetingCard() {
         {t('greeting')} <span className="text-foreground-muted">{t('greeting_detail')}</span>
       </p>
     </div>
+  );
+}
+
+/** Switch to a hands-free voice call — for when typing and reading is too slow. */
+function TalkInsteadLink({ href, compact = false }: { href: string; compact?: boolean }) {
+  const t = useTranslations('coach');
+  const icon = (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0" />
+      <path d="M12 18v3" />
+    </svg>
+  );
+  if (compact) {
+    return (
+      <Link
+        href={href}
+        className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/5 transition-colors"
+      >
+        {icon}
+        {t('voice.entry_button')}
+      </Link>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      className="focus-ring mb-3 flex items-center gap-3 rounded-2xl border border-foreground/10 bg-surface/80 px-4 py-3 hover:bg-surface transition-colors"
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-onPrimary">
+        {icon}
+      </span>
+      <span className="flex-1">
+        <span className="block text-base font-semibold text-foreground">
+          {t('voice.entry_button')}
+        </span>
+        <span className="block text-sm text-foreground-muted">{t('voice.entry_hint')}</span>
+      </span>
+    </Link>
   );
 }
 
@@ -84,6 +134,14 @@ function CoachPageInner() {
       ).toString()}`
     : '/home';
   const backLabel = isFacilityMode ? tc('nav.back') : tc('nav.back_to_home');
+  const voiceHref = isFacilityMode
+    ? `/voice?${new URLSearchParams(
+        Object.entries({ profile_id: profileId, unit, room, bed }).filter(([, v]) => v != null) as [
+          string,
+          string,
+        ][],
+      ).toString()}`
+    : '/voice';
 
   // Flag that coach was visited this session (suppresses home feedback card)
   useEffect(() => {
@@ -270,6 +328,8 @@ function CoachPageInner() {
 
           <GreetingCard />
 
+          <TalkInsteadLink href={voiceHref} />
+
           <CoachInput onSubmit={handleSendMessage} disabled={isStreaming} />
         </div>
       </main>
@@ -299,11 +359,13 @@ function CoachPageInner() {
               aria-label={tc('loading')}
             />
           )}
+          <span className="ms-auto" />
+          {!isSpeaking && <TalkInsteadLink href={voiceHref} compact />}
           {isSpeaking && (
             <button
               type="button"
               onClick={stop}
-              className="ms-auto inline-flex items-center gap-2 rounded-full border border-foreground/15 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/5 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-foreground/15 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/5 transition-colors"
             >
               <svg
                 width="12"

@@ -31,6 +31,7 @@ from app.config import get_settings
 from app.db import get_session
 from app.models.conversation import Conversation
 from app.models.profile import Profile
+from app.models.safety_event import SafetyEvent
 from app.models.staff import Staff
 from app.routers.coach import (
     _persist_and_learn,
@@ -39,7 +40,7 @@ from app.routers.coach import (
     short_circuit_response_text,
 )
 from app.schemas.profile import ErrorResponse
-from app.schemas.voice import VoiceSessionRequest, VoiceSessionResponse
+from app.schemas.voice import VoiceSafetyStatus, VoiceSessionRequest, VoiceSessionResponse
 from app.services.auth import hash_access_code
 from app.services.availability import record_llm_failure, record_llm_success
 from app.services.crypto import encrypt
@@ -185,6 +186,57 @@ async def create_voice_session(
         expires_in=settings.VOICE_TOKEN_TTL_SECONDS,
         agent_id=settings.ELEVENLABS_AGENT_ID,
         signed_url=signed_url,
+    )
+
+
+@router.get(
+    "/voice/sessions/{session_id}/safety",
+    response_model=VoiceSafetyStatus,
+    responses={401: {"model": ErrorResponse}},
+)
+async def voice_session_safety(
+    session_id: str, request: Request, session: AsyncSession = Depends(get_session)
+):
+    """Whether any spoken turn in this call tripped the safety gate.
+
+    The ElevenLabs SDK only hands the app the agent's words, not CalmGuide's
+    decision, so the call screen asks here after each agent reply and raises
+    the same full-screen alert typed chat shows. Authorized by the call's own
+    voice token (Authorization: Bearer), which must name this session.
+    """
+    _require_voice_enabled()
+    auth = request.headers.get("authorization", "")
+    try:
+        claims = verify_voice_token(auth[7:] if auth.startswith("Bearer ") else "")
+    except jwt.InvalidTokenError as exc:
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "Invalid or expired voice token", "code": "INVALID_TOKEN"},
+        ) from exc
+    if claims.get("session_id") != session_id:
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "Token does not match this call", "code": "INVALID_TOKEN"},
+        )
+
+    result = await session.execute(
+        select(SafetyEvent)
+        .where(
+            SafetyEvent.session_id == session_id,
+            SafetyEvent.profile_id == claims["profile_id"],
+            SafetyEvent.event_type == "safety_gate_triggered",
+        )
+        .order_by(SafetyEvent.created_at.desc())
+    )
+    events = [e for e in result.scalars().all() if (e.details or {}).get("channel") == "voice"]
+    if not events:
+        return VoiceSafetyStatus(triggered=False, emergency=False)
+    emergency_count = sum(1 for e in events if (e.details or {}).get("emergency"))
+    return VoiceSafetyStatus(
+        triggered=True,
+        emergency=emergency_count > 0,
+        latest_risk_level=(events[0].details or {}).get("risk_level"),
+        emergency_count=emergency_count,
     )
 
 
@@ -344,23 +396,25 @@ async def voice_llm_turn(request: Request, session: AsyncSession = Depends(get_s
             ),
             label=f"voice-safety:{session_id}",
         )
-        _spawn_background(
-            log_safety_event(
-                event_type="safety_gate_triggered",
-                source=decision.source.value,
-                category=decision.category.value if decision.category else None,
-                profile_id=profile_id,
-                session_id=session_id,
-                staff_id=staff_id,
-                facility_id=facility_id,
-                locale_code=locale_code,
-                confidence=decision.confidence,
-                details={
-                    "channel": "voice",
-                    "emergency": decision.risk_level is RiskLevel.EMERGENCY,
-                },
-            ),
-            label=f"voice-safety-log:{session_id}",
+        # Awaited, not detached: the call screen reads this event right after
+        # the reply arrives (GET /voice/sessions/{id}/safety) to raise the
+        # emergency alert, so it must exist before the reply goes out. It is
+        # one small insert and never raises.
+        await log_safety_event(
+            event_type="safety_gate_triggered",
+            source=decision.source.value,
+            category=decision.category.value if decision.category else None,
+            profile_id=profile_id,
+            session_id=session_id,
+            staff_id=staff_id,
+            facility_id=facility_id,
+            locale_code=locale_code,
+            confidence=decision.confidence,
+            details={
+                "channel": "voice",
+                "risk_level": decision.risk_level.value,
+                "emergency": decision.risk_level is RiskLevel.EMERGENCY,
+            },
         )
         logger.info(
             "Voice safety short-circuit (%s, risk_level=%s) for session %s",

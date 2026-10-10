@@ -18,3 +18,16 @@ class VoiceSessionResponse(BaseModel):
     # Set when ELEVENLABS_API_KEY is configured (private agent); connect with
     # this instead of agent_id.
     signed_url: str | None = None
+
+
+class VoiceSafetyStatus(BaseModel):
+    """Whether any spoken turn in a call tripped the safety gate."""
+
+    triggered: bool
+    # True once any turn was an EMERGENCY decision — the call screen shows the
+    # full-screen call alert. HIGH (acute change) alone leaves this False.
+    emergency: bool
+    latest_risk_level: str | None = None
+    # Lets the client raise the alert again for a later emergency turn after
+    # the caregiver dismissed an earlier one.
+    emergency_count: int = 0

@@ -17,6 +17,7 @@
     "format:check": "prettier --ignore-path ../.prettierignore --check ."
   },
   "dependencies": {
+    "@elevenlabs/react": "^1.17.0",
     "@swc/helpers": "^0.5.20",
     "next": "^16.1.0",
     "next-intl": "^4.8.4",

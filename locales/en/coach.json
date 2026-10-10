@@ -44,5 +44,37 @@
     "dismiss": "Close",
     "sound_on": "Sound on",
     "sound_off": "Sound off"
+  },
+  "voice": {
+    "entry_button": "Talk instead",
+    "entry_hint": "Hands full? Have a voice conversation.",
+    "title": "Voice call",
+    "intro": "Speak naturally — CalmGuide listens and answers out loud. Keep this screen open during the call.",
+    "start": "Start voice call",
+    "start_again": "Start a new call",
+    "end": "End call",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "muted_notice": "Your microphone is muted.",
+    "status": {
+      "idle": "Ready when you are",
+      "starting": "Connecting…",
+      "listening": "Listening…",
+      "speaking": "CalmGuide is speaking",
+      "ended": "Call ended"
+    },
+    "transcript_label": "What was said",
+    "you": "You",
+    "agent": "CalmGuide",
+    "emergency_cta": "Call {number}",
+    "emergency_hint": "If someone is in danger, call now. You don't need to end this call first.",
+    "type_instead": "Type instead",
+    "error": {
+      "unavailable": "Voice calls aren't available right now. You can still type to the Moment Coach.",
+      "mic_denied": "CalmGuide needs your microphone for a voice call. Allow microphone access in your browser settings, then try again.",
+      "no_profile": "No access code found. Please set up your profile first.",
+      "failed": "The call couldn't connect. Please try again, or type instead.",
+      "dropped": "The call ended unexpectedly."
+    }
   }
 }

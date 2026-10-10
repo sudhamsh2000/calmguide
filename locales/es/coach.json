@@ -44,5 +44,37 @@
     "dismiss": "Cerrar",
     "sound_on": "Sonido activado",
     "sound_off": "Sonido desactivado"
+  },
+  "voice": {
+    "entry_button": "Hablar en su lugar",
+    "entry_hint": "¿Tiene las manos ocupadas? Converse por voz.",
+    "title": "Llamada de voz",
+    "intro": "Hable con naturalidad: CalmGuide escucha y responde en voz alta. Mantenga esta pantalla abierta durante la llamada.",
+    "start": "Iniciar llamada de voz",
+    "start_again": "Iniciar una nueva llamada",
+    "end": "Terminar llamada",
+    "mute": "Silenciar",
+    "unmute": "Activar micrófono",
+    "muted_notice": "Su micrófono está silenciado.",
+    "status": {
+      "idle": "Listo cuando usted lo esté",
+      "starting": "Conectando…",
+      "listening": "Escuchando…",
+      "speaking": "CalmGuide está hablando",
+      "ended": "Llamada terminada"
+    },
+    "transcript_label": "Lo que se dijo",
+    "you": "Usted",
+    "agent": "CalmGuide",
+    "emergency_cta": "Llamar al {number}",
+    "emergency_hint": "Si alguien está en peligro, llame ahora. No necesita terminar esta llamada primero.",
+    "type_instead": "Escribir en su lugar",
+    "error": {
+      "unavailable": "Las llamadas de voz no están disponibles en este momento. Puede seguir escribiendo al Moment Coach.",
+      "mic_denied": "CalmGuide necesita su micrófono para una llamada de voz. Permita el acceso al micrófono en la configuración del navegador e inténtelo de nuevo.",
+      "no_profile": "No se encontró un código de acceso. Primero configure su perfil.",
+      "failed": "No se pudo conectar la llamada. Inténtelo de nuevo o escriba en su lugar.",
+      "dropped": "La llamada terminó inesperadamente."
+    }
   }
 }

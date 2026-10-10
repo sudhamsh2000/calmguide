@@ -273,3 +273,49 @@ def test_to_spoken_text_strips_markdown_and_keeps_words():
 
 def test_to_spoken_text_keeps_hindi_sentence_end():
     assert to_spoken_text("- नमस्ते।") == "नमस्ते।"
+
+
+# --- call-screen safety status -----------------------------------------------
+
+
+async def _safety(client, data, token=None):
+    return await client.get(
+        f"/api/voice/sessions/{data['session_id']}/safety",
+        headers={"Authorization": f"Bearer {token or data['voice_token']}"},
+    )
+
+
+async def test_safety_status_quiet_call(client):
+    data = await _start_session(client)
+    await _turn(client, data["voice_token"], "Mom is restless tonight")
+    await drain_background_tasks()
+    body = (await _safety(client, data)).json()
+    assert body == {
+        "triggered": False,
+        "emergency": False,
+        "latest_risk_level": None,
+        "emergency_count": 0,
+    }
+
+
+async def test_safety_status_ready_as_soon_as_emergency_reply_returns(client):
+    data = await _start_session(client)
+    await _turn(client, data["voice_token"], "Mom collapsed and is unresponsive")
+    # No drain: the event must already exist when the reply is returned.
+    body = (await _safety(client, data)).json()
+    assert body["emergency"] is True
+    assert body["emergency_count"] == 1
+    assert body["latest_risk_level"] == "emergency"
+
+
+async def test_safety_status_rejects_other_calls_token(client):
+    first = await _start_session(client)
+    second = await _start_session(client)
+    resp = await _safety(client, first, token=second["voice_token"])
+    assert resp.status_code == 401
+
+
+async def test_safety_status_rejects_staff_token(client):
+    data = await _start_session(client)
+    resp = await _safety(client, data, token=create_token("s", "f", "owner"))
+    assert resp.status_code == 401
